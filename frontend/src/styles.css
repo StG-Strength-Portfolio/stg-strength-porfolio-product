@@ -1,0 +1,424 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values using oklch.
+ * All colors MUST use oklch format.
+ *
+ * To add a new semantic color:
+ * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-purple: var(--purple);
+  --color-purple-dark: var(--purple-dark);
+  --color-yellow: var(--yellow);
+  --color-coral: var(--coral);
+  --color-mint: var(--mint);
+  --color-teal: var(--teal);
+  --color-green: var(--green);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --font-display: "Fredoka", "Poppins", system-ui, sans-serif;
+  --font-sans: "Poppins", system-ui, sans-serif;
+}
+
+:root {
+  --radius: 1.25rem;
+
+  /* Brand palette (Huomaa hyvä!) */
+  --purple: oklch(0.45 0.13 295);          /* #6C4F9C */
+  --purple-dark: oklch(0.36 0.13 295);     /* #4E3A78 */
+  --yellow: oklch(0.85 0.16 90);           /* #F4C84A */
+  --coral: oklch(0.68 0.18 25);            /* #E8736B */
+  --mint: oklch(0.85 0.06 185);            /* #A9D9D2 */
+  --teal: oklch(0.78 0.09 190);            /* #7FC9C0 */
+  --green: oklch(0.62 0.16 150);           /* #2FA86A */
+  --ink: oklch(0.24 0.07 290);             /* #2B2342 */
+  --ink-soft: oklch(0.45 0.13 295);        /* same as purple */
+
+  /* App canvas is deep purple */
+  --background: var(--purple);
+  --foreground: oklch(1 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--ink);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--ink);
+  --primary: var(--yellow);
+  --primary-foreground: var(--ink);
+  --secondary: var(--mint);
+  --secondary-foreground: var(--ink);
+  --muted: oklch(0.95 0.02 295);
+  --muted-foreground: oklch(0.45 0.04 290);
+  --accent: var(--coral);
+  --accent-foreground: oklch(1 0 0);
+  --destructive: oklch(0.6 0.22 25);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.9 0.02 290);
+  --input: oklch(0.92 0.02 290);
+  --ring: var(--yellow);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: var(--purple-dark);
+  --sidebar-foreground: oklch(1 0 0);
+  --sidebar-primary: var(--yellow);
+  --sidebar-primary-foreground: var(--ink);
+  --sidebar-accent: oklch(0.4 0.13 295);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(0.32 0.1 295);
+  --sidebar-ring: var(--yellow);
+}
+
+.dark {
+  --background: oklch(0.129 0.042 264.695);
+  --foreground: oklch(0.984 0.003 247.858);
+  --card: oklch(0.208 0.042 265.755);
+  --card-foreground: oklch(0.984 0.003 247.858);
+  --popover: oklch(0.208 0.042 265.755);
+  --popover-foreground: oklch(0.984 0.003 247.858);
+  --primary: oklch(0.929 0.013 255.508);
+  --primary-foreground: oklch(0.208 0.042 265.755);
+  --secondary: oklch(0.279 0.041 260.031);
+  --secondary-foreground: oklch(0.984 0.003 247.858);
+  --muted: oklch(0.279 0.041 260.031);
+  --muted-foreground: oklch(0.704 0.04 256.788);
+  --accent: oklch(0.279 0.041 260.031);
+  --accent-foreground: oklch(0.984 0.003 247.858);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.551 0.027 264.364);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.208 0.042 265.755);
+  --sidebar-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-accent: oklch(0.279 0.041 260.031);
+  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.551 0.027 264.364);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* Sticky-note card primitive — consistent padding + left alignment */
+.sticky-note {
+  background: var(--card);
+  color: var(--card-foreground);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  text-align: left;
+  box-shadow: 6px 8px 0 0 var(--purple-dark);
+}
+.sticky-note > * + * { margin-top: 0.75rem; }
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: white !important; color: black !important; }
+  .sticky-note { box-shadow: none !important; border: 1px solid #ddd; }
+}
+
+/* Pencil scribble badge */
+.pencil-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 9999px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.75rem;
+  background: var(--yellow);
+  color: var(--ink);
+  box-shadow: 2px 2px 0 0 var(--ink);
+}
+
+/* ---------- Playful Vahvuusseikkailu visuals ---------- */
+
+/* Candy-like chip option (used by SelectableChips) */
+.candy-chip {
+  position: relative;
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+.candy-chip:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 0 var(--purple-dark);
+}
+.candy-chip.is-active {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 6px 0 0 var(--purple-dark);
+}
+.candy-chip.is-active::after {
+  content: "✓";
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 1.25rem;
+  height: 1.25rem;
+  display: grid;
+  place-items: center;
+  border-radius: 9999px;
+  background: var(--yellow);
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 800;
+  box-shadow: 1px 1px 0 0 var(--ink);
+}
+
+/* Workbook-paper textarea container — flex column so its child textarea
+   grows to fill the card. */
+.workbook-paper {
+  background-color: #FFFDF6;
+  /* Ruled-paper guide. Lines sit at the BASELINE of each row so text rests
+     on the line. Background origin = content-box so the lines align with the
+     textarea's text (no offset from container padding). */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(1.65rem - 1px),
+    color-mix(in oklab, var(--purple) 22%, transparent) calc(1.65rem - 1px),
+    color-mix(in oklab, var(--purple) 22%, transparent) 1.65rem
+  );
+  background-origin: content-box;
+  background-clip: content-box;
+  border-radius: 1rem;
+  border: 2px solid color-mix(in oklab, var(--purple-dark) 35%, transparent);
+  box-shadow: 4px 4px 0 0 var(--purple-dark);
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+}
+.workbook-paper:focus-within {
+  box-shadow: 4px 4px 0 0 var(--coral);
+  border-color: var(--coral);
+}
+.workbook-paper textarea,
+.workbook-paper input {
+  color: var(--ink) !important;
+  caret-color: var(--coral);
+  flex: 1 1 auto;
+  /* Keep textarea metrics flush with container padding so text rows line up
+     with the ruled background lines. */
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+}
+.workbook-paper textarea::placeholder,
+.workbook-paper input::placeholder,
+.workbook-line textarea::placeholder,
+.workbook-line input::placeholder {
+  color: color-mix(in oklab, var(--ink) 50%, transparent);
+  opacity: 1;
+}
+
+/* Single-line ruled input — same family as .workbook-paper */
+.workbook-line {
+  background-color: #FFFDF6;
+  border-radius: 0.75rem;
+  border: 2px solid color-mix(in oklab, var(--purple-dark) 35%, transparent);
+  box-shadow: 3px 3px 0 0 var(--purple-dark);
+  padding: 0.55rem 0.9rem;
+  color: var(--ink);
+}
+.workbook-line:focus-within {
+  border-color: var(--coral);
+  box-shadow: 3px 3px 0 0 var(--coral);
+}
+.workbook-line input { color: var(--ink); caret-color: var(--coral); }
+.workbook-pill { /* legacy alias */
+  background-color: #FFFDF6;
+  border-radius: 9999px;
+  border: 2px solid color-mix(in oklab, var(--purple-dark) 35%, transparent);
+  box-shadow: 3px 3px 0 0 var(--purple-dark);
+  padding: 0.45rem 0.9rem;
+}
+
+/* Layout primitives (A3) ---------------------------------------------------
+   Decision tree in screen-content.tsx:
+     - 1 prompt + deep reflection            → SingleTallCard
+     - 2–3 related prompts                   → TwoColumnCards
+     - inherently scattered thoughts         → ScatterBoard (existing)
+     - narrative sequence (path/roadmap)     → Roadmap (existing)
+     - else                                  → default sticky-note layout
+*/
+.layout-single-tall {
+  display: flex;
+  flex-direction: column;
+  min-height: 60vh;
+}
+.layout-single-tall > .sticky-note {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+.layout-single-tall .workbook-paper { flex: 1 1 auto; min-height: 14rem; }
+.layout-two-col {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .layout-two-col { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Save celebration — CSS-only checkmark (~300ms, no library) */
+@keyframes celebrate-pop {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
+  50%  { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+}
+.celebrate-check {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  z-index: 100;
+  width: 5rem;
+  height: 5rem;
+  display: grid;
+  place-items: center;
+  border-radius: 9999px;
+  background: var(--yellow);
+  color: var(--ink);
+  font-size: 2.5rem;
+  font-weight: 800;
+  box-shadow: 0 8px 0 0 var(--purple-dark);
+  pointer-events: none;
+  animation: celebrate-pop 300ms ease-out forwards;
+}
+
+/* Decorative journey background (soft floating blobs) */
+.journey-bg {
+  position: relative;
+  isolation: isolate;
+}
+.journey-bg::before,
+.journey-bg::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  border-radius: 9999px;
+  filter: blur(40px);
+  opacity: 0.55;
+  pointer-events: none;
+}
+.journey-bg::before {
+  width: 22rem; height: 22rem;
+  background: var(--coral);
+  top: -6rem; right: -6rem;
+}
+.journey-bg::after {
+  width: 26rem; height: 26rem;
+  background: var(--mint);
+  bottom: -8rem; left: -8rem;
+}
+
+/* Gentle sparkle */
+@keyframes sparkle-pop {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.9; }
+  50%      { transform: scale(1.15) rotate(8deg); opacity: 1; }
+}
+.sparkle { animation: sparkle-pop 2.4s ease-in-out infinite; display: inline-block; }
+
+/* Game-style primary button (Seuraava) */
+.game-btn {
+  box-shadow: 0 5px 0 0 var(--purple-dark);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.game-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 0 0 var(--purple-dark); }
+.game-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 2px 0 0 var(--purple-dark); }
+
+
+/* Bug 3 safety: ensure textarea content can never be hidden behind the
+   sticky BottomNav. The textarea grows inside its card; if the textarea
+   itself scrolls, add scroll padding so the caret/last line stays visible
+   above the nav's reserved space. */
+.workbook-paper textarea {
+  scroll-padding-bottom: 6rem;
+}
+/* Reserve breathing room at the bottom of the screen body so the last card
+   never sits flush against the sticky nav. */
+.journey-bg > div:not(.no-print) {
+  padding-bottom: 1rem;
+}
+
+/* Bug 1 safety: labels and prompts that sit directly on the dark purple
+   page background (not inside a white card) must use the white foreground
+   token. shadcn <Label> defaults to currentColor — this guarantees contrast. */
+.journey-bg label,
+main > label {
+  color: var(--foreground);
+}
