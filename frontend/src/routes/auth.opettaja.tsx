@@ -17,6 +17,7 @@ function TeacherSignup() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [school, setSchool] = useState("");
   const [teacherCode, setTeacherCode] = useState("");
   const [busy, setBusy] = useState(false);
@@ -35,13 +36,22 @@ function TeacherSignup() {
         password,
         options: {
           emailRedirectTo: window.location.origin,
-          data: { school: school.trim() },
+          data: { school: school.trim(), display_name: displayName.trim() },
         },
       });
       if (error) throw error;
       const { data: sess } = await supabase.auth.getSession();
       if (!sess.session) {
         await supabase.auth.signInWithPassword({ email, password });
+      }
+      const { data: u } = await supabase.auth.getUser();
+      if (u.user) {
+        const { error: profileErr } = await supabase
+          .from("profiles" as never)
+          .upsert({ id: u.user.id, display_name: displayName.trim() } as never);
+        if (profileErr) {
+          console.error("Failed to save display name:", profileErr);
+        }
       }
       const { data, error: rpcErr } = await supabase.rpc(
         "claim_teacher_role" as never,
@@ -84,6 +94,18 @@ function TeacherSignup() {
               <Input
                 id="password" type="password" required minLength={6} value={password}
                 onChange={(e) => setPassword(e.target.value)} autoComplete="new-password"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="displayName">{t("auth.student.nameLabel")}</Label>
+              <Input
+                id="displayName"
+                type="text"
+                required
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder={t("auth.student.namePh")}
+                autoComplete="name"
               />
             </div>
             <div className="space-y-1.5">

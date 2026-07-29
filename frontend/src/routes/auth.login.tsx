@@ -17,6 +17,7 @@ export const Route = createFileRoute("/auth/login")({
         .string()
         .refine((v) => v.startsWith("/") && !v.startsWith("//"))
         .optional(),
+      locked: z.string().optional(),
     })
     .default({}),
   component: LoginPage,
@@ -24,11 +25,19 @@ export const Route = createFileRoute("/auth/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const next = Route.useSearch().next ?? "";
+  const search = Route.useSearch();
+  const next = search.next ?? "";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const t = useT();
+
+  useEffect(() => {
+    if (search.locked === "1") {
+      toast.error(t("auth.login.locked"));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -50,6 +59,19 @@ function LoginPage() {
       if (error) {
         toast.error(t("auth.login.wrong"));
         return;
+      }
+      const { data: signedInUser } = await supabase.auth.getUser();
+      if (signedInUser.user) {
+        const { data: profile } = await supabase
+          .from("profiles" as never)
+          .select("locked")
+          .eq("id", signedInUser.user.id)
+          .maybeSingle();
+        if ((profile as { locked?: boolean } | null)?.locked) {
+          await supabase.auth.signOut();
+          toast.error(t("auth.login.locked"));
+          return;
+        }
       }
       if (next) {
         window.location.href = next;

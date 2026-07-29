@@ -90,6 +90,14 @@ export function lookupContent(fi: string, lang: Language): string {
 
 // UI keys are kept small and are the ONLY human-authored translations in
 // this repo. Everything else defers to the Excel dictionary above.
+//
+// Lookup order at runtime (see useT() below): the Finnish text for a key
+// is translated via the Excel-derived workbook dictionary first (this is
+// how most UI chrome ends up correctly translated, since the workbook
+// export included these strings too). If the workbook has no entry for
+// that exact Finnish text (true for UI added *after* the workbook export,
+// e.g. the admin dashboard), useT() falls back to the directly-authored
+// `en`/`sv` entries below before finally falling back to Finnish.
 type UIDict = {
   en: Record<string, string>;
   fi: Record<string, string>;
@@ -232,6 +240,26 @@ export const UI: UIDict = {
     "portfolio.print": "Tulosta Portfolio",
 
     "nav.finishFirst": "Täytä ensin tämän sivun tehtävä, niin pääset jatkamaan.",
+
+    "admin.title": "Ylläpito",
+    "admin.subtitle": "Kaikki käyttäjät",
+    "admin.col.name": "Nimi",
+    "admin.col.email": "Sähköposti",
+    "admin.col.role": "Rooli",
+    "admin.col.language": "Kieli",
+    "admin.col.status": "Tila",
+    "admin.status.active": "Aktiivinen",
+    "admin.status.locked": "Lukittu",
+    "admin.action.lock": "Lukitse",
+    "admin.action.unlock": "Poista lukitus",
+    "admin.confirm.lock": "Lukitaanko tämä käyttäjä? Hän ei voi enää kirjautua sisään.",
+    "admin.confirm.unlock": "Poistetaanko lukitus tältä käyttäjältä?",
+    "admin.err.forbidden": "Sinulla ei ole ylläpito-oikeuksia.",
+    "admin.err.selfLock": "Et voi lukita omaa tiliäsi.",
+    "admin.err.lockAdmin": "Toista ylläpitäjää ei voi lukita.",
+    "admin.loading": "Ladataan käyttäjiä…",
+    "admin.empty": "Ei käyttäjiä.",
+    "auth.login.locked": "Tämä tili on lukittu. Ota yhteyttä opettajaan tai ylläpitoon.",
   },
   en: {
     "common.loading": "Loading…",
@@ -375,6 +403,26 @@ export const UI: UIDict = {
 
     "nav.finishFirst":
       "Please complete this page's task before continuing.",
+
+    "admin.title": "Admin",
+    "admin.subtitle": "All users",
+    "admin.col.name": "Name",
+    "admin.col.email": "Email",
+    "admin.col.role": "Role",
+    "admin.col.language": "Language",
+    "admin.col.status": "Status",
+    "admin.status.active": "Active",
+    "admin.status.locked": "Locked",
+    "admin.action.lock": "Lock",
+    "admin.action.unlock": "Unlock",
+    "admin.confirm.lock": "Lock this user? They will no longer be able to log in.",
+    "admin.confirm.unlock": "Unlock this user?",
+    "admin.err.forbidden": "You do not have admin access.",
+    "admin.err.selfLock": "You cannot lock your own account.",
+    "admin.err.lockAdmin": "Another admin cannot be locked.",
+    "admin.loading": "Loading users…",
+    "admin.empty": "No users.",
+    "auth.login.locked": "This account has been locked. Contact your teacher or admin.",
   },
   sv: {
     "common.loading": "Laddar…",
@@ -518,6 +566,26 @@ export const UI: UIDict = {
 
     "nav.finishFirst":
       "Fyll först i uppgiften på den här sidan för att gå vidare.",
+
+    "admin.title": "Admin",
+    "admin.subtitle": "Alla användare",
+    "admin.col.name": "Namn",
+    "admin.col.email": "E-post",
+    "admin.col.role": "Roll",
+    "admin.col.language": "Språk",
+    "admin.col.status": "Status",
+    "admin.status.active": "Aktiv",
+    "admin.status.locked": "Låst",
+    "admin.action.lock": "Lås",
+    "admin.action.unlock": "Lås upp",
+    "admin.confirm.lock": "Lås denna användare? Hen kan inte längre logga in.",
+    "admin.confirm.unlock": "Lås upp denna användare?",
+    "admin.err.forbidden": "Du har inte adminrättigheter.",
+    "admin.err.selfLock": "Du kan inte låsa ditt eget konto.",
+    "admin.err.lockAdmin": "En annan admin kan inte låsas.",
+    "admin.loading": "Laddar användare…",
+    "admin.empty": "Inga användare.",
+    "auth.login.locked": "Detta konto har låsts. Kontakta din lärare eller admin.",
   },
 };
 
@@ -663,8 +731,32 @@ export function useT(): (key: string, vars?: Record<string, string | number>) =>
         console.warn(`[i18n] Missing Finnish UI translation: ${key}`);
         return formatTemplate(key, vars);
       }
-      // Translate the *template* first, then substitute values.
-      return formatTemplate(trFinnish(raw, language), vars);
+      if (language === "fi") {
+        return formatTemplate(raw, vars);
+      }
+      // 1) Try the Excel-derived workbook dictionary (covers UI strings
+      //    that were part of the original workbook export).
+      const workbookTranslation = translateFinnish(raw, language as AppLanguage);
+      if (workbookTranslation !== raw) {
+        return formatTemplate(workbookTranslation, vars);
+      }
+      // 2) Fall back to a directly-authored UI string for this key (used
+      //    for UI added after the workbook export, e.g. the admin panel).
+      const direct = UI[language][key];
+      if (direct) {
+        return formatTemplate(direct, vars);
+      }
+      // 3) Nothing found anywhere — render Finnish, warn once.
+      const warnKey = `${language}:ui:${key}`;
+      if (!trWarned.has(warnKey)) {
+        trWarned.add(warnKey);
+        // eslint-disable-next-line no-console
+        console.warn(
+          `[i18n] Missing ${language.toUpperCase()} translation for UI key (rendering Finnish):`,
+          key,
+        );
+      }
+      return formatTemplate(raw, vars);
     },
     [language],
   );

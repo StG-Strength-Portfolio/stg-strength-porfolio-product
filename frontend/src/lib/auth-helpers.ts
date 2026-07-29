@@ -14,6 +14,17 @@ export async function getCurrentRole(): Promise<AppRole | null> {
   return (data as { role: AppRole }).role;
 }
 
+export async function isCurrentUserAdmin(): Promise<boolean> {
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData.user) return false;
+  const { data } = await supabase
+    .from("admins" as never)
+    .select("user_id")
+    .eq("user_id", userData.user.id)
+    .maybeSingle();
+  return !!data;
+}
+
 export async function getStudentClassMembership(): Promise<{ classId: string } | null> {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) return null;

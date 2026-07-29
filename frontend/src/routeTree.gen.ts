@@ -26,6 +26,7 @@ import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AdventureScreenRouteImport } from './routes/adventure.$screen'
 import { Route as AuthenticatedOpettajaRouteImport } from './routes/_authenticated/opettaja'
 import { Route as AuthenticatedLiityYhteisoonRouteImport } from './routes/_authenticated/liity-yhteisoon'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedSeikkailuRouteRouteImport } from './routes/_authenticated/seikkailu/route'
 import { Route as AuthenticatedSeikkailuIndexRouteImport } from './routes/_authenticated/seikkailu/index'
 import { Route as AuthenticatedSeikkailuScreenRouteImport } from './routes/_authenticated/seikkailu/$screen'
@@ -116,6 +117,11 @@ const AuthenticatedLiityYhteisoonRoute =
     path: '/liity-yhteisoon',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSeikkailuRouteRoute =
   AuthenticatedSeikkailuRouteRouteImport.update({
     id: '/seikkailu',
@@ -151,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/larare': typeof LarareRoute
   '/teacher': typeof TeacherRoute
   '/seikkailu': typeof AuthenticatedSeikkailuRouteRouteWithChildren
+  '/admin': typeof AuthenticatedAdminRoute
   '/liity-yhteisoon': typeof AuthenticatedLiityYhteisoonRoute
   '/opettaja': typeof AuthenticatedOpettajaRoute
   '/adventure/$screen': typeof AdventureScreenRoute
@@ -170,6 +177,7 @@ export interface FileRoutesByTo {
   '/join-community': typeof JoinCommunityRoute
   '/larare': typeof LarareRoute
   '/teacher': typeof TeacherRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/liity-yhteisoon': typeof AuthenticatedLiityYhteisoonRoute
   '/opettaja': typeof AuthenticatedOpettajaRoute
   '/adventure/$screen': typeof AdventureScreenRoute
@@ -194,6 +202,7 @@ export interface FileRoutesById {
   '/larare': typeof LarareRoute
   '/teacher': typeof TeacherRoute
   '/_authenticated/seikkailu': typeof AuthenticatedSeikkailuRouteRouteWithChildren
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/liity-yhteisoon': typeof AuthenticatedLiityYhteisoonRoute
   '/_authenticated/opettaja': typeof AuthenticatedOpettajaRoute
   '/adventure/$screen': typeof AdventureScreenRoute
@@ -219,6 +228,7 @@ export interface FileRouteTypes {
     | '/larare'
     | '/teacher'
     | '/seikkailu'
+    | '/admin'
     | '/liity-yhteisoon'
     | '/opettaja'
     | '/adventure/$screen'
@@ -238,6 +248,7 @@ export interface FileRouteTypes {
     | '/join-community'
     | '/larare'
     | '/teacher'
+    | '/admin'
     | '/liity-yhteisoon'
     | '/opettaja'
     | '/adventure/$screen'
@@ -261,6 +272,7 @@ export interface FileRouteTypes {
     | '/larare'
     | '/teacher'
     | '/_authenticated/seikkailu'
+    | '/_authenticated/admin'
     | '/_authenticated/liity-yhteisoon'
     | '/_authenticated/opettaja'
     | '/adventure/$screen'
@@ -407,6 +419,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLiityYhteisoonRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/seikkailu': {
       id: '/_authenticated/seikkailu'
       path: '/seikkailu'
@@ -456,6 +475,7 @@ const AuthenticatedSeikkailuRouteRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSeikkailuRouteRoute: typeof AuthenticatedSeikkailuRouteRouteWithChildren
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedLiityYhteisoonRoute: typeof AuthenticatedLiityYhteisoonRoute
   AuthenticatedOpettajaRoute: typeof AuthenticatedOpettajaRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
@@ -465,6 +485,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSeikkailuRouteRoute:
     AuthenticatedSeikkailuRouteRouteWithChildren,
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedLiityYhteisoonRoute: AuthenticatedLiityYhteisoonRoute,
   AuthenticatedOpettajaRoute: AuthenticatedOpettajaRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
