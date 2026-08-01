@@ -1,4 +1,5 @@
 import { Lock } from "lucide-react";
+import { WorldIcon } from "@/components/icons/AppIcons";
 import type { WorldMeta } from "@/lib/screens";
 import { cn } from "@/lib/utils";
 import { useT, useTr } from "@/lib/i18n";
@@ -31,7 +32,7 @@ export function WorldBadge({
           <div className="text-xs font-semibold uppercase tracking-wider opacity-80">{tr(world.title)}</div>
           <div className="font-display text-2xl leading-tight">{tr(world.subtitle)}</div>
         </div>
-        <div className="text-4xl" aria-hidden>{world.emoji}</div>
+        <WorldIcon id={world.id} size={36} aria-hidden />
       </div>
       <div className="mt-4 h-2 rounded-full bg-black/15 overflow-hidden">
         <div className="h-full bg-white/80" style={{ width: `${Math.round(progress * 100)}%` }} />

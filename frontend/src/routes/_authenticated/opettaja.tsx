@@ -23,9 +23,11 @@ import {
   LANGUAGE_FLAG,
   LANGUAGES,
   useT,
+  useTr,
   type Language,
 } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import { CheckIcon } from "@/components/icons/AppIcons";
 
 export const Route = createFileRoute("/_authenticated/opettaja")({
   component: TeacherDashboard,
@@ -49,11 +51,12 @@ function TeacherDashboard() {
   const [language, setLanguageChoice] = useState<Language>("en");
   const [busy, setBusy] = useState(false);
   const t = useT();
+  const tr = useTr();
 
   useEffect(() => {
     getCurrentRole().then((r) => {
       setRole(r);
-      if (r !== "teacher") navigate({ to: "/seikkailu", replace: true });
+      if (r !== "teacher" && r !== "admin") navigate({ to: "/seikkailu", replace: true });
       else loadClasses();
     });
   }, [navigate]);
@@ -62,6 +65,7 @@ function TeacherDashboard() {
     const { data, error } = await supabase
       .from("classes" as never)
       .select("id,name,join_code,created_at,language")
+      .eq("is_deleted" as never, false as never)
       .order("created_at", { ascending: false });
     if (error) {
       toast.error(error.message);
@@ -108,7 +112,9 @@ function TeacherDashboard() {
     navigate({ to: "/auth", replace: true });
   }
 
-  if (role !== "teacher") {
+  const isAdmin = role === "admin";
+
+  if (role !== "teacher" && !isAdmin) {
     return <div className="flex min-h-screen items-center justify-center text-foreground">{t("common.loading")}</div>;
   }
 
@@ -117,9 +123,19 @@ function TeacherDashboard() {
       <CornerBlobs />
       <header className="no-print relative z-10 flex items-center justify-between px-6 py-4">
         <h1 className="text-2xl font-display">{t("teacher.title")}</h1>
+        <div className="flex items-center gap-2">
+        {isAdmin && (
+          <Link
+            to="/admin/schools"
+            className="rounded-full px-3 py-2 text-sm font-semibold text-foreground hover:bg-white/10"
+          >
+            {tr("Hallinnoi kouluja")}
+          </Link>
+        )}
         <Button variant="ghost" onClick={signOut} className="text-foreground hover:bg-white/10 rounded-full">
           {t("common.logout")}
         </Button>
+        </div>
       </header>
 
       <main className="relative z-10 mx-auto max-w-5xl px-6 py-6 space-y-6">
@@ -173,7 +189,7 @@ function TeacherDashboard() {
                       <span
                         className="absolute right-3 top-3 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[color:var(--coral)] text-[11px] font-bold text-white"
                         aria-hidden
-                      >✓</span>
+                      ><CheckIcon size={12} /></span>
                     )}
                   </button>
                 ))}
@@ -213,6 +229,7 @@ function ClassDashboard({ c, tone }: { c: ClassRow; tone: "white" | "yellow" }) 
   const { students, loading, refresh } = useClassRoster(c.id);
   const [sort, setSort] = useState<SortKey>("progress_behind");
   const t = useT();
+  const tr = useTr();
 
   const stats = useMemo(() => summariseClass(students ?? []), [students]);
 
@@ -274,7 +291,7 @@ function ClassDashboard({ c, tone }: { c: ClassRow; tone: "white" | "yellow" }) 
 
       <div className="mt-3 grid gap-2 sm:grid-cols-4 rounded-2xl bg-black/5 p-3 text-sm">
         <Stat label={t("teacher.classCard.students")} value={String(stats.totalStudents)} />
-        <Stat label={t("teacher.classCard.avg")} value={stats.totalStudents ? stats.worldLabel : "–"} />
+        <Stat label={t("teacher.classCard.avg")} value={stats.totalStudents ? tr("Taso {n}", { n: stats.worldNumber }) : "–"} />
         <Stat
           label={t("teacher.classCard.screensAvg")}
           value={
@@ -283,7 +300,7 @@ function ClassDashboard({ c, tone }: { c: ClassRow; tone: "white" | "yellow" }) 
               : "–"
           }
         />
-        <Stat label={t("teacher.classCard.lastActive")} value={formatLastActive(stats.lastActivity)} />
+        <Stat label={t("teacher.classCard.lastActive")} value={formatLastActive(stats.lastActivity, tr)} />
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -352,6 +369,7 @@ function EmptyState({ code }: { code: string }) {
 
 function RosterTable({ students }: { students: RosterStudent[] }) {
   const t = useT();
+  const tr = useTr();
   return (
     <div className="overflow-x-auto rounded-2xl border border-black/10 bg-white/60">
       <table className="w-full text-sm">
@@ -375,7 +393,7 @@ function RosterTable({ students }: { students: RosterStudent[] }) {
                 <strong>{s.screensFilled}</strong>/{s.totalRequiredScreens}
               </td>
               <td className="px-3 py-2 tabular-nums">{s.worldsCompleted} / 7</td>
-              <td className="px-3 py-2">{formatLastActive(s.lastActive)}</td>
+              <td className="px-3 py-2">{formatLastActive(s.lastActive, tr)}</td>
               <td className="px-3 py-2 text-right">
                 <Link
                   to="/opettaja/oppilas/$userId"

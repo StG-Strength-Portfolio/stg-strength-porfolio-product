@@ -83,6 +83,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "Vahvuusseikkailu" },
       { name: "twitter:description", content: "Digitaalinen vahvuusportfolio lukiolaiselle." },
+      { property: "og:image", content: "/icons/icon-512.png" },
+      { name: "twitter:image", content: "/icons/icon-512.png" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },

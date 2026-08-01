@@ -14,21 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      admins: {
-        Row: {
-          created_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       class_members: {
         Row: {
           class_id: string
@@ -58,7 +43,10 @@ export type Database = {
       classes: {
         Row: {
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           id: string
+          is_deleted: boolean
           join_code: string
           language: string
           name: string
@@ -66,7 +54,10 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           id?: string
+          is_deleted?: boolean
           join_code: string
           language?: string
           name: string
@@ -74,13 +65,126 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           id?: string
+          is_deleted?: boolean
           join_code?: string
           language?: string
           name?: string
           teacher_id?: string
         }
         Relationships: []
+      }
+      email_log: {
+        Row: {
+          bounced_at: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          language: string
+          opened_at: string | null
+          recipient_email: string
+          recipient_id: string | null
+          status: string
+          subject: string | null
+          template_key: string
+        }
+        Insert: {
+          bounced_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          language?: string
+          opened_at?: string | null
+          recipient_email: string
+          recipient_id?: string | null
+          status?: string
+          subject?: string | null
+          template_key: string
+        }
+        Update: {
+          bounced_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          language?: string
+          opened_at?: string | null
+          recipient_email?: string
+          recipient_id?: string | null
+          status?: string
+          subject?: string | null
+          template_key?: string
+        }
+        Relationships: []
+      }
+      email_templates: {
+        Row: {
+          body_en: string
+          body_fi: string
+          body_sv: string
+          created_at: string
+          description_en: string | null
+          description_fi: string | null
+          description_sv: string | null
+          id: string
+          name_en: string
+          name_fi: string
+          name_sv: string
+          subject_en: string
+          subject_fi: string
+          subject_sv: string
+          template_key: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          body_en: string
+          body_fi: string
+          body_sv: string
+          created_at?: string
+          description_en?: string | null
+          description_fi?: string | null
+          description_sv?: string | null
+          id?: string
+          name_en: string
+          name_fi: string
+          name_sv: string
+          subject_en: string
+          subject_fi: string
+          subject_sv: string
+          template_key: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          body_en?: string
+          body_fi?: string
+          body_sv?: string
+          created_at?: string
+          description_en?: string | null
+          description_fi?: string | null
+          description_sv?: string | null
+          id?: string
+          name_en?: string
+          name_fi?: string
+          name_sv?: string
+          subject_en?: string
+          subject_fi?: string
+          subject_sv?: string
+          template_key?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_templates_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       external_responses: {
         Row: {
@@ -124,7 +228,7 @@ export type Database = {
           display_name: string | null
           id: string
           language: string
-          locked: boolean
+          school_id: string | null
           updated_at: string
         }
         Insert: {
@@ -133,7 +237,7 @@ export type Database = {
           display_name?: string | null
           id: string
           language?: string
-          locked?: boolean
+          school_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -142,10 +246,18 @@ export type Database = {
           display_name?: string | null
           id?: string
           language?: string
-          locked?: boolean
+          school_id?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       responses: {
         Row: {
@@ -168,6 +280,103 @@ export type Database = {
           updated_at?: string
           user_id?: string
           value?: string | null
+        }
+        Relationships: []
+      }
+      school_codes: {
+        Row: {
+          code: string
+          code_type: string
+          created_at: string
+          created_by: string | null
+          created_by_super_admin_id: string | null
+          id: string
+          is_revoked: boolean
+          is_used: boolean
+          school_id: string
+          used_by_admin_id: string | null
+        }
+        Insert: {
+          code: string
+          code_type?: string
+          created_at?: string
+          created_by?: string | null
+          created_by_super_admin_id?: string | null
+          id?: string
+          is_revoked?: boolean
+          is_used?: boolean
+          school_id: string
+          used_by_admin_id?: string | null
+        }
+        Update: {
+          code?: string
+          code_type?: string
+          created_at?: string
+          created_by?: string | null
+          created_by_super_admin_id?: string | null
+          id?: string
+          is_revoked?: boolean
+          is_used?: boolean
+          school_id?: string
+          used_by_admin_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_codes_created_by_super_admin_id_fkey"
+            columns: ["created_by_super_admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "school_codes_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "school_codes_used_by_admin_id_fkey"
+            columns: ["used_by_admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      schools: {
+        Row: {
+          billing_expiry_date: string | null
+          billing_start_date: string
+          code: string
+          created_at: string
+          id: string
+          is_active: boolean
+          language: string | null
+          name: string
+          school_logo_url: string | null
+        }
+        Insert: {
+          billing_expiry_date?: string | null
+          billing_start_date?: string
+          code: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          language?: string | null
+          name: string
+          school_logo_url?: string | null
+        }
+        Update: {
+          billing_expiry_date?: string | null
+          billing_start_date?: string
+          code?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          language?: string | null
+          name?: string
+          school_logo_url?: string | null
         }
         Relationships: []
       }
@@ -198,6 +407,33 @@ export type Database = {
         }
         Relationships: []
       }
+      teacher_assigned_strengths: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          strength_id: string
+          student_id: string
+          teacher_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          strength_id: string
+          student_id: string
+          teacher_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          strength_id?: string
+          student_id?: string
+          teacher_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -221,8 +457,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_school_expiry: { Args: never; Returns: undefined }
       claim_teacher_role: { Args: { p_code: string }; Returns: boolean }
+      cleanup_deleted_classes: { Args: never; Returns: undefined }
       get_my_class_language: { Args: never; Returns: string }
+      get_my_received_strengths: {
+        Args: never
+        Returns: {
+          created_at: string
+          id: string
+          message: string
+          strength_id: string
+          teacher_name: string
+        }[]
+      }
       get_share_link_info: { Args: { p_token: string }; Returns: Json }
       has_role: {
         Args: {
@@ -235,13 +483,28 @@ export type Database = {
       is_class_teacher: { Args: { _class_id: string }; Returns: boolean }
       is_teacher_of: { Args: { _student_id: string }; Returns: boolean }
       join_class: { Args: { p_join_code: string }; Returns: Json }
+      my_classes_deleted: { Args: never; Returns: boolean }
+      my_school_id: { Args: never; Returns: string }
+      register_teacher_with_any_code: {
+        Args: { p_code: string }
+        Returns: Json
+      }
+      register_teacher_with_school: { Args: { p_code: string }; Returns: Json }
       submit_external_response: {
         Args: { p_payload: Json; p_token: string }
         Returns: Json
       }
+      validate_school_code: {
+        Args: { input_code: string }
+        Returns: {
+          school_id: string
+          school_language: string
+          school_name: string
+        }[]
+      }
     }
     Enums: {
-      app_role: "student" | "teacher"
+      app_role: "student" | "teacher" | "admin" | "super_admin" | "school_admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -253,7 +516,7 @@ type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
 type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
-export type Tables
+export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
@@ -282,7 +545,7 @@ export type Tables
       : never
     : never
 
-export type TablesInsert
+export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
@@ -307,7 +570,7 @@ export type TablesInsert
       : never
     : never
 
-export type TablesUpdate
+export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
@@ -332,7 +595,7 @@ export type TablesUpdate
       : never
     : never
 
-export type Enums
+export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
@@ -349,7 +612,7 @@ export type Enums
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
 
-export type CompositeTypes
+export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
@@ -369,7 +632,7 @@ export type CompositeTypes
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["student", "teacher"],
+      app_role: ["student", "teacher", "admin", "super_admin", "school_admin"],
     },
   },
 } as const

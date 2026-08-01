@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { SaveIndicator } from "@/components/SaveIndicator";
 import type { SaveState } from "@/hooks/use-autosave";
 import { TOTAL_SCREENS } from "@/lib/screens";
+import { SparkleIcon } from "@/components/icons/AppIcons";
 import { celebrateSave } from "@/lib/celebrate";
 import { useT } from "@/lib/i18n";
 
@@ -50,7 +51,7 @@ export function BottomNav({
         disabled={n >= TOTAL_SCREENS || nextDisabled}
         onClick={goNext}
         className="game-btn rounded-full bg-[color:var(--coral)] hover:bg-[color:var(--coral)]/90 text-white font-display font-semibold px-5"
-      ><span className="sparkle mr-1" aria-hidden>✨</span>{t("common.next")} →</Button>
+      ><SparkleIcon size={16} className="sparkle mr-1" />{t("common.next")} →</Button>
 
     </nav>
   );

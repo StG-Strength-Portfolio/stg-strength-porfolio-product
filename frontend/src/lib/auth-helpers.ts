@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 
-export type AppRole = "student" | "teacher";
+export type AppRole = "student" | "teacher" | "admin" | "school_admin" | "super_admin";
 
 export async function getCurrentRole(): Promise<AppRole | null> {
   const { data: userData } = await supabase.auth.getUser();
@@ -12,17 +12,6 @@ export async function getCurrentRole(): Promise<AppRole | null> {
     .maybeSingle();
   if (error || !data) return "student";
   return (data as { role: AppRole }).role;
-}
-
-export async function isCurrentUserAdmin(): Promise<boolean> {
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) return false;
-  const { data } = await supabase
-    .from("admins" as never)
-    .select("user_id")
-    .eq("user_id", userData.user.id)
-    .maybeSingle();
-  return !!data;
 }
 
 export async function getStudentClassMembership(): Promise<{ classId: string } | null> {

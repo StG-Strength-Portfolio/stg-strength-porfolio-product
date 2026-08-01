@@ -18,16 +18,16 @@ export const STRENGTHS: Strength[] = [
   // WISDOM (Visdom & kunskap)
   { nr: 1, fi: "Luovuus", sv: "Kreativitet", en: "Creativity" },
   { nr: 2, fi: "Uteliaisuus", sv: "Nyfikenhet", en: "Curiosity" },
-  { nr: 3, fi: "Arviointikyky", sv: "Omdöme", en: "Judgement / Critical Thinking" },
-  { nr: 4, fi: "Oppimisen ilo", sv: "Lärandets glädje", en: "Love of Learning" },
-  { nr: 5, fi: "Näkökulmanottokyky", sv: "Perspektivförmåga", en: "Perspective" },
+  { nr: 3, fi: "Arviointikyky", sv: "Omdöme", en: "Judgment" },
+  { nr: 4, fi: "Oppimisen ilo", sv: "Lärandeglädje", en: "Love of Learning" },
+  { nr: 5, fi: "Näkökulmanottokyky", sv: "Perspektivtagande", en: "Perspective" },
 
   // COURAGE (Mod)
-  { nr: 6, fi: "Rohkeus", sv: "Mod", en: "Bravery" },
+  { nr: 6, fi: "Rohkeus", sv: "Mod", en: "Courage" },
   { nr: 7, fi: "Sinnikkyys", sv: "Uthållighet", en: "Perseverance" },
   { nr: 8, fi: "Rehellisyys", sv: "Ärlighet", en: "Honesty" },
-  { nr: 9, fi: "Innokkuus", sv: "Entusiasm", en: "Zest" },
-  { nr: 10, fi: "Sisukkuus", sv: "Sisu / Ihärdighet", en: "Sisu / Bravery (inner)" },
+  { nr: 9, fi: "Innokkuus", sv: "Entusiasm", en: "Enthusiasm" },
+  { nr: 10, fi: "Sisukkuus", sv: "Sisu", en: "Sisu" },
 
   // HUMANITY (Mänsklighet)
   { nr: 11, fi: "Myötätunto", sv: "Medkänsla", en: "Compassion" },
@@ -41,16 +41,16 @@ export const STRENGTHS: Strength[] = [
   { nr: 17, fi: "Johtajuus", sv: "Ledarskap", en: "Leadership" },
 
   // TEMPERANCE (Måttfullhet)
-  { nr: 18, fi: "Anteeksiantavuus", sv: "Förlåtelse", en: "Forgiveness" },
-  { nr: 19, fi: "Vaatimattomuus", sv: "Anspråkslöshet", en: "Humility" },
-  { nr: 20, fi: "Harkitsevuus", sv: "Eftertänksamhet", en: "Prudence" },
+  { nr: 18, fi: "Anteeksiantavuus", sv: "Ödmjukhet", en: "Forgiveness" },
+  { nr: 19, fi: "Vaatimattomuus", sv: "Anspråkslöshet", en: "Modesty" },
+  { nr: 20, fi: "Harkitsevuus", sv: "Eftertänksamhet", en: "Carefulness" },
   { nr: 21, fi: "Itsesäätely", sv: "Självreglering", en: "Self-Regulation" },
 
   // TRANSCENDENCE (Transcendens)
-  { nr: 22, fi: "Kauneuden ja erinomaisuuden arvostaminen", sv: "Uppskatta skönhet", en: "Appreciation of Beauty & Excellence" },
+  { nr: 22, fi: "Kauneuden ja erinomaisuuden arvostaminen", sv: "Uppskattning av skönhet", en: "Love of Beauty" },
   { nr: 23, fi: "Kiitollisuus", sv: "Tacksamhet", en: "Gratitude" },
-  { nr: 24, fi: "Toiveikkuus", sv: "Hopp", en: "Hope" },
-  { nr: 25, fi: "Huumorintaju", sv: "Humor", en: "Humour" },
+  { nr: 24, fi: "Toiveikkuus", sv: "Hoppfullhet", en: "Hope" },
+  { nr: 25, fi: "Huumorintaju", sv: "Humor", en: "Humor" },
   { nr: 26, fi: "Hengellisyys", sv: "Andlighet", en: "Spirituality" },
 ];
 
@@ -128,4 +128,39 @@ export function getStrengthNamesTable(
     default:
       return STRENGTH_NAMES_FI;
   }
+}
+
+
+/** Brand hex color per strength number (1–26). Same in every language. */
+export const STRENGTH_COLORS: Record<number, string> = {
+  1: "#2899B8",
+  2: "#FF9D6C",
+  3: "#FF4143",
+  4: "#8FC7D7",
+  5: "#FFC7CC",
+  6: "#FFE77A",
+  7: "#97D9D6",
+  8: "#A2E3D9",
+  9: "#FFE9DF",
+  10: "#FFE2E1",
+  11: "#D1CBDD",
+  12: "#FF772A",
+  13: "#FF6C6B",
+  14: "#ADA2C4",
+  15: "#FFC300",
+  16: "#D9EFDE",
+  17: "#85B0E0",
+  18: "#29C7B4",
+  19: "#FFEBB2",
+  20: "#D2ECD4",
+  21: "#FFD446",
+  22: "#FFCAAF",
+  23: "#A1D7AE",
+  24: "#00B8A1",
+  25: "#9BA5B3",
+  26: "#88CD99",
+};
+
+export function getStrengthColor(nr: number): string {
+  return STRENGTH_COLORS[nr] ?? "var(--purple)";
 }

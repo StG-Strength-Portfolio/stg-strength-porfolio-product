@@ -6,19 +6,10 @@ import { useIdleLogout } from "@/hooks/use-idle-logout";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
- beforeLoad: async () => {
+  beforeLoad: async () => {
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) {
       throw redirect({ to: "/auth" });
-    }
-    const { data: profile } = await supabase
-      .from("profiles" as never)
-      .select("locked")
-      .eq("id", data.user.id)
-      .maybeSingle();
-    if ((profile as { locked?: boolean } | null)?.locked) {
-      await supabase.auth.signOut();
-      throw redirect({ to: "/auth/login", search: { locked: "1" } });
     }
     return { user: data.user };
   },

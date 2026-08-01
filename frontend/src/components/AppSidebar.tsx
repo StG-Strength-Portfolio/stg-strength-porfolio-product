@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Map as MapIcon, Lock } from "lucide-react";
+import { MapIcon, LockIcon, CandyIcon, UserIcon, WorldIcon } from "@/components/icons/AppIcons";
 import { toast } from "sonner";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
-  SidebarMenu, SidebarMenuButton, SidebarMenuItem,
+  SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarFooter,
 } from "@/components/ui/sidebar";
 import { WORLDS } from "@/lib/screens";
 import { useNavGate } from "@/lib/screen-completion";
@@ -35,12 +35,31 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const { canNavigateTo, currentScreen } = useNavGate();
   const [userId, setUserId] = useState<string | null>(null);
+  const [schoolName, setSchoolName] = useState<string | null>(null);
   const t = useT();
   const tr = useTr();
   const hint = t("nav.finishFirst");
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
+    (async () => {
+      const { data } = await supabase.auth.getUser();
+      const uid = data.user?.id ?? null;
+      setUserId(uid);
+      if (!uid) return;
+      const { data: profile } = await supabase
+        .from("profiles" as never)
+        .select("school_id")
+        .eq("id", uid)
+        .maybeSingle();
+      const schoolId = (profile as { school_id?: string | null } | null)?.school_id;
+      if (!schoolId) return;
+      const { data: school } = await supabase
+        .from("schools" as never)
+        .select("name")
+        .eq("id", schoolId)
+        .maybeSingle();
+      setSchoolName((school as { name?: string } | null)?.name ?? null);
+    })();
   }, []);
 
   const progress = useStudentProgress(userId);
@@ -73,7 +92,21 @@ export function AppSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={isMap}>
                   <Link to="/seikkailu" className="flex items-center gap-2">
-                    <MapIcon className="h-4 w-4" /> <span>{t("sidebar.worldmap")}</span>
+                    <MapIcon size={18} /> <span>{t("sidebar.worldmap")}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={path === "/student/strengths"}>
+                  <Link to="/student/strengths" className="flex items-center gap-2">
+                    <CandyIcon size={18} /> <span>{tr("Vahvuuteni")}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={path === "/student/profile"}>
+                  <Link to="/student/profile" className="flex items-center gap-2">
+                    <UserIcon size={18} /> <span>{tr("Profiili")}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -96,19 +129,41 @@ export function AppSidebar() {
                 const locked = currentScreen != null && target > currentScreen && !canNavigateTo(target);
                 const title = tr(w.title);
                 const subtitle = tr(w.subtitle);
+                const stats = progress?.byWorld[w.id];
+                const pct = stats && stats.total > 0
+                  ? Math.round((stats.completed / stats.total) * 100)
+                  : 0;
                 return (
                   <SidebarMenuItem key={w.id}>
-                    <SidebarMenuButton asChild isActive={inWorld}>
+                    <SidebarMenuButton asChild isActive={inWorld} className="h-auto items-start py-2">
                       <a
                         href={`/seikkailu/${target}`}
                         onClick={go(target)}
-                        className="flex items-center gap-2"
+                        className="flex items-start gap-2 whitespace-normal"
                         aria-disabled={locked || undefined}
                         title={locked ? hint : `${title} — ${subtitle}`}
                       >
-                        <span className="text-base leading-none" aria-hidden>{w.emoji}</span>
-                        <span className="truncate flex-1">{title} — {subtitle}</span>
-                        {locked && <Lock className="h-3 w-3 opacity-60" aria-hidden />}
+                        <WorldIcon id={w.id} size={18} className="mt-0.5 shrink-0" />
+                        <span className="min-w-0 flex-1 space-y-1">
+                          <span className="block break-words text-sm font-bold leading-snug">
+                            {title}
+                            {locked && <LockIcon size={12} className="ml-1 inline opacity-60" />}
+                          </span>
+                          <span className="block break-words text-xs leading-snug opacity-80">
+                            {subtitle}
+                          </span>
+                          <span className="flex items-center gap-1.5">
+                            <span className="h-1 flex-1 overflow-hidden rounded-full bg-black/15">
+                              <span
+                                className="block h-full rounded-full bg-[color:var(--purple)] transition-all"
+                                style={{ width: `${pct}%` }}
+                              />
+                            </span>
+                            <span className="shrink-0 text-[10px] tabular-nums opacity-70">
+                              {pct}%
+                            </span>
+                          </span>
+                        </span>
                       </a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -118,6 +173,13 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      {schoolName && (
+        <SidebarFooter>
+          <div className="truncate px-2 pb-2 text-xs opacity-60" title={schoolName}>
+            {schoolName}
+          </div>
+        </SidebarFooter>
+      )}
     </Sidebar>
   );
 }

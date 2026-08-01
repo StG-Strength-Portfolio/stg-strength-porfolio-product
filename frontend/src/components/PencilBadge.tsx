@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
-import { Pencil } from "lucide-react";
+import { PencilIcon } from "@/components/icons/AppIcons";
 
-export function PencilBadge({ children }: { children: ReactNode }) {
+export function PencilBadge({ children, icon }: { children: ReactNode; icon?: ReactNode }) {
   return (
     <span className="pencil-badge">
-      <Pencil className="h-3 w-3" /> {children}
+      {icon ?? <PencilIcon size={14} />} {children}
     </span>
   );
 }
