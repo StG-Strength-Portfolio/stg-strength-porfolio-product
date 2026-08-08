@@ -15,6 +15,8 @@ import { useTr } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { EmailTemplatesTab } from "@/components/superadmin/EmailTemplatesTab";
 import { EmailAnalyticsTab } from "@/components/superadmin/EmailAnalyticsTab";
+// @lovable-new
+import { TeachingMaterialsTab } from "@/components/superadmin/TeachingMaterialsTab";
 import { SuperAdminsTab } from "@/components/superadmin/SuperAdminsTab";
 import {
   listSchools,
@@ -31,6 +33,7 @@ const TABS = [
   "users",
   "admins",
   "emails",
+  "materials",
   "reports",
   "settings",
 ] as const;
@@ -173,7 +176,9 @@ function SuperAdminDashboard() {
                           ? "Ylläpitäjät"
                           : tb === "emails"
                             ? "Sähköpostit"
-                            : tb === "reports"
+                            : tb === "materials"
+                              ? "Opetusmateriaalit"
+                              : tb === "reports"
                               ? "Raportit"
                               : "Asetukset",
                 )}
@@ -405,6 +410,9 @@ function SuperAdminDashboard() {
             </>
           )}
 
+
+          {/* @lovable-new */}
+          {tab === "materials" && <TeachingMaterialsTab />}
 
           {tab === "reports" && (
             <StickyNote seed="sa-reports" className="space-y-2">

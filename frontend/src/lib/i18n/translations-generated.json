@@ -343,6 +343,10 @@
     "en": "2. Identify and make use of your own strengths.",
     "sv": "2. Identifiera och utnyttja dina egna styrkor."
   },
+  "2–50 pelaajaa · 2–10 min": {
+    "en": "2–50 players · 2–10 min",
+    "sv": "2–50 spelare · 2–10 min"
+  },
   "3 – Omat vahvuudet kotona | Tutustut henkilökohtaisiin vahvuuksiin kotona. Myös vanhemmat / läheiset kertovat sinun vahvuuksistasi. | sivut 47–52": {
     "en": "3 – My Strengths at Home | Explore your personal strengths at home. Parents/loved ones share their observations of your strengths. | pages 47–52",
     "sv": "3 – Mina styrkor hemma | Utforska dina personliga styrkor hemma. Föräldrar/närstående berättar om dina styrkor. | sidor 47–52"
@@ -425,9 +429,37 @@
     "en": "Most active class",
     "sv": "Mest aktiva klass"
   },
+  "Alakategoria": {
+    "en": "Sub-category",
+    "sv": "Underkategori"
+  },
+  "Aloita": {
+    "en": "Start",
+    "sv": "Starta"
+  },
+  "Aloita peli": {
+    "en": "Start Game",
+    "sv": "Starta spel"
+  },
+  "Aloita sprintti": {
+    "en": "Start Sprint",
+    "sv": "Starta sprint"
+  },
+  "Anna luokalle nimi ja valitse kieli. Oppilaat liittyvät luodulla koodilla ja saavat luokan kielen käyttöön.": {
+    "en": "Give the class a name and choose a language. Students join with the generated code and get the class language.",
+    "sv": "Ge klassen ett namn och välj språk. Eleverna går med via den skapade koden och får klassens språk."
+  },
   "Anna vahvuuksiesi loistaa.": {
     "en": "Let your strengths shine.",
     "sv": "Låt dina styrkor skina."
+  },
+  "Anna vahvuus opettajalle": {
+    "en": "Give strength to teacher",
+    "sv": "Ge en styrka till lärare"
+  },
+  "Anna vahvuus opettajallesi": {
+    "en": "Give strength to your teacher",
+    "sv": "Ge en styrka till din lärare"
   },
   "Anteeksiantavuus": {
     "en": "Forgiveness",
@@ -437,9 +469,25 @@
     "en": "Did the meter give different answers than what you chose? What did teachers, friends and loved ones get?",
     "sv": "Gav mätaren andra svar än vad du valde? Vad fick lärare, vänner och närstående?"
   },
+  "Artikkeleita": {
+    "en": "articles",
+    "sv": "artiklar"
+  },
+  "Arvioi": {
+    "en": "Assess",
+    "sv": "Bedöm"
+  },
   "Arviointikyky": {
     "en": "Judgment",
     "sv": "Omdöme"
+  },
+  "Avaa dia koko näytölle kaksoisklikkaamalla": {
+    "en": "Double-click a slide to open it fullscreen",
+    "sv": "Dubbelklicka på en bild för helskärm"
+  },
+  "Avaa diaesitys": {
+    "en": "Open slideshow",
+    "sv": "Öppna bildspel"
   },
   "Avausprosentti": {
     "en": "Open rate",
@@ -453,6 +501,10 @@
     "en": "Photo Collage 1/2 – What are you interested in during your free time? Why? Collect a collage of things/objects that are important to you.",
     "sv": "Bildkollage 1/2 – Vad är du intresserad av på fritiden? Varför? Samla ett kollage av saker/föremål som är viktiga för dig."
   },
+  "Canva-esitykset": {
+    "en": "Canva Presentations",
+    "sv": "Canva-presentationer"
+  },
   "De här frågorna hjälper dig att se det goda i ditt liv": {
     "en": "These questions help you see the good in your life",
     "sv": "De här frågorna hjälper dig att se det goda i ditt liv"
@@ -460,6 +512,26 @@
   "Det bästa med mina vänner är:": {
     "en": "The best thing about my friends is:",
     "sv": "Det bästa med mina vänner är:"
+  },
+  "Dia": {
+    "en": "Slide",
+    "sv": "Bild"
+  },
+  "Diat": {
+    "en": "Slides",
+    "sv": "Bilder"
+  },
+  "Diojen määrä": {
+    "en": "Number of slides",
+    "sv": "Antal bilder"
+  },
+  "Edellinen": {
+    "en": "Previous",
+    "sv": "Föregående"
+  },
+  "Edistyminen": {
+    "en": "Progress",
+    "sv": "Framsteg"
   },
   "Ei aktiivisuutta": {
     "en": "No activity",
@@ -473,9 +545,25 @@
     "en": "No data for this period.",
     "sv": "Inga data för denna period."
   },
+  "Ei esityksiä vielä.": {
+    "en": "No presentations yet.",
+    "sv": "Inga presentationer ännu."
+  },
+  "Ei julkaistu": {
+    "en": "Not published",
+    "sv": "Inte publicerad"
+  },
   "Ei lähetettyjä viestejä tällä aikavälillä.": {
     "en": "No emails sent in this period.",
     "sv": "Inga meddelanden skickade under denna period."
+  },
+  "Ei materiaaleja vielä.": {
+    "en": "No materials yet.",
+    "sv": "Inget material ännu."
+  },
+  "Ei opettajaa.": {
+    "en": "No teacher.",
+    "sv": "Ingen lärare."
   },
   "Ei pääkäyttäjiä.": {
     "en": "No super admins.",
@@ -484,6 +572,10 @@
   "Ei sähköpostimalleja.": {
     "en": "No email templates.",
     "sv": "Inga e-postmallar."
+  },
+  "Ei vielä vahvuuksia": {
+    "en": "No strengths yet",
+    "sv": "Inga styrkor ännu"
   },
   "Ei vielä vahvuuksia.": {
     "en": "No strengths yet.",
@@ -517,9 +609,21 @@
     "en": "Preview",
     "sv": "Förhandsgranskning"
   },
+  "Esityksen nimi": {
+    "en": "Presentation name",
+    "sv": "Presentationsnamn"
+  },
+  "Esitystila": {
+    "en": "Presentation Mode",
+    "sv": "Presentationsläge"
+  },
   "Et ole vielä kerännyt vahvuuksia.": {
     "en": "You haven't collected any strengths yet.",
     "sv": "Du har inte samlat några styrkor ännu."
+  },
+  "Et ole vielä saanut vahvuuksia.": {
+    "en": "You haven't received strengths yet.",
+    "sv": "Du har inte fått styrkor ännu."
   },
   "FINSKA TERM": {
     "sv": "SVENSKA TERM"
@@ -568,6 +672,10 @@
   "Henkisyys": {
     "en": "Spirituality",
     "sv": "Andlighet"
+  },
+  "Hienoa! Odotetaan tuloksia...": {
+    "en": "Great! Waiting for results...",
+    "sv": "Bra! Väntar på resultat..."
   },
   "Hur använder du dina styrkor i grupp? Vad påverkar det?": {
     "en": "How do you use your strengths in a group? What effect does it have?",
@@ -646,6 +754,10 @@
   "JOHTAJUUS / LEDARSKAP": {
     "sv": "section_header"
   },
+  "Jaa tämä koodi oppilaille.": {
+    "en": "Share this code with your students.",
+    "sv": "Dela den här koden med eleverna."
+  },
   "Jag på fritiden – Skriv ner vad du gör på din fritid och vilka styrkor du använder.": {
     "en": "Me in my free time – Write down what you do in your free time and which strengths you use.",
     "sv": "Jag på fritiden – Skriv ner vad du gör på din fritid och vilka styrkor du använder."
@@ -661,6 +773,18 @@
   "Jokaisella on omat ydinvahvuutensa, joihin kannattaa keskittyä ja joita on järkevää vahvistaa! Omien vahvuuksien tunteminen ja niiden hyödyntäminen opiskelussa ja vapaa-ajalla lisää tyytyväisyyttä, opiskelun mielekkyyttä ja hyvinvointia.": {
     "en": "Everyone has their own core strengths, which are worth focusing on and developing! Knowing your strengths and using them in studies and free time increases satisfaction, meaningfulness in studying and well-being.",
     "sv": "Alla har sina egna kärnstyrkor – det är just dem det lönar sig att fokusera på och utveckla! Att känna igen sina styrkor och använda dem i studierna och på fritiden ökar välmåendet, motivationen och glädjen i vardagen."
+  },
+  "Jos sähköpostiosoite löytyy järjestelmästä, salasanan palautuslinkki on lähetetty.": {
+    "en": "If the email address exists in the system, a password reset link has been sent.",
+    "sv": "Om e-postadressen finns i systemet har en länk för att återställa lösenordet skickats."
+  },
+  "Julkaise": {
+    "en": "Publish",
+    "sv": "Publicera"
+  },
+  "Julkaistu": {
+    "en": "Published",
+    "sv": "Publicerad"
   },
   "KAUNEUDEN JA ERINOMAISUUDEN ARVOSTAMINEN / UPPSKATTA SKÖNHET": {
     "sv": "section_header"
@@ -722,9 +846,17 @@
     "en": "Who did I help today? How did it feel?",
     "sv": "Vem hjälpte jag idag? Hur kändes det?"
   },
+  "Kieli": {
+    "en": "Language",
+    "sv": "Språk"
+  },
   "Kiitollisuus": {
     "en": "Gratitude",
     "sv": "Tacksamhet"
+  },
+  "Kirjaudu sisään": {
+    "en": "Log in",
+    "sv": "Logga in"
   },
   "Kirjaudu ulos": {
     "en": "Log out",
@@ -741,6 +873,34 @@
   "Kohtuullisuus: Anteeksiantavuus · Vaatimattomuus · Harkitsevuus · Itsesäätely": {
     "en": "Temperance: Forgiveness · Modesty · Carefulness · Self-Regulation",
     "sv": "Måttfullhet: Förlåtelse · Ödmjukhet · Eftertänksamhet · Självreglering"
+  },
+  "Koko käyttöhistoria": {
+    "en": "Full available history",
+    "sv": "Hela tillgängliga historiken"
+  },
+  "Koko näyttö": {
+    "en": "Full screen",
+    "sv": "Helskärm"
+  },
+  "Koodi kopioitu!": {
+    "en": "Code copied!",
+    "sv": "Koden kopierades!"
+  },
+  "Kopioi koodi": {
+    "en": "Copy code",
+    "sv": "Kopiera kod"
+  },
+  "Kopiointi epäonnistui": {
+    "en": "Copying failed",
+    "sv": "Kopieringen misslyckades"
+  },
+  "Kopioitu": {
+    "en": "Copied",
+    "sv": "Kopierat"
+  },
+  "Koulu": {
+    "en": "School",
+    "sv": "Skola"
   },
   "Koulukulttuurissa ja opiskelussa virheet ja puutteet tunnistuvat lähes automaattisesti – mutta vastapaino, eli vahvuudet ja onnistumiset, saa harvoin ansaitsemaansa huomiota. Opiskelussa huomio voi kiinnittyä kaikkeen siihen, mitä ei vielä osaa, missä ei ole onnistunut ja mitä pitää vielä oppia ja kehittää.": {
     "en": "In school culture and studies, mistakes and deficiencies are identified almost automatically – but the counterbalance, namely strengths and successes, rarely receives the attention it deserves. In studies, attention can get stuck on everything one does not yet know, has not succeeded at, and still needs to learn and develop.",
@@ -794,6 +954,14 @@
     "en": "Monthly Report",
     "sv": "Månadsrapport"
   },
+  "Kuva": {
+    "en": "Image",
+    "sv": "Bild"
+  },
+  "Kuvaus": {
+    "en": "Description",
+    "sv": "Beskrivning"
+  },
   "Kuvittele tilanne, jossa ydinvahvuutesi on kielletty seuraavaksi kuukaudeksi.": {
     "en": "Imagine a situation where your core strength is banned for the next month.",
     "sv": "Föreställ dig en situation där din kärnstyrka förbjuds för nästa månad."
@@ -810,6 +978,10 @@
     "en": "Ask for feedback and learn more about yourself",
     "sv": "Be om respons och lär känna dig själv bättre"
   },
+  "Käynnistä reaaliaikainen vahvuuspeli luokallesi": {
+    "en": "Start a real-time strength game for your class",
+    "sv": "Starta ett styrke-spel i realtid för din klass"
+  },
   "Käytettävissä olevat muuttujat": {
     "en": "Available variables",
     "sv": "Tillgängliga variabler"
@@ -818,9 +990,25 @@
     "en": "TALENT – What are you good at?",
     "sv": "BEGÅVNING – Vad är du bra på?"
   },
+  "Ladataan…": {
+    "en": "Loading…",
+    "sv": "Laddar…"
+  },
+  "Lahjoita vahvuus": {
+    "en": "Give strength",
+    "sv": "Ge styrka"
+  },
   "Lempipuuhat": {
     "en": "Favourite activities",
     "sv": "Favoritaktiviteter"
+  },
+  "Liity peliin": {
+    "en": "Join Game",
+    "sv": "Gå med i spel"
+  },
+  "Liity peliin koodilla": {
+    "en": "Join game with code",
+    "sv": "Gå med i spelet med kod"
   },
   "Liity uuteen luokkaan": {
     "en": "Join a new class",
@@ -829,6 +1017,26 @@
   "Listaa resurssisi taulukkoon seuraavalle sivulle. Merkitse tähtistä sen mukaan, kuinka tärkeitä resurssit ovat sinulle.": {
     "en": "List your resources in the table on the next page. Rate the hearts according to how important the resources are to you.",
     "sv": "Lista dina resurser i tabellen på nästa sida. Markera hjärtan utifrån hur viktiga resurserna är för dig."
+  },
+  "Lisää": {
+    "en": "Add",
+    "sv": "Lägg till"
+  },
+  "Lisää alakategoriat itse.": {
+    "en": "Add sub-categories manually.",
+    "sv": "Lägg till underkategorier manuellt."
+  },
+  "Lisää artikkeli": {
+    "en": "Add article",
+    "sv": "Lägg till artikel"
+  },
+  "Lisää kategoria": {
+    "en": "Add category",
+    "sv": "Lägg till kategori"
+  },
+  "Lopeta sprintti": {
+    "en": "End Sprint",
+    "sv": "Avsluta sprint"
   },
   "Love-to-do-lista 1/3 – Mitä kuuluu love-to-do-listaasi? Tee lista viidestä asiasta, joita rakastat tehdä vapaa-ajalla.": {
     "en": "Love-to-do list 1/3 – What is on your love-to-do list? Make a list of five things you love to do in your free time.",
@@ -853,6 +1061,34 @@
   "Lukiossa haluaisin oppia": {
     "en": "At school I would like to learn",
     "sv": "I gymnasiet skulle jag vilja lära mig"
+  },
+  "Luo luokka": {
+    "en": "Create class",
+    "sv": "Skapa klass"
+  },
+  "Luo luokkakoodi": {
+    "en": "Create class code",
+    "sv": "Skapa klasskod"
+  },
+  "Luo uusi sprintti": {
+    "en": "Create new sprint",
+    "sv": "Skapa ny sprint"
+  },
+  "Luodaan…": {
+    "en": "Creating…",
+    "sv": "Skapar…"
+  },
+  "Luokan koodi": {
+    "en": "Class code",
+    "sv": "Klasskod"
+  },
+  "Luokan nimi": {
+    "en": "Class name",
+    "sv": "Klassens namn"
+  },
+  "Luokka luotu.": {
+    "en": "Class created.",
+    "sv": "Klass skapad."
   },
   "Luokka palautettu.": {
     "en": "Class restored.",
@@ -902,6 +1138,10 @@
     "en": "Sent to the principal on the 1st of each month",
     "sv": "Skickas till rektorn den 1:a varje månad"
   },
+  "Lähetetään…": {
+    "en": "Sending…",
+    "sv": "Skickar…"
+  },
   "Lähetysloki": {
     "en": "Sending Log",
     "sv": "Sändningslogg"
@@ -913,6 +1153,10 @@
   "Lähetä palautuslinkki": {
     "en": "Send reset link",
     "sv": "Skicka återställningslänk"
+  },
+  "Lähetä uudelleen": {
+    "en": "Resend",
+    "sv": "Skicka igen"
   },
   "Lähetä viikkoraportti sähköpostiini": {
     "en": "Send weekly report to my email",
@@ -1293,6 +1537,10 @@
     "en": "What strengths are observed in me?",
     "sv": "Vilka styrkor observeras hos mig?"
   },
+  "Mitä vahvuuksia näet": {
+    "en": "What strengths do you see in",
+    "sv": "Vilka styrkor ser du hos"
+  },
   "Mitä vahvuuksia sinulla oli jo lapsena?": {
     "en": "What strengths did you already have as a child?",
     "sv": "Vilka styrkor hade du redan som barn?"
@@ -1360,8 +1608,32 @@
     "en": "These resources can be your own strengths, social relationships, close people, emotional regulation, dreams for the future, your thoughts, your attitude, a self-compassionate approach to yourself, and previous experiences of success.",
     "sv": "Dessa resurser kan vara dina egna styrkor, sociala relationer, närstående personer, känslohantering, drömmar för framtiden, dina tankar, din inställning, ett självmedkännande förhållningssätt till dig själv och tidigare erfarenheter av framgång."
   },
+  "Näyttö": {
+    "en": "Screen",
+    "sv": "Skärm"
+  },
+  "Näytä kaikki": {
+    "en": "Show all",
+    "sv": "Visa alla"
+  },
+  "Näytä luokalle": {
+    "en": "Present to class",
+    "sv": "Visa för klass"
+  },
+  "Näytä top 10": {
+    "en": "Show top 10",
+    "sv": "Visa topp 10"
+  },
+  "Näytöt": {
+    "en": "Screens",
+    "sv": "Skärmar"
+  },
   "OPPIMISEN ILO / LÄRANDETS GLÄDJE": {
     "sv": "section_header"
+  },
+  "Odotetaan opettajaa...": {
+    "en": "Waiting for teacher...",
+    "sv": "Väntar på lärare..."
   },
   "Oikeudenmukaisuus: Ryhmätyötaito / Reiluus / Johtajuus": {
     "en": "Justice: Teamwork / Fairness / Leadership",
@@ -1386,6 +1658,10 @@
   "Olen oppinut sinulta seuraavia asioita:": {
     "en": "I have learned the following from you:",
     "sv": "Jag har lärt mig följande av dig:"
+  },
+  "Olet mukana!": {
+    "en": "You're in!",
+    "sv": "Du är med!"
   },
   "Olin rohkea kohdatessani tämän uuden haasteen": {
     "en": "I was brave when I faced this new challenge",
@@ -1435,13 +1711,33 @@
     "en": "Delivered",
     "sv": "Levererade"
   },
+  "Opeta": {
+    "en": "Teach",
+    "sv": "Undervisa"
+  },
   "Opettajalta saadut vahvuudet": {
     "en": "Strengths received from your teacher",
     "sv": "Styrkor du fått av läraren"
   },
+  "Opettajat": {
+    "en": "Teachers",
+    "sv": "Lärare"
+  },
+  "Opetusmateriaalit": {
+    "en": "Teaching Materials",
+    "sv": "Undervisningsmaterial"
+  },
+  "Opiskelijan raportti": {
+    "en": "Student report",
+    "sv": "Elevrapport"
+  },
   "Opiskelijasi eivät ole vielä keränneet vahvuuksia.": {
     "en": "Your students haven't collected strengths yet.",
     "sv": "Dina elever har inte samlat styrkor ännu."
+  },
+  "Opiskelijat antavat toisilleen vahvuuspalautetta reaaliajassa. Jokainen valitsee yhden vahvuuden kullekin luokkatoverilleen.": {
+    "en": "Students give each other strength feedback in real time. Everyone picks one strength for each classmate.",
+    "sv": "Eleverna ger varandra styrkefeedback i realtid. Var och en väljer en styrka för varje klasskamrat."
   },
   "Opiskelijat menettävät pääsyn seikkailuun. Voit palauttaa luokan 60 päivän ajan.": {
     "en": "Students will lose access to the adventure. You can restore the class for 60 days.",
@@ -1450,6 +1746,10 @@
   "Opiskelussani minulla on monia mahdollisuuksia hyödyntää vahvuuksiani.": {
     "en": "In my studies I have many opportunities to use my strengths.",
     "sv": "I mina studier har jag många möjligheter att använda mina styrkor."
+  },
+  "Oppilailta saadut": {
+    "en": "From students",
+    "sv": "Från elever"
   },
   "Oppimisen ilo": {
     "en": "Love of Learning",
@@ -1479,6 +1779,10 @@
     "en": "Reset link sent to your email.",
     "sv": "Återställningslänk skickad till din e-post."
   },
+  "Palautuslinkki on vanhentunut tai jo käytetty.": {
+    "en": "This reset link has expired or has already been used.",
+    "sv": "Återställningslänken har gått ut eller redan använts."
+  },
   "Palautusprosentti": {
     "en": "Bounce rate",
     "sv": "Studsfrekvens"
@@ -1506,6 +1810,18 @@
   "Perheenjäsenten vahvuudet ovat mielestäni:": {
     "en": "The strengths of my family members, in my opinion, are:",
     "sv": "Familjemedlemmarnas styrkor är enligt mig:"
+  },
+  "Peruuta": {
+    "en": "Cancel",
+    "sv": "Avbryt"
+  },
+  "Piilota": {
+    "en": "Unpublish",
+    "sv": "Avpublicera"
+  },
+  "Piilotettu": {
+    "en": "Hidden",
+    "sv": "Dold"
   },
   "Pohdi ja hyödynnä palautetta – Tutustu saamaasi palautteeseen muilta.": {
     "en": "Reflect on and use the feedback – Explore the feedback you have received from others.",
@@ -1535,9 +1851,17 @@
     "en": "Deleted classes",
     "sv": "Raderade klasser"
   },
+  "Profiili": {
+    "en": "Profile",
+    "sv": "Profil"
+  },
   "Prologi": {
     "en": "Prologue",
     "sv": "Prolog"
+  },
+  "Puhu": {
+    "en": "Speak",
+    "sv": "Tala"
   },
   "Pyrin aina hyödyntämään vahvuuksiani.": {
     "en": "I always strive to use my strengths.",
@@ -1559,9 +1883,17 @@
     "en": "Also ask others to reflect on what your strengths are. Interview your friends, family members or for example your coach.",
     "sv": "Be också andra fundera på vilka de tycker är dina styrkor. Intervjua dina vänner, familjemedlemmar eller till exempel din tränare."
   },
+  "Pyydä uusi palautuslinkki": {
+    "en": "Request a new reset link",
+    "sv": "Begär en ny återställningslänk"
+  },
   "Pyydä vanhempaasi täyttämään! – Kirjoita vahvuuskirje nuorellesi:": {
     "en": "Ask your parent to fill in! – Write a strengths letter to your young person:",
     "sv": "Be din förälder fylla i! – Skriv ett styrkebrev till din ungdom:"
+  },
+  "Päivitä salasana": {
+    "en": "Update password",
+    "sv": "Uppdatera lösenord"
   },
   "Pääkäyttäjät": {
     "en": "Super admins",
@@ -1594,6 +1926,14 @@
     "en": "Love",
     "sv": "Kärlek"
   },
+  "Raportin päiväys": {
+    "en": "Report date",
+    "sv": "Rapportdatum"
+  },
+  "Raportointijakso": {
+    "en": "Reporting period",
+    "sv": "Rapportperiod"
+  },
   "Raportti lähetetty sähköpostiisi!": {
     "en": "Report sent to your email!",
     "sv": "Rapport skickad till din e-post!"
@@ -1605,6 +1945,14 @@
   "Rehellisyys": {
     "en": "Honesty",
     "sv": "Ärlighet"
+  },
+  "Rehtorilta saadut": {
+    "en": "From principal",
+    "sv": "Från rektor"
+  },
+  "Rehtorilta:": {
+    "en": "From principal:",
+    "sv": "Från rektor:"
   },
   "Reiluus": {
     "en": "Fairness",
@@ -1643,6 +1991,18 @@
   "SOSIAALINEN ÄLYKKYYS / SOCIAL INTELLIGENS": {
     "sv": "section_header"
   },
+  "Saamani Top 5 vahvuudet": {
+    "en": "My Top 5 Received Strengths",
+    "sv": "Mina topp 5 mottagna styrkor"
+  },
+  "Saamani vahvuudet": {
+    "en": "My Received Strengths",
+    "sv": "Mina mottagna styrkor"
+  },
+  "Saamasi vahvuudet!": {
+    "en": "Strengths you received!",
+    "sv": "Styrkor du fått!"
+  },
   "Saavutan haluamani vahvuuksiani hyödyntämällä.": {
     "en": "I achieve what I want by using my strengths.",
     "sv": "Jag uppnår det jag vill med hjälp av mina styrkor."
@@ -1671,6 +2031,10 @@
     "en": "Password must be at least 6 characters.",
     "sv": "Lösenordet måste vara minst 6 tecken."
   },
+  "Salasanan vaihto epäonnistui. Yritä uudelleen.": {
+    "en": "Changing the password failed. Please try again.",
+    "sv": "Lösenordsbytet misslyckades. Försök igen."
+  },
   "Salasanat eivät täsmää.": {
     "en": "Passwords do not match.",
     "sv": "Lösenorden matchar inte."
@@ -1682,6 +2046,10 @@
   "Se, mitä erityisesti arvostan sinussa, on ______ ja ______": {
     "en": "What I especially appreciate about you is ______ and ______",
     "sv": "Det jag särskilt uppskattar hos dig är ______ och ______"
+  },
+  "Seuraava": {
+    "en": "Next",
+    "sv": "Nästa"
   },
   "Sinnikkyys": {
     "en": "Perseverance",
@@ -1718,6 +2086,10 @@
   "Sulje": {
     "en": "Close",
     "sv": "Stäng"
+  },
+  "Sulje esitys": {
+    "en": "Exit presentation",
+    "sv": "Avsluta presentation"
   },
   "Suurimman osan ajastani teen asioita, joissa olen hyvä.": {
     "en": "For most of my time I do things I am good at.",
@@ -1766,13 +2138,33 @@
     "en": "Back",
     "sv": "Tillbaka"
   },
+  "Takaisin seikkailuun": {
+    "en": "Back to adventure",
+    "sv": "Tillbaka till äventyret"
+  },
+  "Takaisin ylläpidon kirjautumiseen": {
+    "en": "Back to admin login",
+    "sv": "Tillbaka till admininloggningen"
+  },
   "Tallenna": {
     "en": "Save",
     "sv": "Spara"
   },
+  "Tallenna PDF:nä": {
+    "en": "Save as PDF",
+    "sv": "Spara som PDF"
+  },
   "Tallennettu!": {
     "en": "Saved!",
     "sv": "Sparat!"
+  },
+  "Tarkista Google Slides -linkki": {
+    "en": "Check the Google Slides link",
+    "sv": "Kontrollera Google Slides-länken"
+  },
+  "Tarkista sähköpostiosoite.": {
+    "en": "Please check the email address.",
+    "sv": "Kontrollera e-postadressen."
   },
   "Taso": {
     "en": "Level",
@@ -1850,6 +2242,10 @@
     "en": "Tip: It is likely that the hobbies and activities you enjoy most are fulfilling precisely because they give you the opportunity to use your strengths.",
     "sv": "Tips: Det är troligt att de hobbyer och aktiviteter du gillar mest är tillfredsställande just för att de ger dig möjlighet att använda dina styrkor."
   },
+  "Toimi": {
+    "en": "Act",
+    "sv": "Agera"
+  },
   "Toiveikkuus": {
     "en": "Hope",
     "sv": "Hopp"
@@ -1882,6 +2278,10 @@
     "en": "Future Memory – Think of a situation in your studies or free time where you can use your strengths in the near future.",
     "sv": "Framtidsminne – Tänk på en situation i dina studier eller på fritiden där du i den närmaste framtiden kan använda dina styrkor."
   },
+  "Tulokset!": {
+    "en": "Results!",
+    "sv": "Resultat!"
+  },
   "Tunnista omia vahvuuksia": {
     "en": "Recognise your strengths",
     "sv": "Känn igen dina styrkor"
@@ -1889,6 +2289,10 @@
   "Tunnistin nämä vahvuudet, jotka mahdollistivat onnistumisen": {
     "en": "I recognised these strengths that made the success possible",
     "sv": "Jag kände igen de här styrkorna som möjliggjorde framgången"
+  },
+  "Tuo Canvasta": {
+    "en": "Import from Canva",
+    "sv": "Importera från Canva"
   },
   "Tämä PDF-tiedosto on interaktiivinen ja sisältää täytettäviä elementtejä. Tiedosto toimii parhaiten Adobe Acrobat Reader -ohjelmalla, jonka voit ladata ilmaiseksi täältä.": {
     "en": "This PDF file is interactive and contains fillable fields. It works best in Adobe Acrobat Reader, which you can download for free.",
@@ -1910,6 +2314,10 @@
     "en": "Fill in all your special skills in this list. (Numbered fields 1–10)",
     "sv": "Fyll i alla dina specialkunskaper i den här listan. (Numrerade ifyllnadsfält 1–10)"
   },
+  "Täytä pakolliset kentät": {
+    "en": "Fill in the required fields",
+    "sv": "Fyll i obligatoriska fält"
+  },
   "Täällä olen minä:": {
     "en": "Here I am:",
     "sv": "Här är jag:"
@@ -1925,13 +2333,25 @@
     "en": "Forgot your password?",
     "sv": "Glömt ditt lösenord?"
   },
+  "Unohditko salasanasi?": {
+    "en": "Forgot password?",
+    "sv": "Glömt lösenordet?"
+  },
   "Uteliaisuus": {
     "en": "Curiosity",
     "sv": "Nyfikenhet"
   },
+  "Uusi luokkakoodi": {
+    "en": "New class code",
+    "sv": "Ny klasskod"
+  },
   "Uusi salasana": {
     "en": "New password",
     "sv": "Nytt lösenord"
+  },
+  "Uusi sprintti": {
+    "en": "New Sprint",
+    "sv": "Ny sprint"
   },
   "VAATIMATTOMUUS / ANSPRÅKSLÖSHET": {
     "sv": "section_header"
@@ -1976,6 +2396,10 @@
     "en": "Confirm password",
     "sv": "Bekräfta lösenord"
   },
+  "Vahvista uusi salasana": {
+    "en": "Confirm new password",
+    "sv": "Bekräfta nytt lösenord"
+  },
   "Vahvuudet auttavat haasteiden kohtaamisessa ja edistävät niistä ylipääsemisessä eli selviytymisessä. Taidoilla ja vahvuuksilla on eroa. Taidot ovat opittuja, kun taas vahvuudet ovat itselle luontaisia ja tärkeitä ajattelu- ja toimintatapoja.": {
     "en": "Strengths help in facing challenges and support overcoming them. Skills and strengths are different. Skills are learned, whereas strengths are your natural and important ways of thinking and acting.",
     "sv": "Styrkor hjälper dig att möta utmaningar och ta dig igenom dem. Styrkor och färdigheter är inte samma sak. Färdigheter är inlärda, medan styrkor är ditt naturliga och viktiga sätt att tänka och agera."
@@ -1983,6 +2407,10 @@
   "Vahvuudet eivät ole ominaisuuksia, joissa olet hyvä, eivätkä heikkoudet niitä, joissa tunnet itsesi huonoksi. Sen sijaan vahvuudet tekevät kantajastaan vahvan ja heikkoudet toimivat päinvastoin.": {
     "en": "Strengths are not the things you are good at, and weaknesses are not the things you feel bad at. Instead, strengths make the person who has them stronger – and weaknesses work in the opposite way.",
     "sv": "Styrkor är inte egenskaper du är bra på, och svagheter är inte det du känner dig dålig på. Styrkor gör dig starkare – och svagheter fungerar tvärtom."
+  },
+  "Vahvuuksia lähetetään!": {
+    "en": "Sending strengths!",
+    "sv": "Skickar styrkor!"
   },
   "Vahvuuksiasi ovat mielestäni:": {
     "en": "Your strengths, in my opinion, are:",
@@ -2012,6 +2440,18 @@
     "en": "Using my strengths is familiar to me.",
     "sv": "Att använda mina styrkor är bekant för mig."
   },
+  "Vahvuus": {
+    "en": "Strength",
+    "sv": "Styrka"
+  },
+  "Vahvuus lähetetty opettajalle!": {
+    "en": "Strength sent to teacher!",
+    "sv": "Styrka skickad till lärare!"
+  },
+  "Vahvuus lähetetty opettajallesi!": {
+    "en": "Strength sent to your teacher!",
+    "sv": "Styrka skickad till din lärare!"
+  },
   "Vahvuuskarkkini – Merkkaa tähän vahvuuskarkkisi!": {
     "en": "My strength candy – Mark your strength candy here!",
     "sv": "Mitt styrkegodis – Markera ditt styrkegodis här!"
@@ -2032,6 +2472,14 @@
     "en": "Strengths Feedback with Classmates – Write feedback and praise in a group of 2–4 classmates. Name the strengths you appreciate in each other.",
     "sv": "Styrkerespons från studiekamrater – Skriv respons och beröm i grupp med 2–4 studiekamrater. Namnge de styrkor ni uppskattar hos varandra."
   },
+  "Vahvuuspeli": {
+    "en": "Strength Game",
+    "sv": "Styrkespel"
+  },
+  "Vahvuusportfolio": {
+    "en": "Strength Portfolio",
+    "sv": "Styrkeportfölj"
+  },
   "Vahvuusportfolio lukiolaiselle": {
     "en": "Strength Portfolio for Upper Secondary Students",
     "sv": "Styrkeportfölj för gymnasiet"
@@ -2040,6 +2488,10 @@
     "en": "Compiling the Strength Portfolio",
     "sv": "Sammanställning av styrkeportföljen"
   },
+  "Vahvuussprintti": {
+    "en": "Strength Sprint",
+    "sv": "Styrkesprint"
+  },
   "Vahvuuteni opiskelijana – Tunnista vahvuutesi. Arvosta ja ole ylpeä vahvuuksistasi. Kirjoita parhaat puolesi opiskelijana!": {
     "en": "My Strength as a Student – Identify your strengths. Appreciate and be proud of your strengths. Write down your best qualities as a student!",
     "sv": "Min styrka som studerande – Identifiera dina styrkor. Uppskatta och var stolt över dina styrkor. Skriv ner dina bästa sidor som studerande!"
@@ -2047,6 +2499,14 @@
   "Vahvuutesi ovat ______ ja ______": {
     "en": "Your strengths are ______ and ______",
     "sv": "Dina styrkor är ______ och ______"
+  },
+  "Valitse": {
+    "en": "Select",
+    "sv": "Välj"
+  },
+  "Valitse 1–3 vahvuutta": {
+    "en": "Select 1–3 strengths",
+    "sv": "Välj 1–3 styrkor"
   },
   "Valitse ensin luokka": {
     "en": "Select a class first",
@@ -2063,6 +2523,10 @@
   "Valitse viisi tärkeintä 'karkkiväittämää', jotka kuvaavat sinua parhaiten.": {
     "en": "Choose the five most important 'strength candy' statements that best describe you.",
     "sv": "Välj de fem viktigaste 'styrkegodis' påståenden som stämmer bäst in på dig."
+  },
+  "Valittu": {
+    "en": "Selected",
+    "sv": "Valt"
   },
   "Valmis": {
     "en": "Completed",
@@ -2083,6 +2547,10 @@
   "Vertaa sitten muiden arvioita omiisi ja lopuksi mittarin tuloksiin. Yllätyitkö?": {
     "en": "Then compare others' assessments with your own and finally with the meter results. Were you surprised?",
     "sv": "Jämför sedan andras bedömningar med dina egna och slutligen med resultatet från mätaren. Blev du förvånad?"
+  },
+  "Viesti (valinnainen)": {
+    "en": "Message (optional)",
+    "sv": "Meddelande (valfritt)"
   },
   "Viestin sisältö": {
     "en": "Email body",
@@ -2112,6 +2580,10 @@
     "en": "What new skills have you learned in connection with your interests?",
     "sv": "Vilka nya färdigheter har du lärt dig i samband med dina intressen?"
   },
+  "Virheellinen koodi tai peli on jo päättynyt.": {
+    "en": "Invalid code or game has already ended.",
+    "sv": "Ogiltig kod eller spelet har redan avslutats."
+  },
   "YDINVAHVUUKSIEN KARKKIKAUPPA": {
     "en": "CORE STRENGTHS CANDY STORE",
     "sv": "KÄRNSTYRKORNAS GODISAFFÄR"
@@ -2130,9 +2602,17 @@
     "en": "Core Strengths Roadmap",
     "sv": "Kärnstyrkornas vägkarta"
   },
+  "Yhteensä": {
+    "en": "Total",
+    "sv": "Totalt"
+  },
   "Yhteenveto – kirjoita pisteet tähän luetteloon:": {
     "en": "Summary – write the scores in this list:",
     "sv": "Sammanfattning – skriv poängen i den här listan:"
+  },
+  "Yleinen": {
+    "en": "General",
+    "sv": "Allmän"
   },
   "Ylläpitäjä lisätty.": {
     "en": "Administrator added.",
@@ -2154,13 +2634,25 @@
     "en": "active",
     "sv": "aktiv"
   },
+  "esim. 9A — Vahvuusryhmä": {
+    "en": "e.g. 9A — Strength group",
+    "sv": "t.ex. 9A — Styrkegrupp"
+  },
   "juuri nyt": {
     "en": "just now",
     "sv": "just nu"
   },
+  "kerätty": {
+    "en": "collected",
+    "sv": "samlat"
+  },
   "keskimääräinen valmistuminen": {
     "en": "avg completion",
     "sv": "genomsnittligt slutförande"
+  },
+  "näyttöä": {
+    "en": "screens",
+    "sv": "skärmar"
   },
   "näyttöä tällä viikolla": {
     "en": "screens this week",
@@ -2194,9 +2686,13 @@
     "en": "of strengths discovered",
     "sv": "av styrkorna upptäckta"
   },
+  "vahvuutta lähetetty!": {
+    "en": "strengths sent!",
+    "sv": "styrkor skickade!"
+  },
   "valmis": {
     "en": "complete",
-    "sv": "klar"
+    "sv": "klart"
   },
   "yhteensä": {
     "en": "total",

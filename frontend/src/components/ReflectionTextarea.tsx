@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAutosave, loadResponse, type SaveState } from "@/hooks/use-autosave";
+import { useAutosave, useResponseReader, type SaveState } from "@/hooks/use-autosave";
 import { useReportCompletion } from "@/lib/screen-completion";
 import { useTFi } from "@/lib/i18n";
 
@@ -21,13 +21,15 @@ export function ReflectionTextarea({
   const report = useReportCompletion();
   const tFi = useTFi();
 
+  // @lovable-new 2026-08-05 — mode-aware read (empty in teacher preview).
+  const readResponse = useResponseReader();
   useEffect(() => {
     (async () => {
-      const v = await loadResponse<string>(fieldKey);
+      const v = await readResponse<string>(fieldKey);
       if (typeof v === "string") setValue(v);
       setLoaded(true);
     })();
-  }, [fieldKey]);
+  }, [fieldKey, readResponse]);
 
   const state = useAutosave(fieldKey, value, { enabled: loaded });
   useEffect(() => { onSaveStateChange?.(state); }, [state, onSaveStateChange]);
@@ -83,13 +85,15 @@ export function ReflectionInput({
   const report = useReportCompletion();
   const tFi = useTFi();
 
+  // @lovable-new 2026-08-05 — mode-aware read (empty in teacher preview).
+  const readResponse = useResponseReader();
   useEffect(() => {
     (async () => {
-      const v = await loadResponse<string>(fieldKey);
+      const v = await readResponse<string>(fieldKey);
       if (typeof v === "string") setValue(v);
       setLoaded(true);
     })();
-  }, [fieldKey]);
+  }, [fieldKey, readResponse]);
   const state = useAutosave(fieldKey, value, { enabled: loaded });
   useEffect(() => { onSaveStateChange?.(state); }, [state, onSaveStateChange]);
   useEffect(() => {

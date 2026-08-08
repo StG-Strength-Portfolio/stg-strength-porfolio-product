@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { MapIcon, LockIcon, CandyIcon, UserIcon, WorldIcon } from "@/components/icons/AppIcons";
+import {
+  MapIcon,
+  LockIcon,
+  CandyIcon,
+  UserIcon,
+  WorldIcon,
+  PlayIcon, // @lovable-new
+  StarIcon, // @lovable-new
+} from "@/components/icons/AppIcons";
 import { toast } from "sonner";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -10,6 +18,7 @@ import { WORLDS } from "@/lib/screens";
 import { useNavGate } from "@/lib/screen-completion";
 import { REQUIREMENTS } from "@/lib/screen-completion";
 import { useStudentProgress } from "@/lib/progress";
+import { LevelProgressBar } from "@/components/LevelProgressBar";
 import { supabase } from "@/integrations/supabase/client";
 import { useT, useTr } from "@/lib/i18n";
 
@@ -102,6 +111,28 @@ export function AppSidebar() {
                     <CandyIcon size={18} /> <span>{tr("Vahvuuteni")}</span>
                   </Link>
                 </SidebarMenuButton>
+                {/* @lovable-new 2026-08-05 — removed the collection growth bar,
+                    collected count and compact top-5 list; the sidebar keeps only
+                    the plain navigation row. */}
+
+              </SidebarMenuItem>
+              {/* @lovable-new */}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={path === "/student/sprint"}>
+                  <Link to="/student/sprint" className="flex items-center gap-2">
+                    <PlayIcon size={18} /> <span>{tr("Vahvuuspeli")}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={path === "/student/give-strength"}>
+                  <Link to="/student/give-strength" className="flex items-start gap-2">
+                    <StarIcon size={18} className="mt-0.5 shrink-0" />
+                    <span className="min-w-0 break-words whitespace-normal leading-snug">
+                      {tr("Anna vahvuus opettajallesi")}
+                    </span>
+                  </Link>
+                </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={path === "/student/profile"}>
@@ -152,17 +183,7 @@ export function AppSidebar() {
                           <span className="block break-words text-xs leading-snug opacity-80">
                             {subtitle}
                           </span>
-                          <span className="flex items-center gap-1.5">
-                            <span className="h-1 flex-1 overflow-hidden rounded-full bg-black/15">
-                              <span
-                                className="block h-full rounded-full bg-[color:var(--purple)] transition-all"
-                                style={{ width: `${pct}%` }}
-                              />
-                            </span>
-                            <span className="shrink-0 text-[10px] tabular-nums opacity-70">
-                              {pct}%
-                            </span>
-                          </span>
+                          <LevelProgressBar pct={pct} className="w-full" />
                         </span>
                       </a>
                     </SidebarMenuButton>

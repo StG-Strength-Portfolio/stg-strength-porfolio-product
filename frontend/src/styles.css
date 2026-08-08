@@ -68,8 +68,8 @@
   --color-green: var(--green);
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
-  --font-display: "Fredoka", "Poppins", system-ui, sans-serif;
-  --font-sans: "Poppins", system-ui, sans-serif;
+  --font-display: "Fredoka", sans-serif;
+  --font-sans: "Fredoka", sans-serif;
 }
 
 :root {
@@ -161,11 +161,20 @@
     border-color: var(--color-border);
   }
 
+  body,
+  * {
+    font-family: "Fredoka", sans-serif;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: var(--font-sans);
+    font-weight: 400;
   }
+
+  h1, h2, .page-title { font-weight: 700; }
+  h3, h4, h5, h6 { font-weight: 600; }
+  small, .text-xs, .muted { font-weight: 300; }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
@@ -185,11 +194,113 @@
 }
 .sticky-note > * + * { margin-top: 0.75rem; }
 
+/* @lovable-new 2026-08-05
+   Full purple A4 portrait print design for every report: an edge-to-edge
+   purple page background that repeats on all pages, white report cards on
+   top, and no app chrome, tabs or action buttons in the printed output. */
 @media print {
-  .no-print { display: none !important; }
-  body { background: white !important; color: black !important; }
-  .sticky-note { box-shadow: none !important; border: 1px solid #ddd; }
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  html,
+  body {
+    background: var(--purple) !important;
+    color: #1c1130 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Fixed purple layer so page 2, 3, ... never fall back to white. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: var(--purple);
+    z-index: -1;
+  }
+
+  .no-print,
+  aside,
+  nav,
+  header[data-app-header],
+  [data-sidebar],
+  [data-sidebar="sidebar"],
+  [role="tablist"],
+  button:not(.print-keep) {
+    display: none !important;
+  }
+
+  /* @lovable-new 2026-08-05
+     One print-root owns the page padding. Previously both <main> and
+     .print-page applied 12mm, which double-padded reports and clipped wide
+     charts. Now <main> is the padding owner and nested .print-page blocks are
+     flush; .print-page only pads when it is itself the print root. */
+  main {
+    padding: 12mm !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    background: transparent !important;
+  }
+
+  .print-page {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    background: transparent !important;
+  }
+
+  body > .print-page,
+  .print-root > .print-page {
+    padding: 12mm !important;
+  }
+
+  .sticky-note,
+  .report-card {
+    background: #ffffff !important;
+    color: #1c1130 !important;
+    box-shadow: none !important;
+    border: 1px solid #e6e0f2 !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
+
+  /* Long portfolio-answer blocks may split across pages. */
+  .print-splittable,
+  .print-splittable * {
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+
+  h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+  thead { display: table-header-group; }
+
+  .recharts-wrapper,
+  .recharts-surface {
+    max-width: 100% !important;
+  }
+  /* Recharts responsive containers must keep a stable print size. */
+  .chart-box,
+  .chart-box .recharts-responsive-container {
+    width: 165mm !important;
+    height: 70mm !important;
+  }
 }
+
 
 /* Pencil scribble badge */
 .pencil-badge {

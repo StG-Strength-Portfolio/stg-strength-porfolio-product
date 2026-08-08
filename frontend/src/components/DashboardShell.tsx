@@ -1,17 +1,22 @@
 import type { ReactNode } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { CornerBlobs } from "@/components/CornerBlobs";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import {
+  ArrowLeftIcon,
+  BookIcon,
   CandyIcon,
   ChartIcon,
+  GamepadIcon,
+  GiftIcon,
+  GridIcon,
   HomeIcon,
   MapIcon,
   PencilIcon,
   PeopleIcon,
+  PresentIcon,
   SparkleIcon,
-  StarIcon,
   UserIcon,
 } from "@/components/icons/AppIcons";
 import { useTr } from "@/lib/i18n";
@@ -22,17 +27,39 @@ export interface ShellTab {
   label: string;
 }
 
-const TAB_ICONS: Record<string, (p: { size?: number; className?: string }) => ReactNode> = {
+type IconCmp = (p: { size?: number; className?: string }) => ReactNode;
+
+const TAB_ICONS: Record<string, IconCmp> = {
   overview: HomeIcon,
-  classes: MapIcon,
+  classes: GridIcon,
   students: PeopleIcon,
   teachers: UserIcon,
   codes: PencilIcon,
   strengths: CandyIcon,
   reports: ChartIcon,
-  emails: StarIcon,
-  settings: SparkleIcon,
+  emails: PencilIcon,
+  materials: BookIcon,
+  settings: UserIcon,
+  profile: UserIcon,
 };
+
+/**
+ * @lovable-new 2026-08-04 — every sidebar link gets a meaningful icon
+ * (no more generic stars). Resolved from the destination route.
+ */
+export function iconForRoute(to: string): IconCmp {
+  if (/\/(dashboard|seikkailu)$/.test(to)) return ArrowLeftIcon;
+  if (to.includes("teach/materials")) return BookIcon;
+  if (to.includes("teach/portfolio")) return PresentIcon;
+  if (to.includes("sprint")) return to.includes("student") ? GamepadIcon : MapIcon;
+  if (to.includes("give-strength")) return HeartOrGift;
+  if (to.includes("received-strengths")) return GiftIcon;
+  if (to.includes("profile")) return UserIcon;
+  if (to.includes("strengths")) return CandyIcon;
+  return SparkleIcon;
+}
+
+const HeartOrGift: IconCmp = GiftIcon;
 
 /**
  * Shared chrome for the role dashboards: playful purple sidebar, school name
@@ -45,6 +72,8 @@ export function DashboardShell({
   onSelect,
   schoolName,
   persistLanguage = true,
+  links, // @lovable-new — route links (Strength Sprint, give strength, …)
+  sections, // @lovable-new — grouped route links (e.g. "Teach")
   children,
 }: {
   title: string;
@@ -53,8 +82,11 @@ export function DashboardShell({
   onSelect: (id: string) => void;
   schoolName?: string | null;
   persistLanguage?: boolean;
+  links?: Array<{ to: string; label: string }>;
+  sections?: Array<{ label: string; links: Array<{ to: string; label: string }> }>;
   children: ReactNode;
 }) {
+
   const tr = useTr();
   const navigate = useNavigate();
 
@@ -75,7 +107,7 @@ export function DashboardShell({
             </p>
             <nav className="space-y-1.5">
               {tabs.map((tb) => {
-                const Icon = TAB_ICONS[tb.id] ?? StarIcon;
+                const Icon = TAB_ICONS[tb.id] ?? SparkleIcon;
                 const isActive = active === tb.id;
                 return (
                   <button
@@ -95,6 +127,47 @@ export function DashboardShell({
                 );
               })}
             </nav>
+            {/* @lovable-new */}
+            {links && links.length > 0 && (
+              <nav className="mt-3 space-y-1.5 border-t border-white/20 pt-3">
+                {links.map((l) => (
+                  <Link
+                    key={l.to}
+                    to={l.to}
+                    className="flex w-full items-center gap-2 rounded-2xl px-4 py-2.5 text-left text-sm font-semibold text-white/90 transition-all hover:bg-white/15"
+                    activeProps={{ className: "bg-white text-[color:var(--purple)] shadow-md" }}
+                  >
+                    {(() => {
+                      const Icon = iconForRoute(l.to);
+                      return <Icon size={18} className="shrink-0" />;
+                    })()}
+                    <span className="min-w-0 break-words">{l.label}</span>
+                  </Link>
+                ))}
+              </nav>
+            )}
+            {/* @lovable-new */}
+            {sections?.map((sec) => (
+              <nav key={sec.label} className="mt-3 space-y-1.5 border-t border-white/20 pt-3">
+                <p className="px-4 pb-1 text-xs font-bold uppercase tracking-wider text-white/60">
+                  {sec.label}
+                </p>
+                {sec.links.map((l) => (
+                  <Link
+                    key={l.to}
+                    to={l.to}
+                    className="flex w-full items-center gap-2 rounded-2xl px-4 py-2.5 text-left text-sm font-semibold text-white/90 transition-all hover:bg-white/15"
+                    activeProps={{ className: "bg-white text-[color:var(--purple)] shadow-md" }}
+                  >
+                    {(() => {
+                      const Icon = iconForRoute(l.to);
+                      return <Icon size={18} className="shrink-0" />;
+                    })()}
+                    <span className="min-w-0 break-words">{l.label}</span>
+                  </Link>
+                ))}
+              </nav>
+            ))}
             <button
               type="button"
               className="mt-6 px-4 text-left text-xs text-white/80 underline hover:text-white"
@@ -116,7 +189,7 @@ export function DashboardShell({
 
           <nav className="flex flex-wrap gap-2 md:hidden">
             {tabs.map((tb) => {
-              const Icon = TAB_ICONS[tb.id] ?? StarIcon;
+              const Icon = TAB_ICONS[tb.id] ?? SparkleIcon;
               return (
                 <button
                   key={tb.id}

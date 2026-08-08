@@ -31,16 +31,25 @@ import { Route as AuthOpettajaRouteImport } from './routes/auth.opettaja'
 import { Route as AuthStudentRouteImport } from './routes/auth.student'
 import { Route as AventyrScreenRouteImport } from './routes/aventyr.$screen'
 import { Route as SchoolAdminDashboardRouteImport } from './routes/school-admin.dashboard'
+import { Route as SchoolAdminGiveStrengthRouteImport } from './routes/school-admin.give-strength'
 import { Route as SuperadminIndexRouteImport } from './routes/superadmin.index'
 import { Route as SuperadminDashboardRouteImport } from './routes/superadmin.dashboard'
+import { Route as SuperadminForgotPasswordRouteImport } from './routes/superadmin.forgot-password'
 import { Route as SuperadminLoginRouteImport } from './routes/superadmin.login'
 import { Route as TeacherIndexRouteImport } from './routes/teacher.index'
 import { Route as TeacherDashboardRouteImport } from './routes/teacher.dashboard'
+import { Route as TeacherProfileRouteImport } from './routes/teacher.profile'
+import { Route as TeacherSprintRouteImport } from './routes/teacher.sprint'
 import { Route as AuthenticatedSeikkailuIndexRouteImport } from './routes/_authenticated/seikkailu/index'
 import { Route as AuthenticatedSeikkailuScreenRouteImport } from './routes/_authenticated/seikkailu/$screen'
+import { Route as AuthenticatedStudentGiveStrengthRouteImport } from './routes/_authenticated/student/give-strength'
 import { Route as AuthenticatedStudentProfileRouteImport } from './routes/_authenticated/student/profile'
+import { Route as AuthenticatedStudentSprintRouteImport } from './routes/_authenticated/student/sprint'
 import { Route as AuthenticatedStudentStrengthsRouteImport } from './routes/_authenticated/student/strengths'
+import { Route as SchoolAdminTeachMaterialsRouteImport } from './routes/school-admin.teach.materials'
 import { Route as SuperadminSchoolsSchoolIdRouteImport } from './routes/superadmin.schools.$schoolId'
+import { Route as TeacherTeachMaterialsRouteImport } from './routes/teacher.teach.materials'
+import { Route as TeacherTeachPortfolioRouteImport } from './routes/teacher.teach.portfolio'
 import { Route as AuthenticatedOpettajaOppilasUserIdRouteImport } from './routes/_authenticated/opettaja_.oppilas.$userId'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -155,6 +164,11 @@ const SchoolAdminDashboardRoute = SchoolAdminDashboardRouteImport.update({
   path: '/school-admin/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SchoolAdminGiveStrengthRoute = SchoolAdminGiveStrengthRouteImport.update({
+  id: '/school-admin/give-strength',
+  path: '/school-admin/give-strength',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SuperadminIndexRoute = SuperadminIndexRouteImport.update({
   id: '/superadmin/',
   path: '/superadmin/',
@@ -165,6 +179,12 @@ const SuperadminDashboardRoute = SuperadminDashboardRouteImport.update({
   path: '/superadmin/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SuperadminForgotPasswordRoute =
+  SuperadminForgotPasswordRouteImport.update({
+    id: '/superadmin/forgot-password',
+    path: '/superadmin/forgot-password',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const SuperadminLoginRoute = SuperadminLoginRouteImport.update({
   id: '/superadmin/login',
   path: '/superadmin/login',
@@ -180,6 +200,16 @@ const TeacherDashboardRoute = TeacherDashboardRouteImport.update({
   path: '/teacher/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TeacherProfileRoute = TeacherProfileRouteImport.update({
+  id: '/teacher/profile',
+  path: '/teacher/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TeacherSprintRoute = TeacherSprintRouteImport.update({
+  id: '/teacher/sprint',
+  path: '/teacher/sprint',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedSeikkailuIndexRoute =
   AuthenticatedSeikkailuIndexRouteImport.update({
     id: '/',
@@ -192,10 +222,22 @@ const AuthenticatedSeikkailuScreenRoute =
     path: '/$screen',
     getParentRoute: () => AuthenticatedSeikkailuRouteRoute,
   } as any)
+const AuthenticatedStudentGiveStrengthRoute =
+  AuthenticatedStudentGiveStrengthRouteImport.update({
+    id: '/give-strength',
+    path: '/give-strength',
+    getParentRoute: () => AuthenticatedStudentRouteRoute,
+  } as any)
 const AuthenticatedStudentProfileRoute =
   AuthenticatedStudentProfileRouteImport.update({
     id: '/profile',
     path: '/profile',
+    getParentRoute: () => AuthenticatedStudentRouteRoute,
+  } as any)
+const AuthenticatedStudentSprintRoute =
+  AuthenticatedStudentSprintRouteImport.update({
+    id: '/sprint',
+    path: '/sprint',
     getParentRoute: () => AuthenticatedStudentRouteRoute,
   } as any)
 const AuthenticatedStudentStrengthsRoute =
@@ -204,12 +246,28 @@ const AuthenticatedStudentStrengthsRoute =
     path: '/strengths',
     getParentRoute: () => AuthenticatedStudentRouteRoute,
   } as any)
+const SchoolAdminTeachMaterialsRoute =
+  SchoolAdminTeachMaterialsRouteImport.update({
+    id: '/school-admin/teach/materials',
+    path: '/school-admin/teach/materials',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const SuperadminSchoolsSchoolIdRoute =
   SuperadminSchoolsSchoolIdRouteImport.update({
     id: '/superadmin/schools/$schoolId',
     path: '/superadmin/schools/$schoolId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const TeacherTeachMaterialsRoute = TeacherTeachMaterialsRouteImport.update({
+  id: '/teacher/teach/materials',
+  path: '/teacher/teach/materials',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TeacherTeachPortfolioRoute = TeacherTeachPortfolioRouteImport.update({
+  id: '/teacher/teach/portfolio',
+  path: '/teacher/teach/portfolio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedOpettajaOppilasUserIdRoute =
   AuthenticatedOpettajaOppilasUserIdRouteImport.update({
     id: '/opettaja_/oppilas/$userId',
@@ -238,16 +296,25 @@ export interface FileRoutesByFullPath {
   '/auth/student': typeof AuthStudentRoute
   '/aventyr/$screen': typeof AventyrScreenRoute
   '/school-admin/dashboard': typeof SchoolAdminDashboardRoute
+  '/school-admin/give-strength': typeof SchoolAdminGiveStrengthRoute
   '/superadmin/dashboard': typeof SuperadminDashboardRoute
+  '/superadmin/forgot-password': typeof SuperadminForgotPasswordRoute
   '/superadmin/login': typeof SuperadminLoginRoute
   '/teacher/dashboard': typeof TeacherDashboardRoute
+  '/teacher/profile': typeof TeacherProfileRoute
+  '/teacher/sprint': typeof TeacherSprintRoute
   '/auth/': typeof AuthIndexRoute
   '/superadmin/': typeof SuperadminIndexRoute
   '/teacher/': typeof TeacherIndexRoute
   '/seikkailu/$screen': typeof AuthenticatedSeikkailuScreenRoute
+  '/student/give-strength': typeof AuthenticatedStudentGiveStrengthRoute
   '/student/profile': typeof AuthenticatedStudentProfileRoute
+  '/student/sprint': typeof AuthenticatedStudentSprintRoute
   '/student/strengths': typeof AuthenticatedStudentStrengthsRoute
+  '/school-admin/teach/materials': typeof SchoolAdminTeachMaterialsRoute
   '/superadmin/schools/$schoolId': typeof SuperadminSchoolsSchoolIdRoute
+  '/teacher/teach/materials': typeof TeacherTeachMaterialsRoute
+  '/teacher/teach/portfolio': typeof TeacherTeachPortfolioRoute
   '/seikkailu/': typeof AuthenticatedSeikkailuIndexRoute
   '/opettaja/oppilas/$userId': typeof AuthenticatedOpettajaOppilasUserIdRoute
 }
@@ -269,17 +336,26 @@ export interface FileRoutesByTo {
   '/auth/student': typeof AuthStudentRoute
   '/aventyr/$screen': typeof AventyrScreenRoute
   '/school-admin/dashboard': typeof SchoolAdminDashboardRoute
+  '/school-admin/give-strength': typeof SchoolAdminGiveStrengthRoute
   '/superadmin/dashboard': typeof SuperadminDashboardRoute
+  '/superadmin/forgot-password': typeof SuperadminForgotPasswordRoute
   '/superadmin/login': typeof SuperadminLoginRoute
   '/teacher/dashboard': typeof TeacherDashboardRoute
+  '/teacher/profile': typeof TeacherProfileRoute
+  '/teacher/sprint': typeof TeacherSprintRoute
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthIndexRoute
   '/superadmin': typeof SuperadminIndexRoute
   '/teacher': typeof TeacherIndexRoute
   '/seikkailu/$screen': typeof AuthenticatedSeikkailuScreenRoute
+  '/student/give-strength': typeof AuthenticatedStudentGiveStrengthRoute
   '/student/profile': typeof AuthenticatedStudentProfileRoute
+  '/student/sprint': typeof AuthenticatedStudentSprintRoute
   '/student/strengths': typeof AuthenticatedStudentStrengthsRoute
+  '/school-admin/teach/materials': typeof SchoolAdminTeachMaterialsRoute
   '/superadmin/schools/$schoolId': typeof SuperadminSchoolsSchoolIdRoute
+  '/teacher/teach/materials': typeof TeacherTeachMaterialsRoute
+  '/teacher/teach/portfolio': typeof TeacherTeachPortfolioRoute
   '/seikkailu': typeof AuthenticatedSeikkailuIndexRoute
   '/opettaja/oppilas/$userId': typeof AuthenticatedOpettajaOppilasUserIdRoute
 }
@@ -305,17 +381,26 @@ export interface FileRoutesById {
   '/auth/student': typeof AuthStudentRoute
   '/aventyr/$screen': typeof AventyrScreenRoute
   '/school-admin/dashboard': typeof SchoolAdminDashboardRoute
+  '/school-admin/give-strength': typeof SchoolAdminGiveStrengthRoute
   '/superadmin/dashboard': typeof SuperadminDashboardRoute
+  '/superadmin/forgot-password': typeof SuperadminForgotPasswordRoute
   '/superadmin/login': typeof SuperadminLoginRoute
   '/teacher/dashboard': typeof TeacherDashboardRoute
+  '/teacher/profile': typeof TeacherProfileRoute
+  '/teacher/sprint': typeof TeacherSprintRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/auth/': typeof AuthIndexRoute
   '/superadmin/': typeof SuperadminIndexRoute
   '/teacher/': typeof TeacherIndexRoute
   '/_authenticated/seikkailu/$screen': typeof AuthenticatedSeikkailuScreenRoute
+  '/_authenticated/student/give-strength': typeof AuthenticatedStudentGiveStrengthRoute
   '/_authenticated/student/profile': typeof AuthenticatedStudentProfileRoute
+  '/_authenticated/student/sprint': typeof AuthenticatedStudentSprintRoute
   '/_authenticated/student/strengths': typeof AuthenticatedStudentStrengthsRoute
+  '/school-admin/teach/materials': typeof SchoolAdminTeachMaterialsRoute
   '/superadmin/schools/$schoolId': typeof SuperadminSchoolsSchoolIdRoute
+  '/teacher/teach/materials': typeof TeacherTeachMaterialsRoute
+  '/teacher/teach/portfolio': typeof TeacherTeachPortfolioRoute
   '/_authenticated/seikkailu/': typeof AuthenticatedSeikkailuIndexRoute
   '/_authenticated/opettaja_/oppilas/$userId': typeof AuthenticatedOpettajaOppilasUserIdRoute
 }
@@ -342,16 +427,25 @@ export interface FileRouteTypes {
     | '/auth/student'
     | '/aventyr/$screen'
     | '/school-admin/dashboard'
+    | '/school-admin/give-strength'
     | '/superadmin/dashboard'
+    | '/superadmin/forgot-password'
     | '/superadmin/login'
     | '/teacher/dashboard'
+    | '/teacher/profile'
+    | '/teacher/sprint'
     | '/auth/'
     | '/superadmin/'
     | '/teacher/'
     | '/seikkailu/$screen'
+    | '/student/give-strength'
     | '/student/profile'
+    | '/student/sprint'
     | '/student/strengths'
+    | '/school-admin/teach/materials'
     | '/superadmin/schools/$schoolId'
+    | '/teacher/teach/materials'
+    | '/teacher/teach/portfolio'
     | '/seikkailu/'
     | '/opettaja/oppilas/$userId'
   fileRoutesByTo: FileRoutesByTo
@@ -373,17 +467,26 @@ export interface FileRouteTypes {
     | '/auth/student'
     | '/aventyr/$screen'
     | '/school-admin/dashboard'
+    | '/school-admin/give-strength'
     | '/superadmin/dashboard'
+    | '/superadmin/forgot-password'
     | '/superadmin/login'
     | '/teacher/dashboard'
+    | '/teacher/profile'
+    | '/teacher/sprint'
     | '/'
     | '/auth'
     | '/superadmin'
     | '/teacher'
     | '/seikkailu/$screen'
+    | '/student/give-strength'
     | '/student/profile'
+    | '/student/sprint'
     | '/student/strengths'
+    | '/school-admin/teach/materials'
     | '/superadmin/schools/$schoolId'
+    | '/teacher/teach/materials'
+    | '/teacher/teach/portfolio'
     | '/seikkailu'
     | '/opettaja/oppilas/$userId'
   id:
@@ -408,17 +511,26 @@ export interface FileRouteTypes {
     | '/auth/student'
     | '/aventyr/$screen'
     | '/school-admin/dashboard'
+    | '/school-admin/give-strength'
     | '/superadmin/dashboard'
+    | '/superadmin/forgot-password'
     | '/superadmin/login'
     | '/teacher/dashboard'
+    | '/teacher/profile'
+    | '/teacher/sprint'
     | '/_authenticated/'
     | '/auth/'
     | '/superadmin/'
     | '/teacher/'
     | '/_authenticated/seikkailu/$screen'
+    | '/_authenticated/student/give-strength'
     | '/_authenticated/student/profile'
+    | '/_authenticated/student/sprint'
     | '/_authenticated/student/strengths'
+    | '/school-admin/teach/materials'
     | '/superadmin/schools/$schoolId'
+    | '/teacher/teach/materials'
+    | '/teacher/teach/portfolio'
     | '/_authenticated/seikkailu/'
     | '/_authenticated/opettaja_/oppilas/$userId'
   fileRoutesById: FileRoutesById
@@ -435,12 +547,19 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   AdminSchoolsRoute: typeof AdminSchoolsRoute
   SchoolAdminDashboardRoute: typeof SchoolAdminDashboardRoute
+  SchoolAdminGiveStrengthRoute: typeof SchoolAdminGiveStrengthRoute
   SuperadminDashboardRoute: typeof SuperadminDashboardRoute
+  SuperadminForgotPasswordRoute: typeof SuperadminForgotPasswordRoute
   SuperadminLoginRoute: typeof SuperadminLoginRoute
   TeacherDashboardRoute: typeof TeacherDashboardRoute
+  TeacherProfileRoute: typeof TeacherProfileRoute
+  TeacherSprintRoute: typeof TeacherSprintRoute
   SuperadminIndexRoute: typeof SuperadminIndexRoute
   TeacherIndexRoute: typeof TeacherIndexRoute
+  SchoolAdminTeachMaterialsRoute: typeof SchoolAdminTeachMaterialsRoute
   SuperadminSchoolsSchoolIdRoute: typeof SuperadminSchoolsSchoolIdRoute
+  TeacherTeachMaterialsRoute: typeof TeacherTeachMaterialsRoute
+  TeacherTeachPortfolioRoute: typeof TeacherTeachPortfolioRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -599,6 +718,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SchoolAdminDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/school-admin/give-strength': {
+      id: '/school-admin/give-strength'
+      path: '/school-admin/give-strength'
+      fullPath: '/school-admin/give-strength'
+      preLoaderRoute: typeof SchoolAdminGiveStrengthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/superadmin/': {
       id: '/superadmin/'
       path: '/superadmin'
@@ -611,6 +737,13 @@ declare module '@tanstack/react-router' {
       path: '/superadmin/dashboard'
       fullPath: '/superadmin/dashboard'
       preLoaderRoute: typeof SuperadminDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/superadmin/forgot-password': {
+      id: '/superadmin/forgot-password'
+      path: '/superadmin/forgot-password'
+      fullPath: '/superadmin/forgot-password'
+      preLoaderRoute: typeof SuperadminForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/superadmin/login': {
@@ -634,6 +767,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TeacherDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/teacher/profile': {
+      id: '/teacher/profile'
+      path: '/teacher/profile'
+      fullPath: '/teacher/profile'
+      preLoaderRoute: typeof TeacherProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/teacher/sprint': {
+      id: '/teacher/sprint'
+      path: '/teacher/sprint'
+      fullPath: '/teacher/sprint'
+      preLoaderRoute: typeof TeacherSprintRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/seikkailu/': {
       id: '/_authenticated/seikkailu/'
       path: '/'
@@ -648,11 +795,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSeikkailuScreenRouteImport
       parentRoute: typeof AuthenticatedSeikkailuRouteRoute
     }
+    '/_authenticated/student/give-strength': {
+      id: '/_authenticated/student/give-strength'
+      path: '/give-strength'
+      fullPath: '/student/give-strength'
+      preLoaderRoute: typeof AuthenticatedStudentGiveStrengthRouteImport
+      parentRoute: typeof AuthenticatedStudentRouteRoute
+    }
     '/_authenticated/student/profile': {
       id: '/_authenticated/student/profile'
       path: '/profile'
       fullPath: '/student/profile'
       preLoaderRoute: typeof AuthenticatedStudentProfileRouteImport
+      parentRoute: typeof AuthenticatedStudentRouteRoute
+    }
+    '/_authenticated/student/sprint': {
+      id: '/_authenticated/student/sprint'
+      path: '/sprint'
+      fullPath: '/student/sprint'
+      preLoaderRoute: typeof AuthenticatedStudentSprintRouteImport
       parentRoute: typeof AuthenticatedStudentRouteRoute
     }
     '/_authenticated/student/strengths': {
@@ -662,11 +823,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentStrengthsRouteImport
       parentRoute: typeof AuthenticatedStudentRouteRoute
     }
+    '/school-admin/teach/materials': {
+      id: '/school-admin/teach/materials'
+      path: '/school-admin/teach/materials'
+      fullPath: '/school-admin/teach/materials'
+      preLoaderRoute: typeof SchoolAdminTeachMaterialsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/superadmin/schools/$schoolId': {
       id: '/superadmin/schools/$schoolId'
       path: '/superadmin/schools/$schoolId'
       fullPath: '/superadmin/schools/$schoolId'
       preLoaderRoute: typeof SuperadminSchoolsSchoolIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/teacher/teach/materials': {
+      id: '/teacher/teach/materials'
+      path: '/teacher/teach/materials'
+      fullPath: '/teacher/teach/materials'
+      preLoaderRoute: typeof TeacherTeachMaterialsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/teacher/teach/portfolio': {
+      id: '/teacher/teach/portfolio'
+      path: '/teacher/teach/portfolio'
+      fullPath: '/teacher/teach/portfolio'
+      preLoaderRoute: typeof TeacherTeachPortfolioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/opettaja_/oppilas/$userId': {
@@ -696,13 +878,18 @@ const AuthenticatedSeikkailuRouteRouteWithChildren =
   )
 
 interface AuthenticatedStudentRouteRouteChildren {
+  AuthenticatedStudentGiveStrengthRoute: typeof AuthenticatedStudentGiveStrengthRoute
   AuthenticatedStudentProfileRoute: typeof AuthenticatedStudentProfileRoute
+  AuthenticatedStudentSprintRoute: typeof AuthenticatedStudentSprintRoute
   AuthenticatedStudentStrengthsRoute: typeof AuthenticatedStudentStrengthsRoute
 }
 
 const AuthenticatedStudentRouteRouteChildren: AuthenticatedStudentRouteRouteChildren =
   {
+    AuthenticatedStudentGiveStrengthRoute:
+      AuthenticatedStudentGiveStrengthRoute,
     AuthenticatedStudentProfileRoute: AuthenticatedStudentProfileRoute,
+    AuthenticatedStudentSprintRoute: AuthenticatedStudentSprintRoute,
     AuthenticatedStudentStrengthsRoute: AuthenticatedStudentStrengthsRoute,
   }
 
@@ -785,12 +972,19 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   AdminSchoolsRoute: AdminSchoolsRoute,
   SchoolAdminDashboardRoute: SchoolAdminDashboardRoute,
+  SchoolAdminGiveStrengthRoute: SchoolAdminGiveStrengthRoute,
   SuperadminDashboardRoute: SuperadminDashboardRoute,
+  SuperadminForgotPasswordRoute: SuperadminForgotPasswordRoute,
   SuperadminLoginRoute: SuperadminLoginRoute,
   TeacherDashboardRoute: TeacherDashboardRoute,
+  TeacherProfileRoute: TeacherProfileRoute,
+  TeacherSprintRoute: TeacherSprintRoute,
   SuperadminIndexRoute: SuperadminIndexRoute,
   TeacherIndexRoute: TeacherIndexRoute,
+  SchoolAdminTeachMaterialsRoute: SchoolAdminTeachMaterialsRoute,
   SuperadminSchoolsSchoolIdRoute: SuperadminSchoolsSchoolIdRoute,
+  TeacherTeachMaterialsRoute: TeacherTeachMaterialsRoute,
+  TeacherTeachPortfolioRoute: TeacherTeachPortfolioRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

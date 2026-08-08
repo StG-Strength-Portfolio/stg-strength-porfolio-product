@@ -11,10 +11,10 @@ import { WORLDS, TOTAL_SCREENS, type WorldId } from "@/lib/screens";
 import { REQUIREMENTS } from "@/lib/screen-completion";
 import { METER_STRENGTHS, METER_STRENGTH_FIRST, fieldKeyFor } from "@/lib/meter-data";
 
-/** Numbered screens that exist in the range but have no content. */
-export const EMPTY_SCREENS = new Set([71, 72, 73, 74, 75, 76]);
+/** No screens are excluded — the adventure counts all 106 screens. */
+export const EMPTY_SCREENS = new Set<number>();
 
-/** Every screen a student can open, in order (100 screens). */
+/** Every screen a student can open, in order (106 screens). */
 export const ACTIVE_SCREENS: number[] = Array.from(
   { length: TOTAL_SCREENS },
   (_, i) => i + 1,

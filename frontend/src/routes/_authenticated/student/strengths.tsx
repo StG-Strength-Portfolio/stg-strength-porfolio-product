@@ -10,6 +10,9 @@ import { useLanguage, useTr } from "@/lib/i18n";
 import { CandyIcon, StarIcon, TrophyIcon } from "@/components/icons/AppIcons";
 import { TopStrengthCards } from "@/components/strengths/TopStrengthCards";
 import { getPeerTopStrengths, type PeerTopStrengths } from "@/lib/student-strengths.functions";
+// @lovable-new 2026-08-05 — shared growth chart + own-events hook for the student view.
+import { StrengthGrowthChart } from "@/components/reports/StrengthGrowthChart";
+import { useStudentStrengthEvents } from "@/hooks/useStudentStrengthEvents";
 
 export const Route = createFileRoute("/_authenticated/student/strengths")({
   component: StudentStrengthsPage,
@@ -31,6 +34,7 @@ function StudentStrengthsPage() {
   const lang = language === "sv" ? "sv" : language === "en" ? "en" : "fi";
   const { selected, collected } = useStrengthJar();
   const { gifts } = useReceivedGifts();
+  const { events, loading: eventsLoading } = useStudentStrengthEvents();
   const fetchPeers = useServerFn(getPeerTopStrengths);
   const [peers, setPeers] = useState<PeerTopStrengths | null>(null);
 
@@ -120,85 +124,21 @@ function StudentStrengthsPage() {
         )}
       </StickyNote>
 
+      {/* @lovable-new 2026-08-05 — Student-only Strength Collection Growth chart:
+          reuses the report chart with the signed-in student's own events, a
+          30/90/365-day selector (default 30) and no "Show all" button. */}
+      <StrengthGrowthChart
+        events={events}
+        lang={lang}
+        showRangeControls
+        visibleStrengthMode="all"
+        emptyLabel={tr("Et ole vielä kerännyt vahvuuksia.")}
+        seed="student-strength-growth"
+        loading={eventsLoading}
+      />
 
-      {peers && peers.classTop.length > 0 && (
-        <StickyNote
-          seed="student-strengths-class-top5"
-          className="space-y-3 border-4 border-[color:var(--blue,#2899B8)]"
-        >
-          <h2 className="font-display text-xl">
-            {tr("Luokkasi top 5")}
-            {peers.className ? ` — ${peers.className}` : ""}
-          </h2>
-          <TopStrengthCards
-            items={peers.classTop.map((s) => ({
-              id: s.strengthId,
-              count: s.count,
-              caption: `${s.students} ${tr("opiskelijaa")}`,
-            }))}
-            lang={lang}
-            size="sm"
-          />
-        </StickyNote>
-      )}
-
-      {peers && peers.schoolTop.length > 0 && (
-        <StickyNote
-          seed="student-strengths-school-top5"
-          className="space-y-3 border-4 border-[color:var(--purple)]"
-        >
-          <h2 className="font-display text-xl">
-            {tr("Koulusi top 5")}
-            {peers.schoolName ? ` — ${peers.schoolName}` : ""}
-          </h2>
-          <TopStrengthCards
-            items={peers.schoolTop.map((s) => ({
-              id: s.strengthId,
-              count: s.count,
-              caption: `${s.students} ${tr("opiskelijaa")}`,
-            }))}
-            lang={lang}
-            size="sm"
-          />
-        </StickyNote>
-      )}
-
-      <StickyNote seed="student-strengths-picks" className="space-y-3">
-        <h2 className="font-display text-xl">{tr("Valitsemasi vahvuudet")}</h2>
-        <Pills ids={selected} empty={tr("Et ole vielä valinnut vahvuuksia karkkikaupasta.")} />
-      </StickyNote>
-
-      <StickyNote seed="student-strengths-gifts" className="space-y-3">
-        <h2 className="font-display text-xl">{tr("Opettajalta saadut vahvuudet")}</h2>
-        {gifts.length === 0 ? (
-          <p className="text-sm opacity-70">{tr("Et ole vielä saanut vahvuuksia opettajalta.")}</p>
-        ) : (
-          <ul className="grid gap-3 sm:grid-cols-2">
-            {gifts.map((g) => {
-              const id = Number(g.strength_id);
-              const s = ALL_STRENGTHS.find((x) => x.id === id);
-              return (
-                <li
-                  key={g.id}
-                  className="rounded-2xl border-l-4 bg-white/90 p-4 text-slate-900 shadow-sm"
-                  style={{ borderLeftColor: s?.color ?? "var(--purple)" }}
-                >
-                  <div className="font-display text-lg">
-                    <CandyIcon size={18} className="mr-1 inline align-[-3px]" />
-                    {Number.isFinite(id) ? getStrengthName(id, lang) : g.strength_id}
-                  </div>
-                  {g.message && <p className="mt-1 text-sm">{g.message}</p>}
-                  <div className="mt-2 text-xs opacity-60">
-                    {g.teacher_name ?? tr("Opettaja")} ·{" "}
-                    {new Date(g.created_at).toLocaleDateString()}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </StickyNote>
-
+      {/* @lovable-new 2026-08-05 — Section order per spec: Top 5, growth chart,
+          then the full Strength Collection card, then secondary sections. */}
       <StickyNote seed="student-strengths-all" className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-display text-xl">{tr("Vahvuuskokoelmani")}</h2>
@@ -279,6 +219,84 @@ function StudentStrengthsPage() {
             );
           })}
         </ul>
+      </StickyNote>
+
+      {peers && peers.classTop.length > 0 && (
+        <StickyNote
+          seed="student-strengths-class-top5"
+          className="space-y-3 border-4 border-[color:var(--blue,#2899B8)]"
+        >
+          <h2 className="font-display text-xl">
+            {tr("Luokkasi top 5")}
+            {peers.className ? ` — ${peers.className}` : ""}
+          </h2>
+          <TopStrengthCards
+            items={peers.classTop.map((s) => ({
+              id: s.strengthId,
+              count: s.count,
+              caption: `${s.students} ${tr("opiskelijaa")}`,
+            }))}
+            lang={lang}
+            size="sm"
+          />
+        </StickyNote>
+      )}
+
+      {peers && peers.schoolTop.length > 0 && (
+        <StickyNote
+          seed="student-strengths-school-top5"
+          className="space-y-3 border-4 border-[color:var(--purple)]"
+        >
+          <h2 className="font-display text-xl">
+            {tr("Koulusi top 5")}
+            {peers.schoolName ? ` — ${peers.schoolName}` : ""}
+          </h2>
+          <TopStrengthCards
+            items={peers.schoolTop.map((s) => ({
+              id: s.strengthId,
+              count: s.count,
+              caption: `${s.students} ${tr("opiskelijaa")}`,
+            }))}
+            lang={lang}
+            size="sm"
+          />
+        </StickyNote>
+      )}
+
+      <StickyNote seed="student-strengths-picks" className="space-y-3">
+        <h2 className="font-display text-xl">{tr("Valitsemasi vahvuudet")}</h2>
+        <Pills ids={selected} empty={tr("Et ole vielä valinnut vahvuuksia karkkikaupasta.")} />
+      </StickyNote>
+
+      <StickyNote seed="student-strengths-gifts" className="space-y-3">
+        <h2 className="font-display text-xl">{tr("Opettajalta saadut vahvuudet")}</h2>
+        {gifts.length === 0 ? (
+          <p className="text-sm opacity-70">{tr("Et ole vielä saanut vahvuuksia opettajalta.")}</p>
+        ) : (
+          <ul className="grid gap-3 sm:grid-cols-2">
+            {gifts.map((g) => {
+              const id = Number(g.strength_id);
+              const s = ALL_STRENGTHS.find((x) => x.id === id);
+              return (
+                <li
+                  key={g.id}
+                  className="rounded-2xl border-l-4 bg-white/90 p-4 text-slate-900 shadow-sm"
+                  style={{ borderLeftColor: s?.color ?? "var(--purple)" }}
+                >
+                  <div className="font-display text-lg">
+                    <CandyIcon size={18} className="mr-1 inline align-[-3px]" />
+                    {Number.isFinite(id) ? getStrengthName(id, lang) : g.strength_id}
+                  </div>
+                  {g.message && <p className="mt-1 text-sm">{g.message}</p>}
+                  <div className="mt-2 text-xs opacity-60">
+                    {g.teacher_name ?? tr("Opettaja")} ·{" "}
+                    {new Date(g.created_at).toLocaleDateString()}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </StickyNote>
     </div>
   );

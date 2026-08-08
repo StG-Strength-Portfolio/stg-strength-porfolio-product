@@ -1,5 +1,6 @@
 import { Lock } from "lucide-react";
 import { WorldIcon } from "@/components/icons/AppIcons";
+import { LevelProgressBar } from "@/components/LevelProgressBar";
 import type { WorldMeta } from "@/lib/screens";
 import { cn } from "@/lib/utils";
 import { useT, useTr } from "@/lib/i18n";
@@ -34,9 +35,7 @@ export function WorldBadge({
         </div>
         <WorldIcon id={world.id} size={36} aria-hidden />
       </div>
-      <div className="mt-4 h-2 rounded-full bg-black/15 overflow-hidden">
-        <div className="h-full bg-white/80" style={{ width: `${Math.round(progress * 100)}%` }} />
-      </div>
+      <LevelProgressBar pct={progress * 100} className="mt-4 w-full" />
       <div className="mt-2 flex items-center justify-between text-[11px] opacity-90">
         <span>{t("app.screensSuffix")} {world.start}–{world.end}</span>
         {locked ? <span className="inline-flex items-center gap-1"><Lock className="h-3 w-3" /> {t("common.locked")}</span>

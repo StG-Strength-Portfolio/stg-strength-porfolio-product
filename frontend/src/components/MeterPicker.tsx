@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAutosave, loadResponse, type SaveState } from "@/hooks/use-autosave";
+import { useAutosave, useResponseReader, type SaveState } from "@/hooks/use-autosave";
 import { cn } from "@/lib/utils";
 import { useTr } from "@/lib/i18n";
 
@@ -33,13 +33,15 @@ export function MeterPicker({
   const [picked, setPicked] = useState<number | null>(null);
   const [loaded, setLoaded] = useState(false);
 
+  // @lovable-new 2026-08-05 — mode-aware read (empty in teacher preview).
+  const readResponse = useResponseReader();
   useEffect(() => {
     (async () => {
-      const v = await loadResponse<number>(fieldKey);
+      const v = await readResponse<number>(fieldKey);
       setPicked(typeof v === "number" ? v : null);
       setLoaded(true);
     })();
-  }, [fieldKey]);
+  }, [fieldKey, readResponse]);
 
   const state = useAutosave(fieldKey, picked, { enabled: loaded && picked !== null });
   useEffect(() => { onSaveStateChange?.(state); }, [state, onSaveStateChange]);

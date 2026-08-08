@@ -60,6 +60,7 @@ const CONTENT_DICT: Record<string, Entry> = generated as Record<string, Entry>;
 // Normalize a Finnish source string so that trivial whitespace / quote /
 // punctuation variants still match the Excel keys.
 function normalize(s: string): string {
+  if (typeof s !== "string") return "";
   return s
     .replace(/\s+/g, " ")
     .replace(/[\u201C\u201D]/g, '"')
@@ -625,6 +626,8 @@ function formatTemplate(s: string, vars?: Record<string, string | number>): stri
 // ---- Finnish-source lookup (Prompt 1 dictionary) ----
 const trWarned = new Set<string>();
 function trFinnish(finnish: string, language: Language): string {
+  // Defensive: callers occasionally pass an undefined lookup result.
+  if (typeof finnish !== "string" || !finnish) return "";
   if (language === "fi") return finnish;
   const out = translateFinnish(finnish, language as AppLanguage);
   if (out !== finnish && TRANSLATIONS[finnish]) return out;

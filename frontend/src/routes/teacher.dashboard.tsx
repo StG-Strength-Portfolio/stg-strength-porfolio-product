@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { StickyNote } from "@/components/StickyNote";
+import { StrengthPickerGrid } from "@/components/strengths/StrengthPickerGrid";
 import { DashboardShell } from "@/components/DashboardShell";
 import { ProfileSettings } from "@/components/ProfileSettings";
 import { supabase } from "@/integrations/supabase/client";
@@ -82,7 +83,6 @@ function TeacherDashboardPage() {
     { id: "students", label: tr("Opiskelijat") },
     { id: "strengths", label: tr("Vahvuuksien antaminen") },
     { id: "reports", label: tr("Raportit") },
-    { id: "settings", label: tr("Asetukset") },
   ];
 
   function openStudentView(id: string) {
@@ -102,7 +102,24 @@ function TeacherDashboardPage() {
         setOpenStudent(null);
       }}
       schoolName={guard.schoolName}
+      /* @lovable-new */
+      links={[
+        { to: "/teacher/sprint", label: tr("Vahvuussprintti") },
+        { to: "/teacher/profile", label: tr("Profiili") },
+      ]}
+      sections={[
+        {
+          label: tr("Opeta"),
+          links: [
+            { to: "/teacher/teach/portfolio", label: tr("Vahvuusportfolio") },
+            { to: "/teacher/teach/materials", label: tr("Opetusmateriaalit") },
+          ],
+        },
+      ]}
     >
+      {/* @lovable-new 2026-08-07 — class-code generator is always visible on the Classes tab */}
+      {tab === "classes" && !openClass && <CreateClass onCreated={refresh} />}
+
       {tab === "classes" && !openClass && (
         <TopStrengths students={students} classes={classes} assigned={assigned} />
       )}
@@ -124,14 +141,22 @@ function TeacherDashboardPage() {
                 >
                   {c.name}
                 </button>
-                <div className="text-sm opacity-80">
-                  {tr("Luokan koodi")}: <code className="font-mono">{c.join_code}</code> ·{" "}
-                  {tr("Kieli")}: {LANGUAGE_LABEL[c.language] ?? c.language}
+                {/* @lovable-new 2026-08-07 — join code always visible + copy action */}
+                <div className="flex flex-wrap items-center gap-2 text-sm opacity-80">
+                  <span>{tr("Luokan koodi")}:</span>
+                  <code className="rounded-lg bg-[color:var(--yellow)]/60 px-2 py-0.5 font-mono text-base font-bold tracking-wider text-[color:var(--ink)]">
+                    {c.join_code}
+                  </code>
+                  <CopyCodeButton code={c.join_code} />
+                  <span>
+                    · {tr("Kieli")}: {LANGUAGE_LABEL[c.language] ?? c.language}
+                  </span>
                 </div>
                 <div className="text-sm">
                   {tr("Opiskelijoita")}: {inClass.length} · {tr("Valmistuminen %")}: {avg} % ·{" "}
                   {tr("Luotu")}: {new Date(c.created_at).toLocaleDateString()}
                 </div>
+
                 <div className="pt-1">
                   <DeleteClassButton
                     klass={c}
@@ -195,14 +220,11 @@ function TeacherDashboardPage() {
       )}
 
       {tab === "settings" && (
-        <>
-          <ProfileSettings
-            schoolName={guard.schoolName}
-            displayName={guard.displayName}
-            email={guard.email}
-          />
-          <CreateClass onCreated={refresh} />
-        </>
+        <ProfileSettings
+          schoolName={guard.schoolName}
+          displayName={guard.displayName}
+          email={guard.email}
+        />
       )}
     </DashboardShell>
   );
@@ -342,7 +364,7 @@ function AssignStrengths({
   const lang = language === "sv" ? "sv" : language === "en" ? "en" : "fi";
   const [classId, setClassId] = useState("");
   const [studentId, setStudentId] = useState("");
-  const [strengthId, setStrengthId] = useState<number | null>(null);
+  const [strengthIds, setStrengthIds] = useState<number[]>([]);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -362,24 +384,33 @@ function AssignStrengths({
     [unique, classId],
   );
 
+  function toggleStrength(id: number) {
+    setStrengthIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : prev.length >= 3 ? prev : [...prev, id],
+    );
+  }
+
   async function submit() {
-    if (!teacherId || !studentId || strengthId == null) return;
+    if (!teacherId || !studentId || strengthIds.length === 0) return;
+    const names = strengthIds.map((id) => getStrengthName(id, lang)).join(", ");
     const ok = window.confirm(
-      `${tr("Haluatko lahjoittaa vahvuuden")} ${getStrengthName(strengthId, lang)} ${tr("opiskelijalle")} ${nameOf(studentId)}?`,
+      `${tr("Haluatko lahjoittaa vahvuuden")} ${names} ${tr("opiskelijalle")} ${nameOf(studentId)}?`,
     );
     if (!ok) return;
     setBusy(true);
     try {
-      const { error } = await supabase.from("teacher_assigned_strengths" as never).insert({
-        teacher_id: teacherId,
-        student_id: studentId,
-        strength_id: String(strengthId),
-        message: message.trim() || null,
-      } as never);
+      const { error } = await supabase.from("teacher_assigned_strengths" as never).insert(
+        strengthIds.map((id) => ({
+          teacher_id: teacherId,
+          student_id: studentId,
+          strength_id: String(id),
+          message: message.trim() || null,
+        })) as never,
+      );
       if (error) throw error;
-      toast.success(tr("Vahvuus lahjoitettu!"));
+      toast.success(`${strengthIds.length} ${tr("vahvuutta lähetetty!")}`);
       setMessage("");
-      setStrengthId(null);
+      setStrengthIds([]);
       await onDone();
     } catch (e) {
       toast.error((e as Error).message);
@@ -436,27 +467,12 @@ function AssignStrengths({
 
         <div className="space-y-2">
           <Label>{tr("Valitse vahvuus")}</Label>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-            {ALL_STRENGTHS.map((s) => (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => setStrengthId(s.id)}
-                aria-pressed={strengthId === s.id}
-                className={cn(
-                  "flex items-center gap-2 rounded-2xl border-2 bg-white px-3 py-2 text-left text-xs font-medium text-[color:var(--ink)] transition-all hover:-translate-y-0.5",
-                  strengthId === s.id ? "border-[color:var(--coral)] shadow-md" : "border-black/10",
-                )}
-              >
-                <span
-                  className="h-3 w-3 shrink-0 rounded-full"
-                  style={{ background: s.color }}
-                  aria-hidden
-                />
-                <span className="truncate">{getStrengthName(s.id, lang)}</span>
-              </button>
-            ))}
-          </div>
+          <StrengthPickerGrid
+            lang={lang}
+            selectedIds={strengthIds}
+            disabled={busy || !studentId}
+            onSelect={toggleStrength}
+          />
         </div>
 
         <div className="space-y-1">
@@ -470,7 +486,7 @@ function AssignStrengths({
         </div>
 
         <Button
-          disabled={busy || !studentId || strengthId == null}
+          disabled={busy || !studentId || strengthIds.length === 0}
           onClick={() => void submit()}
           className="rounded-full bg-[color:var(--purple)] font-bold text-white hover:bg-[color:var(--purple)]/90"
         >
@@ -738,17 +754,33 @@ function TeacherReports({
   );
 }
 
-function CreateClass({
-  onDoneNoop,
-  onCreated,
-}: {
-  onDoneNoop?: never;
-  onCreated: () => Promise<void>;
-}) {
+/* @lovable-new 2026-08-07 — shared copy-code action */
+function CopyCodeButton({ code }: { code: string }) {
+  const tr = useTr();
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(code);
+      toast.success(tr("Koodi kopioitu!"));
+    } catch {
+      toast.error(tr("Kopiointi epäonnistui"));
+    }
+  }
+  return (
+    <Button type="button" size="sm" variant="secondary" className="rounded-full" onClick={copy}>
+      <Copy className="mr-1 h-3.5 w-3.5" /> {tr("Kopioi koodi")}
+    </Button>
+  );
+}
+
+/* @lovable-new 2026-08-07 — always-visible class-code generator with result panel */
+function CreateClass({ onCreated }: { onCreated: () => Promise<void> }) {
   const tr = useTr();
   const [name, setName] = useState("");
   const [language, setLanguageChoice] = useState<Language>("fi");
   const [busy, setBusy] = useState(false);
+  const [created, setCreated] = useState<{ name: string; code: string; language: Language } | null>(
+    null,
+  );
 
   async function create(e: React.FormEvent) {
     e.preventDefault();
@@ -756,17 +788,28 @@ function CreateClass({
     setBusy(true);
     try {
       const { data: u } = await supabase.auth.getUser();
-      if (!u.user) return;
-      const { error } = await supabase.from("classes" as never).insert({
-        name: name.trim(),
-        teacher_id: u.user.id,
-        join_code: randomCode(),
-        language,
-      } as never);
-      if (error) throw error;
-      setName("");
-      toast.success(tr("Tallennettu!"));
-      await onCreated();
+      if (!u.user) throw new Error("No session.");
+      let lastError: unknown = null;
+      // Retry once on a join_code uniqueness collision.
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const code = randomCode();
+        const { error } = await supabase.from("classes" as never).insert({
+          name: name.trim(),
+          teacher_id: u.user.id,
+          join_code: code,
+          language,
+        } as never);
+        if (!error) {
+          setCreated({ name: name.trim(), code, language });
+          setName("");
+          toast.success(tr("Luokka luotu."));
+          await onCreated();
+          return;
+        }
+        lastError = error;
+        if ((error as { code?: string }).code !== "23505") break;
+      }
+      throw lastError;
     } catch (err) {
       toast.error((err as Error).message);
     } finally {
@@ -776,11 +819,22 @@ function CreateClass({
 
   return (
     <StickyNote seed="t-create-class" className="space-y-3">
-      <h3 className="text-xl font-bold">{tr("Luo luokka")}</h3>
+      <h3 className="text-xl font-bold">{tr("Luo luokkakoodi")}</h3>
+      <p className="text-sm opacity-70">
+        {tr(
+          "Anna luokalle nimi ja valitse kieli. Oppilaat liittyvät luodulla koodilla ja saavat luokan kielen käyttöön.",
+        )}
+      </p>
       <form onSubmit={create} className="grid gap-3 md:grid-cols-3">
-        <div className="space-y-1">
+        <div className="space-y-1 md:col-span-2">
           <Label htmlFor="cc-name">{tr("Luokan nimi")}</Label>
-          <Input id="cc-name" value={name} onChange={(e) => setName(e.target.value)} />
+          <Input
+            id="cc-name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder={tr("esim. 9A — Vahvuusryhmä")}
+            maxLength={80}
+          />
         </div>
         <div className="space-y-1">
           <Label htmlFor="cc-lang">{tr("Kieli")}</Label>
@@ -800,17 +854,32 @@ function CreateClass({
         <div className="md:col-span-3">
           <Button
             type="submit"
-            disabled={busy}
-            className="rounded-full bg-[color:var(--purple)] font-bold text-white hover:bg-[color:var(--purple)]/90"
+            disabled={busy || !name.trim()}
+            className="rounded-full bg-[color:var(--purple)] px-6 py-5 font-bold text-white hover:bg-[color:var(--purple)]/90"
           >
-            {tr("Luo luokka")}
+            {busy ? tr("Luodaan…") : tr("Luo luokkakoodi")}
           </Button>
         </div>
       </form>
-      <p className="text-xs opacity-60">
-        <Copy className="mr-1 inline h-3 w-3" />
-        {tr("Luokan koodi")}
-      </p>
+
+      {created && (
+        <div className="rounded-2xl bg-white/70 p-4">
+          <div className="text-xs uppercase tracking-wider opacity-60">
+            {tr("Uusi luokkakoodi")}
+          </div>
+          <div className="mt-1 flex flex-wrap items-center gap-3">
+            <span className="rounded-2xl bg-[color:var(--yellow)] px-4 py-2 font-mono text-2xl font-bold tracking-wider text-[color:var(--ink)]">
+              {created.code}
+            </span>
+            <span className="text-sm font-semibold">{created.name}</span>
+            <span className="text-sm opacity-70">
+              {tr("Kieli")}: {LANGUAGE_LABEL[created.language] ?? created.language}
+            </span>
+            <CopyCodeButton code={created.code} />
+          </div>
+          <p className="mt-2 text-xs opacity-60">{tr("Jaa tämä koodi oppilaille.")}</p>
+        </div>
+      )}
     </StickyNote>
   );
 }

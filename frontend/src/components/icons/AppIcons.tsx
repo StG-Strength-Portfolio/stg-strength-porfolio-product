@@ -159,3 +159,57 @@ export function WorldIcon({ id, ...rest }: IconProps & { id: WorldId }) {
   const Cmp = WORLD_ICONS[id] ?? SparkleIcon;
   return <Cmp {...rest} />;
 }
+
+/* ---------- @lovable-new 2026-08-04 — navigation icons ---------- */
+
+export const ArrowLeftIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M19 12H5M12 19l-7-7 7-7" />
+  </Svg>
+);
+
+export const BookIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+  </Svg>
+);
+
+export const GiftIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3.5" y="9" width="17" height="11.5" rx="2" />
+    <path d="M3.5 13h17M12 9v11.5" />
+    <path d="M12 9S10.5 4.5 8 4.5a2.2 2.2 0 000 4.5h4zM12 9s1.5-4.5 4-4.5a2.2 2.2 0 010 4.5h-4z" />
+  </Svg>
+);
+
+export const HeartIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 20s-7-4.4-7-9.2A4 4 0 0112 8.6 4 4 0 0119 10.8C19 15.6 12 20 12 20z" />
+  </Svg>
+);
+
+export const GridIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3.5" y="3.5" width="7" height="7" rx="1.5" />
+    <rect x="13.5" y="3.5" width="7" height="7" rx="1.5" />
+    <rect x="3.5" y="13.5" width="7" height="7" rx="1.5" />
+    <rect x="13.5" y="13.5" width="7" height="7" rx="1.5" />
+  </Svg>
+);
+
+export const PresentIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3" y="4" width="18" height="12" rx="2" />
+    <path d="M12 16v4M9 20h6" />
+  </Svg>
+);
+
+export const GamepadIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="2.5" y="7.5" width="19" height="9" rx="4.5" />
+    <path d="M7 10.5v3M5.5 12h3" />
+    <circle cx="16" cy="11" r=".9" />
+    <circle cx="18" cy="13.5" r=".9" />
+  </Svg>
+);

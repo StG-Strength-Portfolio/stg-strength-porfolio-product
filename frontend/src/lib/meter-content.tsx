@@ -11,7 +11,7 @@ import {
   loadAllMeterScores, computeVirtueSubtotals, computeTop5, computeBottom3,
   type StrengthScore,
 } from "@/lib/meter";
-import { useAutosave, loadResponse, type SaveState } from "@/hooks/use-autosave";
+import { useAutosave, useResponseReader, type SaveState } from "@/hooks/use-autosave";
 import { cn } from "@/lib/utils";
 import { useTr } from "@/lib/i18n";
 
@@ -61,14 +61,16 @@ function MeterStrengthScreen({ n, onSaveStateChange }: { n: number } & Props) {
   const [s1, setS1] = useState<number | null>(null);
   const [s2, setS2] = useState<number | null>(null);
   // Load initial scores for the live tally (taking reverse into account)
+  // @lovable-new 2026-08-05 — mode-aware read (empty in teacher preview).
+  const readResponse = useResponseReader();
   useEffect(() => {
     (async () => {
-      const a = await loadResponse<number>(fieldKeyFor(s.id, 0));
-      const b = await loadResponse<number>(fieldKeyFor(s.id, 1));
+      const a = await readResponse<number>(fieldKeyFor(s.id, 0));
+      const b = await readResponse<number>(fieldKeyFor(s.id, 1));
       if (typeof a === "number") setS1(s.statements[0].reversed ? 6 - a : a);
       if (typeof b === "number") setS2(s.statements[1].reversed ? 6 - b : b);
     })();
-  }, [s.id, s.statements]);
+  }, [s.id, s.statements, readResponse]);
 
   const total = (s1 ?? 0) + (s2 ?? 0);
   const both = s1 !== null && s2 !== null;
@@ -115,7 +117,9 @@ function MeterStrengthScreen({ n, onSaveStateChange }: { n: number } & Props) {
 function MeterSummary() {
   const tr = useTr();
   const [scores, setScores] = useState<StrengthScore[] | null>(null);
-  useEffect(() => { loadAllMeterScores().then(setScores); }, []);
+  // @lovable-new 2026-08-05 — mode-aware read (empty in teacher preview).
+  const readResponse = useResponseReader();
+  useEffect(() => { loadAllMeterScores(readResponse).then(setScores); }, [readResponse]);
   const subtotals = useMemo(() => scores ? computeVirtueSubtotals(scores) : [], [scores]);
 
   return (
@@ -158,7 +162,9 @@ function MeterSummary() {
 function MeterReflect() {
   const tr = useTr();
   const [scores, setScores] = useState<StrengthScore[] | null>(null);
-  useEffect(() => { loadAllMeterScores().then(setScores); }, []);
+  // @lovable-new 2026-08-05 — mode-aware read (empty in teacher preview).
+  const readResponse = useResponseReader();
+  useEffect(() => { loadAllMeterScores(readResponse).then(setScores); }, [readResponse]);
   const top = useMemo(() => scores ? computeTop5(scores) : [], [scores]);
   const bot = useMemo(() => scores ? computeBottom3(scores) : [], [scores]);
 
@@ -211,19 +217,21 @@ function MeterTop({ onSaveStateChange }: Props) {
   const [candyPicks, setCandyPicks] = useState<number[] | null>(null);
   const [loaded, setLoaded] = useState(false);
 
+  // @lovable-new 2026-08-05 — mode-aware read (empty in teacher preview).
+  const readResponse = useResponseReader();
   useEffect(() => {
     (async () => {
-      const sc = await loadAllMeterScores();
+      const sc = await loadAllMeterScores(readResponse);
       setScores(sc);
-      const savedTop = await loadResponse<string[]>("meter2_top5");
-      const savedGr = await loadResponse<string[]>("meter2_growth3");
-      const candy = await loadResponse<number[]>("screen_12_karkkikauppa_picks");
+      const savedTop = await readResponse<string[]>("meter2_top5");
+      const savedGr = await readResponse<string[]>("meter2_growth3");
+      const candy = await readResponse<number[]>("screen_12_karkkikauppa_picks");
       setTop5(Array.isArray(savedTop) && savedTop.length ? savedTop : computeTop5(sc).map((s) => s.id));
       setGrowth3(Array.isArray(savedGr) && savedGr.length ? savedGr : computeBottom3(sc).map((s) => s.id));
       setCandyPicks(Array.isArray(candy) ? candy : null);
       setLoaded(true);
     })();
-  }, []);
+  }, [readResponse]);
 
   const sTop = useAutosave("meter2_top5", top5, { enabled: loaded });
   const sGr = useAutosave("meter2_growth3", growth3, { enabled: loaded });

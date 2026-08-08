@@ -6,6 +6,7 @@ import { Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
 import { StickyNote } from "@/components/StickyNote";
 import { DashboardShell } from "@/components/DashboardShell";
 import { ProfileSettings } from "@/components/ProfileSettings";
@@ -160,6 +161,16 @@ function SchoolAdminDashboard() {
         setOpenStudent(null);
       }}
       schoolName={data?.school?.name ?? guard.schoolName}
+      /* @lovable-new */
+      links={[{ to: "/school-admin/give-strength", label: tr("Anna vahvuus opettajalle") }]}
+      sections={[
+        {
+          label: tr("Opeta"),
+          links: [
+            { to: "/school-admin/teach/materials", label: tr("Opetusmateriaalit") },
+          ],
+        },
+      ]}
     >
       {tab === "overview" && (
         <>
@@ -242,6 +253,9 @@ function SchoolAdminDashboard() {
           if (!s) return null;
           return (
             <StudentDetailReport
+              /* @lovable-new 2026-08-05 — school context for the printed report header. */
+              schoolName={data?.school?.name ?? null}
+
               name={s.name}
               className={s.className}
               email={s.email}
@@ -795,21 +809,8 @@ function SchoolAdminClassReport({
   const top = useMemo(() => tally(rows).slice(0, 5), [rows]);
   const avg = rows.length ? Math.round(rows.reduce((a, r) => a + r.pct, 0) / rows.length) : 0;
 
-  const levels = useMemo(
-    () =>
-      WORLDS.map((w, i) => {
-        let done = 0;
-        let total = 0;
-        for (const r of rows) {
-          const x = r.worlds[i];
-          if (!x) continue;
-          done += x.done;
-          total += x.total;
-        }
-        return { id: w.id, title: w.title, pct: total ? Math.round((done / total) * 100) : 0 };
-      }),
-    [rows],
-  );
+
+
 
   const sorted = useMemo(() => {
     const copy = [...rows];
@@ -881,23 +882,8 @@ function SchoolAdminClassReport({
         seedPrefix={`sa-cls-${cls?.id ?? "x"}`}
       />
 
-      <StickyNote seed={`sa-cls-levels-${cls?.id ?? "x"}`} className="space-y-2">
-        <h3 className="text-xl font-bold">{tr("Tasojen valmistuminen")}</h3>
-        <ul className="space-y-2">
-          {levels.map((l) => (
-            <li key={l.id} className="flex items-center gap-3 text-sm">
-              <span className="w-28 shrink-0 font-medium">{tr(l.title)}</span>
-              <span className="h-3 flex-1 overflow-hidden rounded-full bg-black/10">
-                <span
-                  className="block h-full rounded-full bg-[color:var(--purple)]"
-                  style={{ width: `${l.pct}%` }}
-                />
-              </span>
-              <span className="w-12 shrink-0 text-right tabular-nums">{l.pct} %</span>
-            </li>
-          ))}
-        </ul>
-      </StickyNote>
+      {/* Level completion lives inside <ReportTrends /> — no duplicate card here. */}
+
 
       <StickyNote seed={`sa-cls-students-${cls?.id ?? "x"}`} className="space-y-3 overflow-x-auto">
         <div className="flex flex-wrap items-center justify-between gap-2">
