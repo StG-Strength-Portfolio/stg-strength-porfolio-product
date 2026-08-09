@@ -74,22 +74,33 @@ function TeacherSignup() {
             <div className="space-y-1.5">
               <Label htmlFor="email">{t("common.email")}</Label>
               <Input
-                id="email" type="email" required value={email}
+                id="email"
+                type="email"
+                required
+                value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="teacher@school.example" autoComplete="email"
+                placeholder="teacher@school.example"
+                autoComplete="email"
               />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="password">{t("common.password")}</Label>
               <Input
-                id="password" type="password" required minLength={6} value={password}
-                onChange={(e) => setPassword(e.target.value)} autoComplete="new-password"
+                id="password"
+                type="password"
+                required
+                minLength={6}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
               />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="school">{t("auth.teacher.school")}</Label>
               <Input
-                id="school" required value={school}
+                id="school"
+                required
+                value={school}
                 onChange={(e) => setSchool(e.target.value)}
                 placeholder={t("auth.teacher.schoolPh")}
               />
@@ -97,13 +108,16 @@ function TeacherSignup() {
             <div className="space-y-1.5">
               <Label htmlFor="code">{t("auth.teacher.teacherCode")}</Label>
               <Input
-                id="code" required value={teacherCode}
+                id="code"
+                required
+                value={teacherCode}
                 onChange={(e) => setTeacherCode(e.target.value)}
                 placeholder={t("auth.teacher.teacherCodePh")}
               />
             </div>
             <Button
-              type="submit" disabled={busy}
+              type="submit"
+              disabled={busy}
               className="w-full rounded-full bg-[color:var(--coral)] hover:bg-[color:var(--coral)]/90 text-white font-bold py-6 text-base"
             >
               {busy ? t("auth.login.busy") : t("auth.teacher.submit")}

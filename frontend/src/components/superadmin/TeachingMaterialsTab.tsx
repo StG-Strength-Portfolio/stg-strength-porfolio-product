@@ -61,7 +61,6 @@ function PublishToggle({
   );
 }
 
-
 export function TeachingMaterialsTab() {
   const tr = useTr();
   const { language } = useLanguage();
@@ -72,7 +71,7 @@ export function TeachingMaterialsTab() {
   const catOfArticle = useMemo(() => {
     const parent = new Map(subcategories.map((s) => [s.id, s.category_id]));
     return (a: TeachingArticle) =>
-      a.category_id ?? (a.subcategory_id ? parent.get(a.subcategory_id) ?? null : null);
+      a.category_id ?? (a.subcategory_id ? (parent.get(a.subcategory_id) ?? null) : null);
   }, [subcategories]);
 
   const addCategory = useServerFn(createTeachingCategory);
@@ -90,10 +89,7 @@ export function TeachingMaterialsTab() {
   /** @lovable-new 2026-08-05 article shown in the teacher-eye preview panel. */
   const [preview, setPreview] = useState<TeachingArticle | null>(null);
 
-  const usedStrengths = useMemo(
-    () => new Set(categories.map((c) => c.strength_id)),
-    [categories],
-  );
+  const usedStrengths = useMemo(() => new Set(categories.map((c) => c.strength_id)), [categories]);
 
   async function run(fn: () => Promise<unknown>) {
     setBusy(true);
@@ -125,10 +121,10 @@ export function TeachingMaterialsTab() {
               {STRENGTHS.map((s) => s.nr)
                 .filter((id: number) => !usedStrengths.has(String(id)))
                 .map((id: number) => (
-                <option key={id} value={String(id)}>
-                  {getStrengthName(id, lang)}
-                </option>
-              ))}
+                  <option key={id} value={String(id)}>
+                    {getStrengthName(id, lang)}
+                  </option>
+                ))}
             </select>
           </div>
           <Button
@@ -181,7 +177,6 @@ export function TeachingMaterialsTab() {
                 </Button>
               </div>
             </div>
-
 
             {open && (
               <div className="space-y-3">
@@ -317,9 +312,7 @@ function ArticleForm({
 
   return (
     <StickyNote seed="tm-article-form" className="space-y-3">
-      <h3 className="text-xl font-bold">
-        {article ? tr("Muokkaa") : tr("Lisää artikkeli")}
-      </h3>
+      <h3 className="text-xl font-bold">{article ? tr("Muokkaa") : tr("Lisää artikkeli")}</h3>
       <div className="grid gap-3 md:grid-cols-3">
         <Field label={`${tr("Otsikko")} (FI)`} value={titleFi} onChange={setTitleFi} />
         <Field label={`${tr("Otsikko")} (EN)`} value={titleEn} onChange={setTitleEn} />

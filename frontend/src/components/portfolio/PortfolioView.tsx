@@ -168,12 +168,14 @@ export function PortfolioView({ name, currentScreen, responses, header }: Portfo
             <div className="text-xs uppercase tracking-wider opacity-70">
               {tr("Vahvuusmittari")}
             </div>
-            <div className="font-display text-xl">{meterDone ? tr("Suoritettu") : tr("Kesken")}</div>
+            <div className="font-display text-xl">
+              {meterDone ? tr("Suoritettu") : tr("Kesken")}
+            </div>
           </div>
         </div>
       </StickyNote>
 
-      {(top5?.length || growth3?.length) ? (
+      {top5?.length || growth3?.length ? (
         <StickyNote tone="coral">
           <h2 className="mb-2 font-display text-2xl">{tr("Vahvuustulos")}</h2>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -264,7 +266,9 @@ function LevelSection({
         <span className="shrink-0 text-xs font-semibold opacity-60">
           {count} {tr("näyttöä")}
         </span>
-        <ChevronDown className={cn("h-4 w-4 shrink-0 transition-transform", !open && "-rotate-90")} />
+        <ChevronDown
+          className={cn("h-4 w-4 shrink-0 transition-transform", !open && "-rotate-90")}
+        />
       </button>
       {open && <div className="grid gap-2">{children}</div>}
     </section>

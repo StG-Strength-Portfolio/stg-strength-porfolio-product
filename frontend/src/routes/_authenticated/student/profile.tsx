@@ -14,9 +14,15 @@ export const Route = createFileRoute("/_authenticated/student/profile")({
   head: () => ({
     meta: [
       { title: "Profiili — Vahvuusseikkailu" },
-      { name: "description", content: "Muokkaa nimeäsi, sähköpostiasi ja salasanaasi Vahvuusseikkailussa." },
+      {
+        name: "description",
+        content: "Muokkaa nimeäsi, sähköpostiasi ja salasanaasi Vahvuusseikkailussa.",
+      },
       { property: "og:title", content: "Profiili — Vahvuusseikkailu" },
-      { property: "og:description", content: "Muokkaa nimeäsi, sähköpostiasi ja salasanaasi Vahvuusseikkailussa." },
+      {
+        property: "og:description",
+        content: "Muokkaa nimeäsi, sähköpostiasi ja salasanaasi Vahvuusseikkailussa.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -120,7 +126,12 @@ function StudentProfilePage() {
         <form onSubmit={save} className="grid gap-4 md:grid-cols-2">
           <div className="space-y-1">
             <Label htmlFor="sp-name">{tr("Nimi")}</Label>
-            <Input id="sp-name" value={name} onChange={(e) => setName(e.target.value)} maxLength={100} />
+            <Input
+              id="sp-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={100}
+            />
           </div>
           <div className="space-y-1">
             <Label htmlFor="sp-mail">{tr("Sähköposti")}</Label>

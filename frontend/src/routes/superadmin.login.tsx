@@ -94,16 +94,6 @@ function SuperAdminLogin() {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            {/* @lovable-new 2026-08-05 — Forgot password entry point for admins. */}
-            <div className="text-right">
-              <Link
-                to="/superadmin/forgot-password"
-                className="text-xs font-semibold text-[color:var(--purple)] underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--purple)]"
-              >
-                {tr("Unohditko salasanasi?")}
-              </Link>
-            </div>
-
             <Button
               type="submit"
               disabled={busy}

@@ -30,9 +30,18 @@ export function useTeachingMaterials(): TeachingTree {
     setLoading(true);
     try {
       const [c, s, a] = await Promise.all([
-        supabase.from("teaching_categories" as never).select("*").order("sort_order"),
-        supabase.from("teaching_subcategories" as never).select("*").order("sort_order"),
-        supabase.from("teaching_articles" as never).select("*").order("sort_order"),
+        supabase
+          .from("teaching_categories" as never)
+          .select("*")
+          .order("sort_order"),
+        supabase
+          .from("teaching_subcategories" as never)
+          .select("*")
+          .order("sort_order"),
+        supabase
+          .from("teaching_articles" as never)
+          .select("*")
+          .order("sort_order"),
       ]);
       setCategories((c.data ?? []) as unknown as TeachingCategory[]);
       setSubcategories((s.data ?? []) as unknown as TeachingSubcategory[]);

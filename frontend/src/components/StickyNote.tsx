@@ -14,13 +14,12 @@ export function StickyNote({
   tone?: "white" | "yellow" | "mint" | "coral";
 }) {
   const bg =
-    tone === "yellow" ? "bg-[color:var(--yellow)] text-[color:var(--ink)]"
-    : tone === "mint" ? "bg-[color:var(--mint)] text-[color:var(--ink)]"
-    : tone === "coral" ? "bg-[color:var(--coral)] text-white"
-    : "bg-card text-card-foreground";
-  return (
-    <div className={cn("sticky-note", bg, className)}>
-      {children}
-    </div>
-  );
+    tone === "yellow"
+      ? "bg-[color:var(--yellow)] text-[color:var(--ink)]"
+      : tone === "mint"
+        ? "bg-[color:var(--mint)] text-[color:var(--ink)]"
+        : tone === "coral"
+          ? "bg-[color:var(--coral)] text-white"
+          : "bg-card text-card-foreground";
+  return <div className={cn("sticky-note", bg, className)}>{children}</div>;
 }

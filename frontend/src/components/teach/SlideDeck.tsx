@@ -2,14 +2,12 @@
  * @lovable-new 2026-08-05
  * Google Slides deck rendering for the Teach section.
  *
- * Browse mode = every slide stacked vertically (quick scanning).
- * @lovable-new 2026-08-05 — one shared slideshow: the yellow "Open slideshow"
- * button starts at slide 1, double-clicking a slide starts at that slide, and
- * both go through openSlideshowAt(). Native fullscreen is requested inside the
- * user gesture; the scroll position is restored when the slideshow closes.
+ * Browse mode = every slide stacked in a scrollable list (quick scanning).
+ * @lovable-new 2026-08-05 Double-clicking a slide opens THAT slide fullscreen;
+ * the old "Present to class" button is gone.
  */
-import { useCallback, useRef, useState } from "react";
-import { TeachingMaterialsSlideshow } from "@/components/teach/TeachingMaterialsSlideshow";
+import { useState } from "react";
+import { SlideFullscreen } from "@/components/teach/SlideFullscreen";
 import { slidesEmbedUrl, slidesId } from "@/lib/google-slides";
 import { useTr } from "@/lib/i18n";
 
@@ -27,36 +25,17 @@ export function SlideDeck({
   slideCount?: number | null;
 }) {
   const tr = useTr();
-  const [slideshow, setSlideshow] = useState<number | null>(null);
-  const scrollY = useRef(0);
+  const [fullscreen, setFullscreen] = useState<number | null>(null);
 
   const total = slideCount && slideCount > 0 ? slideCount : DEFAULT_SLIDES;
   const id = slidesId(url);
 
-  const openSlideshowAt = useCallback((index: number) => {
-    scrollY.current = window.scrollY;
-    // Must run inside the user gesture — a later effect may lose activation.
-    void document.documentElement.requestFullscreen?.().catch(() => undefined);
-    setSlideshow(index);
-  }, []);
-
-  const closeSlideshow = useCallback(() => {
-    setSlideshow(null);
-    requestAnimationFrame(() => window.scrollTo({ top: scrollY.current }));
-  }, []);
-
   if (!id) return <p className="opacity-70">{tr("Ei materiaaleja vielä.")}</p>;
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          onClick={() => openSlideshowAt(0)}
-          className="rounded-full bg-[color:var(--yellow)] px-5 py-2 font-display text-base font-bold text-[color:var(--purple-dark)] shadow transition-all hover:brightness-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--purple-dark)]"
-        >
-          {tr("Avaa diaesitys")}
-        </button>
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="text-xl font-bold">{title}</h3>
         <span className="text-xs opacity-70">
           {tr("Avaa dia koko näytölle kaksoisklikkaamalla")}
         </span>
@@ -73,9 +52,9 @@ export function SlideDeck({
               role="button"
               tabIndex={0}
               aria-label={`${tr("Dia")} ${i + 1}`}
-              onDoubleClick={() => openSlideshowAt(i)}
+              onDoubleClick={() => setFullscreen(i)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") openSlideshowAt(i);
+                if (e.key === "Enter") setFullscreen(i);
               }}
               className="relative aspect-video w-full cursor-zoom-in overflow-hidden rounded-2xl bg-white shadow"
             >
@@ -91,15 +70,15 @@ export function SlideDeck({
         ))}
       </div>
 
-      {slideshow != null && (
-        <TeachingMaterialsSlideshow
+      {fullscreen != null && (
+        <SlideFullscreen
           url={url}
           title={title}
           lang={lang}
           total={total}
-          index={slideshow}
-          onIndexChange={setSlideshow}
-          onClose={closeSlideshow}
+          index={fullscreen}
+          onIndexChange={setFullscreen}
+          onClose={() => setFullscreen(null)}
         />
       )}
     </div>

@@ -1,7 +1,7 @@
 /**
  * Vahvuusseikkailu — Complete Trilingual Strengths Registry
  * Finnish, Swedish, English (from corrected Excel workbook)
- * 
+ *
  * CRITICAL: This is the single source of truth for all strength names.
  * NO fallback logic — each language is complete and atomic.
  * If a language is selected, ONLY that language is used for display.
@@ -47,7 +47,12 @@ export const STRENGTHS: Strength[] = [
   { nr: 21, fi: "Itsesäätely", sv: "Självreglering", en: "Self-Regulation" },
 
   // TRANSCENDENCE (Transcendens)
-  { nr: 22, fi: "Kauneuden ja erinomaisuuden arvostaminen", sv: "Uppskattning av skönhet", en: "Love of Beauty" },
+  {
+    nr: 22,
+    fi: "Kauneuden ja erinomaisuuden arvostaminen",
+    sv: "Uppskattning av skönhet",
+    en: "Love of Beauty",
+  },
   { nr: 23, fi: "Kiitollisuus", sv: "Tacksamhet", en: "Gratitude" },
   { nr: 24, fi: "Toiveikkuus", sv: "Hoppfullhet", en: "Hope" },
   { nr: 25, fi: "Huumorintaju", sv: "Humor", en: "Humor" },
@@ -58,10 +63,7 @@ export const STRENGTHS: Strength[] = [
  * Get strength name in the specified language.
  * NO FALLBACK — if the language/strength doesn't exist, returns the strength number as fallback.
  */
-export function getStrengthName(
-  strengthNr: number,
-  language: "fi" | "sv" | "en" = "fi"
-): string {
+export function getStrengthName(strengthNr: number, language: "fi" | "sv" | "en" = "fi"): string {
   const strength = STRENGTHS.find((s) => s.nr === strengthNr);
   if (!strength) {
     console.warn(`Strength #${strengthNr} not found`);
@@ -82,14 +84,16 @@ export function getStrengthName(
  * Returns array of { nr, name } sorted by name in that language.
  */
 export function getStrengthsByLanguage(
-  language: "fi" | "sv" | "en" = "fi"
+  language: "fi" | "sv" | "en" = "fi",
 ): Array<{ nr: number; name: string }> {
   return STRENGTHS.map((s) => ({
     nr: s.nr,
     name: s[language],
   })).sort((a, b) => {
     // Sort by name in the appropriate language
-    const collator = new Intl.Collator(language === "sv" ? "sv-SE" : language === "en" ? "en-US" : "fi-FI");
+    const collator = new Intl.Collator(
+      language === "sv" ? "sv-SE" : language === "en" ? "en-US" : "fi-FI",
+    );
     return collator.compare(a.name, b.name);
   });
 }
@@ -100,25 +104,23 @@ export function getStrengthsByLanguage(
  */
 export const STRENGTH_NAMES_FI = STRENGTHS.reduce(
   (acc, s) => ({ ...acc, [s.nr]: s.fi }),
-  {} as Record<number, string>
+  {} as Record<number, string>,
 );
 
 export const STRENGTH_NAMES_SV = STRENGTHS.reduce(
   (acc, s) => ({ ...acc, [s.nr]: s.sv }),
-  {} as Record<number, string>
+  {} as Record<number, string>,
 );
 
 export const STRENGTH_NAMES_EN = STRENGTHS.reduce(
   (acc, s) => ({ ...acc, [s.nr]: s.en }),
-  {} as Record<number, string>
+  {} as Record<number, string>,
 );
 
 /**
  * Get the appropriate strength names table for a language.
  */
-export function getStrengthNamesTable(
-  language: "fi" | "sv" | "en"
-): Record<number, string> {
+export function getStrengthNamesTable(language: "fi" | "sv" | "en"): Record<number, string> {
   switch (language) {
     case "sv":
       return STRENGTH_NAMES_SV;
@@ -129,7 +131,6 @@ export function getStrengthNamesTable(
       return STRENGTH_NAMES_FI;
   }
 }
-
 
 /** Brand hex color per strength number (1–26). Same in every language. */
 export const STRENGTH_COLORS: Record<number, string> = {

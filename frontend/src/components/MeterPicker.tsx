@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAutosave, useResponseReader, type SaveState } from "@/hooks/use-autosave";
+import { useAutosave, loadResponse, type SaveState } from "@/hooks/use-autosave";
 import { cn } from "@/lib/utils";
 import { useTr } from "@/lib/i18n";
 
@@ -33,29 +33,30 @@ export function MeterPicker({
   const [picked, setPicked] = useState<number | null>(null);
   const [loaded, setLoaded] = useState(false);
 
-  // @lovable-new 2026-08-05 — mode-aware read (empty in teacher preview).
-  const readResponse = useResponseReader();
   useEffect(() => {
     (async () => {
-      const v = await readResponse<number>(fieldKey);
+      const v = await loadResponse<number>(fieldKey);
       setPicked(typeof v === "number" ? v : null);
       setLoaded(true);
     })();
-  }, [fieldKey, readResponse]);
+  }, [fieldKey]);
 
   const state = useAutosave(fieldKey, picked, { enabled: loaded && picked !== null });
-  useEffect(() => { onSaveStateChange?.(state); }, [state, onSaveStateChange]);
+  useEffect(() => {
+    onSaveStateChange?.(state);
+  }, [state, onSaveStateChange]);
   useEffect(() => {
     if (!loaded) return;
-    if (picked === null) { onScoreChange?.(null); return; }
+    if (picked === null) {
+      onScoreChange?.(null);
+      return;
+    }
     onScoreChange?.(reversed ? 6 - picked : picked);
   }, [picked, loaded, reversed, onScoreChange]);
 
   return (
     <div className="space-y-3">
-      <p className="text-[0.95rem] leading-snug font-medium text-[color:var(--ink)]">
-        {statement}
-      </p>
+      <p className="text-[0.95rem] leading-snug font-medium text-[color:var(--ink)]">{statement}</p>
       <div className="flex flex-col gap-2">
         {LABELS.map(({ label, value }) => {
           const active = picked === value;
@@ -68,14 +69,16 @@ export function MeterPicker({
                 "candy-chip flex items-center gap-3 rounded-full border-2 px-3 py-2 text-left text-sm font-medium transition-all",
                 active
                   ? "is-active bg-[color:var(--coral)] border-[color:var(--coral)] text-white"
-                  : "bg-white text-slate-900 border-white/40 hover:bg-[color:var(--yellow)]/50",
+                  : "bg-white text-slate-900 border-black hover:bg-[color:var(--yellow)]/50",
               )}
               aria-pressed={active}
             >
               <span
                 className={cn(
                   "inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-display font-bold",
-                  active ? "bg-white text-[color:var(--coral)]" : "bg-[color:var(--yellow)] text-[color:var(--ink)]",
+                  active
+                    ? "bg-white text-[color:var(--coral)]"
+                    : "bg-[color:var(--yellow)] text-[color:var(--ink)]",
                 )}
               >
                 {value}

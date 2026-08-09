@@ -62,9 +62,7 @@ function StudentSignup() {
       });
       if (signUpErr) {
         const msg = signUpErr.message;
-        toast.error(
-          msg.includes("already registered") ? t("auth.student.err.emailTaken") : msg,
-        );
+        toast.error(msg.includes("already registered") ? t("auth.student.err.emailTaken") : msg);
         return;
       }
       const { data: sess } = await supabase.auth.getSession();
@@ -140,9 +138,7 @@ function StudentSignup() {
                 placeholder={t("auth.student.passwordPh")}
                 autoComplete="new-password"
               />
-              <p className="text-sm text-muted-foreground">
-                {t("auth.student.passwordHint")}
-              </p>
+              <p className="text-sm text-muted-foreground">{t("auth.student.passwordHint")}</p>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="displayName">{t("auth.student.nameLabel")}</Label>
@@ -155,9 +151,7 @@ function StudentSignup() {
                 placeholder={t("auth.student.namePh")}
                 autoComplete="name"
               />
-              <p className="text-sm text-muted-foreground">
-                {t("auth.student.nameHint")}
-              </p>
+              <p className="text-sm text-muted-foreground">{t("auth.student.nameHint")}</p>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="code">{t("auth.student.codeLabel")}</Label>

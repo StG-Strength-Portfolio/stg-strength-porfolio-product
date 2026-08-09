@@ -26,7 +26,8 @@ export const Route = createFileRoute("/school-admin/give-strength")({
       { title: "Give a strength to a teacher — Vahvuusseikkailu" },
       {
         name: "description",
-        content: "Principals can send a character strength and a message to any teacher in their school.",
+        content:
+          "Principals can send a character strength and a message to any teacher in their school.",
       },
       { property: "og:title", content: "Give a strength to a teacher — Vahvuusseikkailu" },
       {
@@ -97,9 +98,7 @@ function SchoolAdminGiveStrengthPage() {
       active=""
       onSelect={() => undefined}
       schoolName={guard.schoolName}
-      links={[
-        { to: "/school-admin/dashboard", label: tr("Takaisin") },
-      ]}
+      links={[{ to: "/school-admin/dashboard", label: tr("Takaisin") }]}
     >
       <StickyNote seed="sa-give" className="space-y-4">
         <div className="max-w-sm space-y-2">

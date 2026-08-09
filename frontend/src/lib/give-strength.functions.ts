@@ -151,9 +151,7 @@ export const listSchoolTeachers = createServerFn({ method: "GET" })
         rows.map((r) => r.id),
       )
       .eq("role", "teacher");
-    const teacherIds = new Set(
-      ((roles ?? []) as Array<{ user_id: string }>).map((r) => r.user_id),
-    );
+    const teacherIds = new Set(((roles ?? []) as Array<{ user_id: string }>).map((r) => r.user_id));
     return rows
       .filter((r) => teacherIds.has(r.id))
       .map((r) => ({ id: r.id, name: r.display_name ?? "—" }))
@@ -163,9 +161,7 @@ export const listSchoolTeachers = createServerFn({ method: "GET" })
 /** School admin (principal) gifts a strength to a teacher of their school. */
 export const giveStrengthToTeacher = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (d: { teacherId: string; strengthIds: number[]; message?: string | null }) => d,
-  )
+  .inputValidator((d: { teacherId: string; strengthIds: number[]; message?: string | null }) => d)
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     const { data: isAdmin } = await context.supabase.rpc("has_role", {
       _user_id: context.userId,
@@ -219,10 +215,7 @@ export const getTeacherReceivedStrengths = createServerFn({ method: "GET" })
     const ids = [...new Set(rows.map((r) => r.from_user_id))];
     const names = new Map<string, string>();
     if (ids.length > 0) {
-      const { data: profiles } = await db
-        .from("profiles")
-        .select("id, display_name")
-        .in("id", ids);
+      const { data: profiles } = await db.from("profiles").select("id, display_name").in("id", ids);
       for (const p of (profiles ?? []) as Array<{ id: string; display_name: string | null }>) {
         names.set(p.id, p.display_name ?? "—");
       }

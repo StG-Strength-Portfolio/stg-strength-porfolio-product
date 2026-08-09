@@ -16,8 +16,11 @@ import { Route as AventyrRouteImport } from './routes/aventyr'
 import { Route as GaMedIGemenskapenRouteImport } from './routes/ga-med-i-gemenskapen'
 import { Route as JoinCommunityRouteImport } from './routes/join-community'
 import { Route as LarareRouteImport } from './routes/larare'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as RegisterTeacherRouteImport } from './routes/register-teacher'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedLiityYhteisoonRouteImport } from './routes/_authenticated/liity-yhteisoon'
 import { Route as AuthenticatedOpettajaRouteImport } from './routes/_authenticated/opettaja'
@@ -34,12 +37,13 @@ import { Route as SchoolAdminDashboardRouteImport } from './routes/school-admin.
 import { Route as SchoolAdminGiveStrengthRouteImport } from './routes/school-admin.give-strength'
 import { Route as SuperadminIndexRouteImport } from './routes/superadmin.index'
 import { Route as SuperadminDashboardRouteImport } from './routes/superadmin.dashboard'
-import { Route as SuperadminForgotPasswordRouteImport } from './routes/superadmin.forgot-password'
 import { Route as SuperadminLoginRouteImport } from './routes/superadmin.login'
 import { Route as TeacherIndexRouteImport } from './routes/teacher.index'
 import { Route as TeacherDashboardRouteImport } from './routes/teacher.dashboard'
 import { Route as TeacherProfileRouteImport } from './routes/teacher.profile'
 import { Route as TeacherSprintRouteImport } from './routes/teacher.sprint'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as AuthenticatedSeikkailuIndexRouteImport } from './routes/_authenticated/seikkailu/index'
 import { Route as AuthenticatedSeikkailuScreenRouteImport } from './routes/_authenticated/seikkailu/$screen'
 import { Route as AuthenticatedStudentGiveStrengthRouteImport } from './routes/_authenticated/student/give-strength'
@@ -86,6 +90,11 @@ const LarareRoute = LarareRouteImport.update({
   path: '/larare',
   getParentRoute: () => rootRouteImport,
 } as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterTeacherRoute = RegisterTeacherRouteImport.update({
   id: '/register-teacher',
   path: '/register-teacher',
@@ -96,6 +105,18 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -179,12 +200,6 @@ const SuperadminDashboardRoute = SuperadminDashboardRouteImport.update({
   path: '/superadmin/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SuperadminForgotPasswordRoute =
-  SuperadminForgotPasswordRouteImport.update({
-    id: '/superadmin/forgot-password',
-    path: '/superadmin/forgot-password',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const SuperadminLoginRoute = SuperadminLoginRouteImport.update({
   id: '/superadmin/login',
   path: '/superadmin/login',
@@ -210,6 +225,17 @@ const TeacherSprintRoute = TeacherSprintRouteImport.update({
   path: '/teacher/sprint',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedSeikkailuIndexRoute =
   AuthenticatedSeikkailuIndexRouteImport.update({
     id: '/',
@@ -283,10 +309,13 @@ export interface FileRoutesByFullPath {
   '/ga-med-i-gemenskapen': typeof GaMedIGemenskapenRoute
   '/join-community': typeof JoinCommunityRoute
   '/larare': typeof LarareRoute
+  '/mcp': typeof McpRoute
   '/register-teacher': typeof RegisterTeacherRoute
   '/reset-password': typeof ResetPasswordRoute
   '/seikkailu': typeof AuthenticatedSeikkailuRouteRouteWithChildren
   '/student': typeof AuthenticatedStudentRouteRouteWithChildren
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/liity-yhteisoon': typeof AuthenticatedLiityYhteisoonRoute
   '/opettaja': typeof AuthenticatedOpettajaRoute
   '/admin/schools': typeof AdminSchoolsRoute
@@ -298,7 +327,6 @@ export interface FileRoutesByFullPath {
   '/school-admin/dashboard': typeof SchoolAdminDashboardRoute
   '/school-admin/give-strength': typeof SchoolAdminGiveStrengthRoute
   '/superadmin/dashboard': typeof SuperadminDashboardRoute
-  '/superadmin/forgot-password': typeof SuperadminForgotPasswordRoute
   '/superadmin/login': typeof SuperadminLoginRoute
   '/teacher/dashboard': typeof TeacherDashboardRoute
   '/teacher/profile': typeof TeacherProfileRoute
@@ -306,6 +334,8 @@ export interface FileRoutesByFullPath {
   '/auth/': typeof AuthIndexRoute
   '/superadmin/': typeof SuperadminIndexRoute
   '/teacher/': typeof TeacherIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/seikkailu/$screen': typeof AuthenticatedSeikkailuScreenRoute
   '/student/give-strength': typeof AuthenticatedStudentGiveStrengthRoute
   '/student/profile': typeof AuthenticatedStudentProfileRoute
@@ -324,9 +354,12 @@ export interface FileRoutesByTo {
   '/ga-med-i-gemenskapen': typeof GaMedIGemenskapenRoute
   '/join-community': typeof JoinCommunityRoute
   '/larare': typeof LarareRoute
+  '/mcp': typeof McpRoute
   '/register-teacher': typeof RegisterTeacherRoute
   '/reset-password': typeof ResetPasswordRoute
   '/student': typeof AuthenticatedStudentRouteRouteWithChildren
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/liity-yhteisoon': typeof AuthenticatedLiityYhteisoonRoute
   '/opettaja': typeof AuthenticatedOpettajaRoute
   '/admin/schools': typeof AdminSchoolsRoute
@@ -338,7 +371,6 @@ export interface FileRoutesByTo {
   '/school-admin/dashboard': typeof SchoolAdminDashboardRoute
   '/school-admin/give-strength': typeof SchoolAdminGiveStrengthRoute
   '/superadmin/dashboard': typeof SuperadminDashboardRoute
-  '/superadmin/forgot-password': typeof SuperadminForgotPasswordRoute
   '/superadmin/login': typeof SuperadminLoginRoute
   '/teacher/dashboard': typeof TeacherDashboardRoute
   '/teacher/profile': typeof TeacherProfileRoute
@@ -347,6 +379,8 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthIndexRoute
   '/superadmin': typeof SuperadminIndexRoute
   '/teacher': typeof TeacherIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/seikkailu/$screen': typeof AuthenticatedSeikkailuScreenRoute
   '/student/give-strength': typeof AuthenticatedStudentGiveStrengthRoute
   '/student/profile': typeof AuthenticatedStudentProfileRoute
@@ -368,10 +402,13 @@ export interface FileRoutesById {
   '/ga-med-i-gemenskapen': typeof GaMedIGemenskapenRoute
   '/join-community': typeof JoinCommunityRoute
   '/larare': typeof LarareRoute
+  '/mcp': typeof McpRoute
   '/register-teacher': typeof RegisterTeacherRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/seikkailu': typeof AuthenticatedSeikkailuRouteRouteWithChildren
   '/_authenticated/student': typeof AuthenticatedStudentRouteRouteWithChildren
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/liity-yhteisoon': typeof AuthenticatedLiityYhteisoonRoute
   '/_authenticated/opettaja': typeof AuthenticatedOpettajaRoute
   '/admin/schools': typeof AdminSchoolsRoute
@@ -383,7 +420,6 @@ export interface FileRoutesById {
   '/school-admin/dashboard': typeof SchoolAdminDashboardRoute
   '/school-admin/give-strength': typeof SchoolAdminGiveStrengthRoute
   '/superadmin/dashboard': typeof SuperadminDashboardRoute
-  '/superadmin/forgot-password': typeof SuperadminForgotPasswordRoute
   '/superadmin/login': typeof SuperadminLoginRoute
   '/teacher/dashboard': typeof TeacherDashboardRoute
   '/teacher/profile': typeof TeacherProfileRoute
@@ -392,6 +428,8 @@ export interface FileRoutesById {
   '/auth/': typeof AuthIndexRoute
   '/superadmin/': typeof SuperadminIndexRoute
   '/teacher/': typeof TeacherIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/seikkailu/$screen': typeof AuthenticatedSeikkailuScreenRoute
   '/_authenticated/student/give-strength': typeof AuthenticatedStudentGiveStrengthRoute
   '/_authenticated/student/profile': typeof AuthenticatedStudentProfileRoute
@@ -414,10 +452,13 @@ export interface FileRouteTypes {
     | '/ga-med-i-gemenskapen'
     | '/join-community'
     | '/larare'
+    | '/mcp'
     | '/register-teacher'
     | '/reset-password'
     | '/seikkailu'
     | '/student'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/liity-yhteisoon'
     | '/opettaja'
     | '/admin/schools'
@@ -429,7 +470,6 @@ export interface FileRouteTypes {
     | '/school-admin/dashboard'
     | '/school-admin/give-strength'
     | '/superadmin/dashboard'
-    | '/superadmin/forgot-password'
     | '/superadmin/login'
     | '/teacher/dashboard'
     | '/teacher/profile'
@@ -437,6 +477,8 @@ export interface FileRouteTypes {
     | '/auth/'
     | '/superadmin/'
     | '/teacher/'
+    | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/seikkailu/$screen'
     | '/student/give-strength'
     | '/student/profile'
@@ -455,9 +497,12 @@ export interface FileRouteTypes {
     | '/ga-med-i-gemenskapen'
     | '/join-community'
     | '/larare'
+    | '/mcp'
     | '/register-teacher'
     | '/reset-password'
     | '/student'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/liity-yhteisoon'
     | '/opettaja'
     | '/admin/schools'
@@ -469,7 +514,6 @@ export interface FileRouteTypes {
     | '/school-admin/dashboard'
     | '/school-admin/give-strength'
     | '/superadmin/dashboard'
-    | '/superadmin/forgot-password'
     | '/superadmin/login'
     | '/teacher/dashboard'
     | '/teacher/profile'
@@ -478,6 +522,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/superadmin'
     | '/teacher'
+    | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/seikkailu/$screen'
     | '/student/give-strength'
     | '/student/profile'
@@ -498,10 +544,13 @@ export interface FileRouteTypes {
     | '/ga-med-i-gemenskapen'
     | '/join-community'
     | '/larare'
+    | '/mcp'
     | '/register-teacher'
     | '/reset-password'
     | '/_authenticated/seikkailu'
     | '/_authenticated/student'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/_authenticated/liity-yhteisoon'
     | '/_authenticated/opettaja'
     | '/admin/schools'
@@ -513,7 +562,6 @@ export interface FileRouteTypes {
     | '/school-admin/dashboard'
     | '/school-admin/give-strength'
     | '/superadmin/dashboard'
-    | '/superadmin/forgot-password'
     | '/superadmin/login'
     | '/teacher/dashboard'
     | '/teacher/profile'
@@ -522,6 +570,8 @@ export interface FileRouteTypes {
     | '/auth/'
     | '/superadmin/'
     | '/teacher/'
+    | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/seikkailu/$screen'
     | '/_authenticated/student/give-strength'
     | '/_authenticated/student/profile'
@@ -543,19 +593,23 @@ export interface RootRouteChildren {
   GaMedIGemenskapenRoute: typeof GaMedIGemenskapenRoute
   JoinCommunityRoute: typeof JoinCommunityRoute
   LarareRoute: typeof LarareRoute
+  McpRoute: typeof McpRoute
   RegisterTeacherRoute: typeof RegisterTeacherRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   AdminSchoolsRoute: typeof AdminSchoolsRoute
   SchoolAdminDashboardRoute: typeof SchoolAdminDashboardRoute
   SchoolAdminGiveStrengthRoute: typeof SchoolAdminGiveStrengthRoute
   SuperadminDashboardRoute: typeof SuperadminDashboardRoute
-  SuperadminForgotPasswordRoute: typeof SuperadminForgotPasswordRoute
   SuperadminLoginRoute: typeof SuperadminLoginRoute
   TeacherDashboardRoute: typeof TeacherDashboardRoute
   TeacherProfileRoute: typeof TeacherProfileRoute
   TeacherSprintRoute: typeof TeacherSprintRoute
   SuperadminIndexRoute: typeof SuperadminIndexRoute
   TeacherIndexRoute: typeof TeacherIndexRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   SchoolAdminTeachMaterialsRoute: typeof SchoolAdminTeachMaterialsRoute
   SuperadminSchoolsSchoolIdRoute: typeof SuperadminSchoolsSchoolIdRoute
   TeacherTeachMaterialsRoute: typeof TeacherTeachMaterialsRoute
@@ -613,6 +667,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LarareRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register-teacher': {
       id: '/register-teacher'
       path: '/register-teacher'
@@ -625,6 +686,20 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/': {
@@ -739,13 +814,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuperadminDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/superadmin/forgot-password': {
-      id: '/superadmin/forgot-password'
-      path: '/superadmin/forgot-password'
-      fullPath: '/superadmin/forgot-password'
-      preLoaderRoute: typeof SuperadminForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/superadmin/login': {
       id: '/superadmin/login'
       path: '/superadmin/login'
@@ -779,6 +847,20 @@ declare module '@tanstack/react-router' {
       path: '/teacher/sprint'
       fullPath: '/teacher/sprint'
       preLoaderRoute: typeof TeacherSprintRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/seikkailu/': {
@@ -968,19 +1050,24 @@ const rootRouteChildren: RootRouteChildren = {
   GaMedIGemenskapenRoute: GaMedIGemenskapenRoute,
   JoinCommunityRoute: JoinCommunityRoute,
   LarareRoute: LarareRoute,
+  McpRoute: McpRoute,
   RegisterTeacherRoute: RegisterTeacherRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   AdminSchoolsRoute: AdminSchoolsRoute,
   SchoolAdminDashboardRoute: SchoolAdminDashboardRoute,
   SchoolAdminGiveStrengthRoute: SchoolAdminGiveStrengthRoute,
   SuperadminDashboardRoute: SuperadminDashboardRoute,
-  SuperadminForgotPasswordRoute: SuperadminForgotPasswordRoute,
   SuperadminLoginRoute: SuperadminLoginRoute,
   TeacherDashboardRoute: TeacherDashboardRoute,
   TeacherProfileRoute: TeacherProfileRoute,
   TeacherSprintRoute: TeacherSprintRoute,
   SuperadminIndexRoute: SuperadminIndexRoute,
   TeacherIndexRoute: TeacherIndexRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   SchoolAdminTeachMaterialsRoute: SchoolAdminTeachMaterialsRoute,
   SuperadminSchoolsSchoolIdRoute: SuperadminSchoolsSchoolIdRoute,
   TeacherTeachMaterialsRoute: TeacherTeachMaterialsRoute,

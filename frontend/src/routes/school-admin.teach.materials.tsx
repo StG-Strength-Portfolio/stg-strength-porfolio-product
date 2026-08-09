@@ -1,12 +1,12 @@
 /**
  * @lovable-new 2026-08-04
  * School admin "Teaching Materials" — same library the teachers see.
- * @lovable-new 2026-08-05 — DashboardShell removed: shared full-width layout.
  */
 import { createFileRoute } from "@tanstack/react-router";
+import { DashboardShell } from "@/components/DashboardShell";
 import { MaterialsBrowser } from "@/components/teach/MaterialsBrowser";
-import { TeachingMaterialsLayout } from "@/components/teach/TeachingMaterialsLayout";
 import { useRoleGuard } from "@/lib/role-guard";
+import { useTr } from "@/lib/i18n";
 
 export const Route = createFileRoute("/school-admin/teach/materials")({
   head: () => ({
@@ -29,12 +29,23 @@ export const Route = createFileRoute("/school-admin/teach/materials")({
 });
 
 function SchoolAdminMaterialsPage() {
+  const tr = useTr();
   const guard = useRoleGuard(["school_admin"]);
   if (!guard.ready) return null;
 
   return (
-    <TeachingMaterialsLayout>
-      <MaterialsBrowser rootBackTo="/school-admin/dashboard" />
-    </TeachingMaterialsLayout>
+    <DashboardShell
+      title={tr("Opetusmateriaalit")}
+      tabs={[]}
+      active=""
+      onSelect={() => undefined}
+      schoolName={guard.schoolName}
+      links={[
+        { to: "/school-admin/dashboard", label: tr("Takaisin") },
+        { to: "/school-admin/give-strength", label: tr("Anna vahvuus opettajalle") },
+      ]}
+    >
+      <MaterialsBrowser />
+    </DashboardShell>
   );
 }

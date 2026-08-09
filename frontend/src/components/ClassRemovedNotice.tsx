@@ -23,7 +23,9 @@ export function ClassRemovedNotice() {
     <div className="relative flex min-h-screen items-center justify-center bg-background px-4 text-foreground">
       <CornerBlobs />
       <StickyNote seed="class-removed" className="relative z-10 max-w-md space-y-4 text-center">
-        <div className="flex justify-center"><LockIcon size={36} /></div>
+        <div className="flex justify-center">
+          <LockIcon size={36} />
+        </div>
         <h1 className="font-display text-2xl">{tr("Luokkasi on poistettu")}</h1>
         <p className="text-sm opacity-80">
           {tr(

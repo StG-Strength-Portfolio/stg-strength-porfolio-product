@@ -67,7 +67,12 @@ export function ProfileSettings({
         </div>
         <div className="space-y-1">
           <Label htmlFor="set-mail">{tr("Sähköposti")}</Label>
-          <Input id="set-mail" type="email" value={mail} onChange={(e) => setMail(e.target.value)} />
+          <Input
+            id="set-mail"
+            type="email"
+            value={mail}
+            onChange={(e) => setMail(e.target.value)}
+          />
         </div>
         <div className="space-y-1">
           <Label htmlFor="set-pass">{tr("Uusi salasana")}</Label>

@@ -1,12 +1,10 @@
 /**
- * @lovable-new 2026-08-05 — ONE shared Teaching Materials slideshow.
- * Replaces SlideFullscreen and the old PresentationOverlay: both the
- * "Open slideshow" button and double-clicking a slide use this component and
- * the same openSlideshowAt(index) state.
+ * @lovable-new 2026-08-05
+ * Fullscreen single-slide viewer for Teaching Materials.
  *
- * Native fullscreen is requested by the caller inside the user gesture; if the
- * browser rejects it (preview iframe), this fixed 100vw × 100dvh body portal
- * still covers the screen, so the user never sees a blank page or a new tab.
+ * Opened by double-clicking a slide in browse mode, starting on that slide.
+ * Edge arrows (left/right 10% of the screen), a close button and a bottom
+ * counter fade out after 3 s of no mouse movement. Keyboard: ←/→/Escape.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -14,7 +12,7 @@ import { slidesEmbedUrl } from "@/lib/google-slides";
 import { useTr } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
-export function TeachingMaterialsSlideshow({
+export function SlideFullscreen({
   url,
   title,
   lang,
@@ -57,8 +55,6 @@ export function TeachingMaterialsSlideshow({
     return () => {
       document.body.style.overflow = prevOverflow;
       if (timer.current) window.clearTimeout(timer.current);
-      // Leaving the slideshow always leaves native fullscreen too.
-      if (document.fullscreenElement) void document.exitFullscreen?.().catch(() => undefined);
     };
   }, [wake]);
 
@@ -80,22 +76,13 @@ export function TeachingMaterialsSlideshow({
     return () => window.removeEventListener("keydown", onKey);
   }, [next, prev, onClose, wake]);
 
-  // Leaving browser fullscreen closes only the slideshow — never the article.
-  useEffect(() => {
-    function onFsChange() {
-      if (!document.fullscreenElement) onClose();
-    }
-    document.addEventListener("fullscreenchange", onFsChange);
-    return () => document.removeEventListener("fullscreenchange", onFsChange);
-  }, [onClose]);
-
   if (typeof document === "undefined") return null;
 
   const fade = chrome ? "opacity-100" : "opacity-0";
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[120] h-[100dvh] w-screen bg-black"
+      className="fixed inset-0 z-[120] bg-black"
       onMouseMove={wake}
       role="dialog"
       aria-label={title}
@@ -104,19 +91,18 @@ export function TeachingMaterialsSlideshow({
         key={index}
         src={slidesEmbedUrl(url, { lang, slide: index + 1 }) ?? undefined}
         title={`${title} — ${tr("Dia")} ${index + 1}`}
-        className="h-full w-full border-0"
+        className="h-screen w-screen border-0"
         allowFullScreen
       />
 
-      {/* Edge click zones — ~9% of the viewport each */}
+      {/* Edge click zones — whole left / right 10% of the screen */}
       <button
         type="button"
         aria-label={tr("Edellinen")}
         onClick={prev}
-        onFocus={wake}
         disabled={index <= 0}
         className={cn(
-          "group absolute inset-y-0 left-0 z-10 flex w-[9%] items-center justify-start pl-3 transition-opacity disabled:pointer-events-none disabled:opacity-0",
+          "group absolute inset-y-0 left-0 z-10 flex w-[10%] items-center justify-start pl-3 transition-opacity disabled:opacity-0",
           fade,
         )}
       >
@@ -136,10 +122,9 @@ export function TeachingMaterialsSlideshow({
         type="button"
         aria-label={tr("Seuraava")}
         onClick={next}
-        onFocus={wake}
         disabled={index >= total - 1}
         className={cn(
-          "group absolute inset-y-0 right-0 z-10 flex w-[9%] items-center justify-end pr-3 transition-opacity disabled:pointer-events-none disabled:opacity-0",
+          "group absolute inset-y-0 right-0 z-10 flex w-[10%] items-center justify-end pr-3 transition-opacity disabled:opacity-0",
           fade,
         )}
       >
@@ -161,19 +146,28 @@ export function TeachingMaterialsSlideshow({
         type="button"
         aria-label={tr("Sulje esitys")}
         onClick={onClose}
-        onFocus={wake}
         className={cn(
           "absolute right-5 top-5 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-white/30 text-white backdrop-blur transition-opacity hover:bg-white/50",
           fade,
         )}
       >
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+          <path
+            d="M6 6l12 12M18 6 6 18"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          />
         </svg>
       </button>
 
       {/* Counter */}
-      <div className={cn("absolute inset-x-0 bottom-6 z-20 flex justify-center transition-opacity", fade)}>
+      <div
+        className={cn(
+          "absolute inset-x-0 bottom-6 z-20 flex justify-center transition-opacity",
+          fade,
+        )}
+      >
         <span className="rounded-full bg-black/50 px-4 py-1.5 font-mono text-sm text-white backdrop-blur">
           {tr("Dia")} {index + 1} / {total}
         </span>

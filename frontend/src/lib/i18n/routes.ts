@@ -9,12 +9,7 @@
 
 import type { Language } from "./index";
 
-export type RouteKey =
-  | "adventure"
-  | "adventure_screen"
-  | "join"
-  | "teacher"
-  | "worldmap";
+export type RouteKey = "adventure" | "adventure_screen" | "join" | "teacher" | "worldmap";
 
 const CANON: Record<RouteKey, string> = {
   adventure: "/seikkailu",

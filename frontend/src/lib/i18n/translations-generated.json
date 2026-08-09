@@ -331,9 +331,9 @@
     "en": "1. Notice the good! Practise recognising positive actions in the people around you. Make noticing goodness a habit.",
     "sv": "1. Se det goda! Öva på att se positiva handlingar hos människorna runt dig. Gör det till en vana att lägga märke till det goda."
   },
-  "2 – Omat vahvuudet lukiossa | Tutustut henkilökohtaisiin vahvuuksiin opiskelijana. Opit kysymään palautetta opettajilta ja opiskelukavereilta. | sivut 34–46": {
-    "en": "2 – My Strengths at School | Explore your personal strengths as a student. Learn to ask for feedback from teachers and classmates. | pages 34–46",
-    "sv": "2 – Mina styrkor i gymnasiet | Utforska dina personliga styrkor som studerande. Lär dig be om feedback från lärare och klasskamrater. | sidor 34–46"
+  "2. Omat vahvuudet lukiossa | Tutustut henkilökohtaisiin vahvuuksiin opiskelijana. Opit kysymään palautetta opettajilta ja opiskelukavereilta. | sivut 34–46": {
+    "en": "2. My Strengths at School | Explore your personal strengths as a student. Learn to ask for feedback from teachers and classmates. | pages 34–46",
+    "sv": "2. Mina styrkor i gymnasiet | Utforska dina personliga styrkor som studerande. Lär dig be om feedback från lärare och klasskamrater. | sidor 34–46"
   },
   "2. Nimeä käytetty vahvuus ja sano palaute ääneen tai liitä viestiin somessa. \"Olit todella rohkea.\" \"Kiitos ystävällisyydestä.\" \"Sinussa on myötätuntoa.\"": {
     "en": "2. Name the strength used and say the feedback aloud – or send it in a message. \"You were really brave.\" \"Thank you for your kindness.\" \"You have compassion in you.\"",
@@ -441,13 +441,15 @@
     "en": "Start Game",
     "sv": "Starta spel"
   },
+
+  "Aloita tästä": {
+    "en": "Start here",
+    "sv": "Börja här"
+  },
+
   "Aloita sprintti": {
     "en": "Start Sprint",
     "sv": "Starta sprint"
-  },
-  "Anna luokalle nimi ja valitse kieli. Oppilaat liittyvät luodulla koodilla ja saavat luokan kielen käyttöön.": {
-    "en": "Give the class a name and choose a language. Students join with the generated code and get the class language.",
-    "sv": "Ge klassen ett namn och välj språk. Eleverna går med via den skapade koden och får klassens språk."
   },
   "Anna vahvuuksiesi loistaa.": {
     "en": "Let your strengths shine.",
@@ -484,10 +486,6 @@
   "Avaa dia koko näytölle kaksoisklikkaamalla": {
     "en": "Double-click a slide to open it fullscreen",
     "sv": "Dubbelklicka på en bild för helskärm"
-  },
-  "Avaa diaesitys": {
-    "en": "Open slideshow",
-    "sv": "Öppna bildspel"
   },
   "Avausprosentti": {
     "en": "Open rate",
@@ -528,10 +526,6 @@
   "Edellinen": {
     "en": "Previous",
     "sv": "Föregående"
-  },
-  "Edistyminen": {
-    "en": "Progress",
-    "sv": "Framsteg"
   },
   "Ei aktiivisuutta": {
     "en": "No activity",
@@ -645,9 +639,13 @@
   "HUUMORINTAJU / HUMOR": {
     "sv": "section_header"
   },
-  "Haasteet ja vahvuudet – Pohdi ja kirjoita vastaukset.": {
-    "en": "Challenges and strengths – Reflect and write down your answers.",
-    "sv": "Utmaningar och styrkor – Fundera och skriv ner svaren."
+  "Haasteet ja vahvuudet ": {
+    "en": "Challenges and strengths",
+    "sv": "Utmaningar och styrkor"
+  },
+  "– Pohdi ja kirjoita vastaukset.": {
+    "en": "– Reflect and write down your answers.",
+    "sv": "– Fundera och skriv ner svaren."
   },
   "Haluatko varmasti poistaa luokan": {
     "en": "Are you sure you want to delete the class",
@@ -754,10 +752,6 @@
   "JOHTAJUUS / LEDARSKAP": {
     "sv": "section_header"
   },
-  "Jaa tämä koodi oppilaille.": {
-    "en": "Share this code with your students.",
-    "sv": "Dela den här koden med eleverna."
-  },
   "Jag på fritiden – Skriv ner vad du gör på din fritid och vilka styrkor du använder.": {
     "en": "Me in my free time – Write down what you do in your free time and which strengths you use.",
     "sv": "Jag på fritiden – Skriv ner vad du gör på din fritid och vilka styrkor du använder."
@@ -773,10 +767,6 @@
   "Jokaisella on omat ydinvahvuutensa, joihin kannattaa keskittyä ja joita on järkevää vahvistaa! Omien vahvuuksien tunteminen ja niiden hyödyntäminen opiskelussa ja vapaa-ajalla lisää tyytyväisyyttä, opiskelun mielekkyyttä ja hyvinvointia.": {
     "en": "Everyone has their own core strengths, which are worth focusing on and developing! Knowing your strengths and using them in studies and free time increases satisfaction, meaningfulness in studying and well-being.",
     "sv": "Alla har sina egna kärnstyrkor – det är just dem det lönar sig att fokusera på och utveckla! Att känna igen sina styrkor och använda dem i studierna och på fritiden ökar välmåendet, motivationen och glädjen i vardagen."
-  },
-  "Jos sähköpostiosoite löytyy järjestelmästä, salasanan palautuslinkki on lähetetty.": {
-    "en": "If the email address exists in the system, a password reset link has been sent.",
-    "sv": "Om e-postadressen finns i systemet har en länk för att återställa lösenordet skickats."
   },
   "Julkaise": {
     "en": "Publish",
@@ -846,17 +836,9 @@
     "en": "Who did I help today? How did it feel?",
     "sv": "Vem hjälpte jag idag? Hur kändes det?"
   },
-  "Kieli": {
-    "en": "Language",
-    "sv": "Språk"
-  },
   "Kiitollisuus": {
     "en": "Gratitude",
     "sv": "Tacksamhet"
-  },
-  "Kirjaudu sisään": {
-    "en": "Log in",
-    "sv": "Logga in"
   },
   "Kirjaudu ulos": {
     "en": "Log out",
@@ -874,33 +856,9 @@
     "en": "Temperance: Forgiveness · Modesty · Carefulness · Self-Regulation",
     "sv": "Måttfullhet: Förlåtelse · Ödmjukhet · Eftertänksamhet · Självreglering"
   },
-  "Koko käyttöhistoria": {
-    "en": "Full available history",
-    "sv": "Hela tillgängliga historiken"
-  },
-  "Koko näyttö": {
-    "en": "Full screen",
-    "sv": "Helskärm"
-  },
-  "Koodi kopioitu!": {
-    "en": "Code copied!",
-    "sv": "Koden kopierades!"
-  },
-  "Kopioi koodi": {
-    "en": "Copy code",
-    "sv": "Kopiera kod"
-  },
-  "Kopiointi epäonnistui": {
-    "en": "Copying failed",
-    "sv": "Kopieringen misslyckades"
-  },
   "Kopioitu": {
     "en": "Copied",
     "sv": "Kopierat"
-  },
-  "Koulu": {
-    "en": "School",
-    "sv": "Skola"
   },
   "Koulukulttuurissa ja opiskelussa virheet ja puutteet tunnistuvat lähes automaattisesti – mutta vastapaino, eli vahvuudet ja onnistumiset, saa harvoin ansaitsemaansa huomiota. Opiskelussa huomio voi kiinnittyä kaikkeen siihen, mitä ei vielä osaa, missä ei ole onnistunut ja mitä pitää vielä oppia ja kehittää.": {
     "en": "In school culture and studies, mistakes and deficiencies are identified almost automatically – but the counterbalance, namely strengths and successes, rarely receives the attention it deserves. In studies, attention can get stuck on everything one does not yet know, has not succeeded at, and still needs to learn and develop.",
@@ -909,6 +867,14 @@
   "Koulumuistot – Katso taaksepäin omia aiempia opiskelukokemuksiasi ja huomaa, mitä vahvuuksia sinulla on.": {
     "en": "School Memories – Look back at your own previous study experiences and notice what strengths you have.",
     "sv": "Skolerfarenheter – Titta tillbaka på dina egna tidigare studieerfarenheter och lägg märke till vilka styrkor du har."
+  },
+  "Koulumuistot": {
+    "en": "School Memories",
+    "sv": "Skolerfarenheter"
+  },
+  "Katso taaksepäin omia aiempia opiskelukokemuksiasi ja huomaa, mitä vahvuuksia sinulla on.": {
+    "en": "Look back at your own previous study experiences and notice what strengths you have.",
+    "sv": "Titta tillbaka på dina egna tidigare studieerfarenheter och lägg märke till vilka styrkor du har."
   },
   "Koulun 5 yleisintä vahvuutta": {
     "en": "School-wide top 5 strengths",
@@ -970,6 +936,10 @@
     "en": "Ask 2–4 close people, a teacher and a friend for feedback on your strengths. Use page 10 as a template. Ask them to name the strengths they appreciate most in you. Also ask where and how your strengths show.",
     "sv": "Be 2–4 närstående, en lärare och en vän om respons om dina styrkor. Använd sida 10 som mall. Be dem nämna de styrkor de uppskattar mest hos dig. Fråga också var och hur styrkorna syns."
   },
+  "Kysy itseltäsi päivän aikana ja päätteeksi:": {
+    "en": "Ask yourself during the day and at the end of it:",
+    "sv": "Fråga dig själv under dagen och när den avslutas:"
+  },
   "Kysy palautetta": {
     "en": "Det finns mycket mer styrka i oss alla än vad som syns utåt. Att fundera på sina styrkor och använda dem stärker självkänslan, ger självförtroende och hjälper dig att göra val – till exempel när det gäller studier eller arbetsplats.",
     "sv": "Be om respons"
@@ -989,10 +959,6 @@
   "LAHJAKKUUS – Missä asioissa olet hyvä?": {
     "en": "TALENT – What are you good at?",
     "sv": "BEGÅVNING – Vad är du bra på?"
-  },
-  "Ladataan…": {
-    "en": "Loading…",
-    "sv": "Laddar…"
   },
   "Lahjoita vahvuus": {
     "en": "Give strength",
@@ -1062,33 +1028,9 @@
     "en": "At school I would like to learn",
     "sv": "I gymnasiet skulle jag vilja lära mig"
   },
-  "Luo luokka": {
-    "en": "Create class",
-    "sv": "Skapa klass"
-  },
-  "Luo luokkakoodi": {
-    "en": "Create class code",
-    "sv": "Skapa klasskod"
-  },
   "Luo uusi sprintti": {
     "en": "Create new sprint",
     "sv": "Skapa ny sprint"
-  },
-  "Luodaan…": {
-    "en": "Creating…",
-    "sv": "Skapar…"
-  },
-  "Luokan koodi": {
-    "en": "Class code",
-    "sv": "Klasskod"
-  },
-  "Luokan nimi": {
-    "en": "Class name",
-    "sv": "Klassens namn"
-  },
-  "Luokka luotu.": {
-    "en": "Class created.",
-    "sv": "Klass skapad."
   },
   "Luokka palautettu.": {
     "en": "Class restored.",
@@ -1138,10 +1080,6 @@
     "en": "Sent to the principal on the 1st of each month",
     "sv": "Skickas till rektorn den 1:a varje månad"
   },
-  "Lähetetään…": {
-    "en": "Sending…",
-    "sv": "Skickar…"
-  },
   "Lähetysloki": {
     "en": "Sending Log",
     "sv": "Sändningslogg"
@@ -1153,10 +1091,6 @@
   "Lähetä palautuslinkki": {
     "en": "Send reset link",
     "sv": "Skicka återställningslänk"
-  },
-  "Lähetä uudelleen": {
-    "en": "Resend",
-    "sv": "Skicka igen"
   },
   "Lähetä viikkoraportti sähköpostiini": {
     "en": "Send weekly report to my email",
@@ -1196,6 +1130,10 @@
   "Mestari!": {
     "en": "Champion!",
     "sv": "Mästare!"
+  },
+  "Mieti kolme hyvää asiaa, jotka olet saanut kokea tänään.": {
+    "en": "Think of three good things you got to experience today.",
+    "sv": "Fundera på tre bra saker du har fått uppleva idag."
   },
   "Mieti kolmea hyvää asiaa, jota sait tänään kokea.": {
     "en": "Think of three good things you got to experience today.",
@@ -1265,6 +1203,10 @@
     "en": "What feels easy and natural?",
     "sv": "Vad känns lätt att göra?"
   },
+  "Mikä tänään meni hyvin?": {
+    "en": "What went well today?",
+    "sv": "Vad gick bra idag?"
+  },
   "Mikäli täytettävät elementit eivät näy Acrobat Readerissa, kokeile vaihtaa näkymän asetuksia Preferences > Forms.": {
     "en": "If the fillable fields are not visible in Acrobat Reader, try changing the settings under Preferences > Forms.",
     "sv": "Om ifyllnadsfälten inte syns i Acrobat Reader, prova att ändra inställningarna under Preferences → Forms."
@@ -1288,6 +1230,14 @@
   "Miltä se tuntuisi? Miten se vaikuttaisi arkeesi – ja opiskeluusi?": {
     "en": "How would that feel? How would it affect your everyday life – and your studies?",
     "sv": "Hur skulle det kännas? Hur skulle det påverka din vardag – och dina studier?"
+  },
+  "Miten tämä vaikuttaisi arkeesi, entä opintoihin?": {
+    "en": "How would it affect your everyday life, and your studies?",
+    "sv": "Hur skulle det påverka din vardag, och dina studier?"
+  },
+  "Miten tämä vaikuttaisi arkeesi,\nentä opintoihin?": {
+    "en": "How would it affect your everyday life,\nand your studies?",
+    "sv": "Hur skulle det påverka din vardag,\noch dina studier?"
   },
   "Min vision och mina mål – Fundera till sist:": {
     "en": "My vision and my goals – Finally, reflect:",
@@ -1341,9 +1291,13 @@
     "en": "I feel this way now when I recall what I experienced",
     "sv": "Jag känner mig just nu såhär när jag minns det jag upplevt"
   },
+  "Minä olen –harjoitus": {
+    "en": "I Am – Exercise",
+    "sv": "Jag är – övning"
+  },
   "Minä olen –övning": {
-    "en": "I Am – exercise",
-    "sv": "Jag är –övning"
+    "en": "I Am – Exercise",
+    "sv": "Jag är – övning"
   },
   "Minä opiskelijana – Listaa seuraavalle sivulle kaikki vahvuutesi opiskelijana – myös sellaiset, jotka voivat tuntua sinusta itsestäänselvyyksiltä.": {
     "en": "Me as a student – List all your strengths as a student on the next page – including ones that might seem obvious to you.",
@@ -1449,6 +1403,10 @@
     "en": "What do you want to remember from the feedback?",
     "sv": "Vad vill du minnas av responsen?"
   },
+  "Mitä huomasin jo osaavani?": {
+    "en": "What did I notice I already know how to do?",
+    "sv": "Vad märkte jag att jag redan kan?"
+  },
   "Mitä huomasin osaavani jo?": {
     "en": "What did I notice I am already capable of?",
     "sv": "Vad märkte jag att jag redan kan?"
@@ -1516,6 +1474,10 @@
   "Mitä uutta opin palautteista?": {
     "en": "What new things did I learn from the feedback?",
     "sv": "Vad lärde jag mig av responsen?"
+  },
+  "Mitä vahvuuksia hyödynsin opinnoissani?": {
+    "en": "What strengths did I use in my studies?",
+    "sv": "Vilka styrkor använde jag i mina studier?"
   },
   "Mitä vahvuuksia ja taitoja haluat kehittää itsessäsi, ja miksi?": {
     "en": "What strengths and skills do you want to develop in yourself, and why?",
@@ -1593,6 +1555,14 @@
     "en": "Compassion",
     "sv": "Medkänsla"
   },
+  "Myötätunto": {
+    "en": "Compassion",
+    "sv": "Medkänsla"
+  },
+  "Maali": {
+    "en": "Finish",
+    "sv": "Mål"
+  },
   "Nimi": {
     "en": "Name",
     "sv": "Namn"
@@ -1603,6 +1573,10 @@
   "Näkökulmanottokyky": {
     "en": "Perspective",
     "sv": "Perspektivförmåga"
+  },
+  "Nämä kysymykset auttavat sinua\nnäkemään hyviä puolia elämästäsi": {
+    "en": "These questions help you\nsee the good sides of your life",
+    "sv": "Dessa frågor hjälper dig\nse det goda i ditt liv"
   },
   "Nämä resurssit voivat olla omat vahvuutesi, sosiaaliset suhteet, läheiset ihmiset, tunteiden käsittely, tulevaisuuden unelmat, ajatuksesi, asenteesi, itsemyötätuntoinen suhtautuminen itseen ja aiemmat onnistumiskokemukset.": {
     "en": "These resources can be your own strengths, social relationships, close people, emotional regulation, dreams for the future, your thoughts, your attitude, a self-compassionate approach to yourself, and previous experiences of success.",
@@ -1695,9 +1669,9 @@
     "en": "My Strengths in Friendships",
     "sv": "Mina styrkor i vänskapsrelationer"
   },
-  "Omat ydinvahvuudet": {
-    "en": "My Core Strengths",
-    "sv": "Mina kärnstyrkor"
+  "1. Omat ydinvahvuudet": {
+    "en": "1. My Core Strengths",
+    "sv": "1. Mina kärnstyrkor"
   },
   "Omien vahvuuksien käyttäminen – asteikko (Govindji & Linley, 2007) – Vastaa seuraavaan asteikolla 1 (täysin eri mieltä) – 5 (täysin samaa mieltä).": {
     "en": "Using My Own Strengths – scale (Govindji & Linley, 2007) – Answer the following on a scale of 1 (strongly disagree) to 5 (strongly agree).",
@@ -1726,10 +1700,6 @@
   "Opetusmateriaalit": {
     "en": "Teaching Materials",
     "sv": "Undervisningsmaterial"
-  },
-  "Opiskelijan raportti": {
-    "en": "Student report",
-    "sv": "Elevrapport"
   },
   "Opiskelijasi eivät ole vielä keränneet vahvuuksia.": {
     "en": "Your students haven't collected strengths yet.",
@@ -1778,10 +1748,6 @@
   "Palautuslinkki lähetetty sähköpostiisi.": {
     "en": "Reset link sent to your email.",
     "sv": "Återställningslänk skickad till din e-post."
-  },
-  "Palautuslinkki on vanhentunut tai jo käytetty.": {
-    "en": "This reset link has expired or has already been used.",
-    "sv": "Återställningslänken har gått ut eller redan använts."
   },
   "Palautusprosentti": {
     "en": "Bounce rate",
@@ -1883,17 +1849,9 @@
     "en": "Also ask others to reflect on what your strengths are. Interview your friends, family members or for example your coach.",
     "sv": "Be också andra fundera på vilka de tycker är dina styrkor. Intervjua dina vänner, familjemedlemmar eller till exempel din tränare."
   },
-  "Pyydä uusi palautuslinkki": {
-    "en": "Request a new reset link",
-    "sv": "Begär en ny återställningslänk"
-  },
   "Pyydä vanhempaasi täyttämään! – Kirjoita vahvuuskirje nuorellesi:": {
     "en": "Ask your parent to fill in! – Write a strengths letter to your young person:",
     "sv": "Be din förälder fylla i! – Skriv ett styrkebrev till din ungdom:"
-  },
-  "Päivitä salasana": {
-    "en": "Update password",
-    "sv": "Uppdatera lösenord"
   },
   "Pääkäyttäjät": {
     "en": "Super admins",
@@ -1925,14 +1883,6 @@
   "Rakkaus": {
     "en": "Love",
     "sv": "Kärlek"
-  },
-  "Raportin päiväys": {
-    "en": "Report date",
-    "sv": "Rapportdatum"
-  },
-  "Raportointijakso": {
-    "en": "Reporting period",
-    "sv": "Rapportperiod"
   },
   "Raportti lähetetty sähköpostiisi!": {
     "en": "Report sent to your email!",
@@ -2031,10 +1981,6 @@
     "en": "Password must be at least 6 characters.",
     "sv": "Lösenordet måste vara minst 6 tecken."
   },
-  "Salasanan vaihto epäonnistui. Yritä uudelleen.": {
-    "en": "Changing the password failed. Please try again.",
-    "sv": "Lösenordsbytet misslyckades. Försök igen."
-  },
   "Salasanat eivät täsmää.": {
     "en": "Passwords do not match.",
     "sv": "Lösenorden matchar inte."
@@ -2046,6 +1992,10 @@
   "Se, mitä erityisesti arvostan sinussa, on ______ ja ______": {
     "en": "What I especially appreciate about you is ______ and ______",
     "sv": "Det jag särskilt uppskattar hos dig är ______ och ______"
+  },
+  "See the Good Candy": {
+    "en": "See the Good Candy",
+    "sv": "Se det Goda-godis"
   },
   "Seuraava": {
     "en": "Next",
@@ -2142,10 +2092,6 @@
     "en": "Back to adventure",
     "sv": "Tillbaka till äventyret"
   },
-  "Takaisin ylläpidon kirjautumiseen": {
-    "en": "Back to admin login",
-    "sv": "Tillbaka till admininloggningen"
-  },
   "Tallenna": {
     "en": "Save",
     "sv": "Spara"
@@ -2161,10 +2107,6 @@
   "Tarkista Google Slides -linkki": {
     "en": "Check the Google Slides link",
     "sv": "Kontrollera Google Slides-länken"
-  },
-  "Tarkista sähköpostiosoite.": {
-    "en": "Please check the email address.",
-    "sv": "Kontrollera e-postadressen."
   },
   "Taso": {
     "en": "Level",
@@ -2278,6 +2220,7 @@
     "en": "Future Memory – Think of a situation in your studies or free time where you can use your strengths in the near future.",
     "sv": "Framtidsminne – Tänk på en situation i dina studier eller på fritiden där du i den närmaste framtiden kan använda dina styrkor."
   },
+
   "Tulokset!": {
     "en": "Results!",
     "sv": "Resultat!"
@@ -2314,6 +2257,18 @@
     "en": "Fill in all your special skills in this list. (Numbered fields 1–10)",
     "sv": "Fyll i alla dina specialkunskaper i den här listan. (Numrerade ifyllnadsfält 1–10)"
   },
+  "Täytä kaikki erityisosaamisesi tähän listaan. (Täytettävät kohdat 1–5)": {
+    "en": "Fill in all your special skills in this list. (Numbered fields 1–5)",
+    "sv": "Fyll i alla dina specialkunskaper i den här listan. (Numrerade ifyllnadsfält 1–5)"
+  },
+  "Täytä kaikki erityisosaamisesi tähän listaan.": {
+    "en": "Fill in all your special skills in this list.",
+    "sv": "Fyll i alla dina specialkunskaper i den här listan."
+  },
+  "(Täytettävät kohdat 1–5)": {
+    "en": "(Numbered fields 1–5)",
+    "sv": "(Numrerade ifyllnadsfält 1–5)"
+  },
   "Täytä pakolliset kentät": {
     "en": "Fill in the required fields",
     "sv": "Fyll i obligatoriska fält"
@@ -2333,17 +2288,9 @@
     "en": "Forgot your password?",
     "sv": "Glömt ditt lösenord?"
   },
-  "Unohditko salasanasi?": {
-    "en": "Forgot password?",
-    "sv": "Glömt lösenordet?"
-  },
   "Uteliaisuus": {
     "en": "Curiosity",
     "sv": "Nyfikenhet"
-  },
-  "Uusi luokkakoodi": {
-    "en": "New class code",
-    "sv": "Ny klasskod"
   },
   "Uusi salasana": {
     "en": "New password",
@@ -2355,6 +2302,10 @@
   },
   "VAATIMATTOMUUS / ANSPRÅKSLÖSHET": {
     "sv": "section_header"
+  },
+  "VINKKI!": {
+    "en": "TIP!",
+    "sv": "TIPS!"
   },
   "VINKKI! Näin voit antaa toiselle kehuja ja kannustusta vahvuuksista:": {
     "en": "TIP! Here is how you can give others praise and encouragement based on strengths:",
@@ -2396,17 +2347,17 @@
     "en": "Confirm password",
     "sv": "Bekräfta lösenord"
   },
-  "Vahvista uusi salasana": {
-    "en": "Confirm new password",
-    "sv": "Bekräfta nytt lösenord"
-  },
   "Vahvuudet auttavat haasteiden kohtaamisessa ja edistävät niistä ylipääsemisessä eli selviytymisessä. Taidoilla ja vahvuuksilla on eroa. Taidot ovat opittuja, kun taas vahvuudet ovat itselle luontaisia ja tärkeitä ajattelu- ja toimintatapoja.": {
     "en": "Strengths help in facing challenges and support overcoming them. Skills and strengths are different. Skills are learned, whereas strengths are your natural and important ways of thinking and acting.",
     "sv": "Styrkor hjälper dig att möta utmaningar och ta dig igenom dem. Styrkor och färdigheter är inte samma sak. Färdigheter är inlärda, medan styrkor är ditt naturliga och viktiga sätt att tänka och agera."
   },
-  "Vahvuudet eivät ole ominaisuuksia, joissa olet hyvä, eivätkä heikkoudet niitä, joissa tunnet itsesi huonoksi. Sen sijaan vahvuudet tekevät kantajastaan vahvan ja heikkoudet toimivat päinvastoin.": {
-    "en": "Strengths are not the things you are good at, and weaknesses are not the things you feel bad at. Instead, strengths make the person who has them stronger – and weaknesses work in the opposite way.",
-    "sv": "Styrkor är inte egenskaper du är bra på, och svagheter är inte det du känner dig dålig på. Styrkor gör dig starkare – och svagheter fungerar tvärtom."
+  "Vahvuudet eivät ole ominaisuuksia, joissa olet hyvä, eivätkä heikkoudet niitä, joissa tunnet itsesi huonoksi.": {
+    "en": "Strengths are not the things you are good at, and weaknesses are not the things you feel bad at.",
+    "sv": "Styrkor är inte egenskaper du är bra på, och svagheter är inte det du känner dig dålig på."
+  },
+  "Sen sijaan vahvuudet tekevät kantajastaan vahvan ja heikkoudet toimivat päinvastoin.": {
+    "en": "Instead, strengths make the person who has them stronger – and weaknesses work in the opposite way.",
+    "sv": "I stället gör styrkor personen som har dem starkare – och svagheter fungerar på motsatt sätt."
   },
   "Vahvuuksia lähetetään!": {
     "en": "Sending strengths!",
@@ -2471,6 +2422,14 @@
   "Vahvuuspalaute opiskelukavereilla – Kirjoita palautetta ja kehuja ryhmässä 2–4 opiskelukaverin kanssa. Nimeä vahvuuksia, joita arvostat toisissanne.": {
     "en": "Strengths Feedback with Classmates – Write feedback and praise in a group of 2–4 classmates. Name the strengths you appreciate in each other.",
     "sv": "Styrkerespons från studiekamrater – Skriv respons och beröm i grupp med 2–4 studiekamrater. Namnge de styrkor ni uppskattar hos varandra."
+  },
+  "Anna palautetta ja kehuja täydentämällä seuraavia lauseenalkuja:": {
+    "en": "Give feedback and praise by completing these sentence starters:",
+    "sv": "Ge feedback och beröm genom att fylla i följande meningsbörjor:"
+  },
+  "Anna palautetta ja kehuja täydentämällä\nseuraavia lauseenalkuja:": {
+    "en": "Give feedback and praise by completing\nthese sentence starters:",
+    "sv": "Ge feedback och beröm genom att fylla i\nföljande meningsbörjor:"
   },
   "Vahvuuspeli": {
     "en": "Strength Game",
@@ -2634,10 +2593,6 @@
     "en": "active",
     "sv": "aktiv"
   },
-  "esim. 9A — Vahvuusryhmä": {
-    "en": "e.g. 9A — Strength group",
-    "sv": "t.ex. 9A — Styrkegrupp"
-  },
   "juuri nyt": {
     "en": "just now",
     "sv": "just nu"
@@ -2698,6 +2653,426 @@
     "en": "total",
     "sv": "totalt"
   },
+  "Erilaisia käsiä nostettuna ilmaan": {
+    "en": "Different hands raised in the air",
+    "sv": "Olika händer uppsträckta i luften"
+  },
+  "Ydinvahvuuksien karkkikauppa": {
+    "en": "Core Strength Candy Shop",
+    "sv": "Kärnstyrkornas godisbutik"
+  },
+  "Nämä ovat ydinvahvuutesi": {
+    "en": "These are your core strengths",
+    "sv": "Det här är dina kärnstyrkor"
+  },
+  "Hylly kääntyy…": {
+    "en": "The shelf is turning…",
+    "sv": "Hyllan vänder sig…"
+  },
+  "Poimi hyllystä viisi väittämäkarkkia, jotka kuulostavat sinulta. Älä mieti liikaa — mene fiiliksellä.": {
+    "en": "Pick five statement candies from the shelf that sound like you. Do not overthink it — go with your feeling.",
+    "sv": "Välj fem påståendegodisar från hyllan som låter som du. Tänk inte för mycket — gå på känslan."
+  },
+  "Jokaisen purkin takana oli luonteenvahvuus ja sitä vastaava karkki. Sinun viisi loistavat.": {
+    "en": "Behind each jar was a character strength and its matching candy. Your five are shining.",
+    "sv": "Bakom varje burk fanns en karaktärsstyrka och motsvarande godis. Dina fem lyser."
+  },
+  "Katso, mitkä vahvuudet väittämien takaa paljastuvat.": {
+    "en": "See which strengths are revealed behind the statements.",
+    "sv": "Se vilka styrkor som avslöjas bakom påståendena."
+  },
+  "OOT NAMU!": {
+    "en": "YOU'RE SWEET!",
+    "sv": "DU ÄR EN GODBIT!"
+  },
+  "OOT NAMU": {
+    "en": "YOU'RE SWEET",
+    "sv": "DU ÄR EN GODBIT"
+  },
+  "sinun vahvuutesi": {
+    "en": "your strengths",
+    "sv": "dina styrkor"
+  },
+  "pussissa": {
+    "en": "in the bag",
+    "sv": "i påsen"
+  },
+  "karkkia pussissa": {
+    "en": "candies in the bag",
+    "sv": "godisar i påsen"
+  },
+  "Käännä hylly →": {
+    "en": "Turn the shelf →",
+    "sv": "Vänd hyllan →"
+  },
+  "Valitse vielä {n}": {
+    "en": "Choose {n} more",
+    "sv": "Välj {n} till"
+  },
+  "Ota kuitti →": {
+    "en": "Take receipt →",
+    "sv": "Ta kvitto →"
+  },
+  "purkkia kääntyy…": {
+    "en": "jars are turning…",
+    "sv": "burkar vänder sig…"
+  },
+  "Kirjoita tähän…": {
+    "en": "Write here…",
+    "sv": "Skriv här…"
+  },
+  "Tallenna ja jatka": {
+    "en": "Save and continue",
+    "sv": "Spara och fortsätt"
+  },
+  "Valitse karkit uudelleen": {
+    "en": "Choose candies again",
+    "sv": "Välj godisar igen"
+  },
+  "Voimavarani opiskelijana": {
+    "en": "My resources as a student",
+    "sv": "Mina resurser som studerande"
+  },
+  "valitse taso {n}": {
+    "en": "choose level {n}",
+    "sv": "välj nivå {n}"
+  },
+  "Esimerkki Karin vahvuusjulisteesta": {
+    "en": "Example of Kari's strength poster",
+    "sv": "Exempel på Karis styrkeaffisch"
+  },
+  "Mieti jotain tilannetta opinnoissa tai vapaa-ajalla, joka sujui hyvin, josta olet ylpeä ja jossa huomasit onnistuvasi sinulle tärkeissä asioissa.": {
+    "en": "Think of a situation in your studies or free time that went well, that you are proud of, and where you noticed you succeeded in things that matter to you.",
+    "sv": "Tänk på en situation i studierna eller på fritiden som gick bra, som du är stolt över och där du märkte att du lyckades med saker som är viktiga för dig."
+  },
+  "Mitä silloin tapahtui? Mikä siinä meni hyvin? Minkälaista palautetta sait toisilta? Mikä siinä oli sinulle tärkeää?": {
+    "en": "What happened then? What went well? What kind of feedback did you get from others? What was important to you in it?",
+    "sv": "Vad hände då? Vad gick bra? Vilken typ av respons fick du av andra? Vad var viktigt för dig i situationen?"
+  },
+  "Mitä tämä onnistuminen kertoo": {
+    "en": "What does this success tell",
+    "sv": "Vad berättar denna framgång"
+  },
+  "ydinvahvuuksistasi:": {
+    "en": "about your core strengths:",
+    "sv": "om dina kärnstyrkor:"
+  },
+  "mitä omia ydinvahvuuksia käyttämällä onnistuit?": {
+    "en": "which of your core strengths helped you succeed?",
+    "sv": "vilka av dina kärnstyrkor använde du för att lyckas?"
+  },
+  "Mieti jotain tilannetta opinnoissa tai vapaa-ajalla, jossa voit lähitulevaisuudessa hyödyntää vahvuuksiasi?": {
+    "en": "Think of a situation in your studies or free time where you can use your strengths in the near future.",
+    "sv": "Tänk på en situation i studierna eller på fritiden där du kan använda dina styrkor inom den närmaste framtiden."
+  },
+  "Mikä tulee menemään hyvin? Mistä voit huomata, että olet hyödyntänyt vahvuuksiasi tietoisemmin?": {
+    "en": "What will go well? How can you notice that you have used your strengths more consciously?",
+    "sv": "Vad kommer att gå bra? Hur kan du märka att du har använt dina styrkor mer medvetet?"
+  },
+  "Mieti jotain tilannetta, jossa et onnistunut hyödyntämään vahvuuksiasi, tai käytit niitä liikaa?": {
+    "en": "Think of a situation where you did not manage to use your strengths, or where you used them too much.",
+    "sv": "Tänk på en situation där du inte lyckades använda dina styrkor, eller där du använde dem för mycket."
+  },
+  "Mitä tämä tilanne opetti sinulle?": {
+    "en": "What did this situation teach you?",
+    "sv": "Vad lärde den här situationen dig?"
+  },
+  "Back to the Future -kirja": {
+    "en": "Back to the Future book",
+    "sv": "Back to the Future-bok"
+  },
+  "täysin eri mieltä": {
+    "en": "strongly disagree",
+    "sv": "helt av annan åsikt"
+  },
+  "eri mieltä": {
+    "en": "disagree",
+    "sv": "av annan åsikt"
+  },
+  "ei samaa eikä eri mieltä": {
+    "en": "neither agree nor disagree",
+    "sv": "varken av samma eller annan åsikt"
+  },
+  "samaa mieltä": {
+    "en": "agree",
+    "sv": "av samma åsikt"
+  },
+  "täysin samaa mieltä": {
+    "en": "strongly agree",
+    "sv": "helt av samma åsikt"
+  },
+  "Vastaa kyselyyn.": {
+    "en": "Answer the survey.",
+    "sv": "Svara på enkäten."
+  },
+  "Laske yhteen pisteesi:": {
+    "en": "Add up your points:",
+    "sv": "Räkna ihop dina poäng:"
+  },
+  "Tasot 2": {
+    "en": "Level 2",
+    "sv": "Nivå 2"
+  },
+  "Valitse 1–2 vahvuuskarkkia ja": {
+    "en": "Choose 1–2 strength candies and",
+    "sv": "Välj 1–2 styrkegodisar och"
+  },
+  "hyödynnä": {
+    "en": "use them",
+    "sv": "använd dem"
+  },
+  "Kirjoita vahvuudet tähän": {
+    "en": "Write the strengths here",
+    "sv": "Skriv styrkorna här"
+  },
+  "Pohdi, mitä teit, koit ja opit.": {
+    "en": "Reflect on what you did, experienced, and learned.",
+    "sv": "Reflektera över vad du gjorde, upplevde och lärde dig."
+  },
+  "Täydennä oheinen tehtävä.": {
+    "en": "Complete the accompanying task.",
+    "sv": "Fyll i den bifogade uppgiften."
+  },
+  "Meillä kaikilla on osaamisia ja tukipilareita elämässämme. Nämä voidaan jakaa neljään osa-alueeseen:": {
+    "en": "We all have skills and pillars of support in our lives. These can be divided into four areas:",
+    "sv": "Vi har alla kunnande och stödpelare i livet. Dessa kan delas in i fyra områden:"
+  },
+  "lahjakkuuksiin, taitoihin, kiinnostuksen kohteisiin ja resursseihin.": {
+    "en": "talents, skills, interests, and resources.",
+    "sv": "talanger, färdigheter, intressen och resurser."
+  },
+  "Moduuli 3": {
+    "en": "Module 3",
+    "sv": "Modul 3"
+  },
+  "Hän kun . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Sinun vahvuuksiasi ovat . . . . . . . . , . . . . . . . . ja . . . . . . . . Olen huomannut, että käytät niitä, kun . . . . . . . . . . ja . . . . . . . . . Arvostan sinussa erityisesti . . . . . . . . . . . . . . . . . ja . . . . . . . . . . . Kun käytät vahvuuksiasi kotona, se vaikuttaa . . . . . . . . . . . . . . . . . . . . Olet opettanut minulle erityisesti . . . . . . . . . . . . . . . . käytöstä. Kun käytät vahvuuksiasi, näen sinut tulevaisuudessa . . . . . . . . . . . . . . . . Anna vahvuuksiesi loistaa. Rakkain terveisin, . . . . . . . . . .": {
+    "en": "When they . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Your strengths are . . . . . . . . , . . . . . . . . and . . . . . . . . I have noticed that you use them when . . . . . . . . . . and . . . . . . . . . I especially appreciate in you . . . . . . . . . . . . . . . . . and . . . . . . . . . . . When you use your strengths at home, it affects . . . . . . . . . . . . . . . . . . . . You have taught me especially about using . . . . . . . . . . . . . . . . When you use your strengths, I see you in the future . . . . . . . . . . . . . . . . Let your strengths shine. With love, . . . . . . . . . .",
+    "sv": "När hen . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Dina styrkor är . . . . . . . . , . . . . . . . . och . . . . . . . . Jag har märkt att du använder dem när . . . . . . . . . . och . . . . . . . . . Jag uppskattar särskilt hos dig . . . . . . . . . . . . . . . . . och . . . . . . . . . . . När du använder dina styrkor hemma påverkar det . . . . . . . . . . . . . . . . . . . . Du har lärt mig särskilt om att använda . . . . . . . . . . . . . . . . När du använder dina styrkor ser jag dig i framtiden . . . . . . . . . . . . . . . . Låt dina styrkor lysa. Med kärlek, . . . . . . . . . ."
+  },
+  "1. Huomaa hyvää!": {
+    "en": "1. Notice the good!",
+    "sv": "1. Lägg märke till det goda!"
+  },
+  "Harjoittele tunnistamaan myönteistä toimintaa ihmisissä ympärilläsi. Tee hyvän huomaamisesta tapa ja tottumus.": {
+    "en": "Practice recognizing positive actions in the people around you. Make noticing the good a habit.",
+    "sv": "Öva på att känna igen positiva handlingar hos människorna omkring dig. Gör det till en vana att lägga märke till det goda."
+  },
+  "2. Nimeä käytetty vahvuus ja sano palaute ääneen tai liitä viestiin somessa.": {
+    "en": "2. Name the strength used and say the feedback aloud, or include it in a social media message.",
+    "sv": "2. Namnge styrkan som användes och säg responsen högt, eller skriv den i ett meddelande på sociala medier."
+  },
+  "“Olit todella rohkea.” “Kiitos ystävällisyydestä”. “Sinussa on myötätuntoa”.": {
+    "en": "\"You were really brave.\" \"Thank you for your kindness.\" \"You have compassion.\"",
+    "sv": "\"Du var verkligen modig.\" \"Tack för din vänlighet.\" \"Du har medkänsla.\""
+  },
+  "3. Syvennä ja kuvaile, miten käytetty vahvuus näkyy toisessa. Sanallista tunne.": {
+    "en": "3. Deepen the feedback and describe how the strength appears in the other person. Put the feeling into words.",
+    "sv": "3. Fördjupa responsen och beskriv hur styrkan syns hos den andra. Sätt ord på känslan."
+  },
+  "“Olit rohkea. Huomasin, että uskalsit nostaa esille vaikeita asioita.”": {
+    "en": "\"You were brave. I noticed that you dared to bring up difficult things.\"",
+    "sv": "\"Du var modig. Jag märkte att du vågade lyfta fram svåra saker.\""
+  },
+  "4. Arvosta ja kerro, miten käytetty vahvuus vaikuttaa. Liitä mukaan tunnesana.": {
+    "en": "4. Show appreciation and explain how the strength has an impact. Include a feeling word.",
+    "sv": "4. Visa uppskattning och berätta hur styrkan påverkar. Ta med ett känsloord."
+  },
+  "“Kiitos rohkeudestasi tänään. Tapasi toimia vaikuttaa myönteisesti koko ryhmään. Olen susta ylpeä.”": {
+    "en": "\"Thank you for your courage today. The way you act has a positive effect on the whole group. I am proud of you.\"",
+    "sv": "\"Tack för ditt mod idag. Ditt sätt att agera påverkar hela gruppen positivt. Jag är stolt över dig.\""
+  },
+  "Miltä sinusta tuntui antaa kehuja ja kiitosta? Mikä oli tärkein oivalluksesi?": {
+    "en": "How did it feel to give praise and thanks? What was your most important insight?",
+    "sv": "Hur kändes det att ge beröm och tack? Vilken var din viktigaste insikt?"
+  },
+  "Näin voit antaa toiselle kehuja ja kannustusta vahvuuksista:": {
+    "en": "This is how you can praise and encourage someone about their strengths:",
+    "sv": "Så här kan du ge någon beröm och uppmuntran kring styrkor:"
+  },
+  "Näin voit antaa toiselle kehuja ja\nkannustusta vahvuuksista:": {
+    "en": "This is how you can praise and\nencourage someone about their strengths:",
+    "sv": "Så här kan du ge någon beröm och\nuppmuntran kring styrkor:"
+  },
+  "Harjoittele tunnistamaan myönteistä toimintaa ihmisissä ympärilläsi.\nTee hyvän huomaamisesta tapa ja tottumus.": {
+    "en": "Practice recognizing positive actions in the people around you.\nMake noticing the good a habit.",
+    "sv": "Öva på att känna igen positiva handlingar hos människorna omkring dig.\nGör det till en vana att lägga märke till det goda."
+  },
+  "“Olit todella rohkea.” “Kiitos ystävällisyydestä”. “Sinussa on myötätuntoa”.": {
+    "en": "\"You were really brave.\" \"Thank you for your kindness.\" \"You have compassion.\"",
+    "sv": "\"Du var verkligen modig.\" \"Tack för din vänlighet.\" \"Du har medkänsla.\""
+  },
+  "“Olit rohkea. Huomasin, että uskalsit nostaa esille vaikeita asioita.”": {
+    "en": "\"You were brave. I noticed that you dared to bring up difficult things.\"",
+    "sv": "\"Du var modig. Jag märkte att du vågade lyfta fram svåra saker.\""
+  },
+  "“Kiitos rohkeudestasi tänään. Tapasi toimia vaikuttaa myönteisesti koko ryhmään.\nOlen susta ylpeä.”": {
+    "en": "\"Thank you for your courage today. The way you act has a positive effect on the whole group.\nI am proud of you.\"",
+    "sv": "\"Tack för ditt mod idag. Ditt sätt att agera påverkar hela gruppen positivt.\nJag är stolt över dig.\""
+  },
+  "\"Olit todella rohkea.\" \"Kiitos ystävällisyydestä\". \"Sinussa on myötätuntoa\".": {
+    "en": "\"You were really brave.\" \"Thank you for your kindness.\" \"You have compassion.\"",
+    "sv": "\"Du var verkligen modig.\" \"Tack för din vänlighet.\" \"Du har medkänsla.\""
+  },
+  "\"Olit rohkea. Huomasin, että uskalsit nostaa esille vaikeita asioita.\"": {
+    "en": "\"You were brave. I noticed that you dared to bring up difficult things.\"",
+    "sv": "\"Du var modig. Jag märkte att du vågade lyfta fram svåra saker.\""
+  },
+  "\"Kiitos rohkeudestasi tänään. Tapasi toimia vaikuttaa myönteisesti koko ryhmään. Olen susta ylpeä.\"": {
+    "en": "\"Thank you for your courage today. The way you act has a positive effect on the whole group. I am proud of you.\"",
+    "sv": "\"Tack för ditt mod idag. Ditt sätt att agera påverkar hela gruppen positivt. Jag är stolt över dig.\""
+  },
+  "5. Huomaa, miten positiivinen palaute ja vahvuuksista puhuminen vaikuttaa toiseen.": {
+    "en": "5. Notice how positive feedback and talking about strengths affect another person.",
+    "sv": "5. Lägg märke till hur positiv respons och samtal om styrkor påverkar en annan person."
+  },
+  "Nämä kysymykset auttavat sinua näkemään hyviä puolia elämästäsi": {
+    "en": "These questions help you see the good sides of your life",
+    "sv": "De här frågorna hjälper dig att se de goda sidorna i ditt liv"
+  },
+  "Saan usein kuulla toisilta, että keksin omaperäisiä ideoita.": {
+    "en": "I often hear from others that I come up with original ideas.",
+    "sv": "Jag får ofta höra av andra att jag kommer på originella idéer."
+  },
+  "Haluan jatkuvasti oppia uutta ja olen laajalti kiinnostunut asioista, ihmisistä, ilmiöistä.": {
+    "en": "I constantly want to learn new things and am broadly interested in things, people, and phenomena.",
+    "sv": "Jag vill hela tiden lära mig nytt och är brett intresserad av saker, människor och fenomen."
+  },
+  "Teen päätöksiä vasta kun tiedän asiasta kaiken.": {
+    "en": "I make decisions only when I know everything about the matter.",
+    "sv": "Jag fattar beslut först när jag vet allt om saken."
+  },
+  "Puolustan mielipidettäni ja uskallan kertoa, mitä ajattelen, vaikka kohtaisin jyrkkääkin vastustusta.": {
+    "en": "I stand up for my opinion and dare to say what I think, even if I face strong opposition.",
+    "sv": "Jag försvarar min åsikt och vågar säga vad jag tänker, även om jag möter starkt motstånd."
+  },
+  "Ystäväni kuvailisivat minua energiseksi, tarmokkaaksi ja hyväntuuliseksi.": {
+    "en": "My friends would describe me as energetic, lively, and cheerful.",
+    "sv": "Mina vänner skulle beskriva mig som energisk, driftig och glad."
+  },
+  "Teen mitä tehdä pitää, vaikka vastoinkäymisiä ilmenisi.": {
+    "en": "I do what needs to be done, even when setbacks arise.",
+    "sv": "Jag gör det som behöver göras, även när motgångar uppstår."
+  },
+  "Yksi elämääni eniten merkitystä tuovista asioista on muiden ihmisten auttaminen.": {
+    "en": "One of the things that gives my life the most meaning is helping other people.",
+    "sv": "En av de saker som ger mitt liv mest mening är att hjälpa andra människor."
+  },
+  "Pärjään hyvin erilaisissa sosiaalisissa tilanteissa ja uusien ihmisten parissa.": {
+    "en": "I do well in different social situations and with new people.",
+    "sv": "Jag klarar mig bra i olika sociala situationer och med nya människor."
+  },
+  "En kaivele menneitä, vaan minun on helppo irrottautua niistä ja mennä elämässä eteenpäin.": {
+    "en": "I do not dwell on the past; it is easy for me to let go and move forward in life.",
+    "sv": "Jag gräver inte i det förflutna, utan har lätt att släppa taget och gå vidare i livet."
+  },
+  "Teen aina harkittuja päätöksiä.": {
+    "en": "I always make thoughtful decisions.",
+    "sv": "Jag fattar alltid genomtänkta beslut."
+  },
+  "Pystyn säätelemään tunteitani ja käytöstäni tilanteisiin sopivaksi.": {
+    "en": "I can regulate my emotions and behavior to fit the situation.",
+    "sv": "Jag kan reglera mina känslor och mitt beteende så att de passar situationen."
+  },
+  "Huomaan kauniita yksityiskohtia ja pysähdyn usein niiden äärelle.": {
+    "en": "I notice beautiful details and often pause to appreciate them.",
+    "sv": "Jag lägger märke till vackra detaljer och stannar ofta upp vid dem."
+  },
+  "Ajattele itseäsi tekemässä tavanomaisia ja arkisia asioita. Miten olet näissä tekemisissä käyttänyt ydinvahvuuksiasi? Kirjoita muutama esimerkki.": {
+    "en": "Think of yourself doing ordinary, everyday things. How have you used your core strengths in these activities? Write a few examples.",
+    "sv": "Tänk på dig själv när du gör vanliga vardagliga saker. Hur har du använt dina kärnstyrkor i dessa aktiviteter? Skriv några exempel."
+  },
+  "Minulta pyydetään usein neuvoja ja koen, että mielipiteitäni arvostetaan.": {
+    "en": "I am often asked for advice and feel that my opinions are valued.",
+    "sv": "Jag blir ofta tillfrågad om råd och upplever att mina åsikter värdesätts."
+  },
+  "Jos päätän jotain, teen sen, vaikka haasteita ja vastoinkäymisiä ilmenisi.": {
+    "en": "If I decide on something, I do it, even when challenges and setbacks arise.",
+    "sv": "Om jag bestämmer mig för något gör jag det, trots utmaningar och motgångar."
+  },
+  "Puhun kaunistelematta sen puolesta, mikä on mielestäni oikein ja totta.": {
+    "en": "I speak up plainly for what I believe is right and true.",
+    "sv": "Jag står upp för det jag tycker är rätt och sant."
+  },
+  "Osoitan läheisilleni välittämistäni sanoin, teoin ja viettämällä paljon aikaa heidän kanssaan.": {
+    "en": "I show my loved ones that I care through words, actions, and by spending a lot of time with them.",
+    "sv": "Jag visar mina närstående att jag bryr mig med ord, handlingar och genom att tillbringa mycket tid med dem."
+  },
+  "Olen mielelläni avuksi tai hyödyksi.": {
+    "en": "I am happy to be of help or service.",
+    "sv": "Jag är gärna till hjälp eller nytta."
+  },
+  "Parhaat puoleni pääsevät käyttöön ryhmässä, ja minua motivoi ryhmän onnistuminen.": {
+    "en": "My best qualities come out in a group, and I am motivated by the group's success.",
+    "sv": "Mina bästa sidor kommer fram i grupp, och jag motiveras av att gruppen lyckas."
+  },
+  "Minulle on tärkeää kohdella kaikkia tasapuolisesti.": {
+    "en": "It is important to me to treat everyone fairly.",
+    "sv": "Det är viktigt för mig att behandla alla rättvist."
+  },
+  "En tee itsestäni numeroa missään tilanteissa ja pitäydyn mielelläni taustalla.": {
+    "en": "I never make a big deal of myself in any situation and prefer to stay in the background.",
+    "sv": "Jag gör aldrig ett nummer av mig i någon situation och håller mig gärna i bakgrunden."
+  },
+  "Perheeni kertoisi, että kiitän usein ja olen vilpittömästi kiitollinen.": {
+    "en": "My family would say that I often express thanks and am genuinely grateful.",
+    "sv": "Min familj skulle säga att jag ofta tackar och är genuint tacksam."
+  },
+  "Minun on helppoa nähdä asioissa niiden hyvät puolet ja näen tulevaisuuden myönteisenä.": {
+    "en": "It is easy for me to see the positive side of things and I see the future in a positive light.",
+    "sv": "Det är lätt för mig att se de positiva sidorna av saker och jag ser framtiden i ett positivt ljus."
+  },
+  "Löydän vaikeistakin elämäntilanteista huumoria ja pieniä ilon pilkahduksia.": {
+    "en": "I can find humour and small moments of joy even in difficult life situations.",
+    "sv": "Jag hittar humor och små glädjestunder även i svåra livssituationer."
+  },
+  "Ajattelen, että elämällä on jokin syvempi tarkoitus.": {
+    "en": "I believe that life has a deeper purpose.",
+    "sv": "Jag tänker att livet har ett djupare syfte."
+  },
+  "Listaa voimavarasi seuraavan sivun taulukkoon. Merkkaa sydämiin, miten tärkeiksi voimavarasi koet.": {
+    "en": "List your resources in the table on the next page. Mark in the hearts how important you feel each resource is.",
+    "sv": "Lista dina resurser i tabellen på nästa sida. Markera i hjärtana hur viktiga du upplever att dina resurser är."
+  },
+  "Merkitse\nvahvuutesi": {
+    "en": "Mark\nyour strengths",
+    "sv": "Markera\ndina styrkor"
+  },
+  "Huomaa hyvä": {
+    "en": "Notice the good",
+    "sv": "Lägg märke till det goda"
+  },
+  "KERRO LISÄÄ!": {
+    "en": "TELL ME MORE!",
+    "sv": "BERÄTTA MER!"
+  },
+  "TARKOITATKO ETTÄ…": {
+    "en": "DO YOU MEAN THAT…",
+    "sv": "MENAR DU ATT…"
+  },
+  "OLEN YLPEÄ SINUSTA, KOSKA…": {
+    "en": "I AM PROUD OF YOU BECAUSE…",
+    "sv": "JAG ÄR STOLT ÖVER DIG FÖR ATT…"
+  },
+  "TÄMÄ OLI TÄRKEÄÄ KUULLA, KOSKA…": {
+    "en": "THIS WAS IMPORTANT TO HEAR BECAUSE…",
+    "sv": "DETTA VAR VIKTIGT ATT HÖRA EFTERSOM…"
+  },
+  "MISSÄ OLET HYVÄ?": {
+    "en": "WHAT ARE YOU GOOD AT?",
+    "sv": "VAD ÄR DU BRA PÅ?"
+  },
+  "MITÄ TAITOJA SINULLA JO ON, JOITA HYÖDYNNÄT OPINNOISSA?": {
+    "en": "WHAT SKILLS DO YOU ALREADY HAVE THAT YOU USE IN YOUR STUDIES?",
+    "sv": "VILKA FÄRDIGHETER HAR DU REDAN SOM DU ANVÄNDER I STUDIERNA?"
+  },
+  "MITÄ HARRASTAT? MITKÄ OVAT INNOSTUKSEN JA INTOHIMON KOHTEITA VAPAA-AJALLASI?": {
+    "en": "WHAT ARE YOUR HOBBIES? WHAT EXCITES AND INSPIRES YOU IN YOUR FREE TIME?",
+    "sv": "VILKA HOBBYER HAR DU? VAD VÄCKER ENTUSIASM OCH PASSION PÅ DIN FRITID?"
+  },
+  "MITKÄ ASIAT TAI HENKILÖT OVAT VOIMAVAROJASI? MIKÄ AUTTAA SINUA PYSYMÄÄN VAHVANA VAIKEINA AIKOINA? MIKÄ TUO ELÄMÄÄSI MERKITYSTÄ?": {
+    "en": "WHAT THINGS OR PEOPLE ARE YOUR RESOURCES? WHAT HELPS YOU STAY STRONG IN DIFFICULT TIMES? WHAT BRINGS MEANING TO YOUR LIFE?",
+    "sv": "VILKA SAKER ELLER PERSONER ÄR DINA RESURSER? VAD HJÄLPER DIG ATT HÅLLA DIG STARK I SVÅRA TIDER? VAD GER DITT LIV MENING?"
+  },
   "{n} min sitten": {
     "en": "{n} min ago",
     "sv": "{n} min sedan"
@@ -2709,5 +3084,9 @@
   "{n} t sitten": {
     "en": "{n}h ago",
     "sv": "{n} h sedan"
+  },
+  "Minä olen ...": {
+    "en": "I am ...",
+    "sv": "Jag är ..."
   }
 }

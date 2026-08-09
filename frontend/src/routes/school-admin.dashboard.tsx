@@ -166,9 +166,7 @@ function SchoolAdminDashboard() {
       sections={[
         {
           label: tr("Opeta"),
-          links: [
-            { to: "/school-admin/teach/materials", label: tr("Opetusmateriaalit") },
-          ],
+          links: [{ to: "/school-admin/teach/materials", label: tr("Opetusmateriaalit") }],
         },
       ]}
     >
@@ -253,9 +251,6 @@ function SchoolAdminDashboard() {
           if (!s) return null;
           return (
             <StudentDetailReport
-              /* @lovable-new 2026-08-05 — school context for the printed report header. */
-              schoolName={data?.school?.name ?? null}
-
               name={s.name}
               className={s.className}
               email={s.email}
@@ -809,9 +804,6 @@ function SchoolAdminClassReport({
   const top = useMemo(() => tally(rows).slice(0, 5), [rows]);
   const avg = rows.length ? Math.round(rows.reduce((a, r) => a + r.pct, 0) / rows.length) : 0;
 
-
-
-
   const sorted = useMemo(() => {
     const copy = [...rows];
     if (sort === "name") copy.sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
@@ -883,7 +875,6 @@ function SchoolAdminClassReport({
       />
 
       {/* Level completion lives inside <ReportTrends /> — no duplicate card here. */}
-
 
       <StickyNote seed={`sa-cls-students-${cls?.id ?? "x"}`} className="space-y-3 overflow-x-auto">
         <div className="flex flex-wrap items-center justify-between gap-2">

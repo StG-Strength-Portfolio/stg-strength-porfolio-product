@@ -13,10 +13,7 @@ import { TopStrengthCards } from "@/components/strengths/TopStrengthCards";
 import { useRoleGuard } from "@/lib/role-guard";
 import { useLanguage, useTr } from "@/lib/i18n";
 import { getStrengthColor, getStrengthName } from "@/lib/strengths-i18n";
-import {
-  getTeacherReceivedStrengths,
-  type ReceivedStrength,
-} from "@/lib/give-strength.functions";
+import { getTeacherReceivedStrengths, type ReceivedStrength } from "@/lib/give-strength.functions";
 
 export const Route = createFileRoute("/teacher/profile")({
   head: () => ({
@@ -63,9 +60,7 @@ function Feed({
               aria-hidden
             />
             <span className="min-w-0 flex-1">
-              <span className="block text-sm font-bold">
-                {getStrengthName(r.strengthId, lang)}
-              </span>
+              <span className="block text-sm font-bold">{getStrengthName(r.strengthId, lang)}</span>
               <span className="block text-xs opacity-70">{r.fromName}</span>
               {r.message && <span className="mt-1 block break-words text-sm">{r.message}</span>}
             </span>
@@ -134,7 +129,6 @@ function TeacherProfilePage() {
           <TopStrengthCards items={top5} lang={lang} />
         )}
       </StickyNote>
-
 
       <Feed
         title={tr("Oppilailta saadut")}
