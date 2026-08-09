@@ -191,13 +191,7 @@ export const REQUIREMENTS: Record<number, string[]> = {
   42: Array.from({ length: 7 }, (_, i) => `screen_39_mina_olen_${i + 1}`),
 
   // Module 3
-  44: [
-    "screen_42_karkit",
-    "screen_42_teit",
-    "screen_42_seuraavaksi",
-    "screen_42_opit",
-    "screen_42_hyodynnat",
-  ],
+  44: ["screen_43_vahvuudet", "screen_43_parasta", "screen_43_kiitollinen", "screen_43_yhdessa"],
   45: ["screen_43_vahvuudet", "screen_43_parasta", "screen_43_kiitollinen", "screen_43_yhdessa"],
   46: ["screen_44_perheenjasenena"],
   47: Array.from({ length: 8 }, (_, i) => `screen_45_vanhemmat_${i + 1}`),

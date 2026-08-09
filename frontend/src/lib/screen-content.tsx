@@ -9264,14 +9264,15 @@ function Screen42({ onSaveStateChange }: Props) {
 function Screen43() {
   const tr = useTr();
   return (
-    <StickyNote tone="mint" seed="s40-h" className="text-center">
-      <div className="text-sm font-medium uppercase tracking-[0.12em] opacity-80 mb-2">
-        {tr("Moduuli 3")}
+    <div className="relative h-full min-h-[620px] w-full overflow-hidden text-white">
+      <div className="absolute right-[4%] top-0 rounded-b-[12px] border-2 border-t-0 border-black bg-[#7654ad] px-5 py-3 text-white"></div>
+
+      <div className="absolute inset-0 flex items-center justify-center px-8">
+        <h1 className="text-center font-display text-[clamp(48px,5vw,78px)] font-semibold leading-[1.08] tracking-[-0.02em]">
+          {trLines(tr, "3. Omat vahvuudet kotona")}
+        </h1>
       </div>
-      <h1 className="font-display text-[clamp(40px,4.5vw,68px)] font-medium leading-[1.1] tracking-[-0.025em]">
-        {tr("3. Omat vahvuudet kotona")}
-      </h1>
-    </StickyNote>
+    </div>
   );
 }
 // ----- S41 (PDF p47): Vahvuuskarkkini kotona -----
@@ -9295,37 +9296,243 @@ function S41(p: Props) {
 // ----- S42 (PDF p48): Vahvuudet perheessä -----
 function Screen45({ onSaveStateChange }: Props) {
   const tr = useTr();
+  const notes = [
+    {
+      fieldKey: "screen_43_vahvuudet",
+      label: "Minkälaisia vahvuuksia sinulla on perheenjäsenenä? Miten ne näkyvät?",
+      className: "left-[6%] top-[34%] h-[380px] w-[23%]",
+      rotate: -1.2,
+    },
+    {
+      fieldKey: "screen_43_parasta",
+      label: "Mikä on parasta perheessäsi? Miten erilaiset vahvuudet näkyvät perheen vuorovaikutuksessa?",
+      className: "left-[34%] top-[40%] h-[390px] w-[22%]",
+      rotate: 0.8,
+    },
+    {
+      fieldKey: "screen_43_kiitollinen",
+      label: "Mistä olet kiitollinen perheessäsi?",
+      className: "left-[59%] top-[9%] h-[380px] w-[24%]",
+      rotate: 1.3,
+    },
+    {
+      fieldKey: "screen_43_yhdessa",
+      label: "Mitä tykkäätte tehdä yhdessä?",
+      className: "left-[65%] top-[51%] h-[340px] w-[23%]",
+      rotate: -1.8,
+    },
+  ];
+
   return (
-    <div className="space-y-4">
-      <StickyNote tone="coral" seed="s42-h">
-        <h1 className="font-display text-2xl mb-1">{tr("Vahvuudet perheessä")}</h1>
-        <p className="text-sm opacity-90">{tr("Täydennä laput.")}</p>
-      </StickyNote>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <ReflectionTextarea
-          fieldKey="screen_43_vahvuudet"
-          label={tr("Minkälaisia vahvuuksia sinulla on perheenjäsenenä? Miten ne näkyvät?")}
-          rows={4}
-          onSaveStateChange={onSaveStateChange}
+    <div
+      className="
+        relative
+        h-full
+        min-h-0
+        w-full
+        overflow-x-hidden
+        overflow-y-auto
+        text-white
+        [scrollbar-gutter:stable]
+      "
+    >
+      <div
+        className="
+          relative
+          mx-auto
+          min-h-[790px]
+          w-full
+          max-w-[1500px]
+          overflow-hidden
+          px-[6%]
+          pb-24
+          pt-8
+        "
+      >
+        <WorkbookCornerShapes top="coral" right="yellow" bottomLeft="mint" bottomRight="mint" />
+
+        <div
+          aria-hidden="true"
+          className="
+            pointer-events-none
+            absolute
+            left-[1.8%]
+            top-[70px]
+            z-10
+            h-[118px]
+            w-[9px]
+            rounded-full
+            border
+            border-white
+            bg-white/25
+            shadow-[inset_0_0_0_1px_rgba(255,255,255,0.45)]
+          "
         />
-        <ReflectionTextarea
-          fieldKey="screen_43_parasta"
-          label={tr("Mikä on parasta perheessäsi? Miten erilaiset vahvuudet näkyvät perheessänne?")}
-          rows={4}
-          onSaveStateChange={onSaveStateChange}
+
+        <div
+          className="
+            relative
+            z-20
+            w-[40%]
+            max-w-[560px]
+            pt-[9%]
+          "
+        >
+          <h1
+            className="
+              font-display
+              text-[clamp(42px,4vw,66px)]
+              font-semibold
+              leading-[1.05]
+              tracking-[0]
+              text-white
+            "
+          >
+            {tr("Vahvuudet perheessä")}
+          </h1>
+
+          <p
+            className="
+              mt-10
+              font-display
+              text-[clamp(24px,2vw,34px)]
+              font-semibold
+              leading-[1.15]
+              text-white
+            "
+          >
+            {tr("Täydennä laput.")}
+          </p>
+        </div>
+
+        {notes.map((note) => (
+          <IrregularPaper
+            key={note.fieldKey}
+            rotate={note.rotate}
+            className={cn(
+              `
+                absolute
+                z-20
+                flex
+                min-w-0
+                flex-col
+                border-0
+                px-5
+                pb-5
+                pt-4
+                text-black
+                shadow-[0_16px_0_rgba(54,30,76,0.65)]
+              `,
+              note.className,
+            )}
+          >
+            <p
+              className="
+                relative
+                z-20
+                mx-auto
+                min-h-[56px]
+                max-w-[95%]
+                shrink-0
+                text-center
+                font-display
+                text-[clamp(16px,1.15vw,22px)]
+                font-semibold
+                leading-[1.18]
+                text-black
+              "
+            >
+              {tr(note.label)}
+            </p>
+
+            <div
+              className="
+                relative
+                z-10
+                mt-3
+                min-h-0
+                flex-1
+                overflow-hidden
+                rounded-[18px]
+
+                [&_label]:hidden
+
+                [&>div]:h-full
+                [&>div]:min-h-0
+
+                [&_div]:border-0
+                [&_div]:bg-transparent
+                [&_div]:p-0
+                [&_div]:shadow-none
+
+                [&_textarea]:h-full
+                [&_textarea]:min-h-0
+                [&_textarea]:w-full
+                [&_textarea]:resize-none
+                [&_textarea]:rounded-[18px]
+                [&_textarea]:border-0
+                [&_textarea]:bg-transparent
+                [&_textarea]:px-3
+                [&_textarea]:py-2
+                [&_textarea]:font-display
+                [&_textarea]:text-[16px]
+                [&_textarea]:leading-[32px]
+                [&_textarea]:text-[#241b3f]
+                [&_textarea]:outline-none
+                [&_textarea]:shadow-none
+                [&_textarea]:ring-0
+                [&_textarea]:placeholder:text-[#aaa1b5]
+
+                [&_textarea:focus]:outline-none
+                [&_textarea:focus]:ring-0
+              "
+            >
+              <div
+                aria-hidden="true"
+                className="
+                  pointer-events-none
+                  absolute
+                  inset-x-3
+                  inset-y-2
+                  opacity-65
+                  [background-image:repeating-linear-gradient(to_bottom,transparent_0,transparent_31px,#ddd4ea_32px,#ddd4ea_33px)]
+                "
+              />
+
+              <div className="relative z-10 h-full">
+                <FlatReflectionTextarea
+                  fieldKey={note.fieldKey}
+                  rows={7}
+                  minHeight={190}
+                  textClass="text-[16px]"
+                  onSaveStateChange={onSaveStateChange}
+                />
+              </div>
+            </div>
+          </IrregularPaper>
+        ))}
+
+        <img
+          src="/illustrations/s24-bottom-right.png"
+          alt=""
+          aria-hidden="true"
+          className="
+            pointer-events-none
+            absolute
+            right-[-125px]
+            top-[110px]
+            z-10
+            h-[470px]
+            w-auto
+            rotate-[10deg]
+            object-contain
+            select-none
+          "
         />
-        <ReflectionTextarea
-          fieldKey="screen_43_kiitollinen"
-          label={tr("Mistä olet kiitollinen perheessäsi?")}
-          rows={4}
-          onSaveStateChange={onSaveStateChange}
-        />
-        <ReflectionTextarea
-          fieldKey="screen_43_yhdessa"
-          label={tr("Mitä tykkäätte tehdä yhdessä?")}
-          rows={4}
-          onSaveStateChange={onSaveStateChange}
-        />
+
+        <div className="absolute bottom-[28px] right-[32px] z-30 font-display text-[14px] font-bold text-black">
+          {tr("Huomaa hyvä!")}
+        </div>
       </div>
     </div>
   );
@@ -10134,14 +10341,7 @@ function Screen73() {
 // Screen 44
 // ============================================================
 function Screen44({ onSaveStateChange }: Props) {
-  return (
-    <VahvuuskarkkiSheet
-      title="Vahvuuskarkkini"
-      context="kotona"
-      fieldPrefix="screen_42"
-      onSaveStateChange={onSaveStateChange}
-    />
-  );
+  return <Screen45 onSaveStateChange={onSaveStateChange} />;
 }
 
 const REGISTRY: Record<number, (p: Props) => ReactNode> = {
