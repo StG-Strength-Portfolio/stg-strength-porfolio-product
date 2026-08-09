@@ -18,6 +18,8 @@ import { EmailAnalyticsTab } from "@/components/superadmin/EmailAnalyticsTab";
 // @lovable-new
 import { TeachingMaterialsTab } from "@/components/superadmin/TeachingMaterialsTab";
 import { SuperAdminsTab } from "@/components/superadmin/SuperAdminsTab";
+// @lovable-new 2026-08-08 — super admin "view as student" (view mode only)
+import { setStudentViewMode } from "@/lib/progression";
 import {
   listSchools,
   createSchool,
@@ -186,6 +188,19 @@ function SuperAdminDashboard() {
               </Link>
             ))}
           </nav>
+          {/* @lovable-new 2026-08-08 — QA: open the student-facing portfolio
+              with full bypass. View mode only — the DB role stays super_admin. */}
+          <button
+            type="button"
+            className="mt-4 block w-full rounded-full bg-[color:var(--yellow)] px-4 py-2 text-sm font-bold text-[color:var(--purple)]"
+            onClick={() => {
+              setStudentViewMode(true);
+              window.location.href = "/seikkailu";
+            }}
+          >
+            {tr("Näytä oppilaan näkymä")}
+          </button>
+
           <button
             type="button"
             className="mt-6 px-4 text-xs underline opacity-70"

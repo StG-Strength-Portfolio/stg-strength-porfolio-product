@@ -1,12 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
 import { WORLDS, TOTAL_SCREENS, worldForScreen } from "@/lib/screens";
 import { WorldBadge } from "@/components/WorldBadge";
 import { StickyNote } from "@/components/StickyNote";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
-import { useStudentProgress } from "@/lib/progress";
 import { useT, useTr } from "@/lib/i18n";
+// @lovable-new 2026-08-08 — level locking comes from the shared progression rules
+import { useProgression } from "@/lib/progression";
 
 export const Route = createFileRoute("/_authenticated/seikkailu/")({
   component: WorldMap,
@@ -14,15 +13,11 @@ export const Route = createFileRoute("/_authenticated/seikkailu/")({
 
 function WorldMap() {
   const navigate = useNavigate();
-  const [userId, setUserId] = useState<string | null>(null);
   const t = useT();
   const tr = useTr();
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
-  }, []);
-  const progress = useStudentProgress(userId);
+  const progression = useProgression();
 
-  const current = progress?.currentScreen ?? 1;
+  const current = progression.nextAvailable;
   const currentWorld = worldForScreen(current);
 
   return (
@@ -45,20 +40,22 @@ function WorldMap() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {WORLDS.map((w, idx) => {
-          const wp = progress?.byWorld[w.id] ?? { completed: 0, total: 0 };
-          const prev = idx > 0 ? WORLDS[idx - 1] : null;
-          const prevWP = prev ? (progress?.byWorld[prev.id] ?? { completed: 0, total: 0 }) : null;
-          const prevDone = !prevWP || prevWP.total === 0 || prevWP.completed >= prevWP.total;
-          const locked = idx > 0 && current < w.start && !prevDone;
-          const ratio = wp.total > 0 ? wp.completed / wp.total : (current > w.end ? 1 : 0);
+        {WORLDS.map((w) => {
+          const wp = progression.byWorld?.[w.id] ?? { completed: 0, total: 0 };
+          const locked = !progression.canAccessLevel(w);
+          const ratio = wp.total > 0 ? wp.completed / wp.total : 0;
           return (
             <WorldBadge
               key={w.id}
               world={w}
               locked={locked}
               progress={ratio}
-              onClick={() => navigate({ to: "/seikkailu/$screen", params: { screen: String(Math.max(w.start, Math.min(current, w.end))) } })}
+              onClick={() =>
+                navigate({
+                  to: "/seikkailu/$screen",
+                  params: { screen: String(progression.resumeScreenForLevel(w)) },
+                })
+              }
             />
           );
         })}

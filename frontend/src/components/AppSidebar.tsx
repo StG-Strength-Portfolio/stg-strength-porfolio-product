@@ -15,35 +15,16 @@ import {
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarFooter,
 } from "@/components/ui/sidebar";
 import { WORLDS } from "@/lib/screens";
-import { useNavGate } from "@/lib/screen-completion";
-import { REQUIREMENTS } from "@/lib/screen-completion";
-import { useStudentProgress } from "@/lib/progress";
 import { LevelProgressBar } from "@/components/LevelProgressBar";
 import { supabase } from "@/integrations/supabase/client";
 import { useT, useTr } from "@/lib/i18n";
-
-function pickResumeTarget(
-  start: number,
-  end: number,
-  currentScreen: number | null,
-  completedScreens: Set<number> | undefined,
-): number {
-  if (currentScreen != null && currentScreen >= start && currentScreen <= end) {
-    return currentScreen;
-  }
-  for (let n = start; n <= end; n++) {
-    const req = REQUIREMENTS[n];
-    if (!req || req.length === 0) continue;
-    if (!completedScreens?.has(n)) return n;
-  }
-  return start;
-}
+// @lovable-new 2026-08-08 — shared progression rules (level locking)
+import { useProgression } from "@/lib/progression";
 
 export function AppSidebar() {
   const path = useRouterState({ select: (r) => r.location.pathname });
   const navigate = useNavigate();
-  const { canNavigateTo, currentScreen } = useNavGate();
-  const [userId, setUserId] = useState<string | null>(null);
+  const progression = useProgression();
   const [schoolName, setSchoolName] = useState<string | null>(null);
   const t = useT();
   const tr = useTr();
@@ -53,7 +34,6 @@ export function AppSidebar() {
     (async () => {
       const { data } = await supabase.auth.getUser();
       const uid = data.user?.id ?? null;
-      setUserId(uid);
       if (!uid) return;
       const { data: profile } = await supabase
         .from("profiles" as never)
@@ -71,25 +51,23 @@ export function AppSidebar() {
     })();
   }, []);
 
-  const progress = useStudentProgress(userId);
-
   const isMap = path === "/seikkailu";
   const activeScreen = (() => {
     const m = path.match(/\/seikkailu\/(\d+)/);
     return m ? Number(m[1]) : null;
   })();
 
-  function go(target: number) {
+  function go(target: number, locked: boolean) {
     return (e: React.MouseEvent) => {
-      if (!canNavigateTo(target)) {
-        e.preventDefault();
+      e.preventDefault();
+      if (locked || !progression.canAccessScreen(target)) {
         toast(hint);
         return;
       }
-      e.preventDefault();
       navigate({ to: "/seikkailu/$screen", params: { screen: String(target) } });
     };
   }
+
 
   return (
     <Sidebar collapsible="icon">
@@ -151,29 +129,34 @@ export function AppSidebar() {
             <SidebarMenu>
               {WORLDS.map((w) => {
                 const inWorld = activeScreen != null && activeScreen >= w.start && activeScreen <= w.end;
-                const target = pickResumeTarget(
-                  w.start,
-                  w.end,
-                  inWorld ? activeScreen : currentScreen,
-                  progress?.completedScreens,
-                );
-                const locked = currentScreen != null && target > currentScreen && !canNavigateTo(target);
+                /* @lovable-new 2026-08-08 — one shared progression rule */
+                const locked = !progression.canAccessLevel(w);
+                const target = locked
+                  ? w.start
+                  : inWorld
+                    ? (activeScreen as number)
+                    : progression.resumeScreenForLevel(w);
                 const title = tr(w.title);
                 const subtitle = tr(w.subtitle);
-                const stats = progress?.byWorld[w.id];
+                const stats = progression.byWorld?.[w.id];
                 const pct = stats && stats.total > 0
                   ? Math.round((stats.completed / stats.total) * 100)
                   : 0;
+
                 return (
                   <SidebarMenuItem key={w.id}>
                     <SidebarMenuButton asChild isActive={inWorld} className="h-auto items-start py-2">
                       <a
-                        href={`/seikkailu/${target}`}
-                        onClick={go(target)}
-                        className="flex items-start gap-2 whitespace-normal"
+                        /* @lovable-new 2026-08-08 — locked levels are not links:
+                           no href, not focusable, not keyboard-activatable. */
+                        href={locked ? undefined : `/seikkailu/${target}`}
+                        onClick={go(target, locked)}
+                        className={`flex items-start gap-2 whitespace-normal ${locked ? "cursor-not-allowed opacity-60" : ""}`}
                         aria-disabled={locked || undefined}
+                        tabIndex={locked ? -1 : undefined}
                         title={locked ? hint : `${title} — ${subtitle}`}
                       >
+
                         <WorldIcon id={w.id} size={18} className="mt-0.5 shrink-0" />
                         <span className="min-w-0 flex-1 space-y-1">
                           <span className="block break-words text-sm font-bold leading-snug">

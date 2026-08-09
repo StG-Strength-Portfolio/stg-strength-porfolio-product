@@ -11,6 +11,8 @@ import { WorldIcon } from "@/components/icons/AppIcons";
 import { WORLDS, TOTAL_SCREENS, type WorldId } from "@/lib/screens";
 import { REQUIREMENTS } from "@/lib/screen-completion";
 import { METER_STRENGTHS } from "@/lib/meter-data";
+// @lovable-new 2026-08-08 — shared progression maths (read-only teacher view)
+import { progressFromResponses, levelState } from "@/lib/progression";
 import { fieldLabel } from "@/lib/portfolio-labels";
 import { matchStrengthId, getJarStrength } from "@/lib/strength-jar-data";
 import { getStrengthName } from "@/lib/strengths-i18n";
@@ -141,6 +143,11 @@ export function PortfolioView({ name, currentScreen, responses, header }: Portfo
     if (req.every((k) => isFilledValue(responses.get(k)))) done++;
   }
 
+  /* @lovable-new 2026-08-08 — mirror the student's real progression state so
+     teachers see completed / current / locked exactly as the student does.
+     Read-only: nothing here writes student data. */
+  const { nextAvailable } = progressFromResponses(responses, currentScreen);
+
   const meterDone = METER_STRENGTHS.every(
     (s) =>
       isFilledValue(responses.get(`meter2_${s.id}_s1`)) &&
@@ -161,7 +168,7 @@ export function PortfolioView({ name, currentScreen, responses, header }: Portfo
               {done} / {totalRequired} {tr("näyttöä täytetty")}
             </div>
             <div className="text-sm opacity-80">
-              {tr("Nykyinen näyttö")}: {currentScreen ?? 1} / {TOTAL_SCREENS}
+              {tr("Nykyinen näyttö")}: {nextAvailable} / {TOTAL_SCREENS}
             </div>
           </div>
           <div className="text-right">
@@ -172,6 +179,7 @@ export function PortfolioView({ name, currentScreen, responses, header }: Portfo
           </div>
         </div>
       </StickyNote>
+
 
       {(top5?.length || growth3?.length) ? (
         <StickyNote tone="coral">
@@ -193,7 +201,37 @@ export function PortfolioView({ name, currentScreen, responses, header }: Portfo
         </StickyNote>
       ) : null}
 
+      {/* @lovable-new 2026-08-08 — level status mirror (read-only) */}
+      <StickyNote tone="white" className="space-y-2">
+        <div className="text-xs uppercase tracking-wider opacity-70">{tr("Tasojen tila")}</div>
+        <ul className="grid gap-1.5 sm:grid-cols-2">
+          {WORLDS.map((w) => {
+            const st = levelState(w, nextAvailable, null);
+            const label =
+              st === "completed" ? tr("Suoritettu") : st === "current" ? tr("Kesken") : tr("Lukittu");
+            return (
+              <li key={w.id} className="flex items-center justify-between gap-2 text-sm">
+                <span className="min-w-0 truncate">{tr(w.title)}</span>
+                <span
+                  className={cn(
+                    "shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-bold",
+                    st === "completed"
+                      ? "bg-green-600/15 text-green-800"
+                      : st === "current"
+                        ? "bg-[color:var(--yellow)]/40 text-[color:var(--purple)]"
+                        : "bg-black/10 text-slate-600",
+                  )}
+                >
+                  {label}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      </StickyNote>
+
       {WORLDS.map((w) => {
+
         const screens: Array<{ n: number; entries: Array<{ key: string; value: unknown }> }> = [];
         for (let n = w.start; n <= w.end; n++) {
           const req = REQUIREMENTS[n];

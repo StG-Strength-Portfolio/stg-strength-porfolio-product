@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { StickyNote } from "@/components/StickyNote";
 import { BottomNav } from "@/components/BottomNav";
@@ -13,9 +13,11 @@ import { REQUIREMENTS, useNavGate } from "@/lib/screen-completion";
 import { supabase } from "@/integrations/supabase/client";
 import type { SaveState } from "@/hooks/use-autosave";
 import { useT, useTr } from "@/lib/i18n";
-import { useStudentProgress } from "@/lib/progress";
 import { LevelProgressBar } from "@/components/LevelProgressBar";
 import { WorldIcon } from "@/components/icons/AppIcons";
+// @lovable-new 2026-08-08 — sequential locking (also blocks direct URL access)
+import { useProgression } from "@/lib/progression";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/seikkailu/$screen")({
   component: ScreenView,
@@ -23,6 +25,7 @@ export const Route = createFileRoute("/_authenticated/seikkailu/$screen")({
 
 function ScreenView() {
   const { screen } = Route.useParams();
+  const navigate = useNavigate();
   const n = Math.max(1, Math.min(TOTAL_SCREENS, Number(screen) || 1));
   const world = worldForScreen(n);
   const [saveState, setSaveState] = useState<SaveState>("idle");
@@ -31,11 +34,25 @@ function ScreenView() {
   const t = useT();
   const tr = useTr();
   const hint = t("nav.finishFirst");
-  const progress = useStudentProgress(userId);
-  const stats = progress?.byWorld[world.id];
+  const progression = useProgression();
+  const stats = progression.byWorld?.[world.id];
   const pct = stats && stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0;
+  const allowed = progression.canAccessScreen(n);
+
+  /* @lovable-new 2026-08-08 — enforced in route logic, not only visually:
+     typing a locked screen URL bounces back to the first incomplete screen. */
+  useEffect(() => {
+    if (!progression.ready || allowed) return;
+    toast(tr("Suorita edelliset näytöt ensin."));
+    navigate({
+      to: "/seikkailu/$screen",
+      params: { screen: String(progression.nextAvailable) },
+      replace: true,
+    });
+  }, [progression.ready, progression.nextAvailable, allowed, navigate, tr]);
 
   useEffect(() => {
+    if (!allowed) return;
     (async () => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return;
@@ -51,7 +68,7 @@ function ScreenView() {
         await supabase.from("profiles" as never).update({ current_screen: n } as never).eq("id", u.user.id);
       }
     })();
-  }, [n]);
+  }, [n, allowed]);
 
   useEffect(() => {
     setScreen(n, REQUIREMENTS[n] ?? []);
@@ -59,6 +76,16 @@ function ScreenView() {
   }, [n, setScreen]);
 
   const built = hasContent(n);
+  // Super admins never see the completion lock on "Next".
+  const nextBlocked = !progression.bypass && !isComplete;
+
+  if (!progression.ready || !allowed) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center opacity-80">
+        {t("common.loading")}
+      </div>
+    );
+  }
 
   return (
     <div className="journey-bg flex min-h-[calc(100vh-3.5rem)] flex-col">
@@ -82,14 +109,15 @@ function ScreenView() {
             <h1 className="text-3xl mb-3">{t("app.screenOfTotal", { n, total: TOTAL_SCREENS })}</h1>
           </StickyNote>
         )}
+        {userId ? null : null}
       </div>
 
       <BottomNav
         n={n}
         saveState={saveState}
         showProgress={false}
-        nextDisabled={!isComplete}
-        nextHint={!isComplete ? hint : undefined}
+        nextDisabled={nextBlocked}
+        nextHint={nextBlocked ? hint : undefined}
       />
     </div>
   );

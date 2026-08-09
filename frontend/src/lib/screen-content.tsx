@@ -154,116 +154,24 @@ function Tieto({ onSaveStateChange }: Props) {
 
 function StrengthsList({ onSaveStateChange }: Props) {
   const tr = useTr();
-  const readResponse = useResponseReader();
-  const [selected, setSelected] = useState<string[]>([]);
-  const [loaded, setLoaded] = useState(false);
-  const report = useReportCompletion();
-  const fieldKey = "screen_6_known_strengths";
-  const maxSelections = 3;
-
-  useEffect(() => {
-    (async () => {
-      const saved = await readResponse<string[]>(fieldKey);
-      if (Array.isArray(saved)) setSelected(saved);
-      setLoaded(true);
-    })();
-  }, [readResponse]);
-
-  const state = useAutosave(fieldKey, selected, { enabled: loaded });
-  useEffect(() => {
-    onSaveStateChange?.(state);
-  }, [state, onSaveStateChange]);
-
-  useEffect(() => {
-    if (!loaded) return;
-    report(fieldKey, selected.length >= 1);
-  }, [loaded, report, selected.length]);
-
-  function toggleStrength(name: string) {
-    setSelected((current) => {
-      if (current.includes(name)) return current.filter((item) => item !== name);
-      if (current.length >= maxSelections) return current;
-      return [...current, name];
-    });
-  }
-
-  const colorFor = (name: string) => {
-    const nr = STRENGTHS_24.indexOf(name) + 1;
-    return getStrengthColor(nr);
-  };
-
   return (
-    <div className="relative min-h-[560px] overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#7A55CB] via-[#7951C6] to-[#7AA9D8] p-8 text-white">
-      <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-40 rotate-12 bg-[#F28B4D] [clip-path:polygon(23%_0,100%_22%,84%_100%,0_77%)]" />
-
-      <div className="relative z-10 grid h-full grid-cols-[210px_minmax(0,1fr)] gap-10">
-        <aside className="flex flex-col items-center justify-center pt-8 text-center">
-          <div className="relative h-40 w-36 rounded-[2rem] border-4 border-[#DDF5FA]/90 bg-white/25 shadow-[0_10px_0_rgba(0,0,0,0.12)]">
-            <div className="absolute left-4 -top-[18px] h-6 w-28 rounded-full border-4 border-[#DDF5FA] bg-white" />
-            {selected.length === 0 && (
-              <div className="absolute left-3 top-14 w-28 -rotate-6 bg-[#FFF4DE] px-2 py-3 text-center text-[10px] font-bold leading-tight text-[#4C3B58]">
-                {tr("Minun vahvuuteni")}
-              </div>
-            )}
-            <div className="absolute inset-x-3 bottom-4 flex flex-wrap-reverse justify-center gap-1.5">
-              {selected.map((name) => (
-                <span
-                  key={name}
-                  className="h-5 w-12 rounded-full border-2 border-white/80 shadow-[0_3px_0_rgba(0,0,0,0.16)]"
-                  style={{ backgroundColor: colorFor(name) }}
-                  title={tr(name)}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div className="relative mt-8 max-w-[190px] text-center font-display text-base font-semibold leading-tight text-[#FFE65A]">
-            <span className="absolute -left-10 top-5 text-5xl">↗</span>
-            {tr("Valitse ne vahvuudet, jotka tunnistat itsessäsi tai läheisissäsi. Voit palata muokkaamaan valintaasi myöhemmin.")}
-          </div>
-          <div className="mt-3 font-display text-base font-semibold">
-            {tr("Valittu")} {selected.length} / {maxSelections}
-          </div>
-        </aside>
-
-        <section className="min-w-0 pt-2">
-          <h1 className="mb-2 max-w-[850px] font-display text-4xl font-bold leading-tight">
-            {tr("Luonteenvahvuudet, joita voit tunnistaa itsessäsi ja toisissa")}
-          </h1>
-          <p className="mb-7 font-display text-2xl font-medium">{tr("Keksitkö lisää?")}</p>
-
-          <div className="grid max-w-[980px] grid-cols-4 gap-x-5 gap-y-5">
-            {STRENGTHS_24.map((name) => {
-              const active = selected.includes(name);
-              const disabled = !active && selected.length >= maxSelections;
-              return (
-                <button
-                  key={name}
-                  type="button"
-                  onClick={() => toggleStrength(name)}
-                  disabled={disabled}
-                  aria-pressed={active}
-                  className={cn(
-                    "group relative flex min-h-[64px] items-center justify-center rounded-full px-4 py-3 text-center font-display text-sm font-bold text-[#2E2336] shadow-[0_5px_0_rgba(0,0,0,0.16)] transition-all",
-                    active && "scale-105 ring-4 ring-white/80",
-                    disabled && "cursor-not-allowed opacity-40",
-                    !disabled && "hover:scale-[1.04]",
-                  )}
-                  style={{ backgroundColor: colorFor(name) }}
-                >
-                  <span className="pointer-events-none absolute -left-3 h-7 w-5 rounded-l-full border-2 border-[#2E2336]/60" />
-                  <span className="pointer-events-none absolute -right-3 h-7 w-5 rounded-r-full border-2 border-[#2E2336]/60" />
-                  <span className="relative z-10 leading-tight">{tr(name)}</span>
-                  {active && (
-                    <span className="absolute -right-1 -top-1 z-20 grid h-5 w-5 place-items-center rounded-full border-2 border-white bg-[#FFE65A] text-xs">
-                      ✓
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </section>
+    <div className="space-y-4">
+      <StickyNote tone="coral" seed="s6-h">
+        <h1 className="font-display text-2xl mb-1">
+          {tr("Luonteenvahvuudet, joita voit tunnistaa itsessäsi ja toisissa")}
+        </h1>
+        <p className="text-sm opacity-90">
+          {tr("Valitse ne vahvuudet, jotka tunnistat itsessäsi tai läheisissäsi. Voit palata muokkaamaan valintaasi myöhemmin.")}
+        </p>
+      </StickyNote>
+      <div className="rounded-3xl bg-white/10 p-4">
+        <SelectableChips
+          fieldKey="screen_6_known_strengths"
+          options={STRENGTHS_24}
+          labelFor={(o) => tr(o)}
+          onSaveStateChange={onSaveStateChange}
+          min={1}
+        />
       </div>
     </div>
   );
