@@ -9189,9 +9189,9 @@ function Screen42({ onSaveStateChange }: Props) {
           className="
             pointer-events-none
             absolute
-            bottom-0
+            bottom-[-90px]
             left-0
-            z-10
+            z-40
             w-[760px]
             max-w-[56vw]
             translate-y-[-70px]
@@ -9217,7 +9217,9 @@ function Screen42({ onSaveStateChange }: Props) {
                   h-[clamp(200px,16vw,250px)]
                   w-auto
                   object-contain
+                  object-bottom
                   select-none
+                  drop-shadow-[0_12px_18px_rgba(0,0,0,0.22)]
                 "
               />
             ))}
@@ -9244,7 +9246,9 @@ function Screen42({ onSaveStateChange }: Props) {
                   h-[clamp(200px,16vw,250px)]
                   w-auto
                   object-contain
+                  object-bottom
                   select-none
+                  drop-shadow-[0_12px_18px_rgba(0,0,0,0.22)]
                 "
               />
             ))}
