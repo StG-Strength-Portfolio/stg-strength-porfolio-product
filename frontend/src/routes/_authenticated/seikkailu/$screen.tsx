@@ -14,12 +14,9 @@ import type { SaveState } from "@/hooks/use-autosave";
 
 import { supabase } from "@/integrations/supabase/client";
 
-// @lovable-new 2026-08-05 — student route now renders through the shared
-// student/teacher portfolio renderer so both views can never drift apart.
-import { PortfolioScreenRenderer } from "@/components/portfolio/PortfolioScreenRenderer";
-import { useT, useTr } from "@/lib/i18n";
+import { TranslateFi, useT, useTr } from "@/lib/i18n";
 import { REQUIREMENTS, useNavGate } from "@/lib/screen-completion";
-import { hasContent } from "@/lib/screen-content";
+import { ScreenContent, hasContent } from "@/lib/screen-content";
 import { TOTAL_SCREENS, worldForScreen } from "@/lib/screens";
 
 export const Route = createFileRoute("/_authenticated/seikkailu/$screen")({
@@ -333,12 +330,9 @@ function ScreenView() {
                 overflow-hidden
               "
             >
-              <PortfolioScreenRenderer
-                screenNumber={n}
-                mode="student"
-                onSaveStateChange={setSaveState}
-                className="h-full"
-              />
+              <TranslateFi>
+                <ScreenContent n={n} onSaveStateChange={setSaveState} />
+              </TranslateFi>
             </div>
           ) : (
             <div
