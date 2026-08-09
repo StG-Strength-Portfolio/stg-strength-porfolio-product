@@ -104,7 +104,8 @@ export function SuperAdminsTab() {
             >
               <div className="min-w-0 flex-1">
                 <p className="truncate font-semibold">
-                  {r.name ?? "—"} {r.isSelf && <span className="text-xs opacity-60">({tr("sinä")})</span>}
+                  {r.name ?? "—"}{" "}
+                  {r.isSelf && <span className="text-xs opacity-60">({tr("sinä")})</span>}
                 </p>
                 <p className="truncate text-xs opacity-70">{r.email ?? "—"}</p>
               </div>

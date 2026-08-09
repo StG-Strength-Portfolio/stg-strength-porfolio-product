@@ -13,7 +13,7 @@ import { NavGateProvider } from "@/lib/screen-completion";
 // @lovable-new 2026-08-08 — progression context (locking + super admin bypass)
 import { ProgressionProvider, setStudentViewMode } from "@/lib/progression";
 import { supabase } from "@/integrations/supabase/client";
-import { useLanguage, useT, useTr, isLanguage } from "@/lib/i18n";
+import { useLanguage, useT, useTr, isLanguage, languageFromDisplayName } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/seikkailu")({
   component: SeikkailuLayout,
@@ -66,8 +66,30 @@ function SeikkailuLayout() {
         console.warn("[class-access] check failed:", err);
       }
       try {
-        const { data: lang } = await supabase.rpc("get_my_class_language" as never);
-        if (isLanguage(lang)) setLanguage(lang);
+        const { data: u } = await supabase.auth.getUser();
+        let preferredLang: unknown = null;
+        if (u.user) {
+          const { data: profileData, error: profileError } = await supabase
+            .from("profiles" as never)
+            .select("language, display_name")
+            .eq("id", u.user.id)
+            .maybeSingle();
+          let p = profileData as { language?: string; display_name?: string | null } | null;
+          if (profileError) {
+            const { data: nameOnly } = await supabase
+              .from("profiles" as never)
+              .select("display_name")
+              .eq("id", u.user.id)
+              .maybeSingle();
+            p = nameOnly as { display_name?: string | null } | null;
+          }
+          preferredLang = languageFromDisplayName(p?.display_name) ?? p?.language ?? null;
+        }
+        if (!isLanguage(preferredLang)) {
+          const { data: classLang } = await supabase.rpc("get_my_class_language" as never);
+          preferredLang = classLang;
+        }
+        if (isLanguage(preferredLang)) setLanguage(preferredLang);
       } catch (err) {
         console.warn("[i18n] class language resolve failed:", err);
       }
@@ -76,7 +98,11 @@ function SeikkailuLayout() {
   }, [navigate, setLanguage]);
 
   if (!ready) {
-    return <div className="flex min-h-screen items-center justify-center text-foreground">{t("common.loading")}</div>;
+    return (
+      <div className="flex min-h-screen items-center justify-center text-foreground">
+        {t("common.loading")}
+      </div>
+    );
   }
 
   if (blocked) return <ClassRemovedNotice />;

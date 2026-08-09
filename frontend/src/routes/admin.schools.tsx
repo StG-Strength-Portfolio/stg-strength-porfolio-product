@@ -97,11 +97,7 @@ function AdminSchoolsPage() {
     } as never);
     setBusy(false);
     if (error) {
-      toast.error(
-        error.code === "23505"
-          ? tr("Tämä koulukoodi on jo käytössä.")
-          : error.message,
-      );
+      toast.error(error.code === "23505" ? tr("Tämä koulukoodi on jo käytössä.") : error.message);
       return;
     }
     toast.success(tr("Koulu lisätty onnistuneesti!"));
@@ -131,9 +127,7 @@ function AdminSchoolsPage() {
         <header>
           <h1 className="text-4xl font-bold">{tr("Koulujen hallinta")}</h1>
           <p className="mt-1 opacity-90">
-            {tr(
-              "Luo ja hallinnoi koulukoodeja opettajien rekisteröitymistä varten",
-            )}
+            {tr("Luo ja hallinnoi koulukoodeja opettajien rekisteröitymistä varten")}
           </p>
         </header>
 

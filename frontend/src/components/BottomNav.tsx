@@ -27,7 +27,11 @@ export function BottomNav({
   async function goNext(e: React.MouseEvent<HTMLButtonElement>) {
     const btn = e.currentTarget;
     if (onBeforeNext) {
-      try { await onBeforeNext(); } catch { /* swallow — nav still proceeds */ }
+      try {
+        await onBeforeNext();
+      } catch {
+        /* swallow — nav still proceeds */
+      }
     }
     await celebrateSave(btn);
     navigate({ to: "/seikkailu/$screen", params: { screen: String(n + 1) } });
@@ -39,11 +43,15 @@ export function BottomNav({
         disabled={n <= 1}
         onClick={() => navigate({ to: "/seikkailu/$screen", params: { screen: String(n - 1) } })}
         className="game-btn rounded-full font-display font-semibold"
-      >← {t("common.previous")}</Button>
+      >
+        ← {t("common.previous")}
+      </Button>
 
       <div className="flex flex-col items-center text-xs opacity-90 min-h-[1.5rem] justify-center text-center">
         {showProgress && <span>{t("app.screenOfTotal", { n, total: TOTAL_SCREENS })}</span>}
-        {showProgress ? <SaveIndicator state={saveState} /> : nextDisabled && nextHint ? (
+        {showProgress ? (
+          <SaveIndicator state={saveState} />
+        ) : nextDisabled && nextHint ? (
           <span className="text-[color:var(--yellow)]">{nextHint}</span>
         ) : null}
       </div>
@@ -51,8 +59,10 @@ export function BottomNav({
         disabled={n >= TOTAL_SCREENS || nextDisabled}
         onClick={goNext}
         className="game-btn rounded-full bg-[color:var(--coral)] hover:bg-[color:var(--coral)]/90 text-white font-display font-semibold px-5"
-      ><SparkleIcon size={16} className="sparkle mr-1" />{t("common.next")} →</Button>
-
+      >
+        <SparkleIcon size={16} className="sparkle mr-1" />
+        {t("common.next")} →
+      </Button>
     </nav>
   );
 }

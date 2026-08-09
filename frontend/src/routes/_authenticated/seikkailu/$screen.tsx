@@ -1,23 +1,26 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { StickyNote } from "@/components/StickyNote";
+
 import { BottomNav } from "@/components/BottomNav";
 import { PencilBadge } from "@/components/PencilBadge";
 import { ScreenChrome } from "@/components/ScreenChrome";
-import { TOTAL_SCREENS, worldForScreen } from "@/lib/screens";
-import { hasContent } from "@/lib/screen-content";
-// @lovable-new 2026-08-05 — student route now renders through the shared
-// student/teacher portfolio renderer so both views can never drift apart.
-import { PortfolioScreenRenderer } from "@/components/portfolio/PortfolioScreenRenderer";
-import { REQUIREMENTS, useNavGate } from "@/lib/screen-completion";
-import { supabase } from "@/integrations/supabase/client";
-import type { SaveState } from "@/hooks/use-autosave";
-import { useT, useTr } from "@/lib/i18n";
-import { LevelProgressBar } from "@/components/LevelProgressBar";
+import { StickyNote } from "@/components/StickyNote";
 import { WorldIcon } from "@/components/icons/AppIcons";
 // @lovable-new 2026-08-08 — sequential locking (also blocks direct URL access)
 import { useProgression } from "@/lib/progression";
 import { toast } from "sonner";
+
+import type { SaveState } from "@/hooks/use-autosave";
+
+import { supabase } from "@/integrations/supabase/client";
+
+// @lovable-new 2026-08-05 — student route now renders through the shared
+// student/teacher portfolio renderer so both views can never drift apart.
+import { PortfolioScreenRenderer } from "@/components/portfolio/PortfolioScreenRenderer";
+import { useT, useTr } from "@/lib/i18n";
+import { REQUIREMENTS, useNavGate } from "@/lib/screen-completion";
+import { hasContent } from "@/lib/screen-content";
+import { TOTAL_SCREENS, worldForScreen } from "@/lib/screens";
 
 export const Route = createFileRoute("/_authenticated/seikkailu/$screen")({
   component: ScreenView,
@@ -27,13 +30,18 @@ function ScreenView() {
   const { screen } = Route.useParams();
   const navigate = useNavigate();
   const n = Math.max(1, Math.min(TOTAL_SCREENS, Number(screen) || 1));
+
   const world = worldForScreen(n);
+
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [userId, setUserId] = useState<string | null>(null);
+
   const { setScreen, isComplete } = useNavGate();
+
   const t = useT();
   const tr = useTr();
   const hint = t("nav.finishFirst");
+
   const progression = useProgression();
   const stats = progression.byWorld?.[world.id];
   const pct = stats && stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0;
@@ -51,28 +59,77 @@ function ScreenView() {
     });
   }, [progression.ready, progression.nextAvailable, allowed, navigate, tr]);
 
+  /*
+   * Lấy người dùng hiện tại.
+   * Đồng thời cập nhật current_screen trong Supabase.
+   * Chỉ chạy khi màn hình này thực sự được phép truy cập, tránh ghi dữ liệu
+   * khi học sinh sắp bị redirect ngược lại (xem effect ở trên).
+   */
   useEffect(() => {
     if (!allowed) return;
-    (async () => {
-      const { data: u } = await supabase.auth.getUser();
-      if (!u.user) return;
-      setUserId(u.user.id);
-      const { data: prof } = await supabase
+
+    let cancelled = false;
+
+    async function loadCurrentUserAndSync() {
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+
+      if (cancelled || userError || !userData.user) {
+        return;
+      }
+
+      const currentUserId = userData.user.id;
+      setUserId(currentUserId);
+
+      const { data: profileData, error: profileError } = await supabase
         .from("profiles" as never)
         .select("current_screen")
-        .eq("id", u.user.id)
+        .eq("id", currentUserId)
         .maybeSingle();
-      const p = prof as { current_screen?: number } | null;
-      const cur = p?.current_screen ?? 1;
-      if (n > cur) {
-        await supabase.from("profiles" as never).update({ current_screen: n } as never).eq("id", u.user.id);
+
+      if (cancelled || profileError) {
+        return;
       }
-    })();
+
+      const profile = profileData as {
+        current_screen?: number;
+      } | null;
+
+      const currentScreen = profile?.current_screen ?? 1;
+
+      /*
+       * Chỉ cập nhật khi học sinh đi tới màn hình cao hơn.
+       * (DB trigger enforce_monotonic_current_screen cũng chặn việc lùi/nhảy
+       * cóc quá 1 màn ở phía server, đây chỉ là tối ưu tránh ghi thừa.)
+       */
+      if (n <= currentScreen) {
+        return;
+      }
+
+      await supabase
+        .from("profiles" as never)
+        .update({
+          current_screen: n,
+        } as never)
+        .eq("id", currentUserId);
+    }
+
+    void loadCurrentUserAndSync();
+
+    return () => {
+      cancelled = true;
+    };
   }, [n, allowed]);
 
+  /*
+   * Đăng ký những field bắt buộc của màn hình hiện tại.
+   * Phần này quyết định nút Next có được mở hay không.
+   */
   useEffect(() => {
     setScreen(n, REQUIREMENTS[n] ?? []);
-    return () => setScreen(null, []);
+
+    return () => {
+      setScreen(null, []);
+    };
   }, [n, setScreen]);
 
   const built = hasContent(n);
@@ -88,37 +145,251 @@ function ScreenView() {
   }
 
   return (
-    <div className="journey-bg flex min-h-[calc(100vh-3.5rem)] flex-col">
-      <ScreenChrome n={n} saveState={saveState} />
-      <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
-        <div className="mb-2 flex items-center gap-2">
-          <PencilBadge icon={<WorldIcon id={world.id} size={14} />}>{tr(world.title)}</PencilBadge>
-          <span className="text-sm opacity-80">{tr(world.subtitle)}</span>
-        </div>
-        <div className="mb-5 w-56 max-w-full">
-          <LevelProgressBar pct={pct} />
-        </div>
-        {built ? (
-          <PortfolioScreenRenderer
-            screenNumber={n}
-            mode="student"
-            onSaveStateChange={setSaveState}
-          />
-        ) : (
-          <StickyNote seed={`s${n}`}>
-            <h1 className="text-3xl mb-3">{t("app.screenOfTotal", { n, total: TOTAL_SCREENS })}</h1>
-          </StickyNote>
-        )}
-        {userId ? null : null}
+    <div
+      className="
+        journey-bg
+        relative
+        flex
+        h-[calc(100dvh-3.5rem)]
+        min-h-0
+        min-w-0
+        w-full
+        flex-col
+        overflow-hidden
+      "
+    >
+      {/* =====================================================
+          THANH SCREEN / SAVE STATUS
+      ====================================================== */}
+      <div className="relative z-30 shrink-0">
+        <ScreenChrome n={n} saveState={saveState} />
       </div>
 
-      <BottomNav
-        n={n}
-        saveState={saveState}
-        showProgress={false}
-        nextDisabled={nextBlocked}
-        nextHint={nextBlocked ? hint : undefined}
-      />
+      {/* =====================================================
+          KHOẢNG CÁCH AN TOÀN DƯỚI SCREEN CHROME
+      ====================================================== */}
+      <div aria-hidden="true" className="h-3 w-full shrink-0" />
+
+      {/* =====================================================
+          NỘI DUNG CHÍNH
+      ====================================================== */}
+      <main
+        className="
+    relative
+    z-10
+    flex
+    min-h-0
+    min-w-0
+    w-full
+    max-w-none
+    flex-1
+    flex-col
+    overflow-hidden
+    px-5
+    pb-10
+    pt-0
+  "
+      >
+        {/* =====================================================
+            PROLOGUE + WELCOME + PROGRESS
+        ====================================================== */}
+        <div
+          className="
+            relative
+            z-20
+            mb-2
+            flex
+            min-h-[40px]
+            min-w-0
+            w-full
+            shrink-0
+            items-center
+            justify-between
+            gap-8
+          "
+        >
+          {/* BÊN TRÁI */}
+          <div
+            className="
+              flex
+              min-w-0
+              shrink-0
+              items-center
+              gap-2
+            "
+          >
+            <PencilBadge icon={<WorldIcon id={world.id} size={14} />}>
+              {tr(world.title)}
+            </PencilBadge>
+
+            <span
+              className="
+                min-w-0
+                whitespace-nowrap
+                text-sm
+                opacity-80
+              "
+            >
+              {tr(world.subtitle)}
+            </span>
+          </div>
+
+          {/* BÊN PHẢI: THANH TIẾN ĐỘ */}
+          <div
+            className="
+              ml-auto
+              flex
+              min-w-[360px]
+              max-w-[700px]
+              flex-1
+              items-center
+              justify-center
+            "
+          >
+            <div
+              className="
+                flex
+                w-full
+                max-w-[620px]
+                items-center
+                justify-center
+                gap-3
+              "
+            >
+              {/* NỀN THANH TIẾN ĐỘ */}
+              <div
+                className="
+                  h-[7px]
+                  min-w-0
+                  flex-1
+                  overflow-hidden
+                  rounded-full
+                  bg-black/20
+                "
+                role="progressbar"
+                aria-label={tr("valmis")}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={pct}
+              >
+                {/* PHẦN ĐÃ HOÀN THÀNH MÀU VÀNG */}
+                <div
+                  className="
+                    h-full
+                    rounded-full
+                    bg-[#ffd12f]
+                    transition-[width]
+                    duration-500
+                    ease-out
+                  "
+                  style={{
+                    width: `${pct}%`,
+                  }}
+                />
+              </div>
+
+              {/* PHẦN TRĂM HOÀN THÀNH */}
+              <span
+                className="
+                  min-w-[96px]
+                  shrink-0
+                  whitespace-nowrap
+                  text-right
+                  text-sm
+                  font-medium
+                  tabular-nums
+                  text-white/90
+                "
+              >
+                {pct}% {tr("valmis")}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* =====================================================
+            NỘI DUNG CỦA SCREEN
+        ====================================================== */}
+        <div
+          className="
+            relative
+            z-10
+            min-h-0
+            min-w-0
+            w-full
+            max-w-none
+            flex-1
+            overflow-hidden
+          "
+        >
+          {built ? (
+            <div
+              className="
+                h-full
+                min-h-0
+                min-w-0
+                w-full
+                max-w-none
+                overflow-hidden
+              "
+            >
+              <PortfolioScreenRenderer
+                screenNumber={n}
+                mode="student"
+                onSaveStateChange={setSaveState}
+                className="h-full"
+              />
+            </div>
+          ) : (
+            <div
+              className="
+                h-full
+                min-h-0
+                min-w-0
+                w-full
+                max-w-none
+                overflow-x-hidden
+                overflow-y-auto
+              "
+            >
+              <StickyNote seed={`s${n}`}>
+                <h1 className="mb-3 text-3xl">
+                  {t("app.screenOfTotal", {
+                    n,
+                    total: TOTAL_SCREENS,
+                  })}
+                </h1>
+              </StickyNote>
+            </div>
+          )}
+        </div>
+      </main>
+
+      {/* =====================================================
+          PREVIOUS / NEXT
+          Cố định sát đáy container
+      ====================================================== */}
+      <div
+        className="
+    fixed
+    bottom-0
+    right-0
+    left-[289px]
+    z-[100]
+    m-0
+    w-auto
+    translate-y-4
+    p-0
+  "
+      >
+        <BottomNav
+          n={n}
+          saveState={saveState}
+          showProgress={false}
+          nextDisabled={nextBlocked}
+          nextHint={nextBlocked ? hint : undefined}
+        />
+      </div>
     </div>
   );
 }

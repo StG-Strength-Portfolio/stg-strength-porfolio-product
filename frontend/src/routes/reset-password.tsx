@@ -1,5 +1,5 @@
-import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,43 +21,16 @@ export const Route = createFileRoute("/reset-password")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  // @lovable-new 2026-08-05 — ?source=superadmin keeps Super Admin recovery
-  // inside the Super Admin surface (links, wording and post-reset redirect).
-  validateSearch: (search: Record<string, unknown>) => ({
-    source: search['source'] === "superadmin" ? ("superadmin" as const) : undefined,
-  }),
   component: ResetPasswordPage,
 });
 
 function ResetPasswordPage() {
   const tr = useTr();
   const navigate = useNavigate();
-  const { source } = useSearch({ from: "/reset-password" });
-  const isSuperAdmin = source === "superadmin";
-  const loginTo = isSuperAdmin ? "/superadmin/login" : "/auth/login";
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
-  // @lovable-new 2026-08-05 — recovery-session state: the page must not offer a
-  // password form when the recovery link is missing, expired or already used.
-  const [session, setSession] = useState<"checking" | "ready" | "invalid">("checking");
-
-  useEffect(() => {
-    let cancelled = false;
-    // Supabase parses the recovery hash and emits PASSWORD_RECOVERY / a session.
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
-      if (!cancelled && s) setSession("ready");
-    });
-    void supabase.auth.getSession().then(({ data }) => {
-      if (cancelled) return;
-      setSession((prev) => (data.session ? "ready" : prev === "ready" ? prev : "invalid"));
-    });
-    return () => {
-      cancelled = true;
-      sub.subscription.unsubscribe();
-    };
-  }, []);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -73,21 +46,13 @@ function ResetPasswordPage() {
     try {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) {
-        const m = error.message.toLowerCase();
-        if (m.includes("expired") || m.includes("invalid") || m.includes("session")) {
-          setSession("invalid");
-          toast.error(tr("Palautuslinkki on vanhentunut tai jo käytetty."));
-        } else if (m.includes("weak") || m.includes("password")) {
-          toast.error(tr("Salasanan tulee olla vähintään 6 merkkiä."));
-        } else {
-          toast.error(tr("Salasanan vaihto epäonnistui. Yritä uudelleen."));
-        }
+        toast.error(error.message);
         return;
       }
       setDone(true);
       toast.success(tr("Salasana vaihdettu! Voit nyt kirjautua sisään."));
       setTimeout(() => {
-        void navigate({ to: loginTo, replace: true });
+        void navigate({ to: "/auth/login", replace: true });
       }, 3000);
     } finally {
       setBusy(false);
@@ -101,32 +66,10 @@ function ResetPasswordPage() {
       <div className="relative z-10 w-full max-w-md space-y-6">
         <h1 className="text-center text-3xl font-bold">{tr("Salasanan palautus")}</h1>
         <StickyNote seed="reset-card">
-          {session === "checking" ? (
-            <p className="text-center font-semibold opacity-70">{tr("Ladataan…")}</p>
-          ) : session === "invalid" ? (
-            <div className="space-y-4 text-center">
-              <p className="font-semibold">
-                {tr("Palautuslinkki on vanhentunut tai jo käytetty.")}
-              </p>
-              <Link
-                to={isSuperAdmin ? "/superadmin/forgot-password" : "/auth/login"}
-                className="inline-block rounded-full bg-[color:var(--purple)] px-5 py-2 text-sm font-bold text-white"
-              >
-                {tr("Pyydä uusi palautuslinkki")}
-              </Link>
-            </div>
-          ) : done ? (
-            <div className="space-y-4 text-center">
-              <p className="font-semibold">
-                {tr("Salasana vaihdettu! Voit nyt kirjautua sisään.")}
-              </p>
-              <Link
-                to={loginTo}
-                className="inline-block rounded-full bg-[color:var(--purple)] px-5 py-2 text-sm font-bold text-white"
-              >
-                {tr("Kirjaudu sisään")}
-              </Link>
-            </div>
+          {done ? (
+            <p className="text-center font-semibold">
+              {tr("Salasana vaihdettu! Voit nyt kirjautua sisään.")}
+            </p>
           ) : (
             <form onSubmit={submit} className="space-y-4">
               <div className="space-y-1.5">

@@ -18,14 +18,7 @@ import {
   downloadCsv,
   type RosterStudent,
 } from "@/lib/teacher-data";
-import {
-  LANGUAGE_LABEL,
-  LANGUAGE_FLAG,
-  LANGUAGES,
-  useT,
-  useTr,
-  type Language,
-} from "@/lib/i18n";
+import { LANGUAGE_LABEL, LANGUAGE_FLAG, LANGUAGES, useT, useTr, type Language } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { CheckIcon } from "@/components/icons/AppIcons";
 
@@ -33,7 +26,13 @@ export const Route = createFileRoute("/_authenticated/opettaja")({
   component: TeacherDashboard,
 });
 
-type ClassRow = { id: string; name: string; join_code: string; created_at: string; language: Language };
+type ClassRow = {
+  id: string;
+  name: string;
+  join_code: string;
+  created_at: string;
+  language: Language;
+};
 
 const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function randomCode(): string {
@@ -72,6 +71,25 @@ function TeacherDashboard() {
       return;
     }
     setClasses((data as ClassRow[] | null) ?? []);
+  }
+
+  // FIX: giáo viên trước đây không có cách nào đổi ngôn ngữ của một lớp đã
+  // tạo — ngôn ngữ chỉ được chọn một lần lúc tạo lớp (mặc định "en") và
+  // không thể sửa sau đó, khiến học sinh trong lớp mãi mãi thấy tiếng Anh
+  // dù có bấm nút FI|SV|EN ở trang đăng nhập (nút đó chỉ áp dụng cho trang
+  // đăng nhập, không áp dụng bên trong app — ngôn ngữ bên trong app luôn
+  // lấy theo ngôn ngữ của lớp học).
+  async function updateClassLanguage(classId: string, lang: Language) {
+    const { error } = await supabase
+      .from("classes" as never)
+      .update({ language: lang } as never)
+      .eq("id" as never, classId as never);
+    if (error) {
+      toast.error(t("teacher.classCard.language.updateFailed"));
+      return;
+    }
+    setClasses((prev) => prev.map((c) => (c.id === classId ? { ...c, language: lang } : c)));
+    toast.success(t("teacher.classCard.language.updated"));
   }
 
   async function createClass(e: React.FormEvent) {
@@ -115,7 +133,11 @@ function TeacherDashboard() {
   const isAdmin = role === "admin";
 
   if (role !== "teacher" && !isAdmin) {
-    return <div className="flex min-h-screen items-center justify-center text-foreground">{t("common.loading")}</div>;
+    return (
+      <div className="flex min-h-screen items-center justify-center text-foreground">
+        {t("common.loading")}
+      </div>
+    );
   }
 
   return (
@@ -124,26 +146,28 @@ function TeacherDashboard() {
       <header className="no-print relative z-10 flex items-center justify-between px-6 py-4">
         <h1 className="text-2xl font-display">{t("teacher.title")}</h1>
         <div className="flex items-center gap-2">
-        {isAdmin && (
-          <Link
-            to="/admin/schools"
-            className="rounded-full px-3 py-2 text-sm font-semibold text-foreground hover:bg-white/10"
+          {isAdmin && (
+            <Link
+              to="/admin/schools"
+              className="rounded-full px-3 py-2 text-sm font-semibold text-foreground hover:bg-white/10"
+            >
+              {tr("Hallinnoi kouluja")}
+            </Link>
+          )}
+          <Button
+            variant="ghost"
+            onClick={signOut}
+            className="text-foreground hover:bg-white/10 rounded-full"
           >
-            {tr("Hallinnoi kouluja")}
-          </Link>
-        )}
-        <Button variant="ghost" onClick={signOut} className="text-foreground hover:bg-white/10 rounded-full">
-          {t("common.logout")}
-        </Button>
+            {t("common.logout")}
+          </Button>
         </div>
       </header>
 
       <main className="relative z-10 mx-auto max-w-5xl px-6 py-6 space-y-6">
         <StickyNote seed="teacher-create">
           <h2 className="text-2xl mb-1">{t("teacher.create.title")}</h2>
-          <p className="text-sm text-muted-foreground mb-4">
-            {t("teacher.create.hint")}
-          </p>
+          <p className="text-sm text-muted-foreground mb-4">{t("teacher.create.hint")}</p>
           <form onSubmit={createClass} className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-3 sm:items-end">
               <div className="flex-1 space-y-1.5">
@@ -162,7 +186,11 @@ function TeacherDashboard() {
               <Label className="text-sm font-display font-semibold">
                 {t("teacher.create.langLabel")}
               </Label>
-              <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={t("teacher.create.langLabel")}>
+              <div
+                className="grid grid-cols-3 gap-2"
+                role="radiogroup"
+                aria-label={t("teacher.create.langLabel")}
+              >
                 {LANGUAGES.map((lng) => (
                   <button
                     key={lng}
@@ -179,17 +207,25 @@ function TeacherDashboard() {
                     )}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl leading-none" aria-hidden>{LANGUAGE_FLAG[lng]}</span>
+                      <span className="text-2xl leading-none" aria-hidden>
+                        {LANGUAGE_FLAG[lng]}
+                      </span>
                       <div>
-                        <div className="font-display text-base leading-tight text-[color:var(--ink)]">{LANGUAGE_LABEL[lng]}</div>
-                        <div className="text-[11px] font-mono uppercase tracking-wider opacity-60 text-[color:var(--ink)]">{lng}</div>
+                        <div className="font-display text-base leading-tight text-[color:var(--ink)]">
+                          {LANGUAGE_LABEL[lng]}
+                        </div>
+                        <div className="text-[11px] font-mono uppercase tracking-wider opacity-60 text-[color:var(--ink)]">
+                          {lng}
+                        </div>
                       </div>
                     </div>
                     {language === lng && (
                       <span
                         className="absolute right-3 top-3 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[color:var(--coral)] text-[11px] font-bold text-white"
                         aria-hidden
-                      ><CheckIcon size={12} /></span>
+                      >
+                        <CheckIcon size={12} />
+                      </span>
                     )}
                   </button>
                 ))}
@@ -211,11 +247,14 @@ function TeacherDashboard() {
 
         <div className="space-y-4">
           <h2 className="font-display text-2xl">{t("teacher.mine", { n: classes.length })}</h2>
-          {classes.length === 0 && (
-            <p className="opacity-80 text-sm">{t("teacher.mine.empty")}</p>
-          )}
+          {classes.length === 0 && <p className="opacity-80 text-sm">{t("teacher.mine.empty")}</p>}
           {classes.map((c, i) => (
-            <ClassDashboard key={c.id} c={c} tone={i % 2 === 0 ? "white" : "yellow"} />
+            <ClassDashboard
+              key={c.id}
+              c={c}
+              tone={i % 2 === 0 ? "white" : "yellow"}
+              onLanguageChange={updateClassLanguage}
+            />
           ))}
         </div>
       </main>
@@ -225,9 +264,18 @@ function TeacherDashboard() {
 
 type SortKey = "progress_behind" | "name_asc" | "last_active_oldest";
 
-function ClassDashboard({ c, tone }: { c: ClassRow; tone: "white" | "yellow" }) {
+function ClassDashboard({
+  c,
+  tone,
+  onLanguageChange,
+}: {
+  c: ClassRow;
+  tone: "white" | "yellow";
+  onLanguageChange: (classId: string, lang: Language) => void | Promise<void>;
+}) {
   const { students, loading, refresh } = useClassRoster(c.id);
   const [sort, setSort] = useState<SortKey>("progress_behind");
+  const [langMenuOpen, setLangMenuOpen] = useState(false);
   const t = useT();
   const tr = useTr();
 
@@ -238,9 +286,7 @@ function ClassDashboard({ c, tone }: { c: ClassRow; tone: "white" | "yellow" }) 
     const list = [...students];
     switch (sort) {
       case "name_asc":
-        list.sort((a, b) =>
-          (a.displayName ?? "").localeCompare(b.displayName ?? ""),
-        );
+        list.sort((a, b) => (a.displayName ?? "").localeCompare(b.displayName ?? ""));
         break;
       case "last_active_oldest":
         list.sort((a, b) => (a.lastActive?.getTime() ?? 0) - (b.lastActive?.getTime() ?? 0));
@@ -276,22 +322,68 @@ function ClassDashboard({ c, tone }: { c: ClassRow; tone: "white" | "yellow" }) 
     <StickyNote tone={tone}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <div className="text-xs uppercase tracking-wider opacity-70">{t("teacher.classCard.class")}</div>
+          <div className="text-xs uppercase tracking-wider opacity-70">
+            {t("teacher.classCard.class")}
+          </div>
           <div className="font-display text-xl leading-tight">{c.name}</div>
-          <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-[color:var(--purple)]/10 px-2 py-0.5 text-xs font-semibold text-[color:var(--ink)]">
-            <span aria-hidden>{langFlag}</span>
-            <span>{t("teacher.classCard.language")}: {langLabel}</span>
+          <div className="relative mt-1 inline-block">
+            <button
+              type="button"
+              onClick={() => setLangMenuOpen((v) => !v)}
+              aria-expanded={langMenuOpen}
+              className="inline-flex items-center gap-1 rounded-full bg-[color:var(--purple)]/10 px-2 py-0.5 text-xs font-semibold text-[color:var(--ink)] hover:bg-[color:var(--purple)]/20 transition-colors"
+            >
+              <span aria-hidden>{langFlag}</span>
+              <span>
+                {t("teacher.classCard.language")}: {langLabel}
+              </span>
+              <span className="opacity-60">· {t("teacher.classCard.language.edit")}</span>
+            </button>
+
+            {langMenuOpen && (
+              <div
+                role="menu"
+                className="absolute left-0 top-full z-20 mt-1 flex gap-1 rounded-xl border border-black/10 bg-white p-1.5 shadow-lg"
+              >
+                {LANGUAGES.map((lng) => (
+                  <button
+                    key={lng}
+                    type="button"
+                    role="menuitemradio"
+                    aria-checked={c.language === lng}
+                    onClick={() => {
+                      setLangMenuOpen(false);
+                      if (lng !== c.language) onLanguageChange(c.id, lng);
+                    }}
+                    className={cn(
+                      "flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold whitespace-nowrap transition-colors",
+                      c.language === lng
+                        ? "bg-[color:var(--coral)]/15 text-[color:var(--ink)]"
+                        : "text-[color:var(--ink)]/70 hover:bg-black/5",
+                    )}
+                  >
+                    <span aria-hidden>{LANGUAGE_FLAG[lng]}</span>
+                    {LANGUAGE_LABEL[lng]}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
         <div className="text-right">
-          <div className="text-xs uppercase tracking-wider opacity-70">{t("teacher.classCard.joinCode")}</div>
+          <div className="text-xs uppercase tracking-wider opacity-70">
+            {t("teacher.classCard.joinCode")}
+          </div>
           <div className="font-mono text-2xl font-bold tracking-wider">{c.join_code}</div>
         </div>
       </div>
 
       <div className="mt-3 grid gap-2 sm:grid-cols-4 rounded-2xl bg-black/5 p-3 text-sm">
         <Stat label={t("teacher.classCard.students")} value={String(stats.totalStudents)} />
-        <Stat label={t("teacher.classCard.avg")} value={stats.totalStudents ? tr("Taso {n}", { n: stats.worldNumber }) : "–"} />
+        <Stat
+          label={t("teacher.classCard.avg")}
+          value={stats.totalStudents ? tr("Taso {n}", { n: stats.worldNumber }) : "–"}
+        />
         <Stat
           label={t("teacher.classCard.screensAvg")}
           value={
@@ -300,7 +392,10 @@ function ClassDashboard({ c, tone }: { c: ClassRow; tone: "white" | "yellow" }) 
               : "–"
           }
         />
-        <Stat label={t("teacher.classCard.lastActive")} value={formatLastActive(stats.lastActivity, tr)} />
+        <Stat
+          label={t("teacher.classCard.lastActive")}
+          value={formatLastActive(stats.lastActivity, tr)}
+        />
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -316,10 +411,23 @@ function ClassDashboard({ c, tone }: { c: ClassRow; tone: "white" | "yellow" }) 
             <option value="last_active_oldest">{t("teacher.classCard.sort.leastActive")}</option>
           </select>
         </label>
-        <Button type="button" variant="secondary" size="sm" onClick={refresh} className="rounded-full">
-          <RefreshCw className={`h-4 w-4 mr-1 ${loading ? "animate-spin" : ""}`} /> {t("common.refresh")}
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={refresh}
+          className="rounded-full"
+        >
+          <RefreshCw className={`h-4 w-4 mr-1 ${loading ? "animate-spin" : ""}`} />{" "}
+          {t("common.refresh")}
         </Button>
-        <Button type="button" variant="secondary" size="sm" onClick={copyCode} className="rounded-full">
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={copyCode}
+          className="rounded-full"
+        >
           <Copy className="h-4 w-4 mr-1" /> {t("teacher.classCard.copyCode")}
         </Button>
         <Button

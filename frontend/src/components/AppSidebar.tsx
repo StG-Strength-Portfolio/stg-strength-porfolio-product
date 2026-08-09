@@ -11,11 +11,19 @@ import {
 } from "@/components/icons/AppIcons";
 import { toast } from "sonner";
 import {
-  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
-  SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarFooter,
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
 import { WORLDS } from "@/lib/screens";
 import { LevelProgressBar } from "@/components/LevelProgressBar";
+import { SidebarStrengthSummary } from "@/components/StrengthSummary";
 import { supabase } from "@/integrations/supabase/client";
 import { useT, useTr } from "@/lib/i18n";
 // @lovable-new 2026-08-08 — shared progression rules (level locking)
@@ -89,10 +97,8 @@ export function AppSidebar() {
                     <CandyIcon size={18} /> <span>{tr("Vahvuuteni")}</span>
                   </Link>
                 </SidebarMenuButton>
-                {/* @lovable-new 2026-08-05 — removed the collection growth bar,
-                    collected count and compact top-5 list; the sidebar keeps only
-                    the plain navigation row. */}
-
+                {/* @lovable-new 2026-08-05 collection growth + top 5 */}
+                <SidebarStrengthSummary />
               </SidebarMenuItem>
               {/* @lovable-new */}
               <SidebarMenuItem>
@@ -145,7 +151,11 @@ export function AppSidebar() {
 
                 return (
                   <SidebarMenuItem key={w.id}>
-                    <SidebarMenuButton asChild isActive={inWorld} className="h-auto items-start py-2">
+                    <SidebarMenuButton
+                      asChild
+                      isActive={inWorld}
+                      className="h-auto items-start py-2"
+                    >
                       <a
                         /* @lovable-new 2026-08-08 — locked levels are not links:
                            no href, not focusable, not keyboard-activatable. */

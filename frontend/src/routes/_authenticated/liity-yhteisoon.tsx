@@ -36,9 +36,17 @@ function JoinCommunityPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      const { data, error } = await supabase.rpc("join_class" as never, { p_join_code: code } as never);
+      const { data, error } = await supabase.rpc(
+        "join_class" as never,
+        { p_join_code: code } as never,
+      );
       if (error) throw error;
-      const result = data as { ok: boolean; error?: string; class_name?: string; language?: string };
+      const result = data as {
+        ok: boolean;
+        error?: string;
+        class_name?: string;
+        language?: string;
+      };
       if (!result?.ok) {
         toast.error(t("join.err.notFound"));
         return;
@@ -60,13 +68,20 @@ function JoinCommunityPage() {
   }
 
   if (checking) {
-    return <div className="flex min-h-screen items-center justify-center text-foreground">{t("common.loading")}</div>;
+    return (
+      <div className="flex min-h-screen items-center justify-center text-foreground">
+        {t("common.loading")}
+      </div>
+    );
   }
 
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-hidden flex items-center justify-center px-4 py-10">
       <CornerBlobs />
-      <button onClick={signOut} className="absolute top-4 right-4 z-20 text-sm opacity-80 hover:opacity-100 underline">
+      <button
+        onClick={signOut}
+        className="absolute top-4 right-4 z-20 text-sm opacity-80 hover:opacity-100 underline"
+      >
         {t("common.logout")}
       </button>
       <div className="relative z-10 w-full max-w-md space-y-6">
@@ -88,14 +103,15 @@ function JoinCommunityPage() {
                 autoComplete="off"
               />
             </div>
-            <Button type="submit" disabled={busy || !code.trim()}
-              className="w-full rounded-full bg-[color:var(--coral)] hover:bg-[color:var(--coral)]/90 text-white font-bold py-6 text-base">
+            <Button
+              type="submit"
+              disabled={busy || !code.trim()}
+              className="w-full rounded-full bg-[color:var(--coral)] hover:bg-[color:var(--coral)]/90 text-white font-bold py-6 text-base"
+            >
               {busy ? t("join.busy") : t("join.submit")}
             </Button>
           </form>
-          <p className="mt-5 text-xs text-muted-foreground">
-            {t("join.hint")}
-          </p>
+          <p className="mt-5 text-xs text-muted-foreground">{t("join.hint")}</p>
         </StickyNote>
       </div>
     </div>

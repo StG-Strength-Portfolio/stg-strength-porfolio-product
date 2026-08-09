@@ -41,7 +41,6 @@ const TABS = [
 ] as const;
 type Tab = (typeof TABS)[number];
 
-
 export const Route = createFileRoute("/superadmin/dashboard")({
   validateSearch: z.object({ tab: z.enum(TABS).optional() }).parse,
   component: SuperAdminDashboard,
@@ -110,7 +109,12 @@ function SuperAdminDashboard() {
     setBusy(true);
     try {
       const res = await addSchool({
-        data: { name, language: "fi", start: new Date(start).toISOString(), expiry: new Date(expiry).toISOString() },
+        data: {
+          name,
+          language: "fi",
+          start: new Date(start).toISOString(),
+          expiry: new Date(expiry).toISOString(),
+        },
       });
       toast.success(`${tr("Koulu lisätty! Koodi: ")}${res.code}`);
       setName("");
@@ -181,10 +185,9 @@ function SuperAdminDashboard() {
                             : tb === "materials"
                               ? "Opetusmateriaalit"
                               : tb === "reports"
-                              ? "Raportit"
-                              : "Asetukset",
+                                ? "Raportit"
+                                : "Asetukset",
                 )}
-
               </Link>
             ))}
           </nav>
@@ -424,7 +427,6 @@ function SuperAdminDashboard() {
               <EmailAnalyticsTab />
             </>
           )}
-
 
           {/* @lovable-new */}
           {tab === "materials" && <TeachingMaterialsTab />}

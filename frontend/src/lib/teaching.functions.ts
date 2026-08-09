@@ -47,7 +47,6 @@ export interface TeachingArticle {
   slide_count: number | null;
 }
 
-
 async function assertSuperAdmin(supabase: any, userId: string) {
   const { data } = await supabase
     .from("user_roles")
@@ -77,7 +76,6 @@ export const createTeachingCategory = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     // Sub-categories are added manually by the super admin — no presets.
     return { id: row.id as string };
-
   });
 
 export const deleteTeachingCategory = createServerFn({ method: "POST" })
@@ -121,7 +119,6 @@ export const setTeachingSubcategoryPublished = createServerFn({ method: "POST" }
     return { ok: true };
   });
 
-
 export const createTeachingSubcategory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
@@ -142,7 +139,6 @@ export const createTeachingSubcategory = createServerFn({ method: "POST" })
       name_en: data.nameEn,
       name_sv: data.nameSv,
       sort_order: data.sortOrder ?? 99,
-
     });
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -177,7 +173,6 @@ export interface ArticleInput {
   sortOrder?: number;
   /** @lovable-new 2026-08-05 */
   slideCount?: number;
-
 }
 
 export const saveTeachingArticle = createServerFn({ method: "POST" })
@@ -201,7 +196,6 @@ export const saveTeachingArticle = createServerFn({ method: "POST" })
       is_published: data.isPublished,
       slide_count: Math.max(1, Math.min(200, Number(data.slideCount) || 10)),
       sort_order: data.sortOrder ?? 0,
-
     };
     const q = data.id
       ? db.from("teaching_articles").update(row).eq("id", data.id)

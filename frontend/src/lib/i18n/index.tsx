@@ -29,7 +29,6 @@ import { supabase } from "@/integrations/supabase/client";
 import generated from "./translations-generated.json";
 import { TRANSLATIONS, translateFinnish, type AppLanguage } from "./translations-generated";
 
-
 // ---------------- Types ----------------
 
 export type Language = "en" | "fi" | "sv";
@@ -50,6 +49,13 @@ export const LANGUAGE_FLAG: Record<Language, string> = {
 
 export function isLanguage(v: unknown): v is Language {
   return v === "en" || v === "fi" || v === "sv";
+}
+
+export function languageFromDisplayName(name?: string | null): Language | null {
+  const match = name?.trim().match(/\+(EN|FI|SV)\s*$/i);
+  if (!match) return null;
+  const lang = match[1].toLowerCase();
+  return isLanguage(lang) ? lang : null;
 }
 
 // ---------------- Content dictionary (Excel-derived) ----------------
@@ -177,8 +183,7 @@ export const UI: UIDict = {
     "join.codePh": "esim. 9A-VAHVUUS-25",
     "join.submit": "Liity luokkaan",
     "join.busy": "Liitytään…",
-    "join.hint":
-      "Et voi aloittaa seikkailua ennen kuin olet liittynyt opettajasi luokkaan.",
+    "join.hint": "Et voi aloittaa seikkailua ennen kuin olet liittynyt opettajasi luokkaan.",
     "join.err.notFound": "Koodia ei löytynyt. Tarkista koodi opettajaltasi.",
     "join.success": "Olet liittynyt luokkaan: {name}",
 
@@ -198,6 +203,9 @@ export const UI: UIDict = {
     "teacher.classCard.class": "Luokka",
     "teacher.classCard.joinCode": "Liittymiskoodi",
     "teacher.classCard.language": "Kieli",
+    "teacher.classCard.language.edit": "Muokkaa",
+    "teacher.classCard.language.updated": "Luokan kieli päivitetty.",
+    "teacher.classCard.language.updateFailed": "Kielen päivitys epäonnistui.",
     "teacher.classCard.students": "Oppilaita",
     "teacher.classCard.avg": "Keskimäärin",
     "teacher.classCard.screensAvg": "Näytöt täytetty (ka.)",
@@ -210,8 +218,7 @@ export const UI: UIDict = {
     "teacher.classCard.copyCode": "Kopioi koodi",
     "teacher.classCard.copyCode.ok": "Koodi kopioitu.",
     "teacher.classCard.copyCode.fail": "Kopiointi epäonnistui — kopioi käsin.",
-    "teacher.classCard.empty":
-      "Ei oppilaita vielä. Jaa luokan koodi oppilaiden kanssa.",
+    "teacher.classCard.empty": "Ei oppilaita vielä. Jaa luokan koodi oppilaiden kanssa.",
     "teacher.roster.student": "Oppilas",
     "teacher.roster.progress": "Edistyminen",
     "teacher.roster.worlds": "Maailmat",
@@ -256,8 +263,7 @@ export const UI: UIDict = {
     "common.locked": "Locked",
 
     "app.title": "Strength Adventure",
-    "app.tagline":
-      "See the Good! — a strength portfolio for upper secondary students",
+    "app.tagline": "See the Good! — a strength portfolio for upper secondary students",
     "app.screenOfTotal": "Screen {n} of {total}",
     "app.screensSuffix": "screens",
 
@@ -266,8 +272,7 @@ export const UI: UIDict = {
     "sidebar.worldmap": "World map",
 
     "worldmap.title": "World map",
-    "worldmap.subtitle":
-      "Pick a world or continue where you left off.",
+    "worldmap.subtitle": "Pick a world or continue where you left off.",
     "worldmap.resumeHeader": "Resume adventure",
     "worldmap.resumeAt": "{world} — screen {n}",
 
@@ -286,8 +291,7 @@ export const UI: UIDict = {
     "auth.student.submit": "Sign up as a student",
     "auth.student.emailPh": "firstname.lastname@school.example",
     "auth.student.passwordPh": "Create a strong password",
-    "auth.student.passwordHint":
-      "At least 8 characters. Include letters, numbers and symbols.",
+    "auth.student.passwordHint": "At least 8 characters. Include letters, numbers and symbols.",
     "auth.student.nameLabel": "Name (First Last)",
     "auth.student.namePh": "e.g. Anna Andersson",
     "auth.student.nameHint": "Enter your first and last name",
@@ -298,8 +302,7 @@ export const UI: UIDict = {
     "auth.student.err.nameMissing": "Please enter your name.",
     "auth.student.err.codeMissing": "Please enter your class code.",
     "auth.student.err.emailTaken": "An account already exists for this email.",
-    "auth.student.err.codeInvalid":
-      "That code is not valid. Please check with your teacher.",
+    "auth.student.err.codeInvalid": "That code is not valid. Please check with your teacher.",
 
     "auth.teacher.title": "For teachers",
     "auth.teacher.school": "School name",
@@ -307,8 +310,7 @@ export const UI: UIDict = {
     "auth.teacher.teacherCode": "Teacher code",
     "auth.teacher.teacherCodePh": "e.g. OPETTAJA-2026",
     "auth.teacher.submit": "Sign up as a teacher",
-    "auth.teacher.err.badCode":
-      "That teacher code is not valid. Ask your school for the code.",
+    "auth.teacher.err.badCode": "That teacher code is not valid. Ask your school for the code.",
     "auth.teacher.hasAccount": "Already have a teacher account?",
 
     "join.title": "Join your community",
@@ -317,16 +319,13 @@ export const UI: UIDict = {
     "join.codePh": "e.g. 9A-STRENGTH-25",
     "join.submit": "Join class",
     "join.busy": "Joining…",
-    "join.hint":
-      "You can start the adventure once you've joined your teacher's class.",
-    "join.err.notFound":
-      "Code not found. Please double-check with your teacher.",
+    "join.hint": "You can start the adventure once you've joined your teacher's class.",
+    "join.err.notFound": "Code not found. Please double-check with your teacher.",
     "join.success": "You joined class: {name}",
 
     "teacher.title": "Teacher dashboard",
     "teacher.create.title": "Create a new class",
-    "teacher.create.hint":
-      "Students use the class code to join your class.",
+    "teacher.create.hint": "Students use the class code to join your class.",
     "teacher.create.nameLabel": "Class name",
     "teacher.create.namePh": "e.g. 9A — Strength group",
     "teacher.create.langLabel": "Class language",
@@ -340,6 +339,9 @@ export const UI: UIDict = {
     "teacher.classCard.class": "Class",
     "teacher.classCard.joinCode": "Join code",
     "teacher.classCard.language": "Language",
+    "teacher.classCard.language.edit": "Change",
+    "teacher.classCard.language.updated": "Class language updated.",
+    "teacher.classCard.language.updateFailed": "Failed to update the class language.",
     "teacher.classCard.students": "Students",
     "teacher.classCard.avg": "Average",
     "teacher.classCard.screensAvg": "Screens filled (avg.)",
@@ -352,8 +354,7 @@ export const UI: UIDict = {
     "teacher.classCard.copyCode": "Copy code",
     "teacher.classCard.copyCode.ok": "Code copied.",
     "teacher.classCard.copyCode.fail": "Copy failed — copy it manually.",
-    "teacher.classCard.empty":
-      "No students yet. Share the class code with your students.",
+    "teacher.classCard.empty": "No students yet. Share the class code with your students.",
     "teacher.roster.student": "Student",
     "teacher.roster.progress": "Progress",
     "teacher.roster.worlds": "Worlds",
@@ -374,8 +375,7 @@ export const UI: UIDict = {
     "portfolio.screenLabel": "Screen {n} — {world}",
     "portfolio.print": "Print portfolio",
 
-    "nav.finishFirst":
-      "Please complete this page's task before continuing.",
+    "nav.finishFirst": "Please complete this page's task before continuing.",
   },
   sv: {
     "common.loading": "Laddar…",
@@ -408,8 +408,7 @@ export const UI: UIDict = {
     "sidebar.worldmap": "Världskarta",
 
     "worldmap.title": "Världskarta",
-    "worldmap.subtitle":
-      "Välj en värld eller fortsätt där du slutade.",
+    "worldmap.subtitle": "Välj en värld eller fortsätt där du slutade.",
     "worldmap.resumeHeader": "Fortsätt äventyret",
     "worldmap.resumeAt": "{world} — sida {n}",
 
@@ -428,8 +427,7 @@ export const UI: UIDict = {
     "auth.student.submit": "Registrera som elev",
     "auth.student.emailPh": "fornamn.efternamn@skola.se",
     "auth.student.passwordPh": "Skapa ett starkt lösenord",
-    "auth.student.passwordHint":
-      "Minst 8 tecken. Använd bokstäver, siffror och specialtecken.",
+    "auth.student.passwordHint": "Minst 8 tecken. Använd bokstäver, siffror och specialtecken.",
     "auth.student.nameLabel": "Namn (Förnamn Efternamn)",
     "auth.student.namePh": "t.ex. Anna Andersson",
     "auth.student.nameHint": "Skriv ditt för- och efternamn",
@@ -439,10 +437,8 @@ export const UI: UIDict = {
     "auth.student.err.passwordShort": "Lösenordet måste vara minst 8 tecken.",
     "auth.student.err.nameMissing": "Ange ditt namn.",
     "auth.student.err.codeMissing": "Ange klasskoden.",
-    "auth.student.err.emailTaken":
-      "Det finns redan ett konto med den här e-posten.",
-    "auth.student.err.codeInvalid":
-      "Koden är ogiltig. Kontrollera med din lärare.",
+    "auth.student.err.emailTaken": "Det finns redan ett konto med den här e-posten.",
+    "auth.student.err.codeInvalid": "Koden är ogiltig. Kontrollera med din lärare.",
 
     "auth.teacher.title": "För lärare",
     "auth.teacher.school": "Skolans namn",
@@ -450,8 +446,7 @@ export const UI: UIDict = {
     "auth.teacher.teacherCode": "Lärarkod",
     "auth.teacher.teacherCodePh": "t.ex. OPETTAJA-2026",
     "auth.teacher.submit": "Registrera som lärare",
-    "auth.teacher.err.badCode":
-      "Lärarkoden är ogiltig. Be din skola om koden.",
+    "auth.teacher.err.badCode": "Lärarkoden är ogiltig. Be din skola om koden.",
     "auth.teacher.hasAccount": "Har du redan ett lärarkonto?",
 
     "join.title": "Gå med i gemenskapen",
@@ -460,21 +455,17 @@ export const UI: UIDict = {
     "join.codePh": "t.ex. 9A-STYRKA-25",
     "join.submit": "Gå med i klassen",
     "join.busy": "Ansluter…",
-    "join.hint":
-      "Du kan börja äventyret när du har gått med i din lärares klass.",
-    "join.err.notFound":
-      "Koden hittades inte. Kontrollera koden med din lärare.",
+    "join.hint": "Du kan börja äventyret när du har gått med i din lärares klass.",
+    "join.err.notFound": "Koden hittades inte. Kontrollera koden med din lärare.",
     "join.success": "Du har gått med i klassen: {name}",
 
     "teacher.title": "Lärarvy",
     "teacher.create.title": "Skapa en ny klass",
-    "teacher.create.hint":
-      "Eleverna använder klasskoden för att gå med i din klass.",
+    "teacher.create.hint": "Eleverna använder klasskoden för att gå med i din klass.",
     "teacher.create.nameLabel": "Klassens namn",
     "teacher.create.namePh": "t.ex. 9A — Styrkegrupp",
     "teacher.create.langLabel": "Klassens språk",
-    "teacher.create.langHint":
-      "Elever som går med med den här koden ser appen på det här språket.",
+    "teacher.create.langHint": "Elever som går med med den här koden ser appen på det här språket.",
     "teacher.create.submit": "Skapa klass",
     "teacher.create.busy": "Skapar…",
     "teacher.create.success": "Klass skapad.",
@@ -483,6 +474,9 @@ export const UI: UIDict = {
     "teacher.classCard.class": "Klass",
     "teacher.classCard.joinCode": "Anslutningskod",
     "teacher.classCard.language": "Språk",
+    "teacher.classCard.language.edit": "Ändra",
+    "teacher.classCard.language.updated": "Klassens språk har uppdaterats.",
+    "teacher.classCard.language.updateFailed": "Det gick inte att uppdatera klassens språk.",
     "teacher.classCard.students": "Elever",
     "teacher.classCard.avg": "Genomsnitt",
     "teacher.classCard.screensAvg": "Ifyllda sidor (snitt)",
@@ -495,8 +489,7 @@ export const UI: UIDict = {
     "teacher.classCard.copyCode": "Kopiera kod",
     "teacher.classCard.copyCode.ok": "Kod kopierad.",
     "teacher.classCard.copyCode.fail": "Kopiering misslyckades — kopiera manuellt.",
-    "teacher.classCard.empty":
-      "Inga elever ännu. Dela klasskoden med dina elever.",
+    "teacher.classCard.empty": "Inga elever ännu. Dela klasskoden med dina elever.",
     "teacher.roster.student": "Elev",
     "teacher.roster.progress": "Framsteg",
     "teacher.roster.worlds": "Världar",
@@ -517,8 +510,7 @@ export const UI: UIDict = {
     "portfolio.screenLabel": "Sida {n} — {world}",
     "portfolio.print": "Skriv ut portfölj",
 
-    "nav.finishFirst":
-      "Fyll först i uppgiften på den här sidan för att gå vidare.",
+    "nav.finishFirst": "Fyll först i uppgiften på den här sidan för att gå vidare.",
   },
 };
 
@@ -567,12 +559,21 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       try {
         const { data: u } = await supabase.auth.getUser();
         if (!u.user) return;
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from("profiles" as never)
-          .select("language")
+          .select("language, display_name")
           .eq("id", u.user.id)
           .maybeSingle();
-        const lang = (data as { language?: string } | null)?.language;
+        let profile = data as { language?: string; display_name?: string | null } | null;
+        if (error) {
+          const { data: nameOnly } = await supabase
+            .from("profiles" as never)
+            .select("display_name")
+            .eq("id", u.user.id)
+            .maybeSingle();
+          profile = nameOnly as { display_name?: string | null } | null;
+        }
+        const lang = languageFromDisplayName(profile?.display_name) ?? profile?.language;
         if (!cancelled && isLanguage(lang)) {
           setLanguageState(lang);
           if (typeof window !== "undefined") {
@@ -607,7 +608,6 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   );
   return <LangContext.Provider value={value}>{children}</LangContext.Provider>;
 }
-
 
 export function useLanguage(): LangCtx {
   return useContext(LangContext);
@@ -649,7 +649,6 @@ function trFinnish(finnish: string, language: Language): string {
   return out;
 }
 
-
 /**
  * Translate a Finnish source string into the active language.
  * Finnish returns unchanged; a missing translation returns the Finnish original.
@@ -684,9 +683,39 @@ export function useTFi(): (fi: string | undefined | null) => string {
   return useCallback((fi) => fi ?? "", []);
 }
 
-
 // ---------------- Recursive text translator ----------------
-// STEP 1 Finnish-only: passthrough. Kept for API compatibility.
 export function TranslateFi({ children }: { children: ReactNode }) {
-  return <>{children}</>;
+  const tr = useTr();
+
+  const translateNode = useCallback(
+    (node: ReactNode): ReactNode => {
+      if (typeof node === "string") {
+        if (!node.trim()) return node;
+        const leading = node.match(/^\s*/)?.[0] ?? "";
+        const trailing = node.match(/\s*$/)?.[0] ?? "";
+        return `${leading}${tr(node.trim())}${trailing}`;
+      }
+
+      if (Array.isArray(node)) {
+        return node.map(translateNode);
+      }
+
+      if (!isValidElement(node)) return node;
+
+      const element = node as ReactElement<{ children?: ReactNode }>;
+      if (
+        typeof element.type === "string" &&
+        ["script", "style", "textarea"].includes(element.type)
+      ) {
+        return element;
+      }
+
+      const childNodes = element.props.children;
+      if (childNodes === undefined) return element;
+      return cloneElement(element, undefined, Children.map(childNodes, translateNode));
+    },
+    [tr],
+  );
+
+  return <>{Children.map(children, translateNode)}</>;
 }

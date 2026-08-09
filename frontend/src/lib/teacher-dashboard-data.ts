@@ -45,7 +45,6 @@ export function useTeacherData() {
   const [events, setEvents] = useState<ReportEvent[]>([]);
   const [loading, setLoading] = useState(true);
 
-
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
@@ -92,11 +91,13 @@ export function useTeacherData() {
           ]);
 
           const profMap = new Map(
-            ((profs ?? []) as unknown as Array<{
-              id: string;
-              display_name: string | null;
-              current_screen: number | null;
-            }>).map((p) => [p.id, p]),
+            (
+              (profs ?? []) as unknown as Array<{
+                id: string;
+                display_name: string | null;
+                current_screen: number | null;
+              }>
+            ).map((p) => [p.id, p]),
           );
 
           const classOf = new Map(memberRows.map((m) => [m.student_id, m.class_id]));

@@ -13,7 +13,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { StickyNote } from "@/components/StickyNote";
 import { StrengthPickerGrid } from "@/components/strengths/StrengthPickerGrid";
 import { useLanguage, useTr } from "@/lib/i18n";
-import { getMyTeacher, giveStrengthToMyTeacher, type PersonRef } from "@/lib/give-strength.functions";
+import {
+  getMyTeacher,
+  giveStrengthToMyTeacher,
+  type PersonRef,
+} from "@/lib/give-strength.functions";
 
 export const Route = createFileRoute("/_authenticated/student/give-strength")({
   head: () => ({
@@ -86,9 +90,7 @@ function StudentGiveStrengthPage() {
       <div className="mx-auto w-full max-w-4xl space-y-5">
         <h1 className="font-display text-3xl">{tr("Anna vahvuus opettajallesi")}</h1>
         <StickyNote seed="give-teacher" className="space-y-4">
-          <p className="text-sm font-bold">
-            {teacher ? teacher.name : tr("Ei opettajaa.")}
-          </p>
+          <p className="text-sm font-bold">{teacher ? teacher.name : tr("Ei opettajaa.")}</p>
           <StrengthPickerGrid
             lang={lang}
             selectedIds={selected}

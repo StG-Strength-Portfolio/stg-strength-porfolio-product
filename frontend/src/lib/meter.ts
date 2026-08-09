@@ -1,6 +1,6 @@
 // Scoring + aggregation for Vahvuusmittari.
 import { METER_STRENGTHS, VIRTUES, fieldKeyFor, type Virtue } from "./meter-data";
-import { loadResponse, type ResponseReader } from "@/hooks/use-autosave";
+import { loadResponse } from "@/hooks/use-autosave";
 
 export interface StrengthScore {
   id: string;
@@ -12,18 +12,19 @@ export interface StrengthScore {
   complete: boolean;
 }
 
-// @lovable-new 2026-08-05 — accepts a mode-aware reader so the teacher
-// preview never reads student meter answers.
-export async function loadAllMeterScores(read: ResponseReader = loadResponse): Promise<StrengthScore[]> {
+export async function loadAllMeterScores(): Promise<StrengthScore[]> {
   const out: StrengthScore[] = [];
   for (const s of METER_STRENGTHS) {
-    const s1 = await read<number>(fieldKeyFor(s.id, 0));
-    const s2 = await read<number>(fieldKeyFor(s.id, 1));
+    const s1 = await loadResponse<number>(fieldKeyFor(s.id, 0));
+    const s2 = await loadResponse<number>(fieldKeyFor(s.id, 1));
     const v1 = typeof s1 === "number" ? s1 : null;
     const v2 = typeof s2 === "number" ? s2 : null;
     out.push({
-      id: s.id, name: s.name, virtue: s.virtue,
-      s1: v1, s2: v2,
+      id: s.id,
+      name: s.name,
+      virtue: s.virtue,
+      s1: v1,
+      s2: v2,
       total: (v1 ?? 0) + (v2 ?? 0),
       complete: v1 !== null && v2 !== null,
     });

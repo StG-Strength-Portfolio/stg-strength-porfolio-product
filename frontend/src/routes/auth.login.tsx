@@ -125,8 +125,6 @@ function LoginPage() {
         </StickyNote>
 
         {forgotOpen && <ForgotPasswordDialog onClose={() => setForgotOpen(false)} />}
-
-
       </div>
     </div>
   );

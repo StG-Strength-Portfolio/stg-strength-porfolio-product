@@ -3,7 +3,11 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { StickyNote } from "@/components/StickyNote";
 import { useTr } from "@/lib/i18n";
-import { getEmailLog, type EmailAnalytics, type EmailLogRow } from "@/lib/email-templates.functions";
+import {
+  getEmailLog,
+  type EmailAnalytics,
+  type EmailLogRow,
+} from "@/lib/email-templates.functions";
 
 const RANGES = [7, 30, 90] as const;
 

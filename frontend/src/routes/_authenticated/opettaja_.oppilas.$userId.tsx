@@ -12,8 +12,15 @@ export const Route = createFileRoute("/_authenticated/opettaja_/oppilas/$userId"
   component: StudentPortfolioRoute,
 });
 
-interface ResponseRow { field_key: string; value: unknown; }
-interface ProfileRow { id: string; display_name: string | null; current_screen: number | null; }
+interface ResponseRow {
+  field_key: string;
+  value: unknown;
+}
+interface ProfileRow {
+  id: string;
+  display_name: string | null;
+  current_screen: number | null;
+}
 
 function StudentPortfolioRoute() {
   const tr = useTr();
@@ -53,9 +60,7 @@ function StudentPortfolioRoute() {
   }, [allowed, userId]);
 
   if (!allowed)
-    return (
-      <div className="flex min-h-screen items-center justify-center">{tr("Ladataan…")}</div>
-    );
+    return <div className="flex min-h-screen items-center justify-center">{tr("Ladataan…")}</div>;
 
   return (
     <div className="relative min-h-screen bg-background text-foreground">

@@ -51,14 +51,7 @@ function bucketOf(d: Date, weekly: boolean): string {
  */
 export function buildReportSeries(
   events: ReportEvent[],
-  opts: {
-    days: RangeDays;
-    studentCount: number;
-    totalRequired: number;
-    classId?: string | null;
-    // @lovable-new 2026-08-05 — explicit chart-date locale.
-    locale?: string;
-  },
+  opts: { days: RangeDays; studentCount: number; totalRequired: number; classId?: string | null },
 ): SeriesPoint[] {
   const weekly = opts.days > 30;
   const now = new Date();
@@ -75,18 +68,13 @@ export function buildReportSeries(
   }
   if (buckets.length === 0) buckets.push(bucketOf(now, weekly));
 
-  const scoped = opts.classId
-    ? events.filter((e) => e.classId === opts.classId)
-    : events;
+  const scoped = opts.classId ? events.filter((e) => e.classId === opts.classId) : events;
 
   // Baseline: everything that happened before the range still counts toward
   // the cumulative totals so the curve starts at the real level.
   let cumStrengths = 0;
   const seenKeys = new Set<string>();
-  const perBucket = new Map<
-    string,
-    { strengths: number; keys: string[]; active: Set<string> }
-  >();
+  const perBucket = new Map<string, { strengths: number; keys: string[]; active: Set<string> }>();
   for (const b of buckets) perBucket.set(b, { strengths: 0, keys: [], active: new Set() });
 
   for (const e of scoped) {
@@ -114,7 +102,7 @@ export function buildReportSeries(
     const d = new Date(`${b}T00:00:00Z`);
     return {
       date: b,
-      label: d.toLocaleDateString(opts.locale ?? "fi-FI", { day: "numeric", month: "short" }),
+      label: d.toLocaleDateString(undefined, { day: "numeric", month: "short" }),
       strengths: cumStrengths,
       completion: Math.round((seenKeys.size / denom) * 1000) / 10,
       active: slot.active.size,
@@ -128,9 +116,7 @@ export function buildReportSeries(
  */
 export function buildStrengthSeries(
   events: ReportEvent[],
-  // @lovable-new 2026-08-05 — explicit chart-date locale (fi-FI / sv-SE / en-US)
-  // instead of the browser default, so FI/SV/EN reports read consistently.
-  opts: { days: RangeDays; classId?: string | null; limit?: number; locale?: string },
+  opts: { days: RangeDays; classId?: string | null; limit?: number },
 ): StrengthSeries {
   const weekly = opts.days > 30;
   const now = new Date();
@@ -180,7 +166,7 @@ export function buildStrengthSeries(
     const d = new Date(`${b}T00:00:00Z`);
     const row: Record<string, string | number> = {
       date: b,
-      label: d.toLocaleDateString(opts.locale ?? "fi-FI", { day: "numeric", month: "short" }),
+      label: d.toLocaleDateString(undefined, { day: "numeric", month: "short" }),
     };
     for (const id of visible) row[`s${id}`] = running.get(id) ?? 0;
     return row;

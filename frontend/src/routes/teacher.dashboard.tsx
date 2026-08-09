@@ -117,12 +117,16 @@ function TeacherDashboardPage() {
         },
       ]}
     >
-      {/* @lovable-new 2026-08-07 — class-code generator is always visible on the Classes tab */}
-      {tab === "classes" && !openClass && <CreateClass onCreated={refresh} />}
-
       {tab === "classes" && !openClass && (
         <TopStrengths students={students} classes={classes} assigned={assigned} />
       )}
+
+      {/* FIX: form "Luo luokka" (CreateClass) trước đây chỉ được render khi
+          tab === "settings" — nhưng KHÔNG có nút nào trong sidebar trỏ tới
+          tab đó (Profile trỏ sang route /teacher/profile riêng), nên form
+          này hoàn toàn không thể truy cập được qua UI. Chuyển nó lên đầu
+          tab "Classes" để giáo viên thấy và tạo lớp được ngay. */}
+      {tab === "classes" && !openClass && <CreateClass onCreated={refresh} />}
 
       {tab === "classes" && !openClass && (
         <div className="grid gap-3 md:grid-cols-2">
@@ -141,22 +145,14 @@ function TeacherDashboardPage() {
                 >
                   {c.name}
                 </button>
-                {/* @lovable-new 2026-08-07 — join code always visible + copy action */}
-                <div className="flex flex-wrap items-center gap-2 text-sm opacity-80">
-                  <span>{tr("Luokan koodi")}:</span>
-                  <code className="rounded-lg bg-[color:var(--yellow)]/60 px-2 py-0.5 font-mono text-base font-bold tracking-wider text-[color:var(--ink)]">
-                    {c.join_code}
-                  </code>
-                  <CopyCodeButton code={c.join_code} />
-                  <span>
-                    · {tr("Kieli")}: {LANGUAGE_LABEL[c.language] ?? c.language}
-                  </span>
+                <div className="text-sm opacity-80">
+                  {tr("Luokan koodi")}: <code className="font-mono">{c.join_code}</code> ·{" "}
+                  {tr("Kieli")}: {LANGUAGE_LABEL[c.language] ?? c.language}
                 </div>
                 <div className="text-sm">
                   {tr("Opiskelijoita")}: {inClass.length} · {tr("Valmistuminen %")}: {avg} % ·{" "}
                   {tr("Luotu")}: {new Date(c.created_at).toLocaleDateString()}
                 </div>
-
                 <div className="pt-1">
                   <DeleteClassButton
                     klass={c}
@@ -754,33 +750,17 @@ function TeacherReports({
   );
 }
 
-/* @lovable-new 2026-08-07 — shared copy-code action */
-function CopyCodeButton({ code }: { code: string }) {
-  const tr = useTr();
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(code);
-      toast.success(tr("Koodi kopioitu!"));
-    } catch {
-      toast.error(tr("Kopiointi epäonnistui"));
-    }
-  }
-  return (
-    <Button type="button" size="sm" variant="secondary" className="rounded-full" onClick={copy}>
-      <Copy className="mr-1 h-3.5 w-3.5" /> {tr("Kopioi koodi")}
-    </Button>
-  );
-}
-
-/* @lovable-new 2026-08-07 — always-visible class-code generator with result panel */
-function CreateClass({ onCreated }: { onCreated: () => Promise<void> }) {
+function CreateClass({
+  onDoneNoop,
+  onCreated,
+}: {
+  onDoneNoop?: never;
+  onCreated: () => Promise<void>;
+}) {
   const tr = useTr();
   const [name, setName] = useState("");
   const [language, setLanguageChoice] = useState<Language>("fi");
   const [busy, setBusy] = useState(false);
-  const [created, setCreated] = useState<{ name: string; code: string; language: Language } | null>(
-    null,
-  );
 
   async function create(e: React.FormEvent) {
     e.preventDefault();
@@ -788,28 +768,17 @@ function CreateClass({ onCreated }: { onCreated: () => Promise<void> }) {
     setBusy(true);
     try {
       const { data: u } = await supabase.auth.getUser();
-      if (!u.user) throw new Error("No session.");
-      let lastError: unknown = null;
-      // Retry once on a join_code uniqueness collision.
-      for (let attempt = 0; attempt < 3; attempt++) {
-        const code = randomCode();
-        const { error } = await supabase.from("classes" as never).insert({
-          name: name.trim(),
-          teacher_id: u.user.id,
-          join_code: code,
-          language,
-        } as never);
-        if (!error) {
-          setCreated({ name: name.trim(), code, language });
-          setName("");
-          toast.success(tr("Luokka luotu."));
-          await onCreated();
-          return;
-        }
-        lastError = error;
-        if ((error as { code?: string }).code !== "23505") break;
-      }
-      throw lastError;
+      if (!u.user) return;
+      const { error } = await supabase.from("classes" as never).insert({
+        name: name.trim(),
+        teacher_id: u.user.id,
+        join_code: randomCode(),
+        language,
+      } as never);
+      if (error) throw error;
+      setName("");
+      toast.success(tr("Tallennettu!"));
+      await onCreated();
     } catch (err) {
       toast.error((err as Error).message);
     } finally {
@@ -819,22 +788,11 @@ function CreateClass({ onCreated }: { onCreated: () => Promise<void> }) {
 
   return (
     <StickyNote seed="t-create-class" className="space-y-3">
-      <h3 className="text-xl font-bold">{tr("Luo luokkakoodi")}</h3>
-      <p className="text-sm opacity-70">
-        {tr(
-          "Anna luokalle nimi ja valitse kieli. Oppilaat liittyvät luodulla koodilla ja saavat luokan kielen käyttöön.",
-        )}
-      </p>
+      <h3 className="text-xl font-bold">{tr("Luo luokka")}</h3>
       <form onSubmit={create} className="grid gap-3 md:grid-cols-3">
-        <div className="space-y-1 md:col-span-2">
+        <div className="space-y-1">
           <Label htmlFor="cc-name">{tr("Luokan nimi")}</Label>
-          <Input
-            id="cc-name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder={tr("esim. 9A — Vahvuusryhmä")}
-            maxLength={80}
-          />
+          <Input id="cc-name" value={name} onChange={(e) => setName(e.target.value)} />
         </div>
         <div className="space-y-1">
           <Label htmlFor="cc-lang">{tr("Kieli")}</Label>
@@ -854,32 +812,17 @@ function CreateClass({ onCreated }: { onCreated: () => Promise<void> }) {
         <div className="md:col-span-3">
           <Button
             type="submit"
-            disabled={busy || !name.trim()}
-            className="rounded-full bg-[color:var(--purple)] px-6 py-5 font-bold text-white hover:bg-[color:var(--purple)]/90"
+            disabled={busy}
+            className="rounded-full bg-[color:var(--purple)] font-bold text-white hover:bg-[color:var(--purple)]/90"
           >
-            {busy ? tr("Luodaan…") : tr("Luo luokkakoodi")}
+            {tr("Luo luokka")}
           </Button>
         </div>
       </form>
-
-      {created && (
-        <div className="rounded-2xl bg-white/70 p-4">
-          <div className="text-xs uppercase tracking-wider opacity-60">
-            {tr("Uusi luokkakoodi")}
-          </div>
-          <div className="mt-1 flex flex-wrap items-center gap-3">
-            <span className="rounded-2xl bg-[color:var(--yellow)] px-4 py-2 font-mono text-2xl font-bold tracking-wider text-[color:var(--ink)]">
-              {created.code}
-            </span>
-            <span className="text-sm font-semibold">{created.name}</span>
-            <span className="text-sm opacity-70">
-              {tr("Kieli")}: {LANGUAGE_LABEL[created.language] ?? created.language}
-            </span>
-            <CopyCodeButton code={created.code} />
-          </div>
-          <p className="mt-2 text-xs opacity-60">{tr("Jaa tämä koodi oppilaille.")}</p>
-        </div>
-      )}
+      <p className="text-xs opacity-60">
+        <Copy className="mr-1 inline h-3 w-3" />
+        {tr("Luokan koodi")}
+      </p>
     </StickyNote>
   );
 }

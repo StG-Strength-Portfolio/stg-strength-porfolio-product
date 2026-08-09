@@ -18,8 +18,8 @@ const SAMPLE: Record<string, string> = {
   name: "Maija Meikäläinen",
   school: "Esimerkkikoulu",
   month: "01/2026",
-  reset_link: "https://vahvuus-seikkailu-test.dadat180405.workers.dev/reset-password",
-  login_link: "https://vahvuus-seikkailu-test.dadat180405.workers.dev/auth/login",
+  reset_link: "https://vahvuus-seikkailu.lovable.app/reset-password",
+  login_link: "https://vahvuus-seikkailu.lovable.app/auth/login",
   top_strengths: "1. Ystävällisyys ×12<br/>2. Rohkeus ×9<br/>3. Uteliaisuus ×7",
   active_students: "18",
   student_count: "24",
@@ -191,7 +191,11 @@ function EditTemplateDialog({
           </div>
           <p className="text-xs opacity-70">
             {tr("Käytettävissä olevat muuttujat")}:{" "}
-            <code>{Object.keys(SAMPLE).map((k) => `{{${k}}}`).join(" ")}</code>
+            <code>
+              {Object.keys(SAMPLE)
+                .map((k) => `{{${k}}}`)
+                .join(" ")}
+            </code>
           </p>
         </div>
 

@@ -28,14 +28,20 @@ function WorldMap() {
           <p className="opacity-85 mt-1">{t("worldmap.subtitle")}</p>
         </div>
         <StickyNote tone="yellow" className="!p-3 !px-4 max-w-xs">
-          <div className="text-xs font-semibold uppercase tracking-wide">{t("worldmap.resumeHeader")}</div>
+          <div className="text-xs font-semibold uppercase tracking-wide">
+            {t("worldmap.resumeHeader")}
+          </div>
           <div className="font-display text-lg leading-tight">
             {t("worldmap.resumeAt", { world: tr(currentWorld.title), n: current })}
           </div>
           <Button
             className="mt-2 rounded-full bg-[color:var(--coral)] hover:bg-[color:var(--coral)]/90 text-white"
-            onClick={() => navigate({ to: "/seikkailu/$screen", params: { screen: String(current) } })}
-          >{t("common.continue")} →</Button>
+            onClick={() =>
+              navigate({ to: "/seikkailu/$screen", params: { screen: String(current) } })
+            }
+          >
+            {t("common.continue")} →
+          </Button>
         </StickyNote>
       </div>
 
@@ -61,7 +67,9 @@ function WorldMap() {
         })}
       </div>
 
-      <p className="mt-8 text-center text-xs opacity-70">{TOTAL_SCREENS} {t("app.screensSuffix")} • {t("app.title")}</p>
+      <p className="mt-8 text-center text-xs opacity-70">
+        {TOTAL_SCREENS} {t("app.screensSuffix")} • {t("app.title")}
+      </p>
     </div>
   );
 }

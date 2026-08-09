@@ -68,23 +68,23 @@
   --color-green: var(--green);
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
-  --font-display: "Fredoka", sans-serif;
-  --font-sans: "Fredoka", sans-serif;
+  --font-display: "Fredoka", system-ui, sans-serif;
+  --font-sans: "Fredoka", system-ui, sans-serif;
 }
 
 :root {
   --radius: 1.25rem;
 
   /* Brand palette (Huomaa hyvä!) */
-  --purple: oklch(0.45 0.13 295);          /* #6C4F9C */
-  --purple-dark: oklch(0.36 0.13 295);     /* #4E3A78 */
-  --yellow: oklch(0.85 0.16 90);           /* #F4C84A */
-  --coral: oklch(0.68 0.18 25);            /* #E8736B */
-  --mint: oklch(0.85 0.06 185);            /* #A9D9D2 */
-  --teal: oklch(0.78 0.09 190);            /* #7FC9C0 */
-  --green: oklch(0.62 0.16 150);           /* #2FA86A */
-  --ink: oklch(0.24 0.07 290);             /* #2B2342 */
-  --ink-soft: oklch(0.45 0.13 295);        /* same as purple */
+  --purple: oklch(0.544 0.173 293.3); /* #7755c9 */
+  --purple-dark: oklch(0.36 0.13 295); /* #4E3A78 */
+  --yellow: oklch(0.85 0.16 90); /* #F4C84A */
+  --coral: oklch(0.68 0.18 25); /* #E8736B */
+  --mint: oklch(0.85 0.06 185); /* #A9D9D2 */
+  --teal: oklch(0.78 0.09 190); /* #7FC9C0 */
+  --green: oklch(59.086% 0.08141 154.908); /* #2FA86A */
+  --ink: oklch(0.24 0.07 290); /* #2B2342 */
+  --ink-soft: oklch(0.45 0.13 295); /* same as purple */
 
   /* App canvas is deep purple */
   --background: var(--purple);
@@ -161,22 +161,18 @@
     border-color: var(--color-border);
   }
 
-  body,
-  * {
-    font-family: "Fredoka", sans-serif;
-  }
-
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-weight: 400;
+    font-family: var(--font-sans);
   }
 
-  h1, h2, .page-title { font-weight: 700; }
-  h3, h4, h5, h6 { font-weight: 600; }
-  small, .text-xs, .muted { font-weight: 300; }
-
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-display);
     font-weight: 700;
     letter-spacing: -0.01em;
@@ -188,119 +184,28 @@
   background: var(--card);
   color: var(--card-foreground);
   border-radius: 1.5rem;
+  border: 3px solid #000;
   padding: 1.5rem;
   text-align: left;
   box-shadow: 6px 8px 0 0 var(--purple-dark);
 }
-.sticky-note > * + * { margin-top: 0.75rem; }
-
-/* @lovable-new 2026-08-05
-   Full purple A4 portrait print design for every report: an edge-to-edge
-   purple page background that repeats on all pages, white report cards on
-   top, and no app chrome, tabs or action buttons in the printed output. */
-@media print {
-  @page {
-    size: A4 portrait;
-    margin: 0;
-  }
-
-  html,
-  body {
-    background: var(--purple) !important;
-    color: #1c1130 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  *,
-  *::before,
-  *::after {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    animation: none !important;
-    transition: none !important;
-  }
-
-  /* Fixed purple layer so page 2, 3, ... never fall back to white. */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: var(--purple);
-    z-index: -1;
-  }
-
-  .no-print,
-  aside,
-  nav,
-  header[data-app-header],
-  [data-sidebar],
-  [data-sidebar="sidebar"],
-  [role="tablist"],
-  button:not(.print-keep) {
-    display: none !important;
-  }
-
-  /* @lovable-new 2026-08-05
-     One print-root owns the page padding. Previously both <main> and
-     .print-page applied 12mm, which double-padded reports and clipped wide
-     charts. Now <main> is the padding owner and nested .print-page blocks are
-     flush; .print-page only pads when it is itself the print root. */
-  main {
-    padding: 12mm !important;
-    margin: 0 !important;
-    max-width: 100% !important;
-    background: transparent !important;
-  }
-
-  .print-page {
-    padding: 0 !important;
-    margin: 0 !important;
-    max-width: 100% !important;
-    background: transparent !important;
-  }
-
-  body > .print-page,
-  .print-root > .print-page {
-    padding: 12mm !important;
-  }
-
-  .sticky-note,
-  .report-card {
-    background: #ffffff !important;
-    color: #1c1130 !important;
-    box-shadow: none !important;
-    border: 1px solid #e6e0f2 !important;
-    break-inside: avoid;
-    page-break-inside: avoid;
-    max-width: 100% !important;
-    overflow: visible !important;
-  }
-
-  /* Long portfolio-answer blocks may split across pages. */
-  .print-splittable,
-  .print-splittable * {
-    break-inside: auto !important;
-    page-break-inside: auto !important;
-  }
-
-  h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
-  thead { display: table-header-group; }
-
-  .recharts-wrapper,
-  .recharts-surface {
-    max-width: 100% !important;
-  }
-  /* Recharts responsive containers must keep a stable print size. */
-  .chart-box,
-  .chart-box .recharts-responsive-container {
-    width: 165mm !important;
-    height: 70mm !important;
-  }
+.sticky-note > * + * {
+  margin-top: 0.75rem;
 }
 
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .sticky-note {
+    box-shadow: none !important;
+    border: 1px solid #ddd;
+  }
+}
 
 /* Pencil scribble badge */
 .pencil-badge {
@@ -322,7 +227,11 @@
 /* Candy-like chip option (used by SelectableChips) */
 .candy-chip {
   position: relative;
-  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+  border-color: #000 !important;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
 }
 .candy-chip:hover:not(:disabled) {
   transform: translateY(-2px);
@@ -352,7 +261,7 @@
 /* Workbook-paper textarea container — flex column so its child textarea
    grows to fill the card. */
 .workbook-paper {
-  background-color: #FFFDF6;
+  background-color: #fffdf6;
   /* Ruled-paper guide. Lines sit at the BASELINE of each row so text rests
      on the line. Background origin = content-box so the lines align with the
      textarea's text (no offset from container padding). */
@@ -360,21 +269,25 @@
     to bottom,
     transparent 0,
     transparent calc(1.65rem - 1px),
-    color-mix(in oklab, var(--purple) 22%, transparent) calc(1.65rem - 1px),
-    color-mix(in oklab, var(--purple) 22%, transparent) 1.65rem
+    #ddd0f1 calc(1.65rem - 1px),
+    #ddd0f1 1.65rem
   );
   background-origin: content-box;
-  background-clip: content-box;
-  border-radius: 1rem;
-  border: 2px solid color-mix(in oklab, var(--purple-dark) 35%, transparent);
-  box-shadow: 4px 4px 0 0 var(--purple-dark);
-  padding: 0.75rem 1rem;
+  background-clip: padding-box;
+  border-radius: 1.25rem;
+  border: 3px solid #000;
+  box-shadow:
+    4px 4px 0 0 #000,
+    10px 10px 0 0 rgba(43, 35, 66, 0.34);
+  padding: 1rem 1.35rem;
   display: flex;
   flex-direction: column;
 }
 .workbook-paper:focus-within {
-  box-shadow: 4px 4px 0 0 var(--coral);
-  border-color: var(--coral);
+  box-shadow:
+    4px 4px 0 0 #000,
+    10px 10px 0 0 rgba(43, 35, 66, 0.34);
+  border-color: #000;
 }
 .workbook-paper textarea,
 .workbook-paper input {
@@ -398,22 +311,26 @@
 
 /* Single-line ruled input — same family as .workbook-paper */
 .workbook-line {
-  background-color: #FFFDF6;
+  background-color: #fffdf6;
   border-radius: 0.75rem;
-  border: 2px solid color-mix(in oklab, var(--purple-dark) 35%, transparent);
+  border: 2px solid #000;
   box-shadow: 3px 3px 0 0 var(--purple-dark);
   padding: 0.55rem 0.9rem;
   color: var(--ink);
 }
 .workbook-line:focus-within {
-  border-color: var(--coral);
+  border-color: #000;
   box-shadow: 3px 3px 0 0 var(--coral);
 }
-.workbook-line input { color: var(--ink); caret-color: var(--coral); }
-.workbook-pill { /* legacy alias */
-  background-color: #FFFDF6;
+.workbook-line input {
+  color: var(--ink);
+  caret-color: var(--coral);
+}
+.workbook-pill {
+  /* legacy alias */
+  background-color: #fffdf6;
   border-radius: 9999px;
-  border: 2px solid color-mix(in oklab, var(--purple-dark) 35%, transparent);
+  border: 2px solid #000;
   box-shadow: 3px 3px 0 0 var(--purple-dark);
   padding: 0.45rem 0.9rem;
 }
@@ -436,21 +353,35 @@
   display: flex;
   flex-direction: column;
 }
-.layout-single-tall .workbook-paper { flex: 1 1 auto; min-height: 14rem; }
+.layout-single-tall .workbook-paper {
+  flex: 1 1 auto;
+  min-height: 14rem;
+}
 .layout-two-col {
   display: grid;
   gap: 0.75rem;
   grid-template-columns: 1fr;
 }
 @media (min-width: 768px) {
-  .layout-two-col { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .layout-two-col {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 /* Save celebration — CSS-only checkmark (~300ms, no library) */
 @keyframes celebrate-pop {
-  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
-  50%  { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.4);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 .celebrate-check {
   position: fixed;
@@ -487,31 +418,52 @@
   pointer-events: none;
 }
 .journey-bg::before {
-  width: 22rem; height: 22rem;
+  width: 22rem;
+  height: 22rem;
   background: var(--coral);
-  top: -6rem; right: -6rem;
+  top: -6rem;
+  right: -6rem;
 }
 .journey-bg::after {
-  width: 26rem; height: 26rem;
+  width: 26rem;
+  height: 26rem;
   background: var(--mint);
-  bottom: -8rem; left: -8rem;
+  bottom: -8rem;
+  left: -8rem;
 }
 
 /* Gentle sparkle */
 @keyframes sparkle-pop {
-  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.9; }
-  50%      { transform: scale(1.15) rotate(8deg); opacity: 1; }
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.15) rotate(8deg);
+    opacity: 1;
+  }
 }
-.sparkle { animation: sparkle-pop 2.4s ease-in-out infinite; display: inline-block; }
+.sparkle {
+  animation: sparkle-pop 2.4s ease-in-out infinite;
+  display: inline-block;
+}
 
 /* Game-style primary button (Seuraava) */
 .game-btn {
   box-shadow: 0 5px 0 0 var(--purple-dark);
-  transition: transform 120ms ease, box-shadow 120ms ease;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease;
 }
-.game-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 0 0 var(--purple-dark); }
-.game-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 2px 0 0 var(--purple-dark); }
-
+.game-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 0 0 var(--purple-dark);
+}
+.game-btn:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 0 var(--purple-dark);
+}
 
 /* Bug 3 safety: ensure textarea content can never be hidden behind the
    sticky BottomNav. The textarea grows inside its card; if the textarea
@@ -532,4 +484,71 @@
 .journey-bg label,
 main > label {
   color: var(--foreground);
+}
+
+/* Näyttö 1 */
+
+.cover-page {
+  border-radius: 28px;
+
+  min-height: 650px;
+
+  padding-top: 48px;
+  padding-right: 40px;
+  padding-bottom: 48px;
+  padding-left: 40px;
+}
+
+.cover-content {
+  width: 100%;
+  max-width: 1100px;
+
+  margin-left: auto;
+  margin-right: auto;
+
+  text-align: center;
+}
+
+.cover-title {
+  color: white;
+
+  font-size: 82px;
+  font-weight: 800;
+  line-height: 1.05;
+
+  text-align: center;
+
+  margin-top: 0;
+  margin-bottom: 55px;
+}
+
+.cover-description {
+  color: white;
+  width: 70%;
+  max-width: 760px;
+
+  margin-left: auto;
+  margin-right: auto;
+
+  margin-top: 10px;
+  margin-bottom: 20px;
+
+  font-size: 18px;
+  line-height: 1.6;
+
+  text-align: center;
+}
+
+.cover-illustration {
+  display: block;
+
+  width: 100%;
+  max-width: 300px;
+  max-height: 200px;
+
+  object-fit: contain;
+
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 32px;
 }

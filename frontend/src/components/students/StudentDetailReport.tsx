@@ -13,11 +13,6 @@ import { WORLDS } from "@/lib/screens";
 import { ALL_STRENGTHS } from "@/lib/strength-jar-data";
 import { getStrengthName } from "@/lib/strengths-i18n";
 import { formatLastActive, worldCompletion, TOTAL_REQUIRED } from "@/lib/teacher-data";
-// @lovable-new 2026-08-05 — individual student report: printable header, growth
-// chart and a shared "Save as PDF" button.
-import { PrintReportButton } from "@/components/reports/PrintReportButton";
-import { StrengthGrowthChart } from "@/components/reports/StrengthGrowthChart";
-import type { ReportEvent } from "@/lib/report-series";
 
 export interface StudentGift {
   id: string;
@@ -42,16 +37,6 @@ export interface StudentDetailReportProps {
   onBack?: () => void;
   /** "Open portfolio" action rendered at the bottom. */
   portfolioAction?: ReactNode;
-  /** @lovable-new 2026-08-05 — printable report header context. */
-  schoolName?: string | null;
-  schoolLogoUrl?: string | null;
-  teacherNames?: string[];
-  /** Human-readable reporting period, e.g. "30 päivää". */
-  periodLabel?: string | null;
-  /** This student's own collection events, for the growth chart. */
-  events?: ReportEvent[];
-  /** Extra sections (portfolio answers, peer/family strengths) printed last. */
-  extraSections?: ReactNode;
 }
 
 export function StudentDetailReport({
@@ -67,12 +52,6 @@ export function StudentDetailReport({
   header,
   onBack,
   portfolioAction,
-  schoolName,
-  schoolLogoUrl,
-  teacherNames = [],
-  periodLabel,
-  events,
-  extraSections,
 }: StudentDetailReportProps) {
   const tr = useTr();
   const { language } = useLanguage();
@@ -107,83 +86,8 @@ export function StudentDetailReport({
   );
 
   return (
-    <div className="print-page space-y-6">
-      {/* @lovable-new 2026-08-05 — professional report header (name, email, class,
-          school, teachers, report date, period, progress, logos) + PDF action. */}
-      <div className="no-print flex justify-end">
-        <PrintReportButton />
-      </div>
-
-      <StickyNote seed={`student-report-hdr-${name ?? "x"}`} className="report-card space-y-3">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider opacity-70">
-              {tr("Opiskelijan raportti")}
-            </p>
-            <h2 className="text-2xl font-bold">{name?.trim() || tr("Opiskelija")}</h2>
-          </div>
-          <div className="flex items-center gap-3">
-            {schoolLogoUrl ? (
-              <img
-                src={schoolLogoUrl}
-                alt={schoolName ?? tr("Koulu")}
-                className="h-10 w-auto object-contain"
-              />
-            ) : (
-              schoolName && <span className="text-sm font-bold">{schoolName}</span>
-            )}
-            <span className="rounded-full bg-[color:var(--purple)] px-3 py-1 text-xs font-bold text-white">
-              See the Good!
-            </span>
-          </div>
-        </div>
-        <dl className="grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2">
-          {email && (
-            <div className="flex gap-2">
-              <dt className="font-semibold">{tr("Sähköposti")}:</dt>
-              <dd>{email}</dd>
-            </div>
-          )}
-          {className && (
-            <div className="flex gap-2">
-              <dt className="font-semibold">{tr("Luokka")}:</dt>
-              <dd>{className}</dd>
-            </div>
-          )}
-          {schoolName && (
-            <div className="flex gap-2">
-              <dt className="font-semibold">{tr("Koulu")}:</dt>
-              <dd>{schoolName}</dd>
-            </div>
-          )}
-          {teacherNames.length > 0 && (
-            <div className="flex gap-2">
-              <dt className="font-semibold">{tr("Opettaja")}:</dt>
-              <dd>{teacherNames.join(", ")}</dd>
-            </div>
-          )}
-          <div className="flex gap-2">
-            <dt className="font-semibold">{tr("Raportin päiväys")}:</dt>
-            <dd>{new Date().toLocaleDateString()}</dd>
-          </div>
-          <div className="flex gap-2">
-            <dt className="font-semibold">{tr("Raportointijakso")}:</dt>
-            <dd>{periodLabel ?? tr("Koko käyttöhistoria")}</dd>
-          </div>
-          <div className="flex gap-2">
-            <dt className="font-semibold">{tr("Viimeksi aktiivinen")}:</dt>
-            <dd>{formatLastActive(last, tr)}</dd>
-          </div>
-          <div className="flex gap-2">
-            <dt className="font-semibold">{tr("Edistyminen")}:</dt>
-            <dd>
-              {screensFilled}/{TOTAL_REQUIRED} ({pct}%)
-            </dd>
-          </div>
-        </dl>
-      </StickyNote>
-
-      <StickyNote seed={`student-hdr-${name ?? "x"}`} className="report-card space-y-4">
+    <>
+      <StickyNote seed={`student-hdr-${name ?? "x"}`} className="space-y-4">
         {header}
         {onBack && (
           <Button variant="outline" className="rounded-full" onClick={onBack}>
@@ -208,7 +112,7 @@ export function StudentDetailReport({
         </div>
       </StickyNote>
 
-      <StickyNote seed={`student-top5-${name ?? "x"}`} className="report-card space-y-3">
+      <StickyNote seed={`student-top5-${name ?? "x"}`} className="space-y-3">
         <h3 className="text-xl font-bold">{tr("Opiskelijan Top 5 vahvuudet")}</h3>
         {top5.length === 0 ? (
           <p className="opacity-70">{tr("Ei vielä vahvuuksia.")}</p>
@@ -217,7 +121,7 @@ export function StudentDetailReport({
         )}
       </StickyNote>
 
-      <StickyNote seed={`student-levels-${name ?? "x"}`} className="report-card space-y-2">
+      <StickyNote seed={`student-levels-${name ?? "x"}`} className="space-y-2">
         <h3 className="text-xl font-bold">{tr("Tasojen valmistuminen")}</h3>
         {worlds.map((w, i) => {
           const meta = WORLDS[i];
@@ -240,7 +144,7 @@ export function StudentDetailReport({
         })}
       </StickyNote>
 
-      <StickyNote seed={`student-collection-${name ?? "x"}`} className="report-card space-y-3">
+      <StickyNote seed={`student-collection-${name ?? "x"}`} className="space-y-3">
         <h3 className="text-xl font-bold">{tr("Vahvuuskokoelma")}</h3>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
           {ALL_STRENGTHS.map((s) => {
@@ -267,7 +171,7 @@ export function StudentDetailReport({
         </div>
       </StickyNote>
 
-      <StickyNote seed={`student-gifts-${name ?? "x"}`} className="report-card space-y-2">
+      <StickyNote seed={`student-gifts-${name ?? "x"}`} className="space-y-2">
         <h3 className="text-xl font-bold">{tr("Opettajilta saadut vahvuudet")}</h3>
         {gifts.length === 0 ? (
           <p className="opacity-70">{tr("Ei vielä vahvuuksia.")}</p>
@@ -287,20 +191,7 @@ export function StudentDetailReport({
         )}
       </StickyNote>
 
-      {events && events.length > 0 && (
-        /* @lovable-new 2026-08-05 — this student's own cumulative growth chart. */
-        <StrengthGrowthChart
-          events={events}
-          lang={lang}
-          visibleStrengthMode="all"
-          seed={`student-growth-${name ?? "x"}`}
-          printMode
-        />
-      )}
-
-      {extraSections}
-
-      {portfolioAction && <div className="no-print">{portfolioAction}</div>}
-    </div>
+      {portfolioAction && <div>{portfolioAction}</div>}
+    </>
   );
 }

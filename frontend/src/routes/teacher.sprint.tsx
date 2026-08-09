@@ -149,8 +149,8 @@ function TeacherSprintPage() {
   async function setSprintStatus(next: Status) {
     if (!sprintId) return;
     const patch: Record<string, unknown> = { status: next };
-    if (next === "active") patch['started_at'] = new Date().toISOString();
-    if (next === "completed") patch['ended_at'] = new Date().toISOString();
+    if (next === "active") patch["started_at"] = new Date().toISOString();
+    if (next === "completed") patch["ended_at"] = new Date().toISOString();
     const { error } = await supabase
       .from("sprint_sessions" as never)
       .update(patch as never)
@@ -164,7 +164,10 @@ function TeacherSprintPage() {
 
   async function cancelSprint() {
     if (!sprintId) return;
-    await supabase.from("sprint_sessions" as never).delete().eq("id", sprintId);
+    await supabase
+      .from("sprint_sessions" as never)
+      .delete()
+      .eq("id", sprintId);
     setSprintId(null);
     setCode("");
     setPlayers([]);

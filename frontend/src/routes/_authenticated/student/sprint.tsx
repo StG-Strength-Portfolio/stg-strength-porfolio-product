@@ -28,7 +28,8 @@ export const Route = createFileRoute("/_authenticated/student/sprint")({
       { title: "Strength Game — Vahvuusseikkailu" },
       {
         name: "description",
-        content: "Join your class Strength Sprint and tell classmates the strengths you see in them.",
+        content:
+          "Join your class Strength Sprint and tell classmates the strengths you see in them.",
       },
       { property: "og:title", content: "Strength Game — Vahvuusseikkailu" },
       {
@@ -97,12 +98,22 @@ function StudentSprintPage() {
       .channel(`sprint-player-${sprintId}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "sprint_players", filter: `sprint_id=eq.${sprintId}` },
+        {
+          event: "*",
+          schema: "public",
+          table: "sprint_players",
+          filter: `sprint_id=eq.${sprintId}`,
+        },
         () => void reloadPlayers(sprintId),
       )
       .on(
         "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "sprint_sessions", filter: `id=eq.${sprintId}` },
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "sprint_sessions",
+          filter: `id=eq.${sprintId}`,
+        },
         () => void reloadStatus(sprintId),
       )
       .subscribe();
@@ -114,10 +125,7 @@ function StudentSprintPage() {
   }, [sprintId, reloadPlayers, reloadStatus]);
 
   /** Classmates the student still has to rate. */
-  const others = useMemo(
-    () => players.filter((p) => p.studentId !== userId),
-    [players, userId],
-  );
+  const others = useMemo(() => players.filter((p) => p.studentId !== userId), [players, userId]);
 
   async function join() {
     const trimmed = code.trim().toUpperCase();
@@ -255,11 +263,7 @@ function StudentSprintPage() {
                 {given.size + 1} / {others.length}
               </span>
             </div>
-            <StrengthPickerGrid
-              lang={lang}
-              disabled={busy}
-              onSelect={(id) => void pick(id)}
-            />
+            <StrengthPickerGrid lang={lang} disabled={busy} onSelect={(id) => void pick(id)} />
           </StickyNote>
         )}
 
@@ -283,9 +287,7 @@ function StudentSprintPage() {
                     <span>
                       {getStrengthName(r.strengthId, lang)} ×{r.count}
                     </span>
-                    <span className="text-xs font-medium opacity-70">
-                      {r.names.join(", ")}
-                    </span>
+                    <span className="text-xs font-medium opacity-70">{r.names.join(", ")}</span>
                   </div>
                   <div className="h-3 w-full overflow-hidden rounded-full bg-white/60">
                     <div

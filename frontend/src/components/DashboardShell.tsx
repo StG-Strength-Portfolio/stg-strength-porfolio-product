@@ -86,7 +86,6 @@ export function DashboardShell({
   sections?: Array<{ label: string; links: Array<{ to: string; label: string }> }>;
   children: ReactNode;
 }) {
-
   const tr = useTr();
   const navigate = useNavigate();
 

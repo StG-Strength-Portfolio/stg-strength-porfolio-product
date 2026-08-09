@@ -1,13 +1,12 @@
 /**
  * @lovable-new 2026-08-04
- * Teacher "Teach → Teaching Materials" — Google Slides decks published by the super admin.
- * @lovable-new 2026-08-05 — DashboardShell removed: the page now uses the shared
- * full-width TeachingMaterialsLayout so there is no duplicated left sidebar.
+ * Teacher "Teach → Teaching Materials" — Canva decks published by the super admin.
  */
 import { createFileRoute } from "@tanstack/react-router";
+import { DashboardShell } from "@/components/DashboardShell";
 import { MaterialsBrowser } from "@/components/teach/MaterialsBrowser";
-import { TeachingMaterialsLayout } from "@/components/teach/TeachingMaterialsLayout";
 import { useRoleGuard } from "@/lib/role-guard";
+import { useTr } from "@/lib/i18n";
 
 export const Route = createFileRoute("/teacher/teach/materials")({
   head: () => ({
@@ -30,12 +29,23 @@ export const Route = createFileRoute("/teacher/teach/materials")({
 });
 
 function TeacherMaterialsPage() {
+  const tr = useTr();
   const guard = useRoleGuard(["teacher"]);
   if (!guard.ready) return null;
 
   return (
-    <TeachingMaterialsLayout>
-      <MaterialsBrowser rootBackTo="/teacher/dashboard" />
-    </TeachingMaterialsLayout>
+    <DashboardShell
+      title={tr("Opetusmateriaalit")}
+      tabs={[]}
+      active=""
+      onSelect={() => undefined}
+      schoolName={guard.schoolName}
+      links={[
+        { to: "/teacher/dashboard", label: tr("Takaisin") },
+        { to: "/teacher/teach/portfolio", label: tr("Vahvuusportfolio") },
+      ]}
+    >
+      <MaterialsBrowser />
+    </DashboardShell>
   );
 }

@@ -86,7 +86,8 @@ export const listSchools = createServerFn({ method: "GET" })
     // Map class-joined students to their teacher's school so students without a
     // school_id on their profile still show up in the counts.
     const schoolOfProfile = new Map<string, string>();
-    for (const p of (profiles ?? []) as any[]) if (p.school_id) schoolOfProfile.set(p.id, p.school_id);
+    for (const p of (profiles ?? []) as any[])
+      if (p.school_id) schoolOfProfile.set(p.id, p.school_id);
 
     const { data: classRows } = await db
       .from("classes")
@@ -126,7 +127,6 @@ export const listSchools = createServerFn({ method: "GET" })
       };
     });
   });
-
 
 export const createSchool = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -412,7 +412,10 @@ export const inviteSuperAdmin = createServerFn({ method: "POST" })
       userId = created.user.id as string;
       await db
         .from("profiles")
-        .upsert({ id: userId, display_name: data.name || email.split("@")[0] }, { onConflict: "id" });
+        .upsert(
+          { id: userId, display_name: data.name || email.split("@")[0] },
+          { onConflict: "id" },
+        );
     }
 
     const { error: roleErr } = await db
@@ -428,7 +431,8 @@ export const removeSuperAdmin = createServerFn({ method: "POST" })
   .inputValidator((d: { userId: string }) => d)
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.supabase, context.userId);
-    if (data.userId === context.userId) throw new Error("You cannot remove your own super admin role");
+    if (data.userId === context.userId)
+      throw new Error("You cannot remove your own super admin role");
     const db = await admin();
     const { count } = await db
       .from("user_roles")

@@ -22,9 +22,7 @@ async function admin() {
   return supabaseAdmin as any;
 }
 
-function topOf(
-  perStudent: Map<string, number[]>,
-): PeerTopItem[] {
+function topOf(perStudent: Map<string, number[]>): PeerTopItem[] {
   const count = new Map<number, number>();
   const students = new Map<number, Set<string>>();
   for (const [studentId, ids] of perStudent) {
@@ -120,7 +118,10 @@ export const getPeerTopStrengths = createServerFn({ method: "GET" })
 
     const [{ data: responses }, { data: gifts }] = await Promise.all([
       db.from("responses").select("user_id, field_key, value").in("user_id", allIds),
-      db.from("teacher_assigned_strengths").select("student_id, strength_id").in("student_id", allIds),
+      db
+        .from("teacher_assigned_strengths")
+        .select("student_id, strength_id")
+        .in("student_id", allIds),
     ]);
 
     const perStudent = new Map<string, number[]>();
