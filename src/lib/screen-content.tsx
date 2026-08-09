@@ -9001,6 +9001,7 @@ function Screen41({ onSaveStateChange }: Props) {
 // ----- Screen42 (PDF p45): Minä olen (M2) -----
 function Screen42({ onSaveStateChange }: Props) {
   const tr = useTr();
+
   const figures = [
     "/illustrations/illustration-screen42-1.png",
     "/illustrations/illustration-screen42-2.png",
@@ -9008,42 +9009,170 @@ function Screen42({ onSaveStateChange }: Props) {
     "/illustrations/illustration-screen42-4.png",
     "/illustrations/illustration-screen42-5.png",
   ];
+
   const cardPositions = ["", "", "", "", "", "", "md:col-start-2 xl:col-start-3"];
 
   return (
-    <div className="relative h-full min-h-0 w-full overflow-x-hidden overflow-y-auto px-[3%] pb-28 pt-7 text-white [scrollbar-gutter:stable]">
-      <div className="relative mx-auto min-h-[920px] w-full max-w-[1360px]">
-        <div className="relative z-20 grid w-full grid-cols-1 items-start gap-5 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[285px_minmax(0,1fr)]">
-          <div className="min-w-0 pt-1">
-            <h1 className="font-display text-[clamp(34px,3vw,42px)] font-medium leading-[1.12]">
-              {tr("Minä olen")}
-            </h1>
-            <p className="mt-5 max-w-[280px] font-display text-[clamp(18px,1.45vw,22px)] font-medium leading-[1.35]">
-              {tr("Muuta muilta saamasi palaute lauseiksi minä muotoon:")}
-            </p>
-            <div className="mt-5 max-w-[280px] text-[clamp(17px,1.3vw,21px)] font-normal leading-[1.4]">
-              {tr('"Olet sinnikäs" → "Minä olen sinnikäs."')}
-            </div>
-          </div>
+    <div
+      className="
+        relative
+        h-full
+        min-h-0
+        w-full
+        overflow-x-hidden
+        overflow-y-auto
+        text-white
+        [scrollbar-gutter:stable]
+      "
+    >
+      {/* =====================================================
+          MAIN CONTENT
+      ====================================================== */}
 
-          <div className="grid min-w-0 auto-rows-[minmax(126px,auto)] gap-3 md:grid-cols-2 xl:grid-cols-3">
+      <div
+        className="
+          relative
+          z-20
+          mx-auto
+          min-h-[900px]
+          w-full
+          max-w-[1500px]
+          px-[4%]
+          pb-28
+          pt-8
+        "
+      >
+        {/* =====================================================
+            LEFT SIDE
+        ====================================================== */}
+
+        <div
+          className="
+            relative
+            z-30
+            w-[300px]
+            max-w-[24%]
+          "
+        >
+          <h1
+            className="
+              font-display
+              text-[clamp(38px,3.4vw,56px)]
+              font-semibold
+              leading-[1.05]
+              text-[#FFE77A]
+            "
+          >
+            {tr("Minä olen")}
+          </h1>
+
+          <p
+            className="
+              mt-8
+              font-display
+              text-[clamp(18px,1.45vw,24px)]
+              font-semibold
+              leading-[1.4]
+              text-white
+            "
+          >
+            {tr("Muuta muilta saamasi palaute lauseiksi minä muotoon:")}
+          </p>
+
+          <p
+            className="
+              mt-7
+              font-display
+              text-[clamp(17px,1.35vw,22px)]
+              font-medium
+              leading-[1.4]
+              text-white
+            "
+          >
+            {tr('"Olet sinnikäs" → "Minä olen sinnikäs."')}
+          </p>
+        </div>
+
+        {/* =====================================================
+            7 RESPONSE CARDS
+        ====================================================== */}
+
+        <div
+          className="
+            absolute
+            z-30
+            right-[4%]
+            top-8
+            w-[70%]
+          "
+        >
+          <div
+            className="
+              grid
+              min-w-0
+              auto-rows-[minmax(126px,auto)]
+              gap-3
+              md:grid-cols-2
+              xl:grid-cols-3
+            "
+          >
             {Array.from({ length: 7 }).map((_, i) => (
               <div
                 key={i}
                 className={cn(
-                  "flex min-h-[126px] flex-col overflow-hidden rounded-[18px_14px_24px_16px] border-[3px] border-black bg-[#fffefa] px-4 pb-3 pt-3 text-black shadow-[0_8px_0_#4b326c]",
+                  `
+                    flex
+                    min-h-[126px]
+                    flex-col
+                    overflow-hidden
+                    rounded-[18px_14px_24px_16px]
+                    border-[3px]
+                    border-black
+                    bg-[#fffefa]
+                    px-4
+                    pb-3
+                    pt-3
+                    text-black
+                    shadow-[0_8px_0_#4b326c]
+                  `,
                   cardPositions[i],
                 )}
               >
-                <p className="mb-2 shrink-0 text-center font-display text-[14px] font-medium uppercase leading-[1.2] text-black">
+                <p
+                  className="
+                    mb-2
+                    shrink-0
+                    text-center
+                    font-display
+                    text-[14px]
+                    font-medium
+                    uppercase
+                    leading-[1.2]
+                    text-black
+                  "
+                >
                   {tr("Minä olen ...")}
                 </p>
-                <div className="min-h-0 flex-1 overflow-hidden rounded-[12px] border-2 border-black bg-[#fffefa]">
+
+                <div
+                  className="
+                    min-h-0
+                    flex-1
+                    overflow-hidden
+                    rounded-[12px]
+                    border-2
+                    border-black
+                    bg-[#fffefa]
+                  "
+                >
                   <FlatReflectionTextarea
                     fieldKey={`screen_39_mina_olen_${i + 1}`}
                     rows={3}
                     minHeight={74}
-                    textClass="text-[16px] bg-[repeating-linear-gradient(to_bottom,transparent_0,transparent_28px,#b7a8cc_29px,#b7a8cc_30px)]"
+                    textClass="
+                      text-[16px]
+                      bg-[repeating-linear-gradient(to_bottom,transparent_0,transparent_28px,#b7a8cc_29px,#b7a8cc_30px)]
+                    "
                     onSaveStateChange={onSaveStateChange}
                   />
                 </div>
@@ -9052,32 +9181,72 @@ function Screen42({ onSaveStateChange }: Props) {
           </div>
         </div>
 
-        {/* Cụm 5 hình illustration – bên phải, xếp 2 hàng: 2 trên / 3 dưới */}
-        <div className="pointer-events-none absolute right-[1%] top-[315px] z-10 flex w-[760px] max-w-[56vw] flex-col items-end gap-2">
-          {/* Hàng trên: 2 hình */}
-          <div className="flex items-end justify-end gap-3 pr-16">
+        {/* =====================================================
+            5 ILLUSTRATIONS
+        ====================================================== */}
+
+        <div
+          className="
+            pointer-events-none
+            absolute
+            bottom-0
+            left-0
+            z-10
+            w-[760px]
+            max-w-[56vw]
+            translate-y-[-70px]
+          "
+        >
+          {/* HÀNG TRÊN: 2 HÌNH */}
+
+          <div
+            className="
+              flex
+              items-end
+              justify-start
+              gap-8
+            "
+          >
             {figures.slice(0, 2).map((src, index) => (
-              <div key={`${src}-${index}`} className="flex items-end justify-center">
-                <img
-                  src={src}
-                  alt=""
-                  aria-hidden="true"
-                  className="h-[clamp(200px,16vw,250px)] w-auto select-none object-contain object-bottom drop-shadow-[0_12px_18px_rgba(0,0,0,0.22)]"
-                />
-              </div>
+              <img
+                key={`${src}-${index}`}
+                src={src}
+                alt=""
+                aria-hidden="true"
+                className="
+                  h-[clamp(200px,16vw,250px)]
+                  w-auto
+                  object-contain
+                  select-none
+                "
+              />
             ))}
           </div>
-          {/* Hàng dưới: 3 hình */}
-          <div className="flex items-end justify-end gap-3">
+
+          {/* HÀNG DƯỚI: 3 HÌNH */}
+
+          <div
+            className="
+              mt-[-16px]
+              flex
+              items-end
+              justify-start
+              gap-6
+            "
+          >
             {figures.slice(2, 5).map((src, index) => (
-              <div key={`${src}-${index + 2}`} className="flex items-end justify-center">
-                <img
-                  src={src}
-                  alt=""
-                  aria-hidden="true"
-                  className="h-[clamp(200px,16vw,250px)] w-auto select-none object-contain object-bottom drop-shadow-[0_12px_18px_rgba(0,0,0,0.22)]"
-                />
-              </div>
+              <img
+                key={`${src}-${index + 2}`}
+                src={src}
+                alt=""
+                aria-hidden="true"
+                className="
+                  h-[clamp(200px,16vw,250px)]
+                  w-auto
+                  object-contain
+                  select-none
+                "
+              />
             ))}
           </div>
         </div>
