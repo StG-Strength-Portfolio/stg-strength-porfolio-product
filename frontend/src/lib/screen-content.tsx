@@ -9300,25 +9300,21 @@ function Screen45({ onSaveStateChange }: Props) {
     {
       fieldKey: "screen_43_vahvuudet",
       label: "Minkälaisia vahvuuksia sinulla on perheenjäsenenä? Miten ne näkyvät?",
-      className: "left-[6%] top-[34%] h-[380px] w-[23%]",
       rotate: -1.2,
     },
     {
       fieldKey: "screen_43_parasta",
       label: "Mikä on parasta perheessäsi? Miten erilaiset vahvuudet näkyvät perheen vuorovaikutuksessa?",
-      className: "left-[34%] top-[40%] h-[390px] w-[22%]",
       rotate: 0.8,
     },
     {
       fieldKey: "screen_43_kiitollinen",
       label: "Mistä olet kiitollinen perheessäsi?",
-      className: "left-[59%] top-[9%] h-[380px] w-[24%]",
       rotate: 1.3,
     },
     {
       fieldKey: "screen_43_yhdessa",
       label: "Mitä tykkäätte tehdä yhdessä?",
-      className: "left-[65%] top-[51%] h-[340px] w-[23%]",
       rotate: -1.8,
     },
   ];
@@ -9340,198 +9336,187 @@ function Screen45({ onSaveStateChange }: Props) {
         className="
           relative
           mx-auto
-          min-h-[790px]
+          min-h-[940px]
           w-full
           max-w-[1500px]
           overflow-hidden
-          px-[6%]
-          pb-24
-          pt-8
+          px-[5%]
+          pb-28
+          pt-10
         "
       >
-        <WorkbookCornerShapes top="coral" right="yellow" bottomLeft="mint" bottomRight="mint" />
-
         <div
-          aria-hidden="true"
           className="
-            pointer-events-none
-            absolute
-            left-[1.8%]
-            top-[70px]
-            z-10
-            h-[118px]
-            w-[9px]
-            rounded-full
-            border
-            border-white
-            bg-white/25
-            shadow-[inset_0_0_0_1px_rgba(255,255,255,0.45)]
+            relative
+            z-20
+            flex
+            min-h-[190px]
+            items-start
+            justify-between
+            gap-10
           "
-        />
+        >
+          <div className="max-w-[560px] pt-10">
+            <h1
+              className="
+                font-display
+                text-[clamp(42px,4vw,66px)]
+                font-semibold
+                leading-[1.05]
+                tracking-[0]
+                text-white
+              "
+            >
+              {tr("Vahvuudet perheessä")}
+            </h1>
+
+            <p
+              className="
+                mt-8
+                font-display
+                text-[clamp(24px,2vw,34px)]
+                font-semibold
+                leading-[1.15]
+                text-white
+              "
+            >
+              {tr("Täydennä laput.")}
+            </p>
+          </div>
+
+          <img
+            src="/illustrations/s44-mouse.svg"
+            alt=""
+            aria-hidden="true"
+            className="
+              pointer-events-none
+              mt-2
+              h-auto
+              w-[min(420px,30vw)]
+              shrink-0
+              object-contain
+              select-none
+            "
+          />
+        </div>
 
         <div
           className="
             relative
             z-20
-            w-[40%]
-            max-w-[560px]
-            pt-[9%]
+            mt-8
+            grid
+            grid-cols-1
+            gap-x-10
+            gap-y-9
+            lg:grid-cols-2
           "
         >
-          <h1
-            className="
-              font-display
-              text-[clamp(42px,4vw,66px)]
-              font-semibold
-              leading-[1.05]
-              tracking-[0]
-              text-white
-            "
-          >
-            {tr("Vahvuudet perheessä")}
-          </h1>
-
-          <p
-            className="
-              mt-10
-              font-display
-              text-[clamp(24px,2vw,34px)]
-              font-semibold
-              leading-[1.15]
-              text-white
-            "
-          >
-            {tr("Täydennä laput.")}
-          </p>
-        </div>
-
-        {notes.map((note) => (
-          <IrregularPaper
-            key={note.fieldKey}
-            rotate={note.rotate}
-            className={cn(
-              `
-                absolute
+          {notes.map((note) => (
+            <IrregularPaper
+              key={note.fieldKey}
+              rotate={note.rotate}
+              className="
+                relative
                 z-20
                 flex
+                h-[320px]
                 min-w-0
                 flex-col
                 border-0
-                px-5
-                pb-5
-                pt-4
+                px-6
+                pb-6
+                pt-5
                 text-black
-                shadow-[0_16px_0_rgba(54,30,76,0.65)]
-              `,
-              note.className,
-            )}
-          >
-            <p
-              className="
-                relative
-                z-20
-                mx-auto
-                min-h-[56px]
-                max-w-[95%]
-                shrink-0
-                text-center
-                font-display
-                text-[clamp(16px,1.15vw,22px)]
-                font-semibold
-                leading-[1.18]
-                text-black
+                shadow-[0_14px_0_rgba(54,30,76,0.55)]
+                lg:h-[330px]
               "
             >
-              {tr(note.label)}
-            </p>
-
-            <div
-              className="
-                relative
-                z-10
-                mt-3
-                min-h-0
-                flex-1
-                overflow-hidden
-                rounded-[18px]
-
-                [&_label]:hidden
-
-                [&>div]:h-full
-                [&>div]:min-h-0
-
-                [&_div]:border-0
-                [&_div]:bg-transparent
-                [&_div]:p-0
-                [&_div]:shadow-none
-
-                [&_textarea]:h-full
-                [&_textarea]:min-h-0
-                [&_textarea]:w-full
-                [&_textarea]:resize-none
-                [&_textarea]:rounded-[18px]
-                [&_textarea]:border-0
-                [&_textarea]:bg-transparent
-                [&_textarea]:px-3
-                [&_textarea]:py-2
-                [&_textarea]:font-display
-                [&_textarea]:text-[16px]
-                [&_textarea]:leading-[32px]
-                [&_textarea]:text-[#241b3f]
-                [&_textarea]:outline-none
-                [&_textarea]:shadow-none
-                [&_textarea]:ring-0
-                [&_textarea]:placeholder:text-[#aaa1b5]
-
-                [&_textarea:focus]:outline-none
-                [&_textarea:focus]:ring-0
-              "
-            >
-              <div
-                aria-hidden="true"
+              <p
                 className="
-                  pointer-events-none
-                  absolute
-                  inset-x-3
-                  inset-y-2
-                  opacity-65
-                  [background-image:repeating-linear-gradient(to_bottom,transparent_0,transparent_31px,#ddd4ea_32px,#ddd4ea_33px)]
+                  relative
+                  z-20
+                  mx-auto
+                  min-h-[54px]
+                  max-w-[92%]
+                  shrink-0
+                  text-center
+                  font-display
+                  text-[clamp(17px,1.25vw,22px)]
+                  font-semibold
+                  leading-[1.18]
+                  text-black
                 "
-              />
+              >
+                {tr(note.label)}
+              </p>
 
-              <div className="relative z-10 h-full">
-                <FlatReflectionTextarea
-                  fieldKey={note.fieldKey}
-                  rows={7}
-                  minHeight={190}
-                  textClass="text-[16px]"
-                  onSaveStateChange={onSaveStateChange}
+              <div
+                className="
+                  relative
+                  z-10
+                  mt-3
+                  min-h-0
+                  flex-1
+                  overflow-hidden
+                  rounded-[18px]
+
+                  [&_label]:hidden
+
+                  [&>div]:h-full
+                  [&>div]:min-h-0
+
+                  [&_div]:border-0
+                  [&_div]:bg-transparent
+                  [&_div]:p-0
+                  [&_div]:shadow-none
+
+                  [&_textarea]:h-full
+                  [&_textarea]:min-h-0
+                  [&_textarea]:w-full
+                  [&_textarea]:resize-none
+                  [&_textarea]:rounded-[18px]
+                  [&_textarea]:border-0
+                  [&_textarea]:bg-transparent
+                  [&_textarea]:px-3
+                  [&_textarea]:py-2
+                  [&_textarea]:font-display
+                  [&_textarea]:text-[16px]
+                  [&_textarea]:leading-[32px]
+                  [&_textarea]:text-[#241b3f]
+                  [&_textarea]:outline-none
+                  [&_textarea]:shadow-none
+                  [&_textarea]:ring-0
+                  [&_textarea]:placeholder:text-[#aaa1b5]
+
+                  [&_textarea:focus]:outline-none
+                  [&_textarea:focus]:ring-0
+                "
+              >
+                <div
+                  aria-hidden="true"
+                  className="
+                    pointer-events-none
+                    absolute
+                    inset-x-3
+                    inset-y-2
+                    opacity-65
+                    [background-image:repeating-linear-gradient(to_bottom,transparent_0,transparent_31px,#ddd4ea_32px,#ddd4ea_33px)]
+                  "
                 />
+
+                <div className="relative z-10 h-full">
+                  <FlatReflectionTextarea
+                    fieldKey={note.fieldKey}
+                    rows={7}
+                    minHeight={210}
+                    textClass="text-[16px]"
+                    onSaveStateChange={onSaveStateChange}
+                  />
+                </div>
               </div>
-            </div>
-          </IrregularPaper>
-        ))}
-
-        <img
-          src="/illustrations/s24-bottom-right.png"
-          alt=""
-          aria-hidden="true"
-          className="
-            pointer-events-none
-            absolute
-            right-[-125px]
-            top-[110px]
-            z-10
-            h-[470px]
-            w-auto
-            rotate-[10deg]
-            object-contain
-            select-none
-          "
-        />
-
-        <div className="absolute bottom-[28px] right-[32px] z-30 font-display text-[14px] font-bold text-black">
-          {tr("Huomaa hyvä!")}
+            </IrregularPaper>
+          ))}
         </div>
       </div>
     </div>
