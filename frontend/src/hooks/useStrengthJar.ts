@@ -2,10 +2,12 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { KARKKIKAUPPA_KEY, strengthIdsFromResponses } from "@/lib/strength-jar-data";
 
+const SCREEN6_CHOSEN_STRENGTHS_KEY = "screen_6_known_strengths";
+
 /**
  * Reads the student's current strength collection from autosaved responses.
  *
- * selected  = the final candy-shop picks
+ * selected  = strengths explicitly chosen by the student on Screen 6 and in the final candy shop
  * collected = current strength selections from all other supported selectors
  *
  * Repeated strengths are intentionally preserved so the collection can show
@@ -33,10 +35,18 @@ export function useStrengthJar() {
       if (error) throw error;
 
       const rows = (data ?? []) as unknown as Array<{ field_key: string; value: unknown }>;
-      const candyRows = rows.filter((row) => row.field_key === KARKKIKAUPPA_KEY);
-      const otherRows = rows.filter((row) => row.field_key !== KARKKIKAUPPA_KEY);
+      const chosenRows = rows.filter(
+        (row) =>
+          row.field_key === KARKKIKAUPPA_KEY ||
+          row.field_key === SCREEN6_CHOSEN_STRENGTHS_KEY,
+      );
+      const otherRows = rows.filter(
+        (row) =>
+          row.field_key !== KARKKIKAUPPA_KEY &&
+          row.field_key !== SCREEN6_CHOSEN_STRENGTHS_KEY,
+      );
 
-      setSelected(strengthIdsFromResponses(candyRows));
+      setSelected(strengthIdsFromResponses(chosenRows));
       setCollected(strengthIdsFromResponses(otherRows));
     } catch (err) {
       console.error("[strength-jar]", err);
