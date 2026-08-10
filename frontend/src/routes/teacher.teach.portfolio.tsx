@@ -8,7 +8,7 @@
  * jumps to the first screen of each level.
  */
 import { createFileRoute } from "@tanstack/react-router";
-import { Component, useMemo, useState, type ReactNode } from "react";
+import { Component, useMemo, useState, type ErrorInfo, type ReactNode } from "react";
 import { StickyNote } from "@/components/StickyNote";
 import { DashboardShell } from "@/components/DashboardShell";
 import { LevelProgressBar } from "@/components/LevelProgressBar";
@@ -37,8 +37,63 @@ export const Route = createFileRoute("/teacher/teach/portfolio")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: TeachPortfolioPage,
+  component: TeachPortfolioRoute,
 });
+
+class TeacherPortfolioBoundary extends Component<
+  { children: ReactNode },
+  { error: Error | null; componentStack: string }
+> {
+  state = { error: null, componentStack: "" } as {
+    error: Error | null;
+    componentStack: string;
+  };
+
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error("[teach-portfolio] route render failed", error, info);
+    this.setState({ componentStack: info.componentStack ?? "" });
+  }
+
+  render() {
+    if (!this.state.error) return this.props.children;
+
+    return (
+      <div className="relative min-h-screen bg-background px-6 py-12 text-foreground">
+        <div className="mx-auto max-w-3xl rounded-3xl border-2 border-black bg-white p-6 shadow-xl">
+          <h1 className="font-display text-2xl font-bold">Teacher Strength Portfolio error</h1>
+          <p className="mt-3 text-sm opacity-75">
+            This diagnostic page is temporary and is only shown in the teacher portfolio preview branch.
+          </p>
+          <pre className="mt-5 max-h-[45vh] overflow-auto whitespace-pre-wrap rounded-2xl bg-slate-100 p-4 text-xs leading-relaxed text-slate-900">
+            {this.state.error.name}: {this.state.error.message}
+            {"\n\n"}
+            {this.state.error.stack ?? "No JavaScript stack available."}
+            {this.state.componentStack ? `\n\nReact component stack:\n${this.state.componentStack}` : ""}
+          </pre>
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="mt-5 rounded-full bg-[color:var(--purple)] px-4 py-2 text-sm font-bold text-white"
+          >
+            Reload
+          </button>
+        </div>
+      </div>
+    );
+  }
+}
+
+function TeachPortfolioRoute() {
+  return (
+    <TeacherPortfolioBoundary>
+      <TeachPortfolioPage />
+    </TeacherPortfolioBoundary>
+  );
+}
 
 /** Keeps a single misbehaving screen from taking down the whole page. */
 class ScreenBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
@@ -116,7 +171,6 @@ function TeachPortfolioPage() {
       ]}
     >
       <div className="grid gap-4 lg:grid-cols-[18rem_minmax(0,1fr)]">
-        {/* Level sub-navigator */}
         <nav className="h-max space-y-2 rounded-3xl bg-[color:var(--purple)] p-3 text-white shadow-lg">
           {WORLDS.map((w) => {
             const active = w.id === world.id;
@@ -145,7 +199,6 @@ function TeachPortfolioPage() {
           })}
         </nav>
 
-        {/* One screen at a time — 1:1 with the student view */}
         <div className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
