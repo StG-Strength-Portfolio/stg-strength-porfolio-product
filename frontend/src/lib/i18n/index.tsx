@@ -240,6 +240,7 @@ export const UI: UIDict = {
     "portfolio.print": "Tulosta Portfolio",
 
     "nav.finishFirst": "Täytä ensin tämän sivun tehtävä, niin pääset jatkamaan.",
+    "nav.previousScreensFirst": "Suorita edelliset näytöt ensin.",
   },
   en: {
     "common.loading": "Loading…",
@@ -376,6 +377,7 @@ export const UI: UIDict = {
     "portfolio.print": "Print portfolio",
 
     "nav.finishFirst": "Please complete this page's task before continuing.",
+    "nav.previousScreensFirst": "Complete the previous screens first.",
   },
   sv: {
     "common.loading": "Laddar…",
@@ -511,6 +513,7 @@ export const UI: UIDict = {
     "portfolio.print": "Skriv ut portfölj",
 
     "nav.finishFirst": "Fyll först i uppgiften på den här sidan för att gå vidare.",
+    "nav.previousScreensFirst": "Slutför de föregående sidorna först.",
   },
 };
 
@@ -665,14 +668,13 @@ export function useT(): (key: string, vars?: Record<string, string | number>) =>
   const { language } = useLanguage();
   return useCallback(
     (key, vars) => {
-      const raw = UI.fi[key];
+      const raw = UI[language]?.[key] ?? UI.fi[key];
       if (!raw) {
         // eslint-disable-next-line no-console
-        console.warn(`[i18n] Missing Finnish UI translation: ${key}`);
+        console.warn(`[i18n] Missing UI translation: ${key}`);
         return formatTemplate(key, vars);
       }
-      // Translate the *template* first, then substitute values.
-      return formatTemplate(trFinnish(raw, language), vars);
+      return formatTemplate(raw, vars);
     },
     [language],
   );
