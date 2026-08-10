@@ -23,7 +23,6 @@ import {
 } from "@/components/ui/sidebar";
 import { WORLDS } from "@/lib/screens";
 import { LevelProgressBar } from "@/components/LevelProgressBar";
-import { SidebarStrengthSummary } from "@/components/StrengthSummary";
 import { supabase } from "@/integrations/supabase/client";
 import { useT, useTr } from "@/lib/i18n";
 // @lovable-new 2026-08-08 — shared progression rules (level locking)
@@ -76,7 +75,6 @@ export function AppSidebar() {
     };
   }
 
-
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
@@ -97,8 +95,7 @@ export function AppSidebar() {
                     <CandyIcon size={18} /> <span>{tr("Vahvuuteni")}</span>
                   </Link>
                 </SidebarMenuButton>
-                {/* @lovable-new 2026-08-05 collection growth + top 5 */}
-                <SidebarStrengthSummary />
+                {/* My strengths stays as a plain navigation row. */}
               </SidebarMenuItem>
               {/* @lovable-new */}
               <SidebarMenuItem>
@@ -134,7 +131,8 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {WORLDS.map((w) => {
-                const inWorld = activeScreen != null && activeScreen >= w.start && activeScreen <= w.end;
+                const inWorld =
+                  activeScreen != null && activeScreen >= w.start && activeScreen <= w.end;
                 /* @lovable-new 2026-08-08 — one shared progression rule */
                 const locked = !progression.canAccessLevel(w);
                 const target = locked
@@ -145,9 +143,8 @@ export function AppSidebar() {
                 const title = tr(w.title);
                 const subtitle = tr(w.subtitle);
                 const stats = progression.byWorld?.[w.id];
-                const pct = stats && stats.total > 0
-                  ? Math.round((stats.completed / stats.total) * 100)
-                  : 0;
+                const pct =
+                  stats && stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0;
 
                 return (
                   <SidebarMenuItem key={w.id}>
@@ -166,7 +163,6 @@ export function AppSidebar() {
                         tabIndex={locked ? -1 : undefined}
                         title={locked ? hint : `${title} — ${subtitle}`}
                       >
-
                         <WorldIcon id={w.id} size={18} className="mt-0.5 shrink-0" />
                         <span className="min-w-0 flex-1 space-y-1">
                           <span className="block break-words text-sm font-bold leading-snug">

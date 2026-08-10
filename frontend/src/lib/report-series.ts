@@ -51,7 +51,13 @@ function bucketOf(d: Date, weekly: boolean): string {
  */
 export function buildReportSeries(
   events: ReportEvent[],
-  opts: { days: RangeDays; studentCount: number; totalRequired: number; classId?: string | null },
+  opts: {
+    days: RangeDays;
+    studentCount: number;
+    totalRequired: number;
+    classId?: string | null;
+    locale?: string;
+  },
 ): SeriesPoint[] {
   const weekly = opts.days > 30;
   const now = new Date();
@@ -102,7 +108,7 @@ export function buildReportSeries(
     const d = new Date(`${b}T00:00:00Z`);
     return {
       date: b,
-      label: d.toLocaleDateString(undefined, { day: "numeric", month: "short" }),
+      label: d.toLocaleDateString(opts.locale ?? "fi-FI", { day: "numeric", month: "short" }),
       strengths: cumStrengths,
       completion: Math.round((seenKeys.size / denom) * 1000) / 10,
       active: slot.active.size,
@@ -116,7 +122,7 @@ export function buildReportSeries(
  */
 export function buildStrengthSeries(
   events: ReportEvent[],
-  opts: { days: RangeDays; classId?: string | null; limit?: number },
+  opts: { days: RangeDays; classId?: string | null; limit?: number; locale?: string },
 ): StrengthSeries {
   const weekly = opts.days > 30;
   const now = new Date();
@@ -166,7 +172,7 @@ export function buildStrengthSeries(
     const d = new Date(`${b}T00:00:00Z`);
     const row: Record<string, string | number> = {
       date: b,
-      label: d.toLocaleDateString(undefined, { day: "numeric", month: "short" }),
+      label: d.toLocaleDateString(opts.locale ?? "fi-FI", { day: "numeric", month: "short" }),
     };
     for (const id of visible) row[`s${id}`] = running.get(id) ?? 0;
     return row;
