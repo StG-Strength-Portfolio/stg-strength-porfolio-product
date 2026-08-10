@@ -55,17 +55,24 @@ class ScreenBoundary extends Component<{ children: ReactNode }, { failed: boolea
   }
 }
 
-/** Renders adventure content with every control inert. */
+/**
+ * Renders one adventure screen with every control inert.
+ *
+ * `ScreenContent` dispatches to screen implementations that use different
+ * hook sets. The keyed child is intentional: each screen number must mount as
+ * a fresh React subtree so navigating between screens cannot reuse the hook
+ * state from the previously rendered screen.
+ */
 function ReadOnlyScreen({ n }: { n: number }) {
   if (!hasContent(n)) return null;
   return (
-    <ScreenBoundary>
+    <ScreenBoundary key={n}>
       <div
         aria-disabled
         className="pointer-events-none select-none opacity-95 [&_button]:pointer-events-none [&_input]:pointer-events-none [&_select]:pointer-events-none [&_textarea]:pointer-events-none"
       >
         <TranslateFi>
-          <ScreenContent n={n} />
+          <ScreenContent key={n} n={n} />
         </TranslateFi>
       </div>
     </ScreenBoundary>
@@ -153,7 +160,7 @@ function TeachPortfolioPage() {
           </div>
 
           <StickyNote seed={`teach-screen-${current}`} className="space-y-3">
-            <ReadOnlyScreen n={current} />
+            <ReadOnlyScreen key={current} n={current} />
           </StickyNote>
 
           <div className="flex flex-wrap items-center justify-between gap-2">
