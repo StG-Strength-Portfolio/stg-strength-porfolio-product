@@ -126,13 +126,19 @@ export function Screen32Strengths({ onSaveStateChange }: Props) {
   const tr = useTr();
   const { language } = useLanguage();
   const sheetIllustration = language === "fi" ? "/illustrations/s29-lukiossa-sheet-fi.png" : language === "sv" ? "/illustrations/s29-lukiossa-sheet-sv.png" : "/illustrations/s29-lukiossa-sheet-en.png";
+  const strengthInstruction =
+    language === "en"
+      ? "Choose 1–2 strength candies and use them in your studies."
+      : language === "sv"
+        ? "Välj 1–2 styrkegodisar och använd dem i dina studier."
+        : "Valitse 1–2 vahvuuskarkkia ja hyödynnä niitä opinnoissa.";
 
   return (
     <div className="relative h-full min-h-0 w-full overflow-x-hidden overflow-y-auto text-white [scrollbar-gutter:stable]">
       <div className="relative mx-auto grid min-h-[760px] w-full max-w-[1500px] grid-cols-1 gap-12 px-[6%] pb-24 pt-8 lg:grid-cols-[44%_56%]">
         <div className="relative min-w-0 pt-6">
           <h1 className="max-w-[520px] font-display text-[clamp(36px,3.2vw,54px)] font-semibold leading-[1.05] text-[#FFE77A]">{tr("Vahvuuskarkkini")}</h1>
-          <p className="mt-10 max-w-[430px] font-display text-[clamp(20px,1.55vw,27px)] font-semibold leading-[1.25] text-white">{tr("Valitse 1–2 vahvuuskarkkia ja")} {tr("hyödynnä")} {tr("opinnoissa")}.</p>
+          <p className="mt-10 max-w-[430px] font-display text-[clamp(20px,1.55vw,27px)] font-semibold leading-[1.25] text-white">{strengthInstruction}</p>
           <StrengthPair onSaveStateChange={onSaveStateChange} />
           <p className="mt-16 max-w-[440px] font-display text-[clamp(19px,1.6vw,26px)] font-semibold leading-[1.35] text-white">{tr("Pohdi, mitä teit, koit ja opit.")}</p>
           <div className="mt-8 grid max-w-[460px] grid-cols-[10px_minmax(0,1fr)] gap-x-4"><span aria-hidden="true" className="mt-[10px] h-[8px] w-[8px] rounded-full bg-[#ffc936]" /><p className="text-[clamp(18px,1.45vw,24px)] leading-[1.35] text-white">{tr("Täydennä oheinen tehtävä.")}</p></div>

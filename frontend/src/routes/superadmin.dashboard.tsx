@@ -11,7 +11,7 @@ import { CornerBlobs } from "@/components/CornerBlobs";
 import { StickyNote } from "@/components/StickyNote";
 import { supabase } from "@/integrations/supabase/client";
 import { useSuperAdminGuard } from "@/lib/superadmin-guard";
-import { useTr } from "@/lib/i18n";
+import { useLanguage, useTr } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { EmailTemplatesTab } from "@/components/superadmin/EmailTemplatesTab";
 import { EmailAnalyticsTab } from "@/components/superadmin/EmailAnalyticsTab";
@@ -73,6 +73,9 @@ function CopyCode({ code }: { code: string }) {
 
 function SuperAdminDashboard() {
   const tr = useTr();
+  const { language } = useLanguage();
+  const studentViewLabel =
+    language === "en" ? "View as student" : language === "sv" ? "Visa elevvyn" : "Näytä oppilaan näkymä";
   const navigate = useNavigate();
   const ready = useSuperAdminGuard();
   const tab: Tab = Route.useSearch().tab ?? "schools";
@@ -201,7 +204,7 @@ function SuperAdminDashboard() {
               window.location.href = "/seikkailu";
             }}
           >
-            {tr("Näytä oppilaan näkymä")}
+            {studentViewLabel}
           </button>
 
           <button

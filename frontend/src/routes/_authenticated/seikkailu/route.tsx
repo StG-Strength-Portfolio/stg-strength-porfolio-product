@@ -13,7 +13,7 @@ import { NavGateProvider } from "@/lib/screen-completion";
 // @lovable-new 2026-08-08 — progression context (locking + super admin bypass)
 import { ProgressionProvider, setStudentViewMode } from "@/lib/progression";
 import { supabase } from "@/integrations/supabase/client";
-import { useLanguage, useT, useTr, isLanguage, languageFromDisplayName } from "@/lib/i18n";
+import { useLanguage, useT, isLanguage, languageFromDisplayName } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/seikkailu")({
   component: SeikkailuLayout,
@@ -26,8 +26,15 @@ function SeikkailuLayout() {
   const [role, setRole] = useState<AppRole | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const t = useT();
-  const tr = useTr();
-  const { setLanguage } = useLanguage();
+  const { language, setLanguage } = useLanguage();
+  const studentViewBanner =
+    language === "en"
+      ? "Student view (super admin) — locks bypassed"
+      : language === "sv"
+        ? "Elevvy (huvudadministratör) — lås ignoreras"
+        : "Oppilasnäkymä (pääkäyttäjä) — lukot ohitettu";
+  const exitStudentViewLabel =
+    language === "en" ? "Exit student view" : language === "sv" ? "Lämna elevvyn" : "Poistu oppilasnäkymästä";
 
   useEffect(() => {
     (async () => {
@@ -118,7 +125,7 @@ function SeikkailuLayout() {
               {/* @lovable-new 2026-08-08 — super admin student-view banner */}
               {role === "super_admin" && (
                 <div className="no-print flex flex-wrap items-center justify-between gap-2 bg-[color:var(--yellow)] px-4 py-2 text-sm font-bold text-[color:var(--purple)]">
-                  <span>{tr("Oppilasnäkymä (pääkäyttäjä) — lukot ohitettu")}</span>
+                  <span>{studentViewBanner}</span>
                   <button
                     type="button"
                     onClick={() => {
@@ -127,7 +134,7 @@ function SeikkailuLayout() {
                     }}
                     className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[color:var(--purple)] shadow"
                   >
-                    {tr("Poistu oppilasnäkymästä")}
+                    {exitStudentViewLabel}
                   </button>
                 </div>
               )}
