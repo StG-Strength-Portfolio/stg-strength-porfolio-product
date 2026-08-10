@@ -7,6 +7,7 @@ import { ScreenChrome } from "@/components/ScreenChrome";
 import { StickyNote } from "@/components/StickyNote";
 import { WorldIcon } from "@/components/icons/AppIcons";
 import { Screen10Strengths } from "@/components/screens/Screen10Strengths";
+import { Screen32Strengths } from "@/components/screens/Screen32Strengths";
 // @lovable-new 2026-08-08 — sequential locking (also blocks direct URL access)
 import { useProgression } from "@/lib/progression";
 import { toast } from "sonner";
@@ -334,6 +335,8 @@ function ScreenView() {
               <TranslateFi>
                 {n === 10 ? (
                   <Screen10Strengths onSaveStateChange={setSaveState} />
+                ) : n === 32 ? (
+                  <Screen32Strengths onSaveStateChange={setSaveState} />
                 ) : (
                   <ScreenContent n={n} onSaveStateChange={setSaveState} />
                 )}
