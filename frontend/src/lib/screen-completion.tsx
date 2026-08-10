@@ -10,7 +10,6 @@ export type CompletionReporter = (fieldKey: string, complete: boolean) => void;
  */
 export const ENABLE_COMPLETION_GATING = true;
 
-
 type NavGate = {
   currentScreen: number | null;
   required: string[];
@@ -124,7 +123,12 @@ export const REQUIREMENTS: Record<number, string[]> = {
   ],
 
   // Module 1
-  15: ["screen_12_karkkikauppa_picks"],
+  15: [
+    "screen_12_karkkikauppa_picks",
+    "screen_15_examples",
+    "screen_15_success",
+    "screen_15_effect",
+  ],
   16: [
     "screen_13_karkki_1",
     "screen_13_karkki_2",
