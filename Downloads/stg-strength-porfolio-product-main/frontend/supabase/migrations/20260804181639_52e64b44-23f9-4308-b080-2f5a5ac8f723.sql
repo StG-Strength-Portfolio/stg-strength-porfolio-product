@@ -1,0 +1,1 @@
+ALTER TABLE public.teaching_articles ADD COLUMN IF NOT EXISTS slide_count INTEGER NOT NULL DEFAULT 10;
