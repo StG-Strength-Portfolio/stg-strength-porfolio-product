@@ -1,20 +1,4 @@
 {
-  "Palautuslinkki on vanhentunut tai jo käytetty.": {
-    "en": "This reset link has expired or has already been used.",
-    "sv": "Den här återställningslänken har gått ut eller har redan använts."
-  },
-  "Pyydä uusi palautuslinkki": {
-    "en": "Request a new reset link",
-    "sv": "Begär en ny återställningslänk"
-  },
-  "Jos sähköposti löytyy järjestelmästä, palautuslinkki on lähetetty.": {
-    "en": "If that email exists in our system, a reset link has been sent.",
-    "sv": "Om e-postadressen finns i systemet har en återställningslänk skickats."
-  },
-  "Lähetä uudelleen": {
-    "en": "Resend",
-    "sv": "Skicka igen"
-  },
   "\"Ajattelen, etta toisen onni on omastani pois, enka voi iloita toisten menestyksesta\"": {
     "en": "\"I feel that another's happiness comes at my expense, and I cannot rejoice in others' success\"",
     "sv": "\"Jag tycker att den andres lycka är något bort från mig och kan inte glädjas åt andras framgångar\""
@@ -2797,6 +2781,14 @@
     "en": "Back to the Future book",
     "sv": "Back to the Future-bok"
   },
+  "Omien vahvuuksien käyttäminen": {
+    "en": "Using My Own Strengths",
+    "sv": "Att använda mina egna styrkor"
+  },
+  "Asteikko (Govindji & Linley, 2007) – Vastaa seuraavaan asteikolla 1 (täysin eri mieltä) – 5 (täysin samaa mieltä).": {
+    "en": "Scale (Govindji & Linley, 2007) – Answer the following on a scale from 1 (strongly disagree) to 5 (strongly agree).",
+    "sv": "Skala (Govindji & Linley, 2007) – Svara på följande på en skala från 1 (helt av annan åsikt) till 5 (helt av samma åsikt)."
+  },
   "täysin eri mieltä": {
     "en": "strongly disagree",
     "sv": "helt av annan åsikt"
@@ -2836,6 +2828,10 @@
   "hyödynnä": {
     "en": "use them",
     "sv": "använd dem"
+  },
+  "opinnoissa": {
+    "en": "in your studies",
+    "sv": "i studierna"
   },
   "Kirjoita vahvuudet tähän": {
     "en": "Write the strengths here",
@@ -3104,6 +3100,37 @@
   "Minä olen ...": {
     "en": "I am ...",
     "sv": "Jag är ..."
+  },
+  "Vahvuuteni opiskelijana": {
+    "en": "My Strengths as a Student",
+    "sv": "Mina styrkor som studerande"
+  },
+  "Tunnista omia vahvuuksiasi. Arvosta ja ole ylpeä omista vahvuuksistasi. Kirjoita itsellesi muistiin omia parhaita puoliasi opiskelijana!": {
+    "en": "Recognize your own strengths. Appreciate and be proud of your strengths. Write down your best qualities as a student!",
+    "sv": "Känn igen dina egna styrkor. Uppskatta och var stolt över dina styrkor. Skriv ner dina bästa sidor som studerande!"
+  },
+  "Mukavia asioita": {
+    "en": "Nice things",
+    "sv": "Trevliga saker"
+  },
+  "Arvostan itsessäni": {
+    "en": "What I appreciate about myself",
+    "sv": "Jag uppskattar hos mig själv"
+  },
+  "Omia vahvuuksia": {
+    "en": "My strengths",
+    "sv": "Egna styrkor"
+  },
+  "Vahvuuksiani ovat mielestäni": {
+    "en": "In my view, my strengths are",
+    "sv": "Mina styrkor är enligt mig"
+  },
+  "Paikkoja": {
+    "en": "Places",
+    "sv": "Platser"
+  },
+  "Näissä paikoissa viihdyn ja pääsen käyttämään vahvuuksiani": {
+    "en": "In these places I feel good and get to use my strengths",
+    "sv": "På dessa platser trivs jag och får använda mina styrkor"
   }
-  
 }
