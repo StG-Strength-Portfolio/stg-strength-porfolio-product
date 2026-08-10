@@ -8,7 +8,7 @@
  * jumps to the first screen of each level.
  */
 import { createFileRoute } from "@tanstack/react-router";
-import { Component, useMemo, useState, type ErrorInfo, type ReactNode } from "react";
+import { Component, useMemo, useState, type ReactNode } from "react";
 import { StickyNote } from "@/components/StickyNote";
 import { DashboardShell } from "@/components/DashboardShell";
 import { LevelProgressBar } from "@/components/LevelProgressBar";
@@ -17,7 +17,9 @@ import { WorldIcon } from "@/components/icons/AppIcons";
 import { useRoleGuard } from "@/lib/role-guard";
 import { TranslateFi, useTr } from "@/lib/i18n";
 import { WORLDS, TOTAL_SCREENS, worldForScreen, type WorldId } from "@/lib/screens";
-import { ScreenContent, hasContent } from "@/lib/screen-content";
+import { ScreenContent } from "@/lib/screen-content";
+import { meterContentFor } from "@/lib/meter-content";
+import { METER_FIRST_SCREEN, METER_TOP } from "@/lib/meter-data";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/teacher/teach/portfolio")({
@@ -37,63 +39,8 @@ export const Route = createFileRoute("/teacher/teach/portfolio")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: TeachPortfolioRoute,
+  component: TeachPortfolioPage,
 });
-
-class TeacherPortfolioBoundary extends Component<
-  { children: ReactNode },
-  { error: Error | null; componentStack: string }
-> {
-  state = { error: null, componentStack: "" } as {
-    error: Error | null;
-    componentStack: string;
-  };
-
-  static getDerivedStateFromError(error: Error) {
-    return { error };
-  }
-
-  componentDidCatch(error: Error, info: ErrorInfo) {
-    console.error("[teach-portfolio] route render failed", error, info);
-    this.setState({ componentStack: info.componentStack ?? "" });
-  }
-
-  render() {
-    if (!this.state.error) return this.props.children;
-
-    return (
-      <div className="relative min-h-screen bg-background px-6 py-12 text-foreground">
-        <div className="mx-auto max-w-3xl rounded-3xl border-2 border-black bg-white p-6 shadow-xl">
-          <h1 className="font-display text-2xl font-bold">Teacher Strength Portfolio error</h1>
-          <p className="mt-3 text-sm opacity-75">
-            This diagnostic page is temporary and is only shown in the teacher portfolio preview branch.
-          </p>
-          <pre className="mt-5 max-h-[45vh] overflow-auto whitespace-pre-wrap rounded-2xl bg-slate-100 p-4 text-xs leading-relaxed text-slate-900">
-            {this.state.error.name}: {this.state.error.message}
-            {"\n\n"}
-            {this.state.error.stack ?? "No JavaScript stack available."}
-            {this.state.componentStack ? `\n\nReact component stack:\n${this.state.componentStack}` : ""}
-          </pre>
-          <button
-            type="button"
-            onClick={() => window.location.reload()}
-            className="mt-5 rounded-full bg-[color:var(--purple)] px-4 py-2 text-sm font-bold text-white"
-          >
-            Reload
-          </button>
-        </div>
-      </div>
-    );
-  }
-}
-
-function TeachPortfolioRoute() {
-  return (
-    <TeacherPortfolioBoundary>
-      <TeachPortfolioPage />
-    </TeacherPortfolioBoundary>
-  );
-}
 
 /** Keeps a single misbehaving screen from taking down the whole page. */
 class ScreenBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
@@ -110,25 +57,20 @@ class ScreenBoundary extends Component<{ children: ReactNode }, { failed: boolea
   }
 }
 
-/**
- * Renders one adventure screen with every control inert.
- *
- * `ScreenContent` dispatches to screen implementations that use different
- * hook sets. The keyed child is intentional: each screen number must mount as
- * a fresh React subtree so navigating between screens cannot reuse the hook
- * state from the previously rendered screen.
- */
+/** Renders one adventure screen with every control inert. */
 function ReadOnlyScreen({ n }: { n: number }) {
-  if (!hasContent(n)) return null;
+  const isMeterScreen = n >= METER_FIRST_SCREEN && n <= METER_TOP;
+  const content = isMeterScreen ? meterContentFor(n, {}) : n >= 1 && n <= 73 ? <ScreenContent n={n} /> : null;
+
+  if (!content) return null;
+
   return (
     <ScreenBoundary key={n}>
       <div
         aria-disabled
         className="pointer-events-none select-none opacity-95 [&_button]:pointer-events-none [&_input]:pointer-events-none [&_select]:pointer-events-none [&_textarea]:pointer-events-none"
       >
-        <TranslateFi>
-          <ScreenContent key={n} n={n} />
-        </TranslateFi>
+        <TranslateFi>{content}</TranslateFi>
       </div>
     </ScreenBoundary>
   );
@@ -139,9 +81,17 @@ function TeachPortfolioPage() {
   const guard = useRoleGuard(["teacher"]);
   const [screen, setScreen] = useState<number>(1);
 
-  /** Every screen that actually has content, in order. */
+  /**
+   * Screens 1–73 live in the workbook registry. Screens 74–76 currently have
+   * no rendered content. The strength meter is 77–106 and is rendered through
+   * its own module so this teacher-only preview does not depend on the broken
+   * meter fallback inside ScreenContent.hasContent().
+   */
   const screens = useMemo(
-    () => Array.from({ length: TOTAL_SCREENS }, (_, i) => i + 1).filter((n) => hasContent(n)),
+    () => [
+      ...Array.from({ length: 73 }, (_, i) => i + 1),
+      ...Array.from({ length: METER_TOP - METER_FIRST_SCREEN + 1 }, (_, i) => METER_FIRST_SCREEN + i),
+    ],
     [],
   );
 
