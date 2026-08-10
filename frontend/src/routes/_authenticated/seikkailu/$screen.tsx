@@ -6,6 +6,7 @@ import { PencilBadge } from "@/components/PencilBadge";
 import { ScreenChrome } from "@/components/ScreenChrome";
 import { StickyNote } from "@/components/StickyNote";
 import { WorldIcon } from "@/components/icons/AppIcons";
+import { Screen6Strengths } from "@/components/screens/Screen6Strengths";
 import { Screen10Strengths } from "@/components/screens/Screen10Strengths";
 import { Screen32Strengths } from "@/components/screens/Screen32Strengths";
 import { useProgression } from "@/lib/progression";
@@ -127,7 +128,9 @@ function ScreenView() {
           {built ? (
             <div className="h-full min-h-0 min-w-0 w-full max-w-none overflow-hidden">
               <TranslateFi>
-                {n === 10 ? (
+                {n === 6 ? (
+                  <Screen6Strengths onSaveStateChange={setSaveState} />
+                ) : n === 10 ? (
                   <Screen10Strengths onSaveStateChange={setSaveState} />
                 ) : n === 32 ? (
                   <Screen32Strengths onSaveStateChange={setSaveState} />
