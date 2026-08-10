@@ -133,7 +133,6 @@ export function Screen32Strengths({ onSaveStateChange }: Props) {
         <div className="relative min-w-0 pt-6">
           <h1 className="max-w-[520px] font-display text-[clamp(36px,3.2vw,54px)] font-semibold leading-[1.05] text-[#FFE77A]">{tr("Vahvuuskarkkini")}</h1>
           <p className="mt-10 max-w-[430px] font-display text-[clamp(20px,1.55vw,27px)] font-semibold leading-[1.25] text-white">{tr("Valitse 1–2 vahvuuskarkkia ja")} {tr("hyödynnä")} {tr("opinnoissa")}.</p>
-          <p className="mt-2 font-display text-[clamp(18px,1.4vw,24px)] font-semibold text-white">{tr("Kirjoita vahvuudet tähän")}</p>
           <StrengthPair onSaveStateChange={onSaveStateChange} />
           <p className="mt-16 max-w-[440px] font-display text-[clamp(19px,1.6vw,26px)] font-semibold leading-[1.35] text-white">{tr("Pohdi, mitä teit, koit ja opit.")}</p>
           <div className="mt-8 grid max-w-[460px] grid-cols-[10px_minmax(0,1fr)] gap-x-4"><span aria-hidden="true" className="mt-[10px] h-[8px] w-[8px] rounded-full bg-[#ffc936]" /><p className="text-[clamp(18px,1.45vw,24px)] leading-[1.35] text-white">{tr("Täydennä oheinen tehtävä.")}</p></div>
