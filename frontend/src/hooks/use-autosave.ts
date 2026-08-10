@@ -48,6 +48,21 @@ export function useAutosave<T>(
           return;
         }
         setState("saved");
+
+        // Keep progression gating in sync immediately after a successful save.
+        // Supabase realtime can arrive slightly later; without this optimistic
+        // local signal, a student can click Next after completing a screen and
+        // still be redirected back as "previous screens incomplete".
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(
+            new CustomEvent("student-response-saved", {
+              detail: {
+                fieldKey,
+                filled: isFilledValue(latest.current),
+              },
+            }),
+          );
+        }
       } catch (e) {
         console.error("[autosave]", e);
         setState("error");
@@ -58,6 +73,25 @@ export function useAutosave<T>(
   }, [JSON.stringify(value), fieldKey, debounceMs, enabled]);
 
   return state;
+}
+
+function isFilledValue(value: unknown): boolean {
+  if (value === null || value === undefined) return false;
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!trimmed || trimmed === '""' || trimmed === "null" || trimmed === "[]") return false;
+    if (trimmed.startsWith("[")) {
+      try {
+        const arr = JSON.parse(trimmed);
+        return Array.isArray(arr) && arr.length > 0;
+      } catch {
+        return true;
+      }
+    }
+    return true;
+  }
+  if (Array.isArray(value)) return value.length > 0;
+  return true;
 }
 
 export async function loadResponse<T = unknown>(fieldKey: string): Promise<T | null> {

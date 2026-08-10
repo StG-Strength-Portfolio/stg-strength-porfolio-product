@@ -443,6 +443,7 @@ function Screen6({ onSaveStateChange }: Props) {
 
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [pendingSave, setPendingSave] = useState(false);
 
   const report = useReportCompletion();
 
@@ -530,15 +531,23 @@ function Screen6({ onSaveStateChange }: Props) {
 
   useEffect(() => {
     onSaveStateChange?.(state);
+    if (state === "saved") setPendingSave(false);
   }, [state, onSaveStateChange]);
 
   useEffect(() => {
     if (!loaded) return;
 
-    report(fieldKey, selectedIds.length >= 1);
-  }, [loaded, report, selectedIds.length]);
+    // Do not unlock navigation until a changed selection is safely persisted.
+    // Existing saved selections loaded from the database remain complete.
+    report(fieldKey, selectedIds.length >= 1 && !pendingSave);
+  }, [loaded, pendingSave, report, selectedIds.length]);
 
   function toggleStrength(id: number) {
+    // Clicking a fourth strength does not change the value, so it must not
+    // create a pending-save state that can never resolve.
+    if (!selectedIds.includes(id) && selectedIds.length >= maxSelections) return;
+
+    setPendingSave(true);
     setSelectedIds((currentIds) => {
       if (currentIds.includes(id)) {
         return currentIds.filter((selectedId) => selectedId !== id);
@@ -2274,7 +2283,7 @@ function Fly({ x0, y0, x1, y1, kind, hue }) {
 }
 
 /* ════════════════════════════════════════════════════════════ */
-function Screen15() {
+function Screen15({ onSaveStateChange }: Props) {
   const tr = useTr();
   const [phase, setPhase] = useState("kauppa"); // kauppa | kaanto | kuitti
   const [picked, setPicked] = useState([]);
@@ -2283,8 +2292,71 @@ function Screen15() {
   const [flying, setFlying] = useState([]);
   const [bump, setBump] = useState(0);
   const [answers, setAnswers] = useState(["", "", ""]);
+  const [loaded, setLoaded] = useState(false);
   const bagRef = useRef(null);
   const flyId = useRef(0);
+  const report = useReportCompletion();
+
+  const picksSaveState = useAutosave("screen_12_karkkikauppa_picks", picked, { enabled: loaded });
+  const examplesSaveState = useAutosave("screen_15_examples", answers[0], { enabled: loaded });
+  const successSaveState = useAutosave("screen_15_success", answers[1], { enabled: loaded });
+  const effectSaveState = useAutosave("screen_15_effect", answers[2], { enabled: loaded });
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const [savedPicks, savedExamples, savedSuccess, savedEffect] = await Promise.all([
+        loadResponse<number[]>("screen_12_karkkikauppa_picks"),
+        loadResponse<string>("screen_15_examples"),
+        loadResponse<string>("screen_15_success"),
+        loadResponse<string>("screen_15_effect"),
+      ]);
+      if (cancelled) return;
+
+      const validPicks = Array.isArray(savedPicks)
+        ? savedPicks.filter((id) => DATA.some((d) => d.id === id)).slice(0, PICK)
+        : [];
+      setPicked(validPicks);
+      setAnswers([savedExamples ?? "", savedSuccess ?? "", savedEffect ?? ""]);
+
+      if (validPicks.length === PICK) {
+        setTurned(true);
+        setSettled(true);
+        setPhase("kuitti");
+      }
+      setLoaded(true);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!loaded) return;
+    report("screen_12_karkkikauppa_picks", picked.length === PICK);
+    report("screen_15_examples", answers[0].trim().length > 0);
+    report("screen_15_success", answers[1].trim().length > 0);
+    report("screen_15_effect", answers[2].trim().length > 0);
+  }, [answers, loaded, picked, report]);
+
+  useEffect(() => {
+    const states = [picksSaveState, examplesSaveState, successSaveState, effectSaveState];
+    const merged: SaveState = states.includes("error")
+      ? "error"
+      : states.includes("saving")
+        ? "saving"
+        : states.includes("saved")
+          ? "saved"
+          : "idle";
+    onSaveStateChange?.(merged);
+  }, [
+    picksSaveState,
+    examplesSaveState,
+    successSaveState,
+    effectSaveState,
+    onSaveStateChange,
+  ]);
 
   const full = picked.length === PICK;
   const chosen = picked.map((id) => DATA.find((d) => d.id === id));
@@ -3454,8 +3526,6 @@ function Screen15() {
             ))}
 
             <div className="acts">
-              <button className="btn">{tr("Tallenna ja jatka")}</button>
-
               <button className="link" onClick={restart}>
                 {tr("Valitse karkit uudelleen")}
               </button>

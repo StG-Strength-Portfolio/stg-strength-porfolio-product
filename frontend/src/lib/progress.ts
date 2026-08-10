@@ -46,6 +46,21 @@ export function useStudentProgress(userId: string | null): ScreenProgress | null
     }
     loadAll();
 
+    const onLocalResponseSaved = (event: Event) => {
+      const detail = (event as CustomEvent<{ fieldKey?: string; filled?: boolean }>).detail;
+      if (!detail?.fieldKey || typeof detail.filled !== "boolean") return;
+
+      setProgress((previous) => {
+        if (!previous) return previous;
+        const filled = new Set(previous.filledKeys);
+        if (detail.filled) filled.add(detail.fieldKey);
+        else filled.delete(detail.fieldKey);
+        return compute(filled, previous.currentScreen);
+      });
+    };
+
+    window.addEventListener("student-response-saved", onLocalResponseSaved);
+
     const ch = supabase
       .channel(`responses:${userId}:${Math.random().toString(36).slice(2)}`)
       .on(
@@ -59,6 +74,7 @@ export function useStudentProgress(userId: string | null): ScreenProgress | null
 
     return () => {
       cancelled = true;
+      window.removeEventListener("student-response-saved", onLocalResponseSaved);
       supabase.removeChannel(ch);
     };
   }, [userId]);

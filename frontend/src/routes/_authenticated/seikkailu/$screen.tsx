@@ -48,13 +48,13 @@ function ScreenView() {
      typing a locked screen URL bounces back to the first incomplete screen. */
   useEffect(() => {
     if (!progression.ready || allowed) return;
-    toast(tr("Suorita edelliset näytöt ensin."));
+    toast(t("nav.previousScreensFirst"));
     navigate({
       to: "/seikkailu/$screen",
       params: { screen: String(progression.nextAvailable) },
       replace: true,
     });
-  }, [progression.ready, progression.nextAvailable, allowed, navigate, tr]);
+  }, [progression.ready, progression.nextAvailable, allowed, navigate, t]);
 
   /*
    * Lấy người dùng hiện tại.
