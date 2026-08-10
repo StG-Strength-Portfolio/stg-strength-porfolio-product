@@ -11,6 +11,8 @@ type Props = { onSaveStateChange?: (s: SaveState) => void };
 export function Screen6Strengths({ onSaveStateChange }: Props) {
   const tr = useTr();
   const { language } = useLanguage();
+  const strengthJarLabel =
+    language === "en" ? "My strengths" : language === "sv" ? "Mina styrkor" : "Minun vahvuuteni";
 
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -119,7 +121,7 @@ export function Screen6Strengths({ onSaveStateChange }: Props) {
             <div className="absolute bottom-0 left-1/2 h-[220px] w-[175px] -translate-x-1/2 overflow-hidden rounded-[36px] border-[3px] border-black bg-white/20 shadow-[0_9px_0_rgba(0,0,0,0.14)]">
               {selectedIds.length === 0 && (
                 <div className="absolute left-1/2 top-[70px] w-[125px] -translate-x-1/2 -rotate-3 bg-[#FFF4DE] px-3 py-3 text-center text-[11px] font-bold leading-tight text-[#4C3B58]">
-                  {tr("Minun vahvuuteni")}
+                  {strengthJarLabel}
                 </div>
               )}
 
