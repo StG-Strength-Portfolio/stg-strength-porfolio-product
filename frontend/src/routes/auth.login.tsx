@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { CornerBlobs } from "@/components/CornerBlobs";
 import { StickyNote } from "@/components/StickyNote";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
+import { ForgotPasswordDialog } from "@/components/ForgotPasswordDialog";
 import { toast } from "sonner";
 import { useT, useTr } from "@/lib/i18n";
 import { homeForRole, roleOfCurrentUser } from "@/lib/role-guard";
@@ -125,66 +126,6 @@ function LoginPage() {
         </StickyNote>
 
         {forgotOpen && <ForgotPasswordDialog onClose={() => setForgotOpen(false)} />}
-      </div>
-    </div>
-  );
-}
-
-function ForgotPasswordDialog({ onClose }: { onClose: () => void }) {
-  const tr = useTr();
-  const [email, setEmail] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [sent, setSent] = useState(false);
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-      if (error) {
-        toast.error(tr("Sähköpostia ei löytynyt."));
-        return;
-      }
-      setSent(true);
-      toast.success(tr("Palautuslinkki lähetetty sähköpostiisi."));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <div className="w-full max-w-sm rounded-3xl bg-white p-6 text-slate-900 shadow-2xl">
-        <h2 className="font-display text-xl">{tr("Salasanan palautus")}</h2>
-        {sent ? (
-          <p className="mt-3 text-sm">{tr("Palautuslinkki lähetetty sähköpostiisi.")}</p>
-        ) : (
-          <form onSubmit={submit} className="mt-4 space-y-3">
-            <div className="space-y-1.5">
-              <Label htmlFor="forgot-email">{tr("Sähköpostiosoitteesi")}</Label>
-              <Input
-                id="forgot-email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-              />
-            </div>
-            <Button
-              type="submit"
-              disabled={busy}
-              className="w-full rounded-full bg-[color:var(--purple)] font-bold text-white hover:bg-[color:var(--purple)]/90"
-            >
-              {tr("Lähetä palautuslinkki")}
-            </Button>
-          </form>
-        )}
-        <Button variant="ghost" className="mt-3 w-full rounded-full" onClick={onClose}>
-          {tr("Sulje")}
-        </Button>
       </div>
     </div>
   );

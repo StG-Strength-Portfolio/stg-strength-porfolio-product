@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { CornerBlobs } from "@/components/CornerBlobs";
 import { StickyNote } from "@/components/StickyNote";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
+import { ForgotPasswordDialog } from "@/components/ForgotPasswordDialog";
 import { toast } from "sonner";
 import { useTr } from "@/lib/i18n";
 
@@ -34,6 +35,7 @@ function SuperAdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [forgotOpen, setForgotOpen] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -102,12 +104,27 @@ function SuperAdminLogin() {
               {tr("Kirjaudu ylläpitoon")}
             </Button>
           </form>
-          <div className="mt-5 text-center text-xs">
-            <Link to="/auth" className="font-semibold text-[color:var(--purple)] underline">
+
+          <div className="mt-4 flex items-center justify-between gap-3">
+            <Link
+              to="/auth"
+              className="text-xs font-semibold text-[color:var(--purple)] underline"
+            >
               {tr("Takaisin pääsivulle")}
             </Link>
+            <button
+              type="button"
+              onClick={() => setForgotOpen(true)}
+              className="text-xs text-muted-foreground underline underline-offset-2 hover:text-[color:var(--purple)]"
+            >
+              {tr("Unohditko salasanan?")}
+            </button>
           </div>
         </StickyNote>
+
+        {forgotOpen && (
+          <ForgotPasswordDialog onClose={() => setForgotOpen(false)} source="superadmin" />
+        )}
       </div>
     </div>
   );
