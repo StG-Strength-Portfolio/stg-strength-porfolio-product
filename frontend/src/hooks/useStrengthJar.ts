@@ -1,25 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { matchStrengthId } from "@/lib/strength-jar-data";
+import { KARKKIKAUPPA_KEY, strengthIdsFromResponses } from "@/lib/strength-jar-data";
 
 /**
- * Reads the student's strength picks from existing autosaved responses.
- * Read-only: never writes, never changes field keys or save behaviour.
+ * Reads the student's current strength collection from autosaved responses.
  *
- * selected  = the five candy-shop picks (screen 12)
- * collected = strengths named anywhere else in the adventure
+ * selected  = the final candy-shop picks
+ * collected = current strength selections from all other supported selectors
+ *
+ * Repeated strengths are intentionally preserved so the collection can show
+ * occurrence counts such as Courage ×3 across three different activities.
  */
-const KARKKIKAUPPA_KEY = "screen_12_karkkikauppa_picks";
-const CHIPS_KEY = "screen_6_known_strengths";
-
-function parse<T>(value: string): T | null {
-  try {
-    return JSON.parse(value) as T;
-  } catch {
-    return value as unknown as T;
-  }
-}
-
 export function useStrengthJar() {
   const [selected, setSelected] = useState<number[]>([]);
   const [collected, setCollected] = useState<number[]>([]);
@@ -34,45 +25,19 @@ export function useStrengthJar() {
         setLoading(false);
         return;
       }
+
       const { data, error } = await supabase
         .from("responses" as never)
         .select("field_key,value")
         .eq("user_id", u.user.id);
       if (error) throw error;
-      const rows = (data ?? []) as unknown as Array<{ field_key: string; value: string }>;
 
-      const sel: number[] = [];
-      const col: number[] = [];
+      const rows = (data ?? []) as unknown as Array<{ field_key: string; value: unknown }>;
+      const candyRows = rows.filter((row) => row.field_key === KARKKIKAUPPA_KEY);
+      const otherRows = rows.filter((row) => row.field_key !== KARKKIKAUPPA_KEY);
 
-      for (const row of rows) {
-        const key = row.field_key;
-        if (key === KARKKIKAUPPA_KEY) {
-          const picks = parse<number[]>(row.value);
-          if (Array.isArray(picks)) {
-            for (const i of picks) {
-              // Statement order on screen 12 matches the registry order (1–26).
-              const id = Number(i) + 1;
-              if (id >= 1 && id <= 26 && !sel.includes(id)) sel.push(id);
-            }
-          }
-          continue;
-        }
-        const isNameField =
-          key === CHIPS_KEY || key.endsWith("_karkit") || /^screen_13_karkki_\d+$/.test(key);
-        if (!isNameField) continue;
-        const v = parse<unknown>(row.value);
-        const names = Array.isArray(v) ? v : [v];
-        for (const n of names) {
-          if (typeof n !== "string" || !n.trim()) continue;
-          for (const part of n.split(/[,;/]| ja /i)) {
-            const id = matchStrengthId(part);
-            if (id && !col.includes(id)) col.push(id);
-          }
-        }
-      }
-
-      setSelected(sel);
-      setCollected(col.filter((id) => !sel.includes(id)));
+      setSelected(strengthIdsFromResponses(candyRows));
+      setCollected(strengthIdsFromResponses(otherRows));
     } catch (err) {
       console.error("[strength-jar]", err);
     } finally {
@@ -81,13 +46,56 @@ export function useStrengthJar() {
   }, []);
 
   useEffect(() => {
-    refresh();
-    const onFocus = () => refresh();
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    let cancelled = false;
+
+    void (async () => {
+      await refresh();
+      if (cancelled) return;
+
+      const { data: u } = await supabase.auth.getUser();
+      const uid = u.user?.id;
+      if (!uid || cancelled) return;
+
+      channel = supabase
+        .channel(`strength-jar:${uid}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "responses",
+            filter: `user_id=eq.${uid}`,
+          },
+          () => {
+            void refresh();
+          },
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "teacher_assigned_strengths",
+            filter: `student_id=eq.${uid}`,
+          },
+          () => {
+            window.dispatchEvent(new Event("strength-gifts:refresh"));
+          },
+        )
+        .subscribe();
+    })();
+
+    const onFocus = () => void refresh();
+    const onManualRefresh = () => void refresh();
     window.addEventListener("focus", onFocus);
-    window.addEventListener("strength-jar:refresh", onFocus);
+    window.addEventListener("strength-jar:refresh", onManualRefresh);
+
     return () => {
+      cancelled = true;
       window.removeEventListener("focus", onFocus);
-      window.removeEventListener("strength-jar:refresh", onFocus);
+      window.removeEventListener("strength-jar:refresh", onManualRefresh);
+      if (channel) void supabase.removeChannel(channel);
     };
   }, [refresh]);
 
