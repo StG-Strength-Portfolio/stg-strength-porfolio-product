@@ -14,6 +14,7 @@ import { useRoleGuard } from "@/lib/role-guard";
 import { useLanguage, useTr } from "@/lib/i18n";
 import { getStrengthColor, getStrengthName } from "@/lib/strengths-i18n";
 import { getTeacherReceivedStrengths, type ReceivedStrength } from "@/lib/give-strength.functions";
+import { getPreviewTeacherReceivedStrengths } from "@/lib/superadmin-preview.functions";
 
 export const Route = createFileRoute("/teacher/profile")({
   head: () => ({
@@ -78,15 +79,20 @@ function TeacherProfilePage() {
   const lang = language === "sv" ? "sv" : language === "en" ? "en" : "fi";
 
   const load = useServerFn(getTeacherReceivedStrengths);
+  const loadPreview = useServerFn(getPreviewTeacherReceivedStrengths);
   const [rows, setRows] = useState<ReceivedStrength[]>([]);
 
   const refresh = useCallback(async () => {
     try {
-      setRows(await load());
+      if (guard.preview && guard.userId) {
+        setRows(await loadPreview({ data: { teacherId: guard.userId } }));
+      } else {
+        setRows(await load());
+      }
     } catch (e) {
       console.error("[teacher-profile]", e);
     }
-  }, [load]);
+  }, [guard.preview, guard.userId, load, loadPreview]);
 
   useEffect(() => {
     if (guard.ready) void refresh();
