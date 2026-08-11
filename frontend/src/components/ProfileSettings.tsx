@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { StickyNote } from "@/components/StickyNote";
 import { supabase } from "@/integrations/supabase/client";
 import { useTr } from "@/lib/i18n";
+import { getSuperAdminPreview } from "@/lib/superadmin-preview";
 
 /** Own-profile settings shared by the School Admin and Teacher dashboards. */
 export function ProfileSettings({
@@ -32,6 +33,14 @@ export function ProfileSettings({
     e.preventDefault();
     setBusy(true);
     try {
+      // Sales demo profile fields are intentionally editable for presentation,
+      // but never update the signed-in Superadmin account or customer data.
+      if (getSuperAdminPreview().mode) {
+        setPassword("");
+        toast.success(tr("Tallennettu!"));
+        return;
+      }
+
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return;
       await supabase
