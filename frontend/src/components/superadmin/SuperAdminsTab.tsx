@@ -8,21 +8,20 @@ import { StickyNote } from "@/components/StickyNote";
 import { useTr } from "@/lib/i18n";
 import {
   listSuperAdmins,
-  inviteSuperAdmin,
   removeSuperAdmin,
   type SuperAdminRow,
 } from "@/lib/superadmin.functions";
+import { inviteSuperAdminByEmail } from "@/lib/superadmin-invite.functions";
 
 export function SuperAdminsTab() {
   const tr = useTr();
   const fetchAdmins = useServerFn(listSuperAdmins);
-  const invite = useServerFn(inviteSuperAdmin);
+  const invite = useServerFn(inviteSuperAdminByEmail);
   const remove = useServerFn(removeSuperAdmin);
 
   const [rows, setRows] = useState<SuperAdminRow[]>([]);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
@@ -41,11 +40,14 @@ export function SuperAdminsTab() {
     e.preventDefault();
     setBusy(true);
     try {
-      await invite({ data: { email, name, password: password || undefined } });
-      toast.success(tr("Ylläpitäjä lisätty."));
+      const result = await invite({ data: { email, name } });
+      toast.success(
+        result.emailKind === "invite"
+          ? tr("Kutsu lähetetty sähköpostiin.")
+          : tr("Salasanan asetuslinkki lähetetty sähköpostiin."),
+      );
       setEmail("");
       setName("");
-      setPassword("");
       await load();
     } catch (err) {
       toast.error((err as Error).message);
@@ -58,7 +60,7 @@ export function SuperAdminsTab() {
     <>
       <StickyNote seed="sa-admins-add" className="space-y-3">
         <h2 className="text-2xl font-bold">{tr("Kutsu uusi pääkäyttäjä")}</h2>
-        <form onSubmit={onInvite} className="grid gap-4 md:grid-cols-4">
+        <form onSubmit={onInvite} className="grid gap-4 md:grid-cols-3">
           <div className="space-y-1">
             <Label htmlFor="sa-adm-email">{tr("Sähköpostiosoite")}</Label>
             <Input
@@ -73,25 +75,19 @@ export function SuperAdminsTab() {
             <Label htmlFor="sa-adm-name">{tr("Nimi")}</Label>
             <Input id="sa-adm-name" value={name} onChange={(e) => setName(e.target.value)} />
           </div>
-          <div className="space-y-1">
-            <Label htmlFor="sa-adm-pw">{tr("Salasana (valinnainen)")}</Label>
-            <Input
-              id="sa-adm-pw"
-              type="text"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
           <div className="flex items-end">
             <Button
               type="submit"
               disabled={busy}
               className="w-full rounded-full bg-[color:var(--purple)] font-bold text-white hover:bg-[color:var(--purple)]/90"
             >
-              {tr("Kutsu")}
+              {busy ? tr("Lähetetään…") : tr("Kutsu")}
             </Button>
           </div>
         </form>
+        <p className="text-sm opacity-70">
+          {tr("Kutsuttu pääkäyttäjä saa sähköpostin, jonka kautta hän asettaa oman salasanansa.")}
+        </p>
       </StickyNote>
 
       <StickyNote seed="sa-admins-list" className="space-y-3">
