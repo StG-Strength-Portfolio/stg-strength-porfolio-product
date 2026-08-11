@@ -4,15 +4,34 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
-import { LanguageProvider } from "@/lib/i18n";
+import { LanguageProvider, useLanguage } from "@/lib/i18n";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+
+const DOCUMENT_TITLE = {
+  fi: "Vahvuusseikkailu",
+  en: "Strength Portfolio",
+  sv: "Styrkeportfolio",
+} as const;
+
+function LocalizedDocumentTitle() {
+  const { language } = useLanguage();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+
+  useEffect(() => {
+    document.title = DOCUMENT_TITLE[language];
+    document.documentElement.lang = language;
+  }, [language, pathname]);
+
+  return null;
+}
 
 function NotFoundComponent() {
   return (
@@ -79,7 +98,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Vahvuusseikkailu" },
+      { title: "Strength Portfolio" },
       { name: "description", content: "Digitaalinen vahvuusportfolio lukiolaiselle." },
       { property: "og:title", content: "Vahvuusseikkailu" },
       { property: "og:description", content: "Digitaalinen vahvuusportfolio lukiolaiselle." },
@@ -138,6 +157,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
+        <LocalizedDocumentTitle />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <Toaster position="top-center" />
