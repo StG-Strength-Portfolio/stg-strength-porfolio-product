@@ -18,6 +18,8 @@ import { EmailAnalyticsTab } from "@/components/superadmin/EmailAnalyticsTab";
 import { TeachingMaterialsTab } from "@/components/superadmin/TeachingMaterialsTab";
 import { SuperAdminsTab } from "@/components/superadmin/SuperAdminsTab";
 import { setStudentViewMode } from "@/lib/progression";
+import { setSuperAdminPreview } from "@/lib/superadmin-preview";
+import { getRolePreviewTarget } from "@/lib/superadmin-preview.functions";
 import {
   getCurrentSchoolAdminCodes,
   generateSecureSchoolAdminCode,
@@ -76,7 +78,23 @@ function SuperAdminDashboard() {
   const tr = useTr();
   const { language } = useLanguage();
   const studentViewLabel =
-    language === "en" ? "View as student" : language === "sv" ? "Visa elevvyn" : "Näytä oppilaan näkymä";
+    language === "en" ? "View as student" : language === "sv" ? "Visa elevvyn" : "Näytä opiskelijan näkymä";
+  const teacherViewLabel =
+    language === "en" ? "View as teacher" : language === "sv" ? "Visa lärarvyn" : "Näytä opettajan näkymä";
+  const principalViewLabel =
+    language === "en" ? "View as principal" : language === "sv" ? "Visa rektorsvyn" : "Näytä rehtorin näkymä";
+  const noTeacherLabel =
+    language === "en"
+      ? "No teachers are available for preview."
+      : language === "sv"
+        ? "Det finns inga lärare att förhandsgranska."
+        : "Esikatseltavia opettajia ei ole.";
+  const noSchoolLabel =
+    language === "en"
+      ? "No active school is available for preview."
+      : language === "sv"
+        ? "Det finns ingen aktiv skola att förhandsgranska."
+        : "Esikatseltavaa aktiivista koulua ei ole.";
   const schoolAdminCodeLabel =
     language === "en"
       ? "School admin code"
@@ -91,6 +109,7 @@ function SuperAdminDashboard() {
 
   const fetchSchools = useServerFn(listSchools);
   const fetchAdminCodes = useServerFn(getCurrentSchoolAdminCodes);
+  const fetchPreviewTarget = useServerFn(getRolePreviewTarget);
   const addSchool = useServerFn(createSchool);
   const renew = useServerFn(renewSchool);
   const edit = useServerFn(updateSchool);
@@ -102,6 +121,7 @@ function SuperAdminDashboard() {
   const [start, setStart] = useState(today());
   const [expiry, setExpiry] = useState("");
   const [busy, setBusy] = useState(false);
+  const [previewBusy, setPreviewBusy] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -118,6 +138,30 @@ function SuperAdminDashboard() {
   }, [ready, load]);
 
   if (!ready) return null;
+
+  async function openRolePreview(mode: "teacher" | "principal") {
+    setPreviewBusy(true);
+    try {
+      const target = await fetchPreviewTarget();
+      if (!target.schoolId) {
+        toast.error(noSchoolLabel);
+        return;
+      }
+      if (mode === "teacher" && !target.teacherId) {
+        toast.error(noTeacherLabel);
+        return;
+      }
+      setSuperAdminPreview(mode, {
+        schoolId: target.schoolId,
+        teacherId: target.teacherId,
+      });
+      window.location.href = mode === "teacher" ? "/teacher/dashboard" : "/school-admin/dashboard";
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setPreviewBusy(false);
+    }
+  }
 
   async function onAdd(e: React.FormEvent) {
     e.preventDefault();
@@ -208,16 +252,35 @@ function SuperAdminDashboard() {
               </Link>
             ))}
           </nav>
-          <button
-            type="button"
-            className="mt-4 block w-full rounded-full bg-[color:var(--yellow)] px-4 py-2 text-sm font-bold text-[color:var(--purple)]"
-            onClick={() => {
-              setStudentViewMode(true);
-              window.location.href = "/seikkailu";
-            }}
-          >
-            {studentViewLabel}
-          </button>
+          <div className="mt-4 space-y-2">
+            <button
+              type="button"
+              className="block w-full rounded-full bg-[color:var(--yellow)] px-4 py-2 text-sm font-bold text-[color:var(--purple)]"
+              onClick={() => {
+                setSuperAdminPreview("student");
+                setStudentViewMode(true);
+                window.location.href = "/seikkailu";
+              }}
+            >
+              {studentViewLabel}
+            </button>
+            <button
+              type="button"
+              disabled={previewBusy}
+              className="block w-full rounded-full bg-white px-4 py-2 text-sm font-bold text-[color:var(--purple)] shadow-sm disabled:opacity-50"
+              onClick={() => void openRolePreview("teacher")}
+            >
+              {teacherViewLabel}
+            </button>
+            <button
+              type="button"
+              disabled={previewBusy}
+              className="block w-full rounded-full border-2 border-white bg-transparent px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+              onClick={() => void openRolePreview("principal")}
+            >
+              {principalViewLabel}
+            </button>
+          </div>
 
           <button
             type="button"
