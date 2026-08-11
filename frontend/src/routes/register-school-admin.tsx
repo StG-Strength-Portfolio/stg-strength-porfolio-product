@@ -128,16 +128,11 @@ function RegisterSchoolAdmin() {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error("Authentication failed");
 
-      const { error: profileError } = await supabase
-        .from("profiles" as never)
-        .upsert(
-          {
-            id: userData.user.id,
-            display_name: fullName,
-            language,
-          } as never,
-          { onConflict: "id" } as never,
-        );
+      const { error: profileError } = await supabase.from("profiles" as never).upsert({
+        id: userData.user.id,
+        display_name: fullName,
+        language,
+      } as never);
       if (profileError) throw profileError;
 
       const { data: resultData, error: claimError } = await supabase.rpc(
