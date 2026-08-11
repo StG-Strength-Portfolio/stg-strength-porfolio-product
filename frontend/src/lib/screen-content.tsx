@@ -75,14 +75,14 @@ function Screen1() {
 
   return (
     <div className="relative flex h-full min-h-[620px] w-full flex-col overflow-hidden px-[5%] text-center font-display text-white">
-      <div className="relative z-10 flex shrink-0 flex-col items-center pt-[7vh]">
+      <div className="relative z-10 flex shrink-0 flex-col items-center pt-[5vh]">
         <div className="text-[clamp(24px,2.4vw,42px)] font-bold leading-none tracking-[0] text-white">
           {tr("Huomaa hyvä!®")}
         </div>
 
         <h1
           className="
-            mt-[3vh]
+            mt-[2.5vh]
             max-w-[900px]
             text-[clamp(30px,3.4vw,48px)]
             font-medium
@@ -91,27 +91,37 @@ function Screen1() {
             text-white
           "
         >
-          {" "}
           {trLines(tr, "Vahvuusportfolio\nlukiolaiselle")}
         </h1>
       </div>
 
-      <div className="relative z-0 flex min-h-0 flex-1 items-end justify-center pb-[8vh] pt-[6vh]">
+      <div
+        className="
+          relative
+          z-0
+          flex
+          min-h-0
+          flex-1
+          items-center
+          justify-center
+          pb-[3vh]
+          pt-[2vh]
+        "
+      >
         <img
           src="/illustrations/naytto-1.png"
           alt=""
           aria-hidden="true"
           className="
-    pointer-events-none
-    block
-    h-auto
-    w-[900px]
-    max-w-none
-    object-contain
-    object-center
-    select-none
-    translate-y-40
-  "
+            pointer-events-none
+            block
+            h-auto
+            w-[760px]
+            max-w-[90%]
+            object-contain
+            object-center
+            select-none
+          "
         />
       </div>
     </div>
