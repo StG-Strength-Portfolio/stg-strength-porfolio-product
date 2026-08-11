@@ -8,6 +8,7 @@ import { CornerBlobs } from "@/components/CornerBlobs";
 import { ClassRemovedNotice } from "@/components/ClassRemovedNotice";
 import { getCurrentRole } from "@/lib/auth-helpers";
 import { homeForRole } from "@/lib/role-guard";
+import { ProgressionProvider } from "@/lib/progression";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage, useT, isLanguage } from "@/lib/i18n";
 
@@ -19,6 +20,7 @@ function StudentLayout() {
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
   const [blocked, setBlocked] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const t = useT();
   const { setLanguage } = useLanguage();
 
@@ -29,6 +31,10 @@ function StudentLayout() {
         window.location.href = homeForRole(role);
         return;
       }
+
+      const { data: userData } = await supabase.auth.getUser();
+      setUserId(userData.user?.id ?? null);
+
       try {
         const { data: removed } = await supabase.rpc("my_classes_deleted" as never);
         if (removed === true) {
@@ -60,18 +66,20 @@ function StudentLayout() {
   if (blocked) return <ClassRemovedNotice />;
 
   return (
-    <SidebarProvider>
-      <div className="relative flex min-h-screen w-full bg-background text-foreground">
-        <CornerBlobs />
-        <AppSidebar />
-        <div className="relative z-10 flex min-h-screen flex-1 flex-col">
-          <TopBar />
-          <main className="flex-1">
-            <Outlet />
-          </main>
+    <ProgressionProvider userId={userId} role="student">
+      <SidebarProvider>
+        <div className="relative flex min-h-screen w-full bg-background text-foreground">
+          <CornerBlobs />
+          <AppSidebar />
+          <div className="relative z-10 flex min-h-screen flex-1 flex-col">
+            <TopBar />
+            <main className="flex-1">
+              <Outlet />
+            </main>
+          </div>
+          <Toaster />
         </div>
-        <Toaster />
-      </div>
-    </SidebarProvider>
+      </SidebarProvider>
+    </ProgressionProvider>
   );
 }
