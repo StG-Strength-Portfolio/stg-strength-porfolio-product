@@ -9,6 +9,7 @@ import {
 import type { Language } from "@/lib/i18n";
 import { matchStrengthId, strengthIdsFromResponses } from "@/lib/strength-jar-data";
 import type { ReportEvent } from "@/lib/report-series";
+import { getSuperAdminPreview } from "@/lib/superadmin-preview";
 
 export interface TeacherClass {
   id: string;
@@ -56,10 +57,14 @@ export function useTeacherData() {
     try {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return;
+      const preview = getSuperAdminPreview();
+      const teacherId =
+        preview.mode === "teacher" && preview.teacherId ? preview.teacherId : u.user.id;
 
       const { data: cls } = await supabase
         .from("classes" as never)
         .select("id,name,join_code,created_at,language,is_deleted,deleted_at")
+        .eq("teacher_id", teacherId as never)
         .order("created_at", { ascending: false });
       const allRows = (cls ?? []) as unknown as TeacherClass[];
       const classRows = allRows.filter((c) => !c.is_deleted);
@@ -170,7 +175,7 @@ export function useTeacherData() {
       const { data: gifts } = await supabase
         .from("teacher_assigned_strengths" as never)
         .select("id, student_id, strength_id, message, created_at")
-        .eq("teacher_id", u.user.id as never)
+        .eq("teacher_id", teacherId as never)
         .order("created_at", { ascending: false });
       const giftRows = (gifts ?? []) as unknown as AssignedStrength[];
       setAssigned(giftRows);
