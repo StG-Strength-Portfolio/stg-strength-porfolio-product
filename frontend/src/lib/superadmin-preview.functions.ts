@@ -24,9 +24,10 @@ export interface RolePreviewTarget {
   teacherName: string | null;
 }
 
-export const getRolePreviewTarget = createServerFn({ method: "GET" })
+export const getRolePreviewTarget = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<RolePreviewTarget> => {
+  .inputValidator((d: { mode: "teacher" | "principal" }) => d)
+  .handler(async ({ data, context }): Promise<RolePreviewTarget> => {
     await assertSuperAdmin(context.supabase, context.userId);
     const db = await admin();
 
@@ -43,6 +44,15 @@ export const getRolePreviewTarget = createServerFn({ method: "GET" })
       return { schoolId: null, schoolName: null, teacherId: null, teacherName: null };
     }
 
+    if (data.mode === "principal") {
+      return {
+        schoolId: principalSchool.id,
+        schoolName: principalSchool.name,
+        teacherId: null,
+        teacherName: null,
+      };
+    }
+
     const activeSchoolIds = new Set(schoolRows.map((s) => s.id));
     const { data: teacherRoles } = await db
       .from("user_roles")
@@ -50,37 +60,42 @@ export const getRolePreviewTarget = createServerFn({ method: "GET" })
       .eq("role", "teacher");
     const teacherIds = ((teacherRoles ?? []) as Array<{ user_id: string }>).map((r) => r.user_id);
 
-    let teacherId: string | null = null;
-    let teacherName: string | null = null;
-    let teacherSchoolId: string | null = null;
-    if (teacherIds.length) {
-      const { data: teacherProfiles } = await db
-        .from("profiles")
-        .select("id, display_name, school_id")
-        .in("id", teacherIds);
-      const teacher = (
-        (teacherProfiles ?? []) as Array<{
-          id: string;
-          display_name: string | null;
-          school_id: string | null;
-        }>
-      ).find((p) => p.school_id && activeSchoolIds.has(p.school_id));
-      if (teacher) {
-        teacherId = teacher.id;
-        teacherName = teacher.display_name;
-        teacherSchoolId = teacher.school_id;
-      }
+    if (!teacherIds.length) {
+      return {
+        schoolId: principalSchool.id,
+        schoolName: principalSchool.name,
+        teacherId: null,
+        teacherName: null,
+      };
     }
 
-    const teacherSchool = teacherSchoolId
-      ? schoolRows.find((s) => s.id === teacherSchoolId) ?? principalSchool
-      : principalSchool;
+    const { data: teacherProfiles } = await db
+      .from("profiles")
+      .select("id, display_name, school_id")
+      .in("id", teacherIds);
+    const teacher = (
+      (teacherProfiles ?? []) as Array<{
+        id: string;
+        display_name: string | null;
+        school_id: string | null;
+      }>
+    ).find((p) => p.school_id && activeSchoolIds.has(p.school_id));
 
+    if (!teacher?.school_id) {
+      return {
+        schoolId: principalSchool.id,
+        schoolName: principalSchool.name,
+        teacherId: null,
+        teacherName: null,
+      };
+    }
+
+    const teacherSchool = schoolRows.find((s) => s.id === teacher.school_id) ?? principalSchool;
     return {
-      schoolId: teacherId ? teacherSchool.id : principalSchool.id,
-      schoolName: teacherId ? teacherSchool.name : principalSchool.name,
-      teacherId,
-      teacherName,
+      schoolId: teacherSchool.id,
+      schoolName: teacherSchool.name,
+      teacherId: teacher.id,
+      teacherName: teacher.display_name,
     };
   });
 
