@@ -31,7 +31,7 @@ export const validateSchoolAdminCode = createServerFn({ method: "POST" })
     const db = await admin();
     const { data: invite, error } = await db
       .from("school_codes")
-      .select("school_id, is_used, is_revoked, schools!inner(name, is_active)")
+      .select("school_id, is_used, is_revoked")
       .eq("code", code)
       .eq("code_type", "school")
       .maybeSingle();
@@ -40,9 +40,13 @@ export const validateSchoolAdminCode = createServerFn({ method: "POST" })
       return { valid: false as const };
     }
 
-    const school = Array.isArray(invite.schools) ? invite.schools[0] : invite.schools;
-    if (!school?.is_active) return { valid: false as const };
+    const { data: school, error: schoolError } = await db
+      .from("schools")
+      .select("name, is_active")
+      .eq("id", invite.school_id)
+      .maybeSingle();
 
+    if (schoolError || !school?.is_active) return { valid: false as const };
     return { valid: true as const, schoolName: school.name as string };
   });
 
