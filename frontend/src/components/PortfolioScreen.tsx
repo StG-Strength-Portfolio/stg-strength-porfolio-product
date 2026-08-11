@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { SaveState } from "@/hooks/use-autosave";
 import { AutosaveScope } from "@/hooks/use-autosave";
 import { TranslateFi } from "@/lib/i18n";
@@ -30,7 +31,7 @@ export function PortfolioScreen({
   const readOnly = mode === "teacher-preview";
   const saveHandler = readOnly ? undefined : onSaveStateChange;
 
-  let content: React.ReactNode = null;
+  let content: ReactNode = null;
 
   if (n === 6) {
     content = <Screen6Strengths onSaveStateChange={saveHandler} />;
