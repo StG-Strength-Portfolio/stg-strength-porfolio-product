@@ -3,20 +3,17 @@ import { useEffect, useState } from "react";
 
 import { BottomNav } from "@/components/BottomNav";
 import { PencilBadge } from "@/components/PencilBadge";
+import { PortfolioScreen, hasPortfolioScreen } from "@/components/PortfolioScreen";
 import { ScreenChrome } from "@/components/ScreenChrome";
 import { StickyNote } from "@/components/StickyNote";
 import { WorldIcon } from "@/components/icons/AppIcons";
-import { Screen6Strengths } from "@/components/screens/Screen6Strengths";
-import { Screen10Strengths } from "@/components/screens/Screen10Strengths";
-import { Screen32Strengths } from "@/components/screens/Screen32Strengths";
 import { useProgression } from "@/lib/progression";
 import { toast } from "sonner";
 
 import type { SaveState } from "@/hooks/use-autosave";
 import { supabase } from "@/integrations/supabase/client";
-import { TranslateFi, useT, useTr } from "@/lib/i18n";
+import { useT, useTr } from "@/lib/i18n";
 import { REQUIREMENTS, useNavGate } from "@/lib/screen-completion";
-import { ScreenContent, hasContent } from "@/lib/screen-content";
 import { TOTAL_SCREENS, worldForScreen } from "@/lib/screens";
 
 export const Route = createFileRoute("/_authenticated/seikkailu/$screen")({
@@ -87,7 +84,7 @@ function ScreenView() {
     };
   }, [n, setScreen]);
 
-  const built = hasContent(n);
+  const built = hasPortfolioScreen(n);
   const nextBlocked = !progression.bypass && !isComplete;
 
   if (!progression.ready || !allowed) {
@@ -127,17 +124,7 @@ function ScreenView() {
         <div className="relative z-10 min-h-0 min-w-0 w-full max-w-none flex-1 overflow-hidden">
           {built ? (
             <div className="h-full min-h-0 min-w-0 w-full max-w-none overflow-hidden">
-              <TranslateFi>
-                {n === 6 ? (
-                  <Screen6Strengths onSaveStateChange={setSaveState} />
-                ) : n === 10 ? (
-                  <Screen10Strengths onSaveStateChange={setSaveState} />
-                ) : n === 32 ? (
-                  <Screen32Strengths onSaveStateChange={setSaveState} />
-                ) : (
-                  <ScreenContent n={n} onSaveStateChange={setSaveState} />
-                )}
-              </TranslateFi>
+              <PortfolioScreen n={n} mode="student" onSaveStateChange={setSaveState} />
             </div>
           ) : (
             <div className="h-full min-h-0 min-w-0 w-full max-w-none overflow-x-hidden overflow-y-auto">

@@ -2,20 +2,18 @@
  * Teacher "Teach → Strength Portfolio".
  *
  * Classroom presentation view of the student Strength Portfolio. It reuses the
- * existing workbook and meter renderers, but keeps their controls inert so a
+ * exact same screen renderer as the student route, but in read-only mode so a
  * teacher can guide students from a projector / classroom display.
  */
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Component, useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState } from "react";
 import { CornerBlobs } from "@/components/CornerBlobs";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { PortfolioScreen, hasPortfolioScreen } from "@/components/PortfolioScreen";
 import { ArrowLeftIcon, WorldIcon } from "@/components/icons/AppIcons";
 import { useRoleGuard } from "@/lib/role-guard";
-import { TranslateFi, useTr } from "@/lib/i18n";
+import { useTr } from "@/lib/i18n";
 import { WORLDS, TOTAL_SCREENS, worldForScreen, type WorldId } from "@/lib/screens";
-import { ScreenContent } from "@/lib/screen-content";
-import { meterContentFor } from "@/lib/meter-content";
-import { METER_FIRST_SCREEN, METER_TOP } from "@/lib/meter-data";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/teacher/teach/portfolio")({
@@ -38,65 +36,13 @@ export const Route = createFileRoute("/teacher/teach/portfolio")({
   component: TeachPortfolioPage,
 });
 
-/** Keeps a single misbehaving workbook screen from taking down the presentation. */
-class ScreenBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
-  state = { failed: false };
-
-  static getDerivedStateFromError() {
-    return { failed: true };
-  }
-
-  componentDidCatch(error: unknown) {
-    console.error("[teach-portfolio] screen render failed", error);
-  }
-
-  render() {
-    if (this.state.failed) return null;
-    return this.props.children;
-  }
-}
-
-/** Renders one student screen while keeping all form controls inert. */
-function ReadOnlyScreen({ n }: { n: number }) {
-  const isMeterScreen = n >= METER_FIRST_SCREEN && n <= METER_TOP;
-  const content = isMeterScreen
-    ? meterContentFor(n, {})
-    : n >= 1 && n <= 73
-      ? <ScreenContent n={n} />
-      : null;
-
-  if (!content) return null;
-
-  return (
-    <ScreenBoundary key={n}>
-      <div
-        aria-disabled
-        className="pointer-events-none min-h-full select-none [&_button]:pointer-events-none [&_input]:pointer-events-none [&_select]:pointer-events-none [&_textarea]:pointer-events-none"
-      >
-        <TranslateFi>{content}</TranslateFi>
-      </div>
-    </ScreenBoundary>
-  );
-}
-
 function TeachPortfolioPage() {
   const tr = useTr();
   const guard = useRoleGuard(["teacher"]);
   const [screen, setScreen] = useState<number>(1);
 
-  /**
-   * Screens 1–73 live in the workbook registry. Screens 74–76 currently have
-   * no rendered content. The strength meter is 77–106 and is rendered through
-   * its own module.
-   */
   const screens = useMemo(
-    () => [
-      ...Array.from({ length: 73 }, (_, i) => i + 1),
-      ...Array.from(
-        { length: METER_TOP - METER_FIRST_SCREEN + 1 },
-        (_, i) => METER_FIRST_SCREEN + i,
-      ),
-    ],
+    () => Array.from({ length: TOTAL_SCREENS }, (_, i) => i + 1).filter(hasPortfolioScreen),
     [],
   );
 
@@ -128,7 +74,6 @@ function TeachPortfolioPage() {
       <CornerBlobs />
 
       <div className="relative z-10 flex h-full min-w-0 flex-col px-5 pb-5 pt-4 xl:px-6 xl:pb-6">
-        {/* Classroom presentation toolbar */}
         <header className="grid h-12 shrink-0 grid-cols-[280px_minmax(0,1fr)_auto] items-center gap-5 xl:grid-cols-[300px_minmax(0,1fr)_auto]">
           <Link
             to="/teacher/dashboard"
@@ -172,7 +117,6 @@ function TeachPortfolioPage() {
         </header>
 
         <div className="mt-3 grid min-h-0 flex-1 grid-cols-[280px_minmax(0,1fr)] gap-5 xl:grid-cols-[300px_minmax(0,1fr)] xl:gap-6">
-          {/* Simplified level navigator, matching the classroom presentation layout. */}
           <aside className="min-h-0 overflow-hidden rounded-[2rem] bg-[#4f378d]/90 shadow-[0_16px_36px_rgba(34,20,70,0.22)] ring-1 ring-white/5 backdrop-blur-sm">
             <nav className="h-full overflow-y-auto px-3 py-3.5 [scrollbar-width:thin]">
               <div className="space-y-1.5">
@@ -207,9 +151,8 @@ function TeachPortfolioPage() {
             </nav>
           </aside>
 
-          {/* Actual student screen. No outer card so the workbook design stays 1:1. */}
           <main className="min-h-0 min-w-0 overflow-y-auto overflow-x-hidden rounded-[2rem] [scrollbar-gutter:stable]">
-            <ReadOnlyScreen key={current} n={current} />
+            <PortfolioScreen key={current} n={current} mode="teacher-preview" />
           </main>
         </div>
       </div>

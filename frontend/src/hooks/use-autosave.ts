@@ -1,7 +1,24 @@
-import { useEffect, useRef, useState } from "react";
+import { createContext, createElement, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export type SaveState = "idle" | "saving" | "saved" | "error";
+
+const AutosaveEnabledContext = createContext(true);
+
+/**
+ * Allows a whole subtree to render the real student screen components without
+ * persisting changes. Student routes keep the default `enabled=true`; teacher
+ * presentation mode sets this to false.
+ */
+export function AutosaveScope({
+  enabled,
+  children,
+}: {
+  enabled: boolean;
+  children: ReactNode;
+}) {
+  return createElement(AutosaveEnabledContext.Provider, { value: enabled }, children);
+}
 
 /**
  * Autosaves a single field_key to public.responses for the current user.
@@ -12,8 +29,9 @@ export function useAutosave<T>(
   value: T,
   opts?: { debounceMs?: number; enabled?: boolean },
 ) {
+  const scopeEnabled = useContext(AutosaveEnabledContext);
   const debounceMs = opts?.debounceMs ?? 700;
-  const enabled = opts?.enabled ?? true;
+  const enabled = scopeEnabled && (opts?.enabled ?? true);
   const [state, setState] = useState<SaveState>("idle");
   const firstRun = useRef(true);
   const latest = useRef(value);
@@ -49,10 +67,6 @@ export function useAutosave<T>(
         }
         setState("saved");
 
-        // Keep progression gating in sync immediately after a successful save.
-        // Supabase realtime can arrive slightly later; without this optimistic
-        // local signal, a student can click Next after completing a screen and
-        // still be redirected back as "previous screens incomplete".
         if (typeof window !== "undefined") {
           window.dispatchEvent(
             new CustomEvent("student-response-saved", {
@@ -79,7 +93,7 @@ function isFilledValue(value: unknown): boolean {
   if (value === null || value === undefined) return false;
   if (typeof value === "string") {
     const trimmed = value.trim();
-    if (!trimmed || trimmed === '""' || trimmed === "null" || trimmed === "[]") return false;
+    if (!trimmed || trimmed === '\"\"' || trimmed === "null" || trimmed === "[]") return false;
     if (trimmed.startsWith("[")) {
       try {
         const arr = JSON.parse(trimmed);
