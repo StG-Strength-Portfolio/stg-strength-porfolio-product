@@ -57,6 +57,7 @@ function SchoolAdminGiveStrengthPage() {
   const [selected, setSelected] = useState<number[]>([]);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [demoHistory, setDemoHistory] = useState<Array<{ id: string; teacher: string; count: number; message: string }>>([]);
 
   const load = useCallback(async () => {
     try {
@@ -81,9 +82,26 @@ function SchoolAdminGiveStrengthPage() {
   }
 
   async function submit() {
-    if (guard.preview || selected.length === 0 || !teacherId) return;
+    if (selected.length === 0 || !teacherId) return;
     setBusy(true);
     try {
+      if (guard.preview) {
+        const teacher = teachers.find((item) => item.id === teacherId)?.name ?? "—";
+        setDemoHistory((current) => [
+          {
+            id: `demo-principal-gift-${Date.now()}`,
+            teacher,
+            count: selected.length,
+            message: message.trim(),
+          },
+          ...current,
+        ]);
+        toast.success(`${selected.length} ${tr("vahvuutta lähetetty!")}`);
+        setSelected([]);
+        setMessage("");
+        return;
+      }
+
       await send({ data: { teacherId, strengthIds: selected, message } });
       toast.success(`${selected.length} ${tr("vahvuutta lähetetty!")}`);
       setSelected([]);
@@ -126,7 +144,7 @@ function SchoolAdminGiveStrengthPage() {
         <StrengthPickerGrid
           lang={lang}
           selectedIds={selected}
-          disabled={busy || !teacherId || guard.preview}
+          disabled={busy || !teacherId}
           onSelect={toggle}
         />
         <div className="space-y-2">
@@ -141,12 +159,26 @@ function SchoolAdminGiveStrengthPage() {
         </div>
         <Button
           className="rounded-full bg-[color:var(--yellow)] font-bold text-slate-900 hover:brightness-95"
-          disabled={busy || selected.length === 0 || !teacherId || guard.preview}
+          disabled={busy || selected.length === 0 || !teacherId}
           onClick={() => void submit()}
         >
           {tr("Lahjoita vahvuus")}
         </Button>
       </StickyNote>
+
+      {guard.preview && demoHistory.length > 0 && (
+        <StickyNote seed="sa-give-demo-history" className="space-y-3">
+          <h3 className="text-xl font-bold">{tr("Annetut vahvuudet")}</h3>
+          <ul className="space-y-2 text-sm">
+            {demoHistory.map((item) => (
+              <li key={item.id} className="rounded-2xl bg-white/70 p-3">
+                <strong>{item.teacher}</strong> · {item.count} {tr("vahvuutta")}
+                {item.message && <div className="mt-1 opacity-70">{item.message}</div>}
+              </li>
+            ))}
+          </ul>
+        </StickyNote>
+      )}
     </DashboardShell>
   );
 }

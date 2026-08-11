@@ -1,7 +1,8 @@
 /**
  * @lovable-new 2026-07-31
  * Strength Sprint — teacher/host view. Create → waiting room → live progress
- * → podium, driven by Supabase Realtime.
+ * → podium, driven by Supabase Realtime for real teachers and entirely local
+ * fictional state while a Superadmin is demonstrating the product.
  */
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -21,22 +22,6 @@ import { getStrengthName, getStrengthColor } from "@/lib/strengths-i18n";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/teacher/sprint")({
-  head: () => ({
-    meta: [
-      { title: "Strength Sprint — Vahvuusseikkailu" },
-      {
-        name: "description",
-        content: "Host a real-time Strength Sprint where your class gives each other strengths.",
-      },
-      { property: "og:title", content: "Strength Sprint — Vahvuusseikkailu" },
-      {
-        property: "og:description",
-        content: "Real-time peer strength game for your class.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
   component: TeacherSprintPage,
 });
 
@@ -48,7 +33,7 @@ function TeacherSprintPage() {
   const lang = language === "sv" ? "sv" : language === "en" ? "en" : "fi";
   const guard = useRoleGuard(["teacher"]);
   const navigate = useNavigate();
-  const { classes } = useTeacherData();
+  const { classes, students } = useTeacherData();
 
   const [classId, setClassId] = useState("");
   const [sprintId, setSprintId] = useState<string | null>(null);
@@ -62,54 +47,49 @@ function TeacherSprintPage() {
 
   const reloadPlayers = useCallback(
     async (id: string) => {
+      if (guard.preview) return;
       try {
         setPlayers(await fetchPlayers({ data: { sprintId: id } }));
       } catch (e) {
         console.error("[sprint]", e);
       }
     },
-    [fetchPlayers],
+    [fetchPlayers, guard.preview],
   );
 
-  const reloadStrengths = useCallback(async (id: string) => {
-    const { data } = await supabase
-      .from("sprint_strengths" as never)
-      .select("strength_id")
-      .eq("sprint_id", id);
-    setSent((data ?? []) as unknown as Array<{ strength_id: string }>);
-  }, []);
+  const reloadStrengths = useCallback(
+    async (id: string) => {
+      if (guard.preview) return;
+      const { data } = await supabase
+        .from("sprint_strengths" as never)
+        .select("strength_id")
+        .eq("sprint_id", id);
+      setSent((data ?? []) as unknown as Array<{ strength_id: string }>);
+    },
+    [guard.preview],
+  );
 
   useEffect(() => {
-    if (!sprintId) return;
+    if (!sprintId || guard.preview) return;
     void reloadPlayers(sprintId);
     void reloadStrengths(sprintId);
     const channel = supabase
       .channel(`sprint-host-${sprintId}`)
       .on(
         "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "sprint_players",
-          filter: `sprint_id=eq.${sprintId}`,
-        },
+        { event: "*", schema: "public", table: "sprint_players", filter: `sprint_id=eq.${sprintId}` },
         () => void reloadPlayers(sprintId),
       )
       .on(
         "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "sprint_strengths",
-          filter: `sprint_id=eq.${sprintId}`,
-        },
+        { event: "*", schema: "public", table: "sprint_strengths", filter: `sprint_id=eq.${sprintId}` },
         () => void reloadStrengths(sprintId),
       )
       .subscribe();
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, [sprintId, reloadPlayers, reloadStrengths]);
+  }, [sprintId, guard.preview, reloadPlayers, reloadStrengths]);
 
   async function createSprint() {
     if (!classId) {
@@ -118,10 +98,28 @@ function TeacherSprintPage() {
     }
     setBusy(true);
     try {
+      const klass = classes.find((c) => c.id === classId);
+      if (guard.preview) {
+        const demoPlayers = students
+          .filter((student) => student.classId === classId)
+          .slice(0, 12)
+          .map((student, index) => ({
+            studentId: student.studentId,
+            name: student.displayName ?? `Student ${index + 1}`,
+            isCompleted: false,
+          }));
+        setSprintId(`demo-sprint-${Date.now()}`);
+        setCode(`NB${String(Math.floor(1000 + Math.random() * 9000))}`);
+        setPlayers(demoPlayers);
+        setSent([]);
+        setStatus("waiting");
+        toast.success(`${tr("Vahvuussprintti")} — ${klass?.name ?? ""}`);
+        return;
+      }
+
       const { data: gen, error: genErr } = await supabase.rpc("generate_sprint_code" as never);
       if (genErr) throw genErr;
       const joinCode = String(gen);
-      const klass = classes.find((c) => c.id === classId);
       const { data, error } = await supabase
         .from("sprint_sessions" as never)
         .insert({
@@ -148,6 +146,23 @@ function TeacherSprintPage() {
 
   async function setSprintStatus(next: Status) {
     if (!sprintId) return;
+    if (guard.preview) {
+      setStatus(next);
+      if (next === "active") {
+        setPlayers((current) => current.map((player, index) => ({ ...player, isCompleted: index < Math.ceil(current.length * 0.75) })));
+        const demoSent: Array<{ strength_id: string }> = [];
+        const total = players.length * Math.max(players.length - 1, 0);
+        for (let i = 0; i < Math.max(18, Math.round(total * 0.78)); i++) {
+          demoSent.push({ strength_id: String(((i * 5 + 6) % 26) + 1) });
+        }
+        setSent(demoSent);
+      }
+      if (next === "completed") {
+        setPlayers((current) => current.map((player) => ({ ...player, isCompleted: true })));
+      }
+      return;
+    }
+
     const patch: Record<string, unknown> = { status: next };
     if (next === "active") patch["started_at"] = new Date().toISOString();
     if (next === "completed") patch["ended_at"] = new Date().toISOString();
@@ -164,10 +179,9 @@ function TeacherSprintPage() {
 
   async function cancelSprint() {
     if (!sprintId) return;
-    await supabase
-      .from("sprint_sessions" as never)
-      .delete()
-      .eq("id", sprintId);
+    if (!guard.preview) {
+      await supabase.from("sprint_sessions" as never).delete().eq("id", sprintId);
+    }
     setSprintId(null);
     setCode("");
     setPlayers([]);
@@ -205,9 +219,7 @@ function TeacherSprintPage() {
         <StickyNote seed="sprint-create" className="space-y-4">
           <h2 className="font-display text-2xl">{tr("Luo uusi sprintti")}</h2>
           <p className="text-sm opacity-80">
-            {tr(
-              "Opiskelijat antavat toisilleen vahvuuspalautetta reaaliajassa. Jokainen valitsee yhden vahvuuden kullekin luokkatoverilleen.",
-            )}
+            {tr("Opiskelijat antavat toisilleen vahvuuspalautetta reaaliajassa. Jokainen valitsee yhden vahvuuden kullekin luokkatoverilleen.")}
           </p>
           <div className="max-w-sm space-y-2">
             <Label htmlFor="sprint-class">{tr("Valitse luokka")}</Label>
@@ -218,11 +230,7 @@ function TeacherSprintPage() {
               onChange={(e) => setClassId(e.target.value)}
             >
               <option value="">{tr("Valitse luokka")}</option>
-              {classes.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
+              {classes.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
           </div>
           <p className="text-xs opacity-70">{tr("2–50 pelaajaa · 2–10 min")}</p>
@@ -247,21 +255,12 @@ function TeacherSprintPage() {
               toast.success(tr("Kopioitu"));
             }}
           >
-            {code}
-            <Copy className="h-6 w-6 opacity-60" />
+            {code}<Copy className="h-6 w-6 opacity-60" />
           </button>
           <div className="flex flex-wrap justify-center gap-2">
             {players.map((p) => (
-              <span
-                key={p.studentId}
-                className="rounded-full bg-white/90 px-4 py-1.5 text-sm font-bold text-slate-900 shadow"
-              >
-                {p.name}
-              </span>
+              <span key={p.studentId} className="rounded-full bg-white/90 px-4 py-1.5 text-sm font-bold text-slate-900 shadow">{p.name}</span>
             ))}
-            {players.length === 0 && (
-              <span className="text-sm opacity-70">{tr("Odotetaan opettajaa...")}</span>
-            )}
           </div>
           <div className="flex justify-center gap-3">
             <Button
@@ -271,9 +270,7 @@ function TeacherSprintPage() {
             >
               {tr("Aloita peli")}
             </Button>
-            <Button variant="outline" className="rounded-full" onClick={() => void cancelSprint()}>
-              {tr("Peruuta")}
-            </Button>
+            <Button variant="outline" className="rounded-full" onClick={() => void cancelSprint()}>{tr("Peruuta")}</Button>
           </div>
         </StickyNote>
       )}
@@ -281,36 +278,21 @@ function TeacherSprintPage() {
       {sprintId && status === "active" && (
         <StickyNote seed="sprint-active" className="space-y-5 text-center">
           <h2 className="font-display text-2xl">{tr("Vahvuuksia lähetetään!")}</h2>
-          <p className="font-mono text-4xl font-bold tabular-nums">
-            {sent.length} / {expected}
-          </p>
+          <p className="font-mono text-4xl font-bold tabular-nums">{sent.length} / {expected}</p>
           <div className="mx-auto h-2 w-full max-w-xl overflow-hidden rounded-full bg-white">
-            <div
-              className="h-full rounded-full bg-[color:var(--yellow)] transition-all"
-              style={{ width: `${pct}%` }}
-            />
+            <div className="h-full rounded-full bg-[color:var(--yellow)] transition-all" style={{ width: `${pct}%` }} />
           </div>
           <div className="flex flex-wrap justify-center gap-2">
             {players.map((p) => (
               <span
                 key={p.studentId}
-                className={cn(
-                  "rounded-full px-4 py-1.5 text-sm font-bold shadow",
-                  p.isCompleted
-                    ? "bg-[color:var(--yellow)] text-slate-900"
-                    : "bg-white/90 text-slate-900",
-                )}
+                className={cn("rounded-full px-4 py-1.5 text-sm font-bold shadow", p.isCompleted ? "bg-[color:var(--yellow)] text-slate-900" : "bg-white/90 text-slate-900")}
               >
                 {p.name}
               </span>
             ))}
           </div>
-          <Button
-            className="rounded-full bg-[color:var(--yellow)] font-bold text-slate-900 hover:brightness-95"
-            onClick={() => void setSprintStatus("completed")}
-          >
-            {tr("Lopeta sprintti")}
-          </Button>
+          <Button className="rounded-full bg-[color:var(--yellow)] font-bold text-slate-900" onClick={() => void setSprintStatus("completed")}>{tr("Lopeta sprintti")}</Button>
         </StickyNote>
       )}
 
@@ -320,32 +302,16 @@ function TeacherSprintPage() {
           <div className="flex flex-wrap items-end justify-center gap-6">
             {[podium[1], podium[0], podium[2]].map((item, slot) =>
               item ? (
-                <div
-                  key={item.strengthId}
-                  className={cn(
-                    "flex flex-col items-center gap-2 rounded-3xl bg-white/90 p-4 text-slate-900 shadow-md",
-                    slot === 1 && "border-4 border-[color:var(--yellow)] p-6 shadow-lg",
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "flex items-center justify-center rounded-full font-display font-bold tabular-nums text-white shadow-inner",
-                      slot === 1 ? "h-24 w-24 text-4xl" : "h-16 w-16 text-2xl",
-                    )}
-                    style={{ background: getStrengthColor(item.strengthId) }}
-                  >
-                    {item.count}
-                  </span>
-                  <span className="max-w-[10rem] break-words text-sm font-bold">
-                    {getStrengthName(item.strengthId, lang)}
-                  </span>
+                <div key={item.strengthId} className={cn("flex flex-col items-center gap-2 rounded-3xl bg-white/90 p-4 text-slate-900 shadow-md", slot === 1 && "border-4 border-[color:var(--yellow)] p-6 shadow-lg")}>
+                  <span className={cn("flex items-center justify-center rounded-full font-display font-bold tabular-nums text-white shadow-inner", slot === 1 ? "h-24 w-24 text-4xl" : "h-16 w-16 text-2xl")} style={{ background: getStrengthColor(item.strengthId) }}>{item.count}</span>
+                  <span className="max-w-[10rem] break-words text-sm font-bold">{getStrengthName(item.strengthId, lang)}</span>
                 </div>
               ) : null,
             )}
           </div>
           <div className="flex justify-center gap-3">
             <Button
-              className="rounded-full bg-[color:var(--yellow)] font-bold text-slate-900 hover:brightness-95"
+              className="rounded-full bg-[color:var(--yellow)] font-bold text-slate-900"
               onClick={() => {
                 setSprintId(null);
                 setCode("");
@@ -356,13 +322,7 @@ function TeacherSprintPage() {
             >
               {tr("Uusi sprintti")}
             </Button>
-            <Button
-              variant="outline"
-              className="rounded-full"
-              onClick={() => navigate({ to: "/teacher/dashboard" })}
-            >
-              {tr("Takaisin")}
-            </Button>
+            <Button variant="outline" className="rounded-full" onClick={() => navigate({ to: "/teacher/dashboard" })}>{tr("Takaisin")}</Button>
           </div>
         </StickyNote>
       )}
