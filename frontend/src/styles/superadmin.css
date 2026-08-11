@@ -1,0 +1,17 @@
+/* Superadmin-only contrast rules.
+ * The shared outline Button variant uses bg-background, and this app's
+ * background token is dark purple. Inside Superadmin that can create dark
+ * purple buttons with inherited dark card text. Keep the fix scoped here so
+ * Student, Teacher and Principal UI are unaffected.
+ */
+
+.superadmin-ui button.bg-background,
+.superadmin-ui a.bg-background {
+  color: white !important;
+}
+
+/* Explicit brand-purple action buttons should always keep high contrast too. */
+.superadmin-ui button[class*="bg-[color:var(--purple)]"],
+.superadmin-ui a[class*="bg-[color:var(--purple)]"] {
+  color: white !important;
+}
