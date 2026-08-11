@@ -1,8 +1,6 @@
 /**
- * @lovable-new 2026-08-05
  * Teaching Materials browser used by teachers and school admins.
  * Flat structure: strength categories → articles → Google Slides.
- * (Sub-categories were removed 2026-08-05.)
  */
 import { useMemo, useState } from "react";
 import { StickyNote } from "@/components/StickyNote";
@@ -11,6 +9,16 @@ import { useLanguage, useTr } from "@/lib/i18n";
 import { getStrengthColor, getStrengthName } from "@/lib/strengths-i18n";
 import { ArticleView } from "@/components/teach/ArticleView";
 import { pickLang, useTeachingMaterials } from "@/hooks/useTeachingMaterials";
+import type { TeachingCategory } from "@/lib/teaching.functions";
+
+function categoryThumbnail(
+  category: TeachingCategory,
+  lang: "fi" | "en" | "sv",
+): string | null {
+  if (lang === "en") return category.thumbnail_url_en;
+  if (lang === "sv") return category.thumbnail_url_sv;
+  return category.thumbnail_url_fi;
+}
 
 export function MaterialsBrowser({
   showCounts = false,
@@ -112,7 +120,6 @@ export function MaterialsBrowser({
         </nav>
       )}
 
-      {/* Level 1 — strength categories */}
       {!category && (
         <StickyNote seed="materials-cats" className="space-y-3">
           <h3 className="flex items-center gap-2 text-xl font-bold">
@@ -121,31 +128,49 @@ export function MaterialsBrowser({
           {visibleCategories.length === 0 ? (
             <p className="opacity-70">{tr("Ei materiaaleja vielä.")}</p>
           ) : (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {visibleCategories.map(({ c, count }) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => setCatId(c.id)}
-                  className="rounded-2xl p-4 text-left text-white shadow transition-transform hover:-translate-y-0.5"
-                  style={{ background: getStrengthColor(Number(c.strength_id)) }}
-                >
-                  <span className="block text-lg font-bold">
-                    {getStrengthName(Number(c.strength_id), lang)}
-                  </span>
-                  {showCounts && (
-                    <span className="block text-sm opacity-90">
-                      {count} {tr("Artikkeleita")}
-                    </span>
-                  )}
-                </button>
-              ))}
+            <div className="grid grid-cols-3 gap-4">
+              {visibleCategories.map(({ c, count }) => {
+                const color = getStrengthColor(Number(c.strength_id));
+                const thumbnail = categoryThumbnail(c, lang);
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setCatId(c.id)}
+                    className="overflow-hidden rounded-2xl bg-white text-left shadow transition-transform hover:-translate-y-0.5"
+                  >
+                    {thumbnail ? (
+                      <img
+                        src={thumbnail}
+                        alt={getStrengthName(Number(c.strength_id), lang)}
+                        loading="lazy"
+                        className="aspect-video w-full object-cover"
+                      />
+                    ) : (
+                      <div
+                        className="aspect-video w-full"
+                        style={{ background: color }}
+                        aria-hidden
+                      />
+                    )}
+                    <div className="p-4 text-white" style={{ background: color }}>
+                      <span className="block text-lg font-bold">
+                        {getStrengthName(Number(c.strength_id), lang)}
+                      </span>
+                      {showCounts && (
+                        <span className="block text-sm opacity-90">
+                          {count} {tr("Artikkeleita")}
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           )}
         </StickyNote>
       )}
 
-      {/* Level 2 — articles of that strength */}
       {category && !article && (
         <StickyNote seed="materials-articles" className="space-y-3">
           <h3 className="text-xl font-bold">{strengthName}</h3>
@@ -179,7 +204,6 @@ export function MaterialsBrowser({
         </StickyNote>
       )}
 
-      {/* Level 3 — Google Slides viewer */}
       {article && <ArticleView article={article} lang={lang} />}
     </div>
   );
