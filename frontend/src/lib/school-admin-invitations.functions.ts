@@ -16,17 +16,29 @@ async function assertSuperAdmin(supabase: any, userId: string) {
   if (error || !data) throw new Error("Forbidden");
 }
 
+function secureIndex(max: number): number {
+  const limit = Math.floor(256 / max) * max;
+  const byte = new Uint8Array(1);
+  do {
+    crypto.getRandomValues(byte);
+  } while (byte[0] >= limit);
+  return byte[0] % max;
+}
+
 function randomSchoolAdminCode(): string {
-  // 20 hexadecimal characters = 80 bits of entropy, plus a role-specific prefix.
-  const token = crypto.randomUUID().replace(/-/g, "").slice(0, 20).toUpperCase();
-  return `ADMIN-${token}`;
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const digits = "0123456789";
+  let code = "";
+  for (let i = 0; i < 6; i++) code += letters[secureIndex(letters.length)];
+  for (let i = 0; i < 2; i++) code += digits[secureIndex(digits.length)];
+  return code;
 }
 
 export const validateSchoolAdminCode = createServerFn({ method: "POST" })
   .inputValidator((d: { code: string }) => d)
   .handler(async ({ data }) => {
     const code = data.code.trim().toUpperCase();
-    if (!/^ADMIN-[A-F0-9]{20}$/.test(code)) return { valid: false as const };
+    if (!/^[A-Z]{6}[0-9]{2}$/.test(code)) return { valid: false as const };
 
     const db = await admin();
     const { data: invite, error } = await db
