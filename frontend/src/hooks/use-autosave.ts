@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, createElement, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export type SaveState = "idle" | "saving" | "saved" | "error";
@@ -17,11 +17,7 @@ export function AutosaveScope({
   enabled: boolean;
   children: ReactNode;
 }) {
-  return (
-    <AutosaveEnabledContext.Provider value={enabled}>
-      {children}
-    </AutosaveEnabledContext.Provider>
-  );
+  return createElement(AutosaveEnabledContext.Provider, { value: enabled }, children);
 }
 
 /**
@@ -71,10 +67,6 @@ export function useAutosave<T>(
         }
         setState("saved");
 
-        // Keep progression gating in sync immediately after a successful save.
-        // Supabase realtime can arrive slightly later; without this optimistic
-        // local signal, a student can click Next after completing a screen and
-        // still be redirected back as "previous screens incomplete".
         if (typeof window !== "undefined") {
           window.dispatchEvent(
             new CustomEvent("student-response-saved", {
