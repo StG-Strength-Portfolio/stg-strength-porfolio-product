@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode, SyntheticEvent } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { CornerBlobs } from "@/components/CornerBlobs";
@@ -120,7 +120,7 @@ export function DashboardShell({
     window.location.href = "/superadmin/dashboard";
   }
 
-  function blockPreviewMutation(e: React.SyntheticEvent) {
+  function blockPreviewMutation(e: SyntheticEvent) {
     if (!rolePreview) return;
     e.preventDefault();
     e.stopPropagation();
