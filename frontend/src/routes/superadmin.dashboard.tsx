@@ -15,17 +15,18 @@ import { useLanguage, useTr } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { EmailTemplatesTab } from "@/components/superadmin/EmailTemplatesTab";
 import { EmailAnalyticsTab } from "@/components/superadmin/EmailAnalyticsTab";
-// @lovable-new
 import { TeachingMaterialsTab } from "@/components/superadmin/TeachingMaterialsTab";
 import { SuperAdminsTab } from "@/components/superadmin/SuperAdminsTab";
-// @lovable-new 2026-08-08 — super admin "view as student" (view mode only)
 import { setStudentViewMode } from "@/lib/progression";
+import {
+  getCurrentSchoolAdminCodes,
+  generateSecureSchoolAdminCode,
+} from "@/lib/school-admin-invitations.functions";
 import {
   listSchools,
   createSchool,
   renewSchool,
   updateSchool,
-  generateSchoolCode,
   type SchoolRow,
 } from "@/lib/superadmin.functions";
 
@@ -76,17 +77,27 @@ function SuperAdminDashboard() {
   const { language } = useLanguage();
   const studentViewLabel =
     language === "en" ? "View as student" : language === "sv" ? "Visa elevvyn" : "Näytä oppilaan näkymä";
+  const schoolAdminCodeLabel =
+    language === "en"
+      ? "School admin code"
+      : language === "sv"
+        ? "Kod för skoladministratör"
+        : "Koulun admin-koodi";
+  const noActiveCodeLabel =
+    language === "en" ? "No active code" : language === "sv" ? "Ingen aktiv kod" : "Ei aktiivista koodia";
   const navigate = useNavigate();
   const ready = useSuperAdminGuard();
   const tab: Tab = Route.useSearch().tab ?? "schools";
 
   const fetchSchools = useServerFn(listSchools);
+  const fetchAdminCodes = useServerFn(getCurrentSchoolAdminCodes);
   const addSchool = useServerFn(createSchool);
   const renew = useServerFn(renewSchool);
   const edit = useServerFn(updateSchool);
-  const genCode = useServerFn(generateSchoolCode);
+  const genCode = useServerFn(generateSecureSchoolAdminCode);
 
   const [schools, setSchools] = useState<SchoolRow[]>([]);
+  const [adminCodes, setAdminCodes] = useState<Record<string, string>>({});
   const [name, setName] = useState("");
   const [start, setStart] = useState(today());
   const [expiry, setExpiry] = useState("");
@@ -94,11 +105,13 @@ function SuperAdminDashboard() {
 
   const load = useCallback(async () => {
     try {
-      setSchools(await fetchSchools());
+      const [schoolRows, currentCodes] = await Promise.all([fetchSchools(), fetchAdminCodes()]);
+      setSchools(schoolRows);
+      setAdminCodes(currentCodes);
     } catch (e) {
       toast.error((e as Error).message);
     }
-  }, [fetchSchools]);
+  }, [fetchAdminCodes, fetchSchools]);
 
   useEffect(() => {
     if (ready) void load();
@@ -119,7 +132,8 @@ function SuperAdminDashboard() {
           expiry: new Date(expiry).toISOString(),
         },
       });
-      toast.success(`${tr("Koulu lisätty! Koodi: ")}${res.code}`);
+      const invite = await genCode({ data: { schoolId: res.id } });
+      toast.success(`${tr("Koulu lisätty! Koodi: ")}${invite.code}`);
       setName("");
       setExpiry("");
       await load();
@@ -194,8 +208,6 @@ function SuperAdminDashboard() {
               </Link>
             ))}
           </nav>
-          {/* @lovable-new 2026-08-08 — QA: open the student-facing portfolio
-              with full bypass. View mode only — the DB role stays super_admin. */}
           <button
             type="button"
             className="mt-4 block w-full rounded-full bg-[color:var(--yellow)] px-4 py-2 text-sm font-bold text-[color:var(--purple)]"
@@ -273,7 +285,7 @@ function SuperAdminDashboard() {
                     <thead>
                       <tr className="border-b border-black/10">
                         <th className="py-2 pr-3">{tr("Koulun nimi")}</th>
-                        <th className="py-2 pr-3">{tr("Koulukoodi")}</th>
+                        <th className="py-2 pr-3">{schoolAdminCodeLabel}</th>
                         <th className="py-2 pr-3">{tr("Tila")}</th>
                         <th className="py-2 pr-3">{tr("Laskutus aloitus")}</th>
                         <th className="py-2 pr-3">{tr("Vanhentuminen")}</th>
@@ -288,7 +300,11 @@ function SuperAdminDashboard() {
                         <tr key={s.id} className="border-b border-black/5 align-top">
                           <td className="py-2 pr-3 font-medium">{s.name}</td>
                           <td className="py-2 pr-3">
-                            <CopyCode code={s.code} />
+                            {adminCodes[s.id] ? (
+                              <CopyCode code={adminCodes[s.id]} />
+                            ) : (
+                              <span className="text-xs opacity-60">{noActiveCodeLabel}</span>
+                            )}
                           </td>
                           <td className="py-2 pr-3">
                             <span
@@ -431,7 +447,6 @@ function SuperAdminDashboard() {
             </>
           )}
 
-          {/* @lovable-new */}
           {tab === "materials" && <TeachingMaterialsTab />}
 
           {tab === "reports" && (

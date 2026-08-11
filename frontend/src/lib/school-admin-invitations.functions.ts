@@ -34,6 +34,63 @@ function randomSchoolAdminCode(): string {
   return code;
 }
 
+export async function createSchoolAdminInvitation(
+  db: any,
+  schoolId: string,
+  createdBy: string,
+): Promise<string> {
+  // Keep only one current unused school-admin invitation per school.
+  const { error: revokeError } = await db
+    .from("school_codes")
+    .update({ is_revoked: true })
+    .eq("school_id", schoolId)
+    .eq("code_type", "school")
+    .eq("is_used", false)
+    .eq("is_revoked", false);
+  if (revokeError) throw new Error(revokeError.message);
+
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const code = randomSchoolAdminCode();
+    const { error } = await db.from("school_codes").insert({
+      school_id: schoolId,
+      code,
+      code_type: "school",
+      created_by_super_admin_id: createdBy,
+      created_by: createdBy,
+      is_used: false,
+      is_revoked: false,
+    });
+
+    if (!error) return code;
+    if ((error as { code?: string }).code !== "23505") throw new Error(error.message);
+  }
+
+  throw new Error("Could not generate a unique school admin code");
+}
+
+export const getCurrentSchoolAdminCodes = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<Record<string, string>> => {
+    await assertSuperAdmin(context.supabase, context.userId);
+    const db = await admin();
+    const { data, error } = await db
+      .from("school_codes")
+      .select("school_id, code, created_at")
+      .eq("code_type", "school")
+      .eq("is_used", false)
+      .eq("is_revoked", false)
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+
+    const current: Record<string, string> = {};
+    for (const row of data ?? []) {
+      if (!current[row.school_id] && /^[A-Z]{6}[0-9]{2}$/.test(row.code)) {
+        current[row.school_id] = row.code;
+      }
+    }
+    return current;
+  });
+
 export const validateSchoolAdminCode = createServerFn({ method: "POST" })
   .inputValidator((d: { code: string }) => d)
   .handler(async ({ data }) => {
@@ -78,21 +135,6 @@ export const generateSecureSchoolAdminCode = createServerFn({ method: "POST" })
     if (!school?.id) throw new Error("School not found");
     if (!school.is_active) throw new Error("School is inactive");
 
-    for (let attempt = 0; attempt < 5; attempt++) {
-      const code = randomSchoolAdminCode();
-      const { error } = await db.from("school_codes").insert({
-        school_id: data.schoolId,
-        code,
-        code_type: "school",
-        created_by_super_admin_id: context.userId,
-        created_by: context.userId,
-        is_used: false,
-        is_revoked: false,
-      });
-
-      if (!error) return { code };
-      if ((error as { code?: string }).code !== "23505") throw new Error(error.message);
-    }
-
-    throw new Error("Could not generate a unique school admin code");
+    const code = await createSchoolAdminInvitation(db, data.schoolId, context.userId);
+    return { code };
   });

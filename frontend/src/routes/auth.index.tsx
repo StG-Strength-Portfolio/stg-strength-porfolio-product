@@ -5,7 +5,7 @@ import { CornerBlobs } from "@/components/CornerBlobs";
 import { StickyNote } from "@/components/StickyNote";
 import { Button } from "@/components/ui/button";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
-import { useLanguage, useT, useTr } from "@/lib/i18n";
+import { useT, useTr } from "@/lib/i18n";
 import { z } from "zod";
 
 export const Route = createFileRoute("/auth/")({
@@ -13,18 +13,11 @@ export const Route = createFileRoute("/auth/")({
   component: AuthLanding,
 });
 
-const schoolAdminLabel = {
-  fi: "Luo koulun admin-tili",
-  en: "Create school admin account",
-  sv: "Skapa konto för skoladministratör",
-} as const;
-
 function AuthLanding() {
   const navigate = useNavigate();
   const search = Route.useSearch();
   const t = useT();
   const tr = useTr();
-  const { language } = useLanguage();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -66,13 +59,6 @@ function AuthLanding() {
             className="w-full rounded-full bg-yellow hover:bg-yellow/90 text-ink font-bold py-6 text-base h-auto"
           >
             {tr("Luo opettajatili")}
-          </Button>
-          <Button
-            asChild
-            variant="outline"
-            className="w-full rounded-full border-2 border-[color:var(--purple)] bg-white py-6 text-base font-bold text-[color:var(--purple)] h-auto"
-          >
-            <a href="/register-school-admin">{schoolAdminLabel[language]}</a>
           </Button>
         </StickyNote>
       </div>
