@@ -33,7 +33,11 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
 }
 
 function createSupabaseAdminClient() {
-  const SUPABASE_URL = process.env.SUPABASE_URL;
+  // The URL isn't sensitive, so it's safe to fall back to the Vite build-time
+  // constant when the plain runtime env binding isn't available. The service
+  // role key must never be build-time-inlined (that would ship it to the
+  // browser bundle), so it only ever comes from the runtime env binding.
+  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
   const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
