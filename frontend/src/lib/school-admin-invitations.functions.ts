@@ -22,6 +22,30 @@ function randomSchoolAdminCode(): string {
   return `ADMIN-${token}`;
 }
 
+export const validateSchoolAdminCode = createServerFn({ method: "POST" })
+  .inputValidator((d: { code: string }) => d)
+  .handler(async ({ data }) => {
+    const code = data.code.trim().toUpperCase();
+    if (!/^ADMIN-[A-F0-9]{20}$/.test(code)) return { valid: false as const };
+
+    const db = await admin();
+    const { data: invite, error } = await db
+      .from("school_codes")
+      .select("school_id, is_used, is_revoked, schools!inner(name, is_active)")
+      .eq("code", code)
+      .eq("code_type", "school")
+      .maybeSingle();
+
+    if (error || !invite || invite.is_used || invite.is_revoked) {
+      return { valid: false as const };
+    }
+
+    const school = Array.isArray(invite.schools) ? invite.schools[0] : invite.schools;
+    if (!school?.is_active) return { valid: false as const };
+
+    return { valid: true as const, schoolName: school.name as string };
+  });
+
 export const generateSecureSchoolAdminCode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { schoolId: string }) => d)
