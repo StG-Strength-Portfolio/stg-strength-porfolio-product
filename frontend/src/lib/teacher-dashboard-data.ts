@@ -10,6 +10,7 @@ import type { Language } from "@/lib/i18n";
 import { matchStrengthId, strengthIdsFromResponses } from "@/lib/strength-jar-data";
 import type { ReportEvent } from "@/lib/report-series";
 import { getSuperAdminPreview } from "@/lib/superadmin-preview";
+import { getDemoTeacherData, onDemoStateChange } from "@/lib/demo-store";
 
 export interface TeacherClass {
   id: string;
@@ -55,11 +56,20 @@ export function useTeacherData() {
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
+      const preview = getSuperAdminPreview();
+      if (preview.mode === "teacher") {
+        const demo = getDemoTeacherData();
+        setClasses(demo.classes);
+        setDeletedClasses(demo.deletedClasses);
+        setStudents(demo.students);
+        setAssigned(demo.assigned);
+        setEvents(demo.events);
+        return;
+      }
+
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return;
-      const preview = getSuperAdminPreview();
-      const teacherId =
-        preview.mode === "teacher" && preview.teacherId ? preview.teacherId : u.user.id;
+      const teacherId = u.user.id;
 
       const { data: cls } = await supabase
         .from("classes" as never)
@@ -213,6 +223,10 @@ export function useTeacherData() {
 
   useEffect(() => {
     void refresh();
+
+    if (getSuperAdminPreview().mode === "teacher") {
+      return onDemoStateChange(() => void refresh());
+    }
 
     const channel = supabase
       .channel("teacher-strength-reports")
