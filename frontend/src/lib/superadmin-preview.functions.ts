@@ -24,10 +24,14 @@ export interface RolePreviewTarget {
   teacherName: string | null;
 }
 
-export const getRolePreviewTarget = createServerFn({ method: "POST" })
+/**
+ * Use the newest active school as the simple role-preview context. Teacher
+ * preview uses a teacher from that same school so teacher and principal views
+ * remain aligned to one remembered session context.
+ */
+export const getRolePreviewTarget = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { mode: "teacher" | "principal" }) => d)
-  .handler(async ({ data, context }): Promise<RolePreviewTarget> => {
+  .handler(async ({ context }): Promise<RolePreviewTarget> => {
     await assertSuperAdmin(context.supabase, context.userId);
     const db = await admin();
 
@@ -35,67 +39,42 @@ export const getRolePreviewTarget = createServerFn({ method: "POST" })
       .from("schools")
       .select("id, name, created_at")
       .eq("is_active", true)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(1);
     if (schoolError) throw new Error(schoolError.message);
 
-    const schoolRows = (schools ?? []) as Array<{ id: string; name: string }>;
-    const principalSchool = schoolRows[0];
-    if (!principalSchool) {
+    const school = (schools ?? [])[0] as { id: string; name: string } | undefined;
+    if (!school) {
       return { schoolId: null, schoolName: null, teacherId: null, teacherName: null };
     }
 
-    if (data.mode === "principal") {
-      return {
-        schoolId: principalSchool.id,
-        schoolName: principalSchool.name,
-        teacherId: null,
-        teacherName: null,
-      };
-    }
-
-    const activeSchoolIds = new Set(schoolRows.map((s) => s.id));
-    const { data: teacherRoles } = await db
-      .from("user_roles")
-      .select("user_id")
-      .eq("role", "teacher");
-    const teacherIds = ((teacherRoles ?? []) as Array<{ user_id: string }>).map((r) => r.user_id);
-
-    if (!teacherIds.length) {
-      return {
-        schoolId: principalSchool.id,
-        schoolName: principalSchool.name,
-        teacherId: null,
-        teacherName: null,
-      };
-    }
-
-    const { data: teacherProfiles } = await db
+    const { data: profiles } = await db
       .from("profiles")
-      .select("id, display_name, school_id")
-      .in("id", teacherIds);
-    const teacher = (
-      (teacherProfiles ?? []) as Array<{
-        id: string;
-        display_name: string | null;
-        school_id: string | null;
-      }>
-    ).find((p) => p.school_id && activeSchoolIds.has(p.school_id));
+      .select("id, display_name")
+      .eq("school_id", school.id);
+    const profileRows = (profiles ?? []) as Array<{ id: string; display_name: string | null }>;
+    const ids = profileRows.map((p) => p.id);
 
-    if (!teacher?.school_id) {
-      return {
-        schoolId: principalSchool.id,
-        schoolName: principalSchool.name,
-        teacherId: null,
-        teacherName: null,
-      };
+    let teacherId: string | null = null;
+    let teacherName: string | null = null;
+    if (ids.length) {
+      const { data: roles } = await db
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "teacher")
+        .in("user_id", ids)
+        .limit(1);
+      teacherId = ((roles ?? []) as Array<{ user_id: string }>)[0]?.user_id ?? null;
+      teacherName = teacherId
+        ? profileRows.find((p) => p.id === teacherId)?.display_name ?? null
+        : null;
     }
 
-    const teacherSchool = schoolRows.find((s) => s.id === teacher.school_id) ?? principalSchool;
     return {
-      schoolId: teacherSchool.id,
-      schoolName: teacherSchool.name,
-      teacherId: teacher.id,
-      teacherName: teacher.display_name,
+      schoolId: school.id,
+      schoolName: school.name,
+      teacherId,
+      teacherName,
     };
   });
 
