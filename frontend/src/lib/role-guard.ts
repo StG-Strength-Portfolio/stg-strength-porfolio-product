@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import type { AppRole } from "@/lib/auth-helpers";
+import { getSuperAdminPreview } from "@/lib/superadmin-preview";
 
 export interface RoleGuardState {
   ready: boolean;
@@ -11,6 +12,7 @@ export interface RoleGuardState {
   schoolName: string | null;
   displayName: string | null;
   email: string | null;
+  preview: boolean;
 }
 
 /** Reads the current user's role (defaults to student). */
@@ -42,8 +44,9 @@ export function homeForRole(role: AppRole | null): string {
 }
 
 /**
- * Client-side gate for role-scoped dashboards. Signed-out users go to /auth,
- * users with a different role are sent to their own dashboard.
+ * Client-side gate for role-scoped dashboards. Superadmins may enter the
+ * teacher or principal UI only when the explicit session preview mode matches.
+ * Their real database role is never changed.
  */
 export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
   const navigate = useNavigate();
@@ -55,6 +58,7 @@ export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
     schoolName: null,
     displayName: null,
     email: null,
+    preview: false,
   });
 
   useEffect(() => {
@@ -72,6 +76,50 @@ export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
         .eq("user_id", user.id)
         .maybeSingle();
       const role = ((roleRow as { role?: AppRole } | null)?.role ?? "student") as AppRole;
+
+      if (role === "super_admin") {
+        const preview = getSuperAdminPreview();
+        const wantsTeacher = preview.mode === "teacher" && allowed.includes("teacher");
+        const wantsPrincipal = preview.mode === "principal" && allowed.includes("school_admin");
+        if (wantsTeacher || wantsPrincipal) {
+          const targetId = wantsTeacher ? preview.teacherId : null;
+          let displayName: string | null = wantsTeacher ? "Teacher preview" : "Principal preview";
+          let email: string | null = null;
+          if (targetId) {
+            const { data: profile } = await supabase
+              .from("profiles" as never)
+              .select("display_name")
+              .eq("id", targetId)
+              .maybeSingle();
+            displayName =
+              (profile as { display_name?: string | null } | null)?.display_name ?? displayName;
+          }
+
+          let schoolName: string | null = null;
+          if (preview.schoolId) {
+            const { data: school } = await supabase
+              .from("schools" as never)
+              .select("name")
+              .eq("id", preview.schoolId)
+              .maybeSingle();
+            schoolName = (school as { name?: string } | null)?.name ?? null;
+          }
+
+          if (cancelled) return;
+          setState({
+            ready: true,
+            role: wantsTeacher ? "teacher" : "school_admin",
+            userId: targetId,
+            schoolId: preview.schoolId,
+            schoolName,
+            displayName,
+            email,
+            preview: true,
+          });
+          return;
+        }
+      }
+
       if (!allowed.includes(role)) {
         window.location.href = homeForRole(role);
         return;
@@ -102,6 +150,7 @@ export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
         schoolName,
         displayName: p?.display_name ?? null,
         email: user.email ?? null,
+        preview: false,
       });
     })();
     return () => {
