@@ -11,10 +11,10 @@ import { Label } from "@/components/ui/label";
 import { CornerBlobs } from "@/components/CornerBlobs";
 import { StickyNote } from "@/components/StickyNote";
 import { useSuperAdminGuard } from "@/lib/superadmin-guard";
-import { useTr } from "@/lib/i18n";
+import { useLanguage, useTr } from "@/lib/i18n";
+import { generateSecureSchoolAdminCode } from "@/lib/school-admin-invitations.functions";
 import {
   getSchoolDetail,
-  generateSchoolCode,
   revokeSchoolCode,
   renewSchool,
   updateUserCredentials,
@@ -29,12 +29,38 @@ export const Route = createFileRoute("/superadmin/schools/$schoolId")({
 
 type Detail = Awaited<ReturnType<typeof getSchoolDetail>>;
 
+const inviteCopy = {
+  fi: {
+    generate: "Luo koulun admin-koodi",
+    linkTitle: "Koulun adminin rekisteröitymislinkki",
+    linkHint: "Anna koulun adminille tämä linkki ja erikseen kertakäyttöinen ADMIN-koodi.",
+    copyLink: "Kopioi linkki",
+    codeCreated: "Uusi koulun admin-koodi luotu: ",
+  },
+  en: {
+    generate: "Generate school admin code",
+    linkTitle: "School admin registration link",
+    linkHint: "Give the school admin this link and the one-time ADMIN code separately.",
+    copyLink: "Copy link",
+    codeCreated: "New school admin code created: ",
+  },
+  sv: {
+    generate: "Skapa kod för skoladministratör",
+    linkTitle: "Registreringslänk för skoladministratör",
+    linkHint: "Ge skoladministratören denna länk och engångskoden ADMIN separat.",
+    copyLink: "Kopiera länk",
+    codeCreated: "Ny kod för skoladministratör skapad: ",
+  },
+} as const;
+
 function SchoolDetailPage() {
   const tr = useTr();
+  const { language } = useLanguage();
+  const inviteText = inviteCopy[language];
   const ready = useSuperAdminGuard();
   const { schoolId } = Route.useParams();
   const fetchDetail = useServerFn(getSchoolDetail);
-  const genCode = useServerFn(generateSchoolCode);
+  const genCode = useServerFn(generateSecureSchoolAdminCode);
   const revoke = useServerFn(revokeSchoolCode);
   const renew = useServerFn(renewSchool);
   const updateCreds = useServerFn(updateUserCredentials);
@@ -288,17 +314,46 @@ function SchoolDetailPage() {
         )}
 
         {tab === "codes" && (
-          <StickyNote seed="sa-detail-codes" className="space-y-3 overflow-x-auto">
+          <StickyNote seed="sa-detail-codes" className="space-y-4 overflow-x-auto">
+            <div className="rounded-xl bg-black/5 p-4">
+              <p className="font-semibold">{inviteText.linkTitle}</p>
+              <p className="mt-1 text-sm opacity-75">{inviteText.linkHint}</p>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <code className="rounded bg-white/70 px-3 py-2 text-sm">/register-school-admin</code>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="rounded-full"
+                  onClick={() => {
+                    const url = `${window.location.origin}/register-school-admin`;
+                    void navigator.clipboard.writeText(url);
+                    toast.success(tr("Kopioitu!"));
+                  }}
+                >
+                  <Copy className="mr-1 h-4 w-4" /> {inviteText.copyLink}
+                </Button>
+                <a
+                  href="/register-school-admin"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-sm font-semibold text-[color:var(--purple)] underline"
+                >
+                  {inviteText.linkTitle}
+                </a>
+              </div>
+            </div>
+
             <Button
               className="rounded-full bg-[color:var(--purple)] text-white font-bold"
               onClick={async () => {
                 const res = await genCode({ data: { schoolId } });
-                toast.success(`${tr("Uusi koodi luotu: ")}${res.code}`);
+                toast.success(`${inviteText.codeCreated}${res.code}`);
                 await load();
               }}
             >
-              {tr("Luo koodi")}
+              {inviteText.generate}
             </Button>
+
             <table className="w-full text-left text-sm">
               <thead>
                 <tr className="border-b border-black/10">
