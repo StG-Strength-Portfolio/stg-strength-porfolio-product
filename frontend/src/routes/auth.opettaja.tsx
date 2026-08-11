@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CornerBlobs } from "@/components/CornerBlobs";
 import { StickyNote } from "@/components/StickyNote";
+import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
 import { toast } from "sonner";
 import { useT } from "@/lib/i18n";
 
@@ -64,6 +65,7 @@ function TeacherSignup() {
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-hidden flex items-center justify-center px-4 py-10">
       <CornerBlobs />
+      <AuthLanguageSwitcher />
       <div className="relative z-10 w-full max-w-md space-y-6">
         <div className="text-center">
           <h1 className="text-4xl font-bold">{t("auth.teacher.title")}</h1>
