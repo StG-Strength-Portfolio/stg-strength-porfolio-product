@@ -24,7 +24,7 @@ const copy = {
     email: "Sähköposti",
     password: "Salasana",
     code: "Koulun admin-koodi",
-    codeHint: "Koodi alkaa muodossa ADMIN- ja on kertakäyttöinen.",
+    codeHint: "Koodi sisältää 6 isoa kirjainta ja 2 numeroa, esimerkiksi ABCDEF12. Koodi on kertakäyttöinen.",
     submit: "Rekisteröidy koulun adminiksi",
     busy: "Rekisteröidään…",
     invalidCode: "Koulun admin-koodi ei ole voimassa tai se on jo käytetty.",
@@ -40,7 +40,7 @@ const copy = {
     email: "Email",
     password: "Password",
     code: "School admin code",
-    codeHint: "The code starts with ADMIN- and can only be used once.",
+    codeHint: "The code contains 6 uppercase letters and 2 digits, for example ABCDEF12. It can only be used once.",
     submit: "Register as school admin",
     busy: "Registering…",
     invalidCode: "This school admin code is invalid, expired, revoked, or already used.",
@@ -56,7 +56,7 @@ const copy = {
     email: "E-post",
     password: "Lösenord",
     code: "Kod för skoladministratör",
-    codeHint: "Koden börjar med ADMIN- och kan bara användas en gång.",
+    codeHint: "Koden innehåller 6 stora bokstäver och 2 siffror, till exempel ABCDEF12. Den kan bara användas en gång.",
     submit: "Registrera som skoladministratör",
     busy: "Registrerar…",
     invalidCode: "Koden för skoladministratör är ogiltig, spärrad eller redan använd.",
@@ -211,8 +211,10 @@ function RegisterSchoolAdmin() {
                 id="school-admin-code"
                 required
                 value={code}
-                onChange={(e) => setCode(e.target.value.toUpperCase())}
-                placeholder="ADMIN-0123456789ABCDEFABCD"
+                onChange={(e) => setCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8))}
+                placeholder="ABCDEF12"
+                maxLength={8}
+                pattern="[A-Z]{6}[0-9]{2}"
                 className="uppercase tracking-wider"
                 autoComplete="off"
               />
