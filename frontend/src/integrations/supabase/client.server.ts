@@ -50,6 +50,20 @@ function createSupabaseAdminClient() {
   const SUPABASE_SERVICE_ROLE_KEY =
     cfEnv?.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+  // TEMPORARY DIAGNOSTIC — safe to leave logged briefly, never prints values,
+  // only whether each source exists and which keys it has. Remove once the
+  // env-binding issue is confirmed fixed.
+  console.error(
+    "[Supabase][diag]",
+    JSON.stringify({
+      hasGlobalEnv: typeof globalThis !== "undefined" && "__env__" in globalThis,
+      globalEnvKeys: cfEnv ? Object.keys(cfEnv) : null,
+      hasProcessEnv: typeof process !== "undefined" && !!process.env,
+      processEnvKeys: typeof process !== "undefined" && process.env ? Object.keys(process.env) : null,
+      hasViteUrl: !!import.meta.env.VITE_SUPABASE_URL,
+    }),
+  );
+
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
     const missing = [
       ...(!SUPABASE_URL ? ["SUPABASE_URL"] : []),
