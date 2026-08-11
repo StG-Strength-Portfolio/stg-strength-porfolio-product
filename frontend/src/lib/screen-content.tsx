@@ -108,21 +108,22 @@ function Screen1() {
           pt-[2vh]
         "
       >
-        <img
-          src="/illustrations/naytto-1.png"
-          alt=""
-          aria-hidden="true"
-          className="
-            pointer-events-none
-            block
-            h-auto
-            w-[760px]
-            max-w-[90%]
-            object-contain
-            object-center
-            select-none
-          "
-        />
+       <img
+  src="/illustrations/naytto-1.png"
+  alt=""
+  aria-hidden="true"
+  className="
+    pointer-events-none
+    block
+    h-auto
+    w-[760px]
+    max-w-[90%]
+    object-contain
+    object-center
+    select-none
+    -translate-y-12
+  "
+/>
       </div>
     </div>
   );
