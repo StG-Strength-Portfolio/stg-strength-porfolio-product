@@ -1,6 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { ReceivedStrength } from "@/lib/give-strength.functions";
+import {
+  DEMO_SCHOOL_ID,
+  DEMO_SCHOOL_NAME,
+  DEMO_TEACHER_ID,
+  demoTeacherName,
+} from "@/lib/demo-store";
 
 async function admin() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -25,56 +31,18 @@ export interface RolePreviewTarget {
 }
 
 /**
- * Use the newest active school as the simple role-preview context. Teacher
- * preview uses a teacher from that same school so teacher and principal views
- * remain aligned to one remembered session context.
+ * Superadmin demos always use a deterministic fictional school and teacher.
+ * No customer school or teacher record is needed to enter demo mode.
  */
 export const getRolePreviewTarget = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<RolePreviewTarget> => {
     await assertSuperAdmin(context.supabase, context.userId);
-    const db = await admin();
-
-    const { data: schools, error: schoolError } = await db
-      .from("schools")
-      .select("id, name, created_at")
-      .eq("is_active", true)
-      .order("created_at", { ascending: false })
-      .limit(1);
-    if (schoolError) throw new Error(schoolError.message);
-
-    const school = (schools ?? [])[0] as { id: string; name: string } | undefined;
-    if (!school) {
-      return { schoolId: null, schoolName: null, teacherId: null, teacherName: null };
-    }
-
-    const { data: profiles } = await db
-      .from("profiles")
-      .select("id, display_name")
-      .eq("school_id", school.id);
-    const profileRows = (profiles ?? []) as Array<{ id: string; display_name: string | null }>;
-    const ids = profileRows.map((p) => p.id);
-
-    let teacherId: string | null = null;
-    let teacherName: string | null = null;
-    if (ids.length) {
-      const { data: roles } = await db
-        .from("user_roles")
-        .select("user_id")
-        .eq("role", "teacher")
-        .in("user_id", ids)
-        .limit(1);
-      teacherId = ((roles ?? []) as Array<{ user_id: string }>)[0]?.user_id ?? null;
-      teacherName = teacherId
-        ? profileRows.find((p) => p.id === teacherId)?.display_name ?? null
-        : null;
-    }
-
     return {
-      schoolId: school.id,
-      schoolName: school.name,
-      teacherId,
-      teacherName,
+      schoolId: DEMO_SCHOOL_ID,
+      schoolName: DEMO_SCHOOL_NAME,
+      teacherId: DEMO_TEACHER_ID,
+      teacherName: demoTeacherName("en"),
     };
   });
 
@@ -83,6 +51,27 @@ export const getPreviewTeacherReceivedStrengths = createServerFn({ method: "POST
   .inputValidator((d: { teacherId: string }) => d)
   .handler(async ({ data, context }): Promise<ReceivedStrength[]> => {
     await assertSuperAdmin(context.supabase, context.userId);
+    if (data.teacherId === DEMO_TEACHER_ID) {
+      return [
+        {
+          id: "demo-teacher-strength-1",
+          strengthId: 13,
+          message: "You create a welcoming atmosphere for students.",
+          createdAt: new Date(Date.now() - 3 * 86400000).toISOString(),
+          fromName: "Maya Rivera",
+          fromRole: "student",
+        },
+        {
+          id: "demo-teacher-strength-2",
+          strengthId: 17,
+          message: "Thank you for helping our team move forward together.",
+          createdAt: new Date(Date.now() - 11 * 86400000).toISOString(),
+          fromName: "Michael Anderson",
+          fromRole: "school_admin",
+        },
+      ];
+    }
+
     const db = await admin();
     const { data: role } = await db
       .from("user_roles")
@@ -128,6 +117,17 @@ export const getPreviewSchoolTeachers = createServerFn({ method: "POST" })
   .inputValidator((d: { schoolId: string }) => d)
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.supabase, context.userId);
+    if (data.schoolId === DEMO_SCHOOL_ID) {
+      return [
+        { id: DEMO_TEACHER_ID, name: "Emma Johnson" },
+        { id: "demo-teacher-2", name: "David Miller" },
+        { id: "demo-teacher-3", name: "Olivia Brown" },
+        { id: "demo-teacher-4", name: "James Wilson" },
+        { id: "demo-teacher-5", name: "Sophia Martinez" },
+        { id: "demo-teacher-6", name: "Daniel Lee" },
+      ];
+    }
+
     const db = await admin();
     const { data: profiles } = await db
       .from("profiles")

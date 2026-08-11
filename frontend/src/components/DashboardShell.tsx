@@ -1,4 +1,4 @@
-import type { ReactNode, SyntheticEvent } from "react";
+import type { ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { CornerBlobs } from "@/components/CornerBlobs";
@@ -21,7 +21,13 @@ import {
 } from "@/components/icons/AppIcons";
 import { useLanguage, useTr } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
-import { clearSuperAdminPreview, getSuperAdminPreview } from "@/lib/superadmin-preview";
+import {
+  clearSuperAdminPreview,
+  getSuperAdminPreview,
+  setSuperAdminPreview,
+} from "@/lib/superadmin-preview";
+import { setStudentViewMode } from "@/lib/progression";
+import { resetDemoState } from "@/lib/demo-store";
 
 export interface ShellTab {
   id: string;
@@ -85,30 +91,21 @@ export function DashboardShell({
   const preview = getSuperAdminPreview();
   const rolePreview = preview.mode === "teacher" || preview.mode === "principal";
 
-  const previewText =
-    preview.mode === "teacher"
-      ? language === "en"
-        ? "Teacher view (Superadmin) — read only"
-        : language === "sv"
-          ? "Lärarvy (huvudadministratör) — skrivskyddad"
-          : "Opettajan näkymä (pääkäyttäjä) — vain luku"
-      : language === "en"
-        ? "Principal view (Superadmin) — read only"
-        : language === "sv"
-          ? "Rektorsvy (huvudadministratör) — skrivskyddad"
-          : "Rehtorin näkymä (pääkäyttäjä) — vain luku";
+  const demoText =
+    language === "en"
+      ? "Demo mode — fictional data"
+      : language === "sv"
+        ? "Demoläge — fiktiva data"
+        : "Demotila — kuvitteellista dataa";
+  const resetLabel =
+    language === "en" ? "Reset demo" : language === "sv" ? "Återställ demo" : "Nollaa demo";
   const exitLabel =
-    preview.mode === "teacher"
-      ? language === "en"
-        ? "Exit teacher view"
-        : language === "sv"
-          ? "Lämna lärarvyn"
-          : "Poistu opettajan näkymästä"
-      : language === "en"
-        ? "Exit principal view"
-        : language === "sv"
-          ? "Lämna rektorsvyn"
-          : "Poistu rehtorin näkymästä";
+    language === "en" ? "Exit demo" : language === "sv" ? "Avsluta demo" : "Poistu demosta";
+  const roleLabels = {
+    student: language === "en" ? "Student" : language === "sv" ? "Elev" : "Opiskelija",
+    teacher: language === "en" ? "Teacher" : language === "sv" ? "Lärare" : "Opettaja",
+    principal: language === "en" ? "Principal" : language === "sv" ? "Rektor" : "Rehtori",
+  };
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -116,14 +113,20 @@ export function DashboardShell({
   }
 
   function exitPreview() {
+    setStudentViewMode(false);
     clearSuperAdminPreview();
     window.location.href = "/superadmin/dashboard";
   }
 
-  function blockPreviewMutation(e: SyntheticEvent) {
-    if (!rolePreview) return;
-    e.preventDefault();
-    e.stopPropagation();
+  function switchDemoRole(mode: "student" | "teacher" | "principal") {
+    setSuperAdminPreview(mode);
+    setStudentViewMode(mode === "student");
+    window.location.href =
+      mode === "student"
+        ? "/seikkailu"
+        : mode === "teacher"
+          ? "/teacher/dashboard"
+          : "/school-admin/dashboard";
   }
 
   return (
@@ -131,14 +134,41 @@ export function DashboardShell({
       <CornerBlobs />
       {rolePreview && (
         <div className="relative z-20 flex flex-wrap items-center justify-between gap-2 bg-[color:var(--yellow)] px-4 py-2 text-sm font-bold text-[color:var(--purple)]">
-          <span>{previewText}</span>
-          <button
-            type="button"
-            onClick={exitPreview}
-            className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[color:var(--purple)] shadow"
-          >
-            {exitLabel}
-          </button>
+          <span>{demoText}</span>
+          <div className="flex flex-wrap items-center gap-1.5">
+            {(["student", "teacher", "principal"] as const).map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => switchDemoRole(mode)}
+                className={cn(
+                  "rounded-full px-3 py-1 text-xs font-bold shadow-sm",
+                  preview.mode === mode
+                    ? "bg-[color:var(--purple)] text-white"
+                    : "bg-white text-[color:var(--purple)]",
+                )}
+              >
+                {roleLabels[mode]}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => {
+                resetDemoState();
+                window.location.reload();
+              }}
+              className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[color:var(--purple)] shadow-sm"
+            >
+              {resetLabel}
+            </button>
+            <button
+              type="button"
+              onClick={exitPreview}
+              className="rounded-full border border-[color:var(--purple)] bg-transparent px-3 py-1 text-xs font-bold text-[color:var(--purple)]"
+            >
+              {exitLabel}
+            </button>
+          </div>
         </div>
       )}
       <div className="relative z-10 mx-auto flex w-full max-w-7xl gap-6 px-4 py-8">
@@ -260,18 +290,7 @@ export function DashboardShell({
             })}
           </nav>
 
-          <div
-            onSubmitCapture={blockPreviewMutation}
-            onClickCapture={(e) => {
-              if (!rolePreview) return;
-              const target = e.target as HTMLElement;
-              const button = target.closest("button");
-              if (button) blockPreviewMutation(e);
-            }}
-            className={rolePreview ? "[&_input]:pointer-events-none [&_textarea]:pointer-events-none [&_select]:pointer-events-none" : undefined}
-          >
-            {children}
-          </div>
+          <div>{children}</div>
 
           <p className="pt-6 text-xs opacity-50 md:hidden">{schoolName ?? ""}</p>
         </main>

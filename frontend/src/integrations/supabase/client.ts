@@ -2,6 +2,13 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 import { missingSupabaseEnvMessage } from "./env";
+import { getSuperAdminPreview } from "@/lib/superadmin-preview";
+import {
+  createDemoClass,
+  deleteDemoClass,
+  giveDemoStudentStrength,
+  restoreDemoClass,
+} from "@/lib/demo-store";
 
 function isNewSupabaseApiKey(value: string): boolean {
   return value.startsWith("sb_publishable_") || value.startsWith("sb_secret_");
@@ -58,9 +65,136 @@ function createSupabaseClient() {
 
 let _supabase: ReturnType<typeof createSupabaseClient> | undefined;
 
+function isDemoMode(): boolean {
+  return getSuperAdminPreview().mode !== null;
+}
+
+type DemoMutation = {
+  table: string;
+  op: "insert" | "update" | "upsert" | "delete";
+  payload?: unknown;
+  filters: Record<string, unknown>;
+  applied: boolean;
+};
+
+function applyDemoMutation(mutation: DemoMutation) {
+  if (mutation.applied) return;
+  mutation.applied = true;
+
+  if (mutation.table === "classes") {
+    if (mutation.op === "insert") {
+      const row = (Array.isArray(mutation.payload) ? mutation.payload[0] : mutation.payload) as
+        | { name?: string; language?: "fi" | "sv" | "en" }
+        | undefined;
+      if (row?.name) createDemoClass(row.name, row.language ?? "fi");
+      return;
+    }
+    const id = String(mutation.filters.id ?? "");
+    const patch = mutation.payload as { is_deleted?: boolean } | undefined;
+    if (id && patch?.is_deleted === true) deleteDemoClass(id);
+    if (id && patch?.is_deleted === false) restoreDemoClass(id);
+    return;
+  }
+
+  if (mutation.table === "teacher_assigned_strengths" && mutation.op === "insert") {
+    const rows = (Array.isArray(mutation.payload) ? mutation.payload : [mutation.payload]) as Array<{
+      student_id?: string;
+      strength_id?: string | number;
+      message?: string | null;
+    }>;
+    const grouped = new Map<string, { ids: number[]; message?: string }>();
+    for (const row of rows) {
+      if (!row?.student_id) continue;
+      const id = Number(row.strength_id);
+      if (!Number.isInteger(id) || id < 1 || id > 26) continue;
+      const current = grouped.get(row.student_id) ?? { ids: [], message: row.message ?? undefined };
+      current.ids.push(id);
+      grouped.set(row.student_id, current);
+    }
+    for (const [studentId, value] of grouped) {
+      giveDemoStudentStrength(studentId, value.ids, value.message);
+    }
+  }
+  // All other client mutations are intentionally successful no-ops in demo
+  // mode. This guarantees a sales demo can never modify customer Supabase data.
+}
+
+function demoMutationBuilder(mutation: DemoMutation): any {
+  const result = { data: null, error: null, count: null, status: 200, statusText: "OK" };
+  const builder: any = {
+    eq(column: string, value: unknown) {
+      mutation.filters[column] = value;
+      return builder;
+    },
+    neq() {
+      return builder;
+    },
+    in() {
+      return builder;
+    },
+    match(values: Record<string, unknown>) {
+      Object.assign(mutation.filters, values);
+      return builder;
+    },
+    select() {
+      return builder;
+    },
+    order() {
+      return builder;
+    },
+    limit() {
+      return builder;
+    },
+    single() {
+      applyDemoMutation(mutation);
+      return Promise.resolve(result);
+    },
+    maybeSingle() {
+      applyDemoMutation(mutation);
+      return Promise.resolve(result);
+    },
+    then(resolve: (value: typeof result) => unknown, reject?: (reason: unknown) => unknown) {
+      try {
+        applyDemoMutation(mutation);
+        return Promise.resolve(result).then(resolve, reject);
+      } catch (error) {
+        return Promise.reject(error).then(resolve, reject);
+      }
+    },
+  };
+  return builder;
+}
+
+function demoSafeTable(table: string, rawBuilder: any): any {
+  return new Proxy(rawBuilder, {
+    get(target, prop) {
+      if (prop === "insert" || prop === "update" || prop === "upsert" || prop === "delete") {
+        return (payload?: unknown) =>
+          demoMutationBuilder({
+            table,
+            op: prop as DemoMutation["op"],
+            payload,
+            filters: {},
+            applied: false,
+          });
+      }
+      const value = Reflect.get(target, prop, target);
+      return typeof value === "function" ? value.bind(target) : value;
+    },
+  });
+}
+
 export const supabase = new Proxy({} as ReturnType<typeof createSupabaseClient>, {
   get(_, prop, receiver) {
     if (!_supabase) _supabase = createSupabaseClient();
+
+    if (prop === "from") {
+      return (table: string) => {
+        const rawBuilder = (_supabase as any).from(table);
+        return isDemoMode() ? demoSafeTable(table, rawBuilder) : rawBuilder;
+      };
+    }
+
     return Reflect.get(_supabase, prop, receiver);
   },
 });

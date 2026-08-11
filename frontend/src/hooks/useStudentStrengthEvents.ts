@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { matchStrengthId, strengthIdsFromResponses } from "@/lib/strength-jar-data";
 import type { ReportEvent } from "@/lib/report-series";
+import { getSuperAdminPreview } from "@/lib/superadmin-preview";
+import { getDemoStudentStrengthEvents, onDemoStateChange } from "@/lib/demo-store";
 
 export function useStudentStrengthEvents() {
   const [events, setEvents] = useState<ReportEvent[]>([]);
@@ -9,6 +11,11 @@ export function useStudentStrengthEvents() {
 
   const refresh = useCallback(async () => {
     try {
+      if (getSuperAdminPreview().mode === "student") {
+        setEvents(getDemoStudentStrengthEvents());
+        return;
+      }
+
       const { data: u } = await supabase.auth.getUser();
       const uid = u.user?.id;
       if (!uid) {
@@ -75,6 +82,8 @@ export function useStudentStrengthEvents() {
     void (async () => {
       await refresh();
       if (cancelled) return;
+      if (getSuperAdminPreview().mode === "student") return;
+
       const { data: u } = await supabase.auth.getUser();
       const uid = u.user?.id;
       if (!uid || cancelled) return;
@@ -104,8 +113,10 @@ export function useStudentStrengthEvents() {
         .subscribe();
     })();
 
+    const offDemo = onDemoStateChange(() => void refresh());
     return () => {
       cancelled = true;
+      offDemo();
       if (channel) void supabase.removeChannel(channel);
     };
   }, [refresh]);

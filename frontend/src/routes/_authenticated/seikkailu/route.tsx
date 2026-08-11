@@ -10,10 +10,16 @@ import { getCurrentRole, getStudentClassMembership } from "@/lib/auth-helpers";
 import type { AppRole } from "@/lib/auth-helpers";
 import { homeForRole } from "@/lib/role-guard";
 import { NavGateProvider } from "@/lib/screen-completion";
-// @lovable-new 2026-08-08 — progression context (locking + super admin bypass)
 import { ProgressionProvider, setStudentViewMode } from "@/lib/progression";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage, useT, isLanguage, languageFromDisplayName } from "@/lib/i18n";
+import {
+  clearSuperAdminPreview,
+  getSuperAdminPreview,
+  setSuperAdminPreview,
+} from "@/lib/superadmin-preview";
+import { DEMO_STUDENT_ID, resetDemoState } from "@/lib/demo-store";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/seikkailu")({
   component: SeikkailuLayout,
@@ -27,30 +33,38 @@ function SeikkailuLayout() {
   const [userId, setUserId] = useState<string | null>(null);
   const t = useT();
   const { language, setLanguage } = useLanguage();
-  const studentViewBanner =
+  const isDemo = role === "super_admin" && getSuperAdminPreview().mode === "student";
+
+  const demoText =
     language === "en"
-      ? "Student view (super admin) — locks bypassed"
+      ? "Demo mode — fictional data"
       : language === "sv"
-        ? "Elevvy (huvudadministratör) — lås ignoreras"
-        : "Oppilasnäkymä (pääkäyttäjä) — lukot ohitettu";
-  const exitStudentViewLabel =
-    language === "en" ? "Exit student view" : language === "sv" ? "Lämna elevvyn" : "Poistu oppilasnäkymästä";
+        ? "Demoläge — fiktiva data"
+        : "Demotila — kuvitteellista dataa";
+  const resetLabel =
+    language === "en" ? "Reset demo" : language === "sv" ? "Återställ demo" : "Nollaa demo";
+  const exitLabel =
+    language === "en" ? "Exit demo" : language === "sv" ? "Avsluta demo" : "Poistu demosta";
+  const roleLabels = {
+    student: language === "en" ? "Student" : language === "sv" ? "Elev" : "Opiskelija",
+    teacher: language === "en" ? "Teacher" : language === "sv" ? "Lärare" : "Opettaja",
+    principal: language === "en" ? "Principal" : language === "sv" ? "Rektor" : "Rehtori",
+  };
 
   useEffect(() => {
     (async () => {
       const { data: u } = await supabase.auth.getUser();
-      setUserId(u.user?.id ?? null);
       const r = await getCurrentRole();
       setRole(r);
 
-      // @lovable-new 2026-08-08 — super admins may open the student view for
-      // QA. Their DB role stays `super_admin`; only the rendered UI changes.
       if (r === "super_admin") {
         setStudentViewMode(true);
+        setUserId(getSuperAdminPreview().mode === "student" ? DEMO_STUDENT_ID : u.user?.id ?? null);
         setReady(true);
         return;
       }
 
+      setUserId(u.user?.id ?? null);
       if (r && r !== "student") {
         window.location.href = homeForRole(r);
         return;
@@ -60,8 +74,6 @@ function SeikkailuLayout() {
         navigate({ to: "/liity-yhteisoon", replace: true });
         return;
       }
-      // Class language governs everything student-facing. Fetch it once
-      // here, apply it, and only then render — avoids flashing Finnish.
       try {
         const { data: removed } = await supabase.rpc("my_classes_deleted" as never);
         if (removed === true) {
@@ -73,20 +85,20 @@ function SeikkailuLayout() {
         console.warn("[class-access] check failed:", err);
       }
       try {
-        const { data: u } = await supabase.auth.getUser();
+        const { data: u2 } = await supabase.auth.getUser();
         let preferredLang: unknown = null;
-        if (u.user) {
+        if (u2.user) {
           const { data: profileData, error: profileError } = await supabase
             .from("profiles" as never)
             .select("language, display_name")
-            .eq("id", u.user.id)
+            .eq("id", u2.user.id)
             .maybeSingle();
           let p = profileData as { language?: string; display_name?: string | null } | null;
           if (profileError) {
             const { data: nameOnly } = await supabase
               .from("profiles" as never)
               .select("display_name")
-              .eq("id", u.user.id)
+              .eq("id", u2.user.id)
               .maybeSingle();
             p = nameOnly as { display_name?: string | null } | null;
           }
@@ -114,6 +126,17 @@ function SeikkailuLayout() {
 
   if (blocked) return <ClassRemovedNotice />;
 
+  function switchDemoRole(mode: "student" | "teacher" | "principal") {
+    setSuperAdminPreview(mode);
+    setStudentViewMode(mode === "student");
+    window.location.href =
+      mode === "student"
+        ? "/seikkailu"
+        : mode === "teacher"
+          ? "/teacher/dashboard"
+          : "/school-admin/dashboard";
+  }
+
   return (
     <ProgressionProvider userId={userId} role={role}>
       <NavGateProvider>
@@ -122,20 +145,47 @@ function SeikkailuLayout() {
             <CornerBlobs />
             <AppSidebar />
             <div className="relative z-10 flex min-h-screen flex-1 flex-col">
-              {/* @lovable-new 2026-08-08 — super admin student-view banner */}
-              {role === "super_admin" && (
+              {isDemo && (
                 <div className="no-print flex flex-wrap items-center justify-between gap-2 bg-[color:var(--yellow)] px-4 py-2 text-sm font-bold text-[color:var(--purple)]">
-                  <span>{studentViewBanner}</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setStudentViewMode(false);
-                      window.location.href = "/superadmin/dashboard";
-                    }}
-                    className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[color:var(--purple)] shadow"
-                  >
-                    {exitStudentViewLabel}
-                  </button>
+                  <span>{demoText}</span>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {(["student", "teacher", "principal"] as const).map((mode) => (
+                      <button
+                        key={mode}
+                        type="button"
+                        onClick={() => switchDemoRole(mode)}
+                        className={cn(
+                          "rounded-full px-3 py-1 text-xs font-bold shadow-sm",
+                          mode === "student"
+                            ? "bg-[color:var(--purple)] text-white"
+                            : "bg-white text-[color:var(--purple)]",
+                        )}
+                      >
+                        {roleLabels[mode]}
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        resetDemoState();
+                        window.location.reload();
+                      }}
+                      className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[color:var(--purple)] shadow-sm"
+                    >
+                      {resetLabel}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStudentViewMode(false);
+                        clearSuperAdminPreview();
+                        window.location.href = "/superadmin/dashboard";
+                      }}
+                      className="rounded-full border border-[color:var(--purple)] bg-transparent px-3 py-1 text-xs font-bold text-[color:var(--purple)]"
+                    >
+                      {exitLabel}
+                    </button>
+                  </div>
                 </div>
               )}
               <TopBar />
