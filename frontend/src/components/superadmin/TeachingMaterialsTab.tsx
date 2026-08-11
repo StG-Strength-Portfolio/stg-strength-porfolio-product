@@ -1,8 +1,5 @@
 /**
- * @lovable-new 2026-08-04
- * Super admin "Teaching Materials" tab — manage the three-level library:
- * @lovable-new 2026-08-05 flat structure: strength categories → articles that
- * embed a Google Slides deck per language (sub-categories removed).
+ * Super admin "Teaching Materials" tab — manage strength categories and articles.
  */
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -22,11 +19,12 @@ import {
   deleteTeachingArticle,
   deleteTeachingCategory,
   saveTeachingArticle,
+  saveTeachingCategoryThumbnails,
   setTeachingCategoryPublished,
   type TeachingArticle,
+  type TeachingCategory,
 } from "@/lib/teaching.functions";
 
-/** Small "hidden from users" pill shown next to unpublished rows. */
 function HiddenBadge({ label }: { label: string }) {
   return (
     <span className="rounded-full bg-slate-900/10 px-2 py-0.5 text-xs font-bold text-slate-700">
@@ -35,7 +33,6 @@ function HiddenBadge({ label }: { label: string }) {
   );
 }
 
-/** Checkbox that flips the published flag for a folder or category. */
 function PublishToggle({
   checked,
   disabled,
@@ -61,13 +58,21 @@ function PublishToggle({
   );
 }
 
+function visibleCategoryThumbnail(
+  category: TeachingCategory,
+  lang: "fi" | "en" | "sv",
+): string | null {
+  if (lang === "en") return category.thumbnail_url_en;
+  if (lang === "sv") return category.thumbnail_url_sv;
+  return category.thumbnail_url_fi;
+}
+
 export function TeachingMaterialsTab() {
   const tr = useTr();
   const { language } = useLanguage();
   const lang = language === "sv" ? "sv" : language === "en" ? "en" : "fi";
   const { categories, subcategories, articles, refresh } = useTeachingMaterials();
 
-  /** Legacy rows may still only carry a sub-category — resolve its parent. */
   const catOfArticle = useMemo(() => {
     const parent = new Map(subcategories.map((s) => [s.id, s.category_id]));
     return (a: TeachingArticle) =>
@@ -79,14 +84,15 @@ export function TeachingMaterialsTab() {
   const saveArticle = useServerFn(saveTeachingArticle);
   const delArticle = useServerFn(deleteTeachingArticle);
   const publishCategory = useServerFn(setTeachingCategoryPublished);
+  const saveCategoryThumbnails = useServerFn(saveTeachingCategoryThumbnails);
 
   const [newStrength, setNewStrength] = useState<string>("");
   const [openCat, setOpenCat] = useState<string | null>(null);
   const [editing, setEditing] = useState<{ catId: string; article: TeachingArticle | null } | null>(
     null,
   );
+  const [thumbnailEditing, setThumbnailEditing] = useState<TeachingCategory | null>(null);
   const [busy, setBusy] = useState(false);
-  /** @lovable-new 2026-08-05 article shown in the teacher-eye preview panel. */
   const [preview, setPreview] = useState<TeachingArticle | null>(null);
 
   const usedStrengths = useMemo(() => new Set(categories.map((c) => c.strength_id)), [categories]);
@@ -143,23 +149,48 @@ export function TeachingMaterialsTab() {
 
       {categories.map((c) => {
         const open = openCat === c.id;
+        const thumbnail = visibleCategoryThumbnail(c, lang);
+        const color = getStrengthColor(Number(c.strength_id));
         return (
           <StickyNote key={c.id} seed={`tm-${c.id}`} className="space-y-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center justify-between gap-4">
               <button
                 type="button"
                 onClick={() => setOpenCat(open ? null : c.id)}
-                className="flex items-center gap-2 text-xl font-bold"
+                className="flex min-w-0 flex-1 items-center gap-4 text-left"
               >
-                <span
-                  className="h-5 w-5 rounded-full"
-                  style={{ background: getStrengthColor(Number(c.strength_id)) }}
-                  aria-hidden
-                />
-                {getStrengthName(Number(c.strength_id), lang)}
-                {!c.is_published && <HiddenBadge label={tr("Piilotettu")} />}
+                {thumbnail ? (
+                  <img
+                    src={thumbnail}
+                    alt={getStrengthName(Number(c.strength_id), lang)}
+                    className="aspect-video w-36 shrink-0 rounded-xl object-cover"
+                  />
+                ) : (
+                  <div
+                    className="aspect-video w-36 shrink-0 rounded-xl"
+                    style={{ background: color }}
+                    aria-hidden
+                  />
+                )}
+                <span className="flex min-w-0 items-center gap-2 text-xl font-bold">
+                  <span
+                    className="h-5 w-5 shrink-0 rounded-full"
+                    style={{ background: color }}
+                    aria-hidden
+                  />
+                  <span className="truncate">{getStrengthName(Number(c.strength_id), lang)}</span>
+                  {!c.is_published && <HiddenBadge label={tr("Piilotettu")} />}
+                </span>
               </button>
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="flex shrink-0 items-center gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="rounded-full"
+                  onClick={() => setThumbnailEditing(c)}
+                >
+                  {language === "en" ? "Thumbnail" : language === "sv" ? "Miniatyrbild" : "Pikkukuva"}
+                </Button>
                 <PublishToggle
                   checked={c.is_published}
                   disabled={busy}
@@ -236,6 +267,27 @@ export function TeachingMaterialsTab() {
         );
       })}
 
+      {thumbnailEditing && (
+        <CategoryThumbnailEditor
+          category={thumbnailEditing}
+          busy={busy}
+          onCancel={() => setThumbnailEditing(null)}
+          onSave={(values) =>
+            void run(async () => {
+              await saveCategoryThumbnails({
+                data: {
+                  id: thumbnailEditing.id,
+                  thumbnailFi: values.fi,
+                  thumbnailEn: values.en,
+                  thumbnailSv: values.sv,
+                },
+              });
+              setThumbnailEditing(null);
+            })
+          }
+        />
+      )}
+
       {preview && (
         <StickyNote seed="tm-preview" className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -263,6 +315,85 @@ export function TeachingMaterialsTab() {
         />
       )}
     </div>
+  );
+}
+
+function CategoryThumbnailEditor({
+  category,
+  busy,
+  onCancel,
+  onSave,
+}: {
+  category: TeachingCategory;
+  busy: boolean;
+  onCancel: () => void;
+  onSave: (value: { fi: string; en: string; sv: string }) => void;
+}) {
+  const tr = useTr();
+  const [fi, setFi] = useState(category.thumbnail_url_fi ?? "");
+  const [en, setEn] = useState(category.thumbnail_url_en ?? "");
+  const [sv, setSv] = useState(category.thumbnail_url_sv ?? "");
+
+  const items = [
+    { code: "FI", value: fi, setValue: setFi },
+    { code: "EN", value: en, setValue: setEn },
+    { code: "SV", value: sv, setValue: setSv },
+  ];
+
+  return (
+    <StickyNote seed={`tm-thumb-${category.id}`} className="space-y-4">
+      <h3 className="text-xl font-bold">{tr("Kuva")} — {getStrengthName(Number(category.strength_id), "en")}</h3>
+      <p className="text-sm opacity-70">
+        Paste a separate image URL for Finnish, English and Swedish. Leave a field empty to remove that language's thumbnail.
+      </p>
+      <div className="grid grid-cols-3 gap-4">
+        {items.map((item) => (
+          <div key={item.code} className="space-y-2 rounded-2xl bg-white/70 p-3">
+            <Label>{item.code} thumbnail URL</Label>
+            <Input
+              type="url"
+              placeholder="https://..."
+              value={item.value}
+              onChange={(e) => item.setValue(e.target.value)}
+            />
+            {item.value.trim() ? (
+              <img
+                src={item.value.trim()}
+                alt={`${item.code} thumbnail preview`}
+                className="aspect-video w-full rounded-xl object-cover"
+              />
+            ) : (
+              <div
+                className="aspect-video w-full rounded-xl"
+                style={{ background: getStrengthColor(Number(category.strength_id)) }}
+              />
+            )}
+            <Button
+              type="button"
+              variant="ghost"
+              className="rounded-full"
+              disabled={!item.value || busy}
+              onClick={() => item.setValue("")}
+            >
+              {tr("Poista")}
+            </Button>
+          </div>
+        ))}
+      </div>
+      <div className="flex gap-2">
+        <Button
+          type="button"
+          disabled={busy}
+          className="rounded-full bg-[color:var(--purple)] font-bold text-white"
+          onClick={() => onSave({ fi, en, sv })}
+        >
+          {tr("Tallenna")}
+        </Button>
+        <Button type="button" variant="ghost" className="rounded-full" onClick={onCancel}>
+          {tr("Peruuta")}
+        </Button>
+      </div>
+    </StickyNote>
   );
 }
 
