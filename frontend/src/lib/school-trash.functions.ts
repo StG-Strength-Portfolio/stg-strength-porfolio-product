@@ -16,21 +16,24 @@ async function assertSuperAdmin(supabase: any, userId: string) {
   if (error || !data) throw new Error("Forbidden");
 }
 
-async function purgeSchool(db: any, schoolId: string) {
-  const { data: staffProfiles } = await db
-    .from("profiles")
-    .select("id")
-    .eq("school_id", schoolId);
-  const staffIds = ((staffProfiles ?? []) as Array<{ id: string }>).map((p) => p.id);
+async function schoolUserIds(db: any, schoolId: string): Promise<string[]> {
+  const { data: profiles } = await db.from("profiles").select("id").eq("school_id", schoolId);
+  const ids = ((profiles ?? []) as Array<{ id: string }>).map((p) => p.id);
+  if (!ids.length) return [];
+  const { data: roles } = await db.from("user_roles").select("user_id,role").in("user_id", ids);
+  const roleById = new Map(
+    ((roles ?? []) as Array<{ user_id: string; role: string }>).map((r) => [r.user_id, r.role]),
+  );
+  // A Superadmin account must never be deleted or demoted merely because an
+  // old profile row happens to reference a school.
+  return ids.filter((id) => roleById.get(id) !== "super_admin");
+}
 
-  // Deleting classes cascades class membership. Student accounts are kept:
-  // a student may later join another school and their personal portfolio is
-  // their own account data, not school-owned authentication data.
-  if (staffIds.length) {
-    const { data: classRows } = await db
-      .from("classes")
-      .select("id")
-      .in("teacher_id", staffIds);
+async function purgeSchool(db: any, schoolId: string) {
+  const userIds = await schoolUserIds(db, schoolId);
+
+  if (userIds.length) {
+    const { data: classRows } = await db.from("classes").select("id").in("teacher_id", userIds);
     const classIds = ((classRows ?? []) as Array<{ id: string }>).map((c) => c.id);
     if (classIds.length) {
       await db.from("class_members").delete().in("class_id", classIds);
@@ -41,11 +44,16 @@ async function purgeSchool(db: any, schoolId: string) {
   await db.from("school_deleted_roles").delete().eq("school_id", schoolId);
   await db.from("school_codes").delete().eq("school_id", schoolId);
 
-  // School staff accounts belong to this school and are removed on final purge.
-  for (const userId of staffIds) {
+  // After the 90-day recovery window, accounts attached exclusively to this
+  // school are permanently removed together with their profile-owned data.
+  for (const userId of userIds) {
     const { error } = await db.auth.admin.deleteUser(userId);
     if (error) throw new Error(error.message);
   }
+
+  // Any protected Superadmin profile that referenced this school is detached
+  // so the school row can be deleted without violating the foreign key.
+  await db.from("profiles").update({ school_id: null }).eq("school_id", schoolId);
 
   const { error: schoolError } = await db.from("schools").delete().eq("id", schoolId);
   if (schoolError) throw new Error(schoolError.message);
@@ -67,17 +75,9 @@ export const trashSchool = createServerFn({ method: "POST" })
     if (school.name !== data.confirmName.trim()) throw new Error("School name does not match");
     if (school.deleted_at) return { ok: true };
 
-    const { data: staffProfiles } = await db
-      .from("profiles")
-      .select("id")
-      .eq("school_id", data.schoolId);
-    const staffIds = ((staffProfiles ?? []) as Array<{ id: string }>).map((p) => p.id);
-
-    if (staffIds.length) {
-      const { data: roles } = await db
-        .from("user_roles")
-        .select("user_id,role")
-        .in("user_id", staffIds);
+    const userIds = await schoolUserIds(db, data.schoolId);
+    if (userIds.length) {
+      const { data: roles } = await db.from("user_roles").select("user_id,role").in("user_id", userIds);
       if ((roles ?? []).length) {
         await db.from("school_deleted_roles").upsert(
           (roles ?? []).map((r: { user_id: string; role: string }) => ({
@@ -89,20 +89,17 @@ export const trashSchool = createServerFn({ method: "POST" })
           { onConflict: "school_id,user_id" },
         );
       }
-      // Suspend school staff while the school is in trash. This prevents them
-      // from using teacher/principal routes without deleting their accounts yet.
-      await db
-        .from("user_roles")
-        .update({ role: "student" })
-        .in("user_id", staffIds);
+      // Suspend all school-bound accounts during the recovery window without
+      // deleting them, so restoring the school can restore the original roles.
+      await db.from("user_roles").update({ role: "student" }).in("user_id", userIds);
     }
 
     const now = new Date().toISOString();
-    if (staffIds.length) {
+    if (userIds.length) {
       await db
         .from("classes")
         .update({ is_deleted: true, deleted_at: now, school_deleted_at: now })
-        .in("teacher_id", staffIds);
+        .in("teacher_id", userIds);
     }
 
     const { error } = await db
@@ -139,12 +136,12 @@ export const restoreSchool = createServerFn({ method: "POST" })
         .upsert({ user_id: row.user_id, role: row.role }, { onConflict: "user_id" });
     }
 
-    const staffIds = ((savedRoles ?? []) as Array<{ user_id: string }>).map((r) => r.user_id);
-    if (staffIds.length) {
+    const userIds = ((savedRoles ?? []) as Array<{ user_id: string }>).map((r) => r.user_id);
+    if (userIds.length) {
       await db
         .from("classes")
         .update({ is_deleted: false, deleted_at: null, school_deleted_at: null })
-        .in("teacher_id", staffIds)
+        .in("teacher_id", userIds)
         .not("school_deleted_at", "is", null);
     }
 
@@ -152,11 +149,7 @@ export const restoreSchool = createServerFn({ method: "POST" })
       !school.billing_expiry_date || new Date(school.billing_expiry_date).getTime() >= Date.now();
     const { error } = await db
       .from("schools")
-      .update({
-        is_active: stillCurrent,
-        deleted_at: null,
-        deleted_by: null,
-      })
+      .update({ is_active: stillCurrent, deleted_at: null, deleted_by: null })
       .eq("id", data.schoolId);
     if (error) throw new Error(error.message);
     await db.from("school_deleted_roles").delete().eq("school_id", data.schoolId);
