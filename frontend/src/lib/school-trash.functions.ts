@@ -26,15 +26,16 @@ async function purgeSchool(db: any, schoolId: string) {
   // Deleting classes cascades class membership. Student accounts are kept:
   // a student may later join another school and their personal portfolio is
   // their own account data, not school-owned authentication data.
-  const { data: classRows } = await db
-    .from("classes")
-    .select("id")
-    .eq("school_deleted_at", null)
-    .in("teacher_id", staffIds.length ? staffIds : ["00000000-0000-0000-0000-000000000000"]);
-  const classIds = ((classRows ?? []) as Array<{ id: string }>).map((c) => c.id);
-  if (classIds.length) {
-    await db.from("class_members").delete().in("class_id", classIds);
-    await db.from("classes").delete().in("id", classIds);
+  if (staffIds.length) {
+    const { data: classRows } = await db
+      .from("classes")
+      .select("id")
+      .in("teacher_id", staffIds);
+    const classIds = ((classRows ?? []) as Array<{ id: string }>).map((c) => c.id);
+    if (classIds.length) {
+      await db.from("class_members").delete().in("class_id", classIds);
+      await db.from("classes").delete().in("id", classIds);
+    }
   }
 
   await db.from("school_deleted_roles").delete().eq("school_id", schoolId);
@@ -97,10 +98,12 @@ export const trashSchool = createServerFn({ method: "POST" })
     }
 
     const now = new Date().toISOString();
-    await db
-      .from("classes")
-      .update({ is_deleted: true, deleted_at: now, school_deleted_at: now })
-      .in("teacher_id", staffIds.length ? staffIds : ["00000000-0000-0000-0000-000000000000"]);
+    if (staffIds.length) {
+      await db
+        .from("classes")
+        .update({ is_deleted: true, deleted_at: now, school_deleted_at: now })
+        .in("teacher_id", staffIds);
+    }
 
     const { error } = await db
       .from("schools")
@@ -136,12 +139,17 @@ export const restoreSchool = createServerFn({ method: "POST" })
         .upsert({ user_id: row.user_id, role: row.role }, { onConflict: "user_id" });
     }
 
-    await db
-      .from("classes")
-      .update({ is_deleted: false, deleted_at: null, school_deleted_at: null })
-      .eq("school_deleted_at", school.deleted_at);
+    const staffIds = ((savedRoles ?? []) as Array<{ user_id: string }>).map((r) => r.user_id);
+    if (staffIds.length) {
+      await db
+        .from("classes")
+        .update({ is_deleted: false, deleted_at: null, school_deleted_at: null })
+        .in("teacher_id", staffIds)
+        .not("school_deleted_at", "is", null);
+    }
 
-    const stillCurrent = !school.billing_expiry_date || new Date(school.billing_expiry_date).getTime() >= Date.now();
+    const stillCurrent =
+      !school.billing_expiry_date || new Date(school.billing_expiry_date).getTime() >= Date.now();
     const { error } = await db
       .from("schools")
       .update({
