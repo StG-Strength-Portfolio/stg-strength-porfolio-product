@@ -68,6 +68,29 @@ export async function createSchoolAdminInvitation(
   throw new Error("Could not generate a unique school admin code");
 }
 
+export const getCurrentSchoolAdminCodes = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<Record<string, string>> => {
+    await assertSuperAdmin(context.supabase, context.userId);
+    const db = await admin();
+    const { data, error } = await db
+      .from("school_codes")
+      .select("school_id, code, created_at")
+      .eq("code_type", "school")
+      .eq("is_used", false)
+      .eq("is_revoked", false)
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+
+    const current: Record<string, string> = {};
+    for (const row of data ?? []) {
+      if (!current[row.school_id] && /^[A-Z]{6}[0-9]{2}$/.test(row.code)) {
+        current[row.school_id] = row.code;
+      }
+    }
+    return current;
+  });
+
 export const validateSchoolAdminCode = createServerFn({ method: "POST" })
   .inputValidator((d: { code: string }) => d)
   .handler(async ({ data }) => {
