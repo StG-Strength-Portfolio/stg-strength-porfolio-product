@@ -35,12 +35,20 @@ export type SchoolCodeRow = {
 };
 
 async function assertSuperAdmin(supabase: any, userId: string) {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("user_roles")
     .select("role")
     .eq("user_id", userId)
     .eq("role", "super_admin")
     .maybeSingle();
+
+  // TEMPORARY DIAGNOSTIC — remove once the Forbidden issue is confirmed fixed.
+  console.error(
+    "[assertSuperAdmin][diag]",
+    JSON.stringify({ userId, hasData: !!data, error: error ? error.message : null }),
+  );
+
+  if (error) throw new Error(`Forbidden: ${error.message}`);
   if (!data) throw new Error("Forbidden");
 }
 
