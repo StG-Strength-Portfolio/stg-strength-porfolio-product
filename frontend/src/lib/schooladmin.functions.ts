@@ -78,6 +78,29 @@ async function assertSchoolAdmin(supabase: any, userId: string): Promise<string>
   return profile.school_id as string;
 }
 
+/** Read access for a real principal or a Superadmin principal preview. */
+async function resolveReadSchool(supabase: any, userId: string): Promise<string> {
+  const { data: role } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (role?.role === "school_admin") return assertSchoolAdmin(supabase, userId);
+  if (role?.role !== "super_admin") throw new Error("Forbidden");
+
+  const db = await admin();
+  const { data: school, error } = await db
+    .from("schools")
+    .select("id")
+    .eq("is_active", true)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!school?.id) throw new Error("No active school available for preview");
+  return school.id as string;
+}
+
 function randomTeacherCode(): string {
   const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let s = "TEACH-";
@@ -88,7 +111,7 @@ function randomTeacherCode(): string {
 export const getSchoolAdminData = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<SchoolAdminData> => {
-    const schoolId = await assertSchoolAdmin(context.supabase, context.userId);
+    const schoolId = await resolveReadSchool(context.supabase, context.userId);
     const db = await admin();
 
     const [{ data: school }, { data: profiles }, { data: roles }, { data: codes }] =
@@ -120,7 +143,6 @@ export const getSchoolAdminData = createServerFn({ method: "GET" })
     const { data: classes } = await db
       .from("classes")
       .select("id, name, teacher_id, join_code, language")
-
       .eq("is_deleted", false)
       .in("teacher_id", teacherIds.length ? teacherIds : ["00000000-0000-0000-0000-000000000000"]);
 
@@ -141,9 +163,6 @@ export const getSchoolAdminData = createServerFn({ method: "GET" })
       studentsPerClass.set(m.class_id, (studentsPerClass.get(m.class_id) ?? 0) + 1);
     }
 
-    // Students are found both by profile.school_id AND by membership in a class
-    // owned by one of the school's teachers (students who joined via a class code
-    // never get a school_id on their profile).
     const studentIdSet = new Set<string>(memberIds.filter((id) => roleOf.get(id) === "student"));
     for (const m of (members ?? []) as any[]) {
       if ((roleOf.get(m.student_id) ?? "student") === "student") studentIdSet.add(m.student_id);
@@ -379,11 +398,9 @@ export const getStudentPortfolio = createServerFn({ method: "GET" })
       currentScreen: number | null;
       responses: { field_key: string; value: string | null }[];
     }> => {
-      const schoolId = await assertSchoolAdmin(context.supabase, context.userId);
+      const schoolId = await resolveReadSchool(context.supabase, context.userId);
       const db = await admin();
 
-      // The student must belong to this school, either directly or through a
-      // class owned by one of the school's teachers.
       const { data: profile } = await db
         .from("profiles")
         .select("id, display_name, current_screen, school_id")

@@ -19,6 +19,7 @@ import {
   giveStrengthToTeacher,
   type PersonRef,
 } from "@/lib/give-strength.functions";
+import { getPreviewSchoolTeachers } from "@/lib/superadmin-preview.functions";
 
 export const Route = createFileRoute("/school-admin/give-strength")({
   head: () => ({
@@ -48,6 +49,7 @@ function SchoolAdminGiveStrengthPage() {
   const lang = language === "sv" ? "sv" : language === "en" ? "en" : "fi";
 
   const loadTeachers = useServerFn(listSchoolTeachers);
+  const loadPreviewTeachers = useServerFn(getPreviewSchoolTeachers);
   const send = useServerFn(giveStrengthToTeacher);
 
   const [teachers, setTeachers] = useState<PersonRef[]>([]);
@@ -58,11 +60,15 @@ function SchoolAdminGiveStrengthPage() {
 
   const load = useCallback(async () => {
     try {
-      setTeachers(await loadTeachers());
+      if (guard.preview && guard.schoolId) {
+        setTeachers(await loadPreviewTeachers({ data: { schoolId: guard.schoolId } }));
+      } else {
+        setTeachers(await loadTeachers());
+      }
     } catch (e) {
       console.error("[give-strength]", e);
     }
-  }, [loadTeachers]);
+  }, [guard.preview, guard.schoolId, loadPreviewTeachers, loadTeachers]);
 
   useEffect(() => {
     if (guard.ready) void load();
@@ -75,7 +81,7 @@ function SchoolAdminGiveStrengthPage() {
   }
 
   async function submit() {
-    if (selected.length === 0 || !teacherId) return;
+    if (guard.preview || selected.length === 0 || !teacherId) return;
     setBusy(true);
     try {
       await send({ data: { teacherId, strengthIds: selected, message } });
@@ -120,7 +126,7 @@ function SchoolAdminGiveStrengthPage() {
         <StrengthPickerGrid
           lang={lang}
           selectedIds={selected}
-          disabled={busy || !teacherId}
+          disabled={busy || !teacherId || guard.preview}
           onSelect={toggle}
         />
         <div className="space-y-2">
@@ -135,7 +141,7 @@ function SchoolAdminGiveStrengthPage() {
         </div>
         <Button
           className="rounded-full bg-[color:var(--yellow)] font-bold text-slate-900 hover:brightness-95"
-          disabled={busy || selected.length === 0 || !teacherId}
+          disabled={busy || selected.length === 0 || !teacherId || guard.preview}
           onClick={() => void submit()}
         >
           {tr("Lahjoita vahvuus")}

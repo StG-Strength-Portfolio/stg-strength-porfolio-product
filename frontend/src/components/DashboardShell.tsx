@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode, SyntheticEvent } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { CornerBlobs } from "@/components/CornerBlobs";
@@ -19,8 +19,9 @@ import {
   SparkleIcon,
   UserIcon,
 } from "@/components/icons/AppIcons";
-import { useTr } from "@/lib/i18n";
+import { useLanguage, useTr } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import { clearSuperAdminPreview, getSuperAdminPreview } from "@/lib/superadmin-preview";
 
 export interface ShellTab {
   id: string;
@@ -43,10 +44,6 @@ const TAB_ICONS: Record<string, IconCmp> = {
   profile: UserIcon,
 };
 
-/**
- * @lovable-new 2026-08-04 — every sidebar link gets a meaningful icon
- * (no more generic stars). Resolved from the destination route.
- */
 export function iconForRoute(to: string): IconCmp {
   if (/\/(dashboard|seikkailu)$/.test(to)) return ArrowLeftIcon;
   if (to.includes("teach/materials")) return BookIcon;
@@ -61,10 +58,6 @@ export function iconForRoute(to: string): IconCmp {
 
 const HeartOrGift: IconCmp = GiftIcon;
 
-/**
- * Shared chrome for the role dashboards: playful purple sidebar, school name
- * bottom-left, FI | SV | EN switcher top-right — matching the student theme.
- */
 export function DashboardShell({
   title,
   tabs,
@@ -72,8 +65,8 @@ export function DashboardShell({
   onSelect,
   schoolName,
   persistLanguage = true,
-  links, // @lovable-new — route links (Strength Sprint, give strength, …)
-  sections, // @lovable-new — grouped route links (e.g. "Teach")
+  links,
+  sections,
   children,
 }: {
   title: string;
@@ -87,16 +80,67 @@ export function DashboardShell({
   children: ReactNode;
 }) {
   const tr = useTr();
+  const { language } = useLanguage();
   const navigate = useNavigate();
+  const preview = getSuperAdminPreview();
+  const rolePreview = preview.mode === "teacher" || preview.mode === "principal";
+
+  const previewText =
+    preview.mode === "teacher"
+      ? language === "en"
+        ? "Teacher view (Superadmin) — read only"
+        : language === "sv"
+          ? "Lärarvy (huvudadministratör) — skrivskyddad"
+          : "Opettajan näkymä (pääkäyttäjä) — vain luku"
+      : language === "en"
+        ? "Principal view (Superadmin) — read only"
+        : language === "sv"
+          ? "Rektorsvy (huvudadministratör) — skrivskyddad"
+          : "Rehtorin näkymä (pääkäyttäjä) — vain luku";
+  const exitLabel =
+    preview.mode === "teacher"
+      ? language === "en"
+        ? "Exit teacher view"
+        : language === "sv"
+          ? "Lämna lärarvyn"
+          : "Poistu opettajan näkymästä"
+      : language === "en"
+        ? "Exit principal view"
+        : language === "sv"
+          ? "Lämna rektorsvyn"
+          : "Poistu rehtorin näkymästä";
 
   async function signOut() {
     await supabase.auth.signOut();
     navigate({ to: "/auth/login", replace: true });
   }
 
+  function exitPreview() {
+    clearSuperAdminPreview();
+    window.location.href = "/superadmin/dashboard";
+  }
+
+  function blockPreviewMutation(e: SyntheticEvent) {
+    if (!rolePreview) return;
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
   return (
     <div className="relative min-h-screen bg-background text-foreground">
       <CornerBlobs />
+      {rolePreview && (
+        <div className="relative z-20 flex flex-wrap items-center justify-between gap-2 bg-[color:var(--yellow)] px-4 py-2 text-sm font-bold text-[color:var(--purple)]">
+          <span>{previewText}</span>
+          <button
+            type="button"
+            onClick={exitPreview}
+            className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[color:var(--purple)] shadow"
+          >
+            {exitLabel}
+          </button>
+        </div>
+      )}
       <div className="relative z-10 mx-auto flex w-full max-w-7xl gap-6 px-4 py-8">
         <aside className="hidden w-72 shrink-0 md:block">
           <div className="sticky top-8 flex min-h-[70vh] flex-col rounded-[2rem] bg-[color:var(--purple)] p-5 text-white shadow-xl">
@@ -126,7 +170,6 @@ export function DashboardShell({
                 );
               })}
             </nav>
-            {/* @lovable-new */}
             {links && links.length > 0 && (
               <nav className="mt-3 space-y-1.5 border-t border-white/20 pt-3">
                 {links.map((l) => (
@@ -145,7 +188,6 @@ export function DashboardShell({
                 ))}
               </nav>
             )}
-            {/* @lovable-new */}
             {sections?.map((sec) => (
               <nav key={sec.label} className="mt-3 space-y-1.5 border-t border-white/20 pt-3">
                 <p className="px-4 pb-1 text-xs font-bold uppercase tracking-wider text-white/60">
@@ -167,13 +209,23 @@ export function DashboardShell({
                 ))}
               </nav>
             ))}
-            <button
-              type="button"
-              className="mt-6 px-4 text-left text-xs text-white/80 underline hover:text-white"
-              onClick={() => void signOut()}
-            >
-              {tr("Kirjaudu ulos")}
-            </button>
+            {rolePreview ? (
+              <button
+                type="button"
+                className="mt-6 px-4 text-left text-xs text-white/80 underline hover:text-white"
+                onClick={exitPreview}
+              >
+                {exitLabel}
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="mt-6 px-4 text-left text-xs text-white/80 underline hover:text-white"
+                onClick={() => void signOut()}
+              >
+                {tr("Kirjaudu ulos")}
+              </button>
+            )}
             <div className="mt-auto break-words pt-10 text-xs text-white/70">
               {schoolName ?? ""}
             </div>
@@ -183,7 +235,7 @@ export function DashboardShell({
         <main className="min-w-0 flex-1 space-y-6">
           <header className="flex flex-wrap items-start justify-between gap-3">
             <h1 className="font-display text-3xl md:text-4xl">{title}</h1>
-            <LanguageSwitcher persistToProfile={persistLanguage} />
+            <LanguageSwitcher persistToProfile={rolePreview ? false : persistLanguage} />
           </header>
 
           <nav className="flex flex-wrap gap-2 md:hidden">
@@ -208,7 +260,18 @@ export function DashboardShell({
             })}
           </nav>
 
-          {children}
+          <div
+            onSubmitCapture={blockPreviewMutation}
+            onClickCapture={(e) => {
+              if (!rolePreview) return;
+              const target = e.target as HTMLElement;
+              const button = target.closest("button");
+              if (button) blockPreviewMutation(e);
+            }}
+            className={rolePreview ? "[&_input]:pointer-events-none [&_textarea]:pointer-events-none [&_select]:pointer-events-none" : undefined}
+          >
+            {children}
+          </div>
 
           <p className="pt-6 text-xs opacity-50 md:hidden">{schoolName ?? ""}</p>
         </main>
