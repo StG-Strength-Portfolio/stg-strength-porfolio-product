@@ -183,22 +183,16 @@ export const REQUIREMENTS: Record<number, string[]> = {
   35: Array.from({ length: 6 }, (_, i) => `screen_32_minaopisk_${i + 1}`),
   36: Array.from({ length: 5 }, (_, i) => `screen_33_erityistaito_${i + 1}`),
   37: ["screen_34_oppi", "screen_34_palaute", "screen_34_aiheet", "screen_34_onnistuminen"],
-  38: [
-    "screen_35_iso_tavoite",
-    "screen_35_jaavuori_1",
-    "screen_35_jaavuori_2",
-    "screen_35_jaavuori_3",
-    "screen_35_jaavuori_4",
-  ],
+  38: [],
   39: ["screen_36_tavoite", "screen_36_vahvuudet", "screen_36_hyodynnan", "screen_36_taidot"],
   40: ["screen_37_arvostan", "screen_37_vahvuuksiani", "screen_37_paikkoja"],
   41: ["screen_38_uutta", "screen_38_tarkeaa", "screen_38_muistetaan", "screen_38_yhteisoon"],
   42: Array.from({ length: 7 }, (_, i) => `screen_39_mina_olen_${i + 1}`),
 
   // Module 3
-  44: ["screen_43_vahvuudet", "screen_43_parasta", "screen_43_kiitollinen", "screen_43_yhdessa"],
+  44: ["screen_41_opit", "screen_41_seuraavaksi", "screen_41_hyodynnat", "screen_41_teit"],
   45: ["screen_43_vahvuudet", "screen_43_parasta", "screen_43_kiitollinen", "screen_43_yhdessa"],
-  46: ["screen_44_perheenjasenena"],
+  46: ["screen_46_perheeni_vahvuudet", "screen_46_perheenjasenten_vahvuudet"],
   47: Array.from({ length: 8 }, (_, i) => `screen_45_vanhemmat_${i + 1}`),
 
   // Module 4
