@@ -54,7 +54,7 @@ export function PortfolioScreen({
         className={
           readOnly
             ? "pointer-events-none min-h-full select-none [&_button]:pointer-events-none [&_input]:pointer-events-none [&_select]:pointer-events-none [&_textarea]:pointer-events-none"
-            : "min-h-full"
+            : "h-full min-h-0 overflow-hidden"
         }
       >
         <TranslateFi>{content}</TranslateFi>
