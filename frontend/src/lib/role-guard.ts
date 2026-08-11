@@ -4,9 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import type { AppRole } from "@/lib/auth-helpers";
 import { getSuperAdminPreview } from "@/lib/superadmin-preview";
 import {
+  DEMO_PRINCIPAL_ID,
   DEMO_SCHOOL_ID,
   DEMO_SCHOOL_NAME,
   DEMO_TEACHER_ID,
+  demoPrincipalName,
   demoTeacherName,
 } from "@/lib/demo-store";
 import { DEFAULT_LANGUAGE, isLanguage } from "@/lib/i18n";
@@ -58,9 +60,9 @@ function demoLanguage() {
 
 /**
  * Client-side gate for role-scoped dashboards. Superadmins may enter the
- * teacher demo UI only when the explicit session preview mode matches. The
- * principal preview has its own client-only dashboard so it never needs a
- * real school-admin server read.
+ * teacher or principal demo UI only when the explicit session preview mode
+ * matches. The principal dashboard itself is client-only, while principal
+ * subpages may still reuse the real product routes with fictional identities.
  */
 export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
   const navigate = useNavigate();
@@ -95,14 +97,28 @@ export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
         const preview = getSuperAdminPreview();
         const wantsTeacher = preview.mode === "teacher" && allowed.includes("teacher");
         const wantsPrincipal = preview.mode === "principal" && allowed.includes("school_admin");
+        const language = demoLanguage();
+
         if (wantsPrincipal) {
-          if (window.location.pathname !== "/superadmin/demo/principal") {
+          if (window.location.pathname === "/school-admin/dashboard") {
             window.location.href = "/superadmin/demo/principal";
+            return;
           }
+          if (cancelled) return;
+          setState({
+            ready: true,
+            role: "school_admin",
+            userId: DEMO_PRINCIPAL_ID,
+            schoolId: DEMO_SCHOOL_ID,
+            schoolName: DEMO_SCHOOL_NAME,
+            displayName: demoPrincipalName(language),
+            email: "principal@northbridge.demo",
+            preview: true,
+          });
           return;
         }
+
         if (wantsTeacher) {
-          const language = demoLanguage();
           if (cancelled) return;
           setState({
             ready: true,
