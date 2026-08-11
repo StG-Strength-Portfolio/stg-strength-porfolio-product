@@ -3,6 +3,15 @@ import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import type { AppRole } from "@/lib/auth-helpers";
 import { getSuperAdminPreview } from "@/lib/superadmin-preview";
+import {
+  DEMO_PRINCIPAL_ID,
+  DEMO_SCHOOL_ID,
+  DEMO_SCHOOL_NAME,
+  DEMO_TEACHER_ID,
+  demoPrincipalName,
+  demoTeacherName,
+} from "@/lib/demo-store";
+import { DEFAULT_LANGUAGE, isLanguage } from "@/lib/i18n";
 
 export interface RoleGuardState {
   ready: boolean;
@@ -43,10 +52,17 @@ export function homeForRole(role: AppRole | null): string {
   }
 }
 
+function demoLanguage() {
+  if (typeof window === "undefined") return DEFAULT_LANGUAGE;
+  const raw = window.localStorage.getItem("student_language");
+  return isLanguage(raw) ? raw : DEFAULT_LANGUAGE;
+}
+
 /**
  * Client-side gate for role-scoped dashboards. Superadmins may enter the
- * teacher or principal UI only when the explicit session preview mode matches.
- * Their real database role is never changed.
+ * teacher or principal demo UI only when the explicit session preview mode
+ * matches. Their real database role is never changed and fictional identities
+ * are resolved locally instead of reading a real school or teacher.
  */
 export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
   const navigate = useNavigate();
@@ -82,38 +98,18 @@ export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
         const wantsTeacher = preview.mode === "teacher" && allowed.includes("teacher");
         const wantsPrincipal = preview.mode === "principal" && allowed.includes("school_admin");
         if (wantsTeacher || wantsPrincipal) {
-          const targetId = wantsTeacher ? preview.teacherId : null;
-          let displayName: string | null = wantsTeacher ? "Teacher preview" : "Principal preview";
-          let email: string | null = null;
-          if (targetId) {
-            const { data: profile } = await supabase
-              .from("profiles" as never)
-              .select("display_name")
-              .eq("id", targetId)
-              .maybeSingle();
-            displayName =
-              (profile as { display_name?: string | null } | null)?.display_name ?? displayName;
-          }
-
-          let schoolName: string | null = null;
-          if (preview.schoolId) {
-            const { data: school } = await supabase
-              .from("schools" as never)
-              .select("name")
-              .eq("id", preview.schoolId)
-              .maybeSingle();
-            schoolName = (school as { name?: string } | null)?.name ?? null;
-          }
-
+          const language = demoLanguage();
           if (cancelled) return;
           setState({
             ready: true,
             role: wantsTeacher ? "teacher" : "school_admin",
-            userId: targetId,
-            schoolId: preview.schoolId,
-            schoolName,
-            displayName,
-            email,
+            userId: wantsTeacher ? DEMO_TEACHER_ID : DEMO_PRINCIPAL_ID,
+            schoolId: DEMO_SCHOOL_ID,
+            schoolName: DEMO_SCHOOL_NAME,
+            displayName: wantsTeacher ? demoTeacherName(language) : demoPrincipalName(language),
+            email: wantsTeacher
+              ? "emma.johnson@northbridge.demo"
+              : "principal@northbridge.demo",
             preview: true,
           });
           return;
