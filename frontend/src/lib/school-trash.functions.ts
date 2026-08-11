@@ -16,6 +16,24 @@ async function assertSuperAdmin(supabase: any, userId: string) {
   if (error || !data) throw new Error("Forbidden");
 }
 
+function isMissingTrashSchema(error: unknown): boolean {
+  const e = error as { code?: string; message?: string } | null;
+  const message = e?.message ?? "";
+  return (
+    e?.code === "42703" ||
+    e?.code === "42P01" ||
+    message.includes("schools.deleted_at") ||
+    message.includes("school_deleted_at") ||
+    message.includes("school_deleted_roles")
+  );
+}
+
+function trashSchemaError(): Error {
+  return new Error(
+    "School deletion is temporarily unavailable because the 90-day restore database migration has not been applied yet.",
+  );
+}
+
 async function schoolUserIds(db: any, schoolId: string): Promise<string[]> {
   const { data: profiles } = await db.from("profiles").select("id").eq("school_id", schoolId);
   const ids = ((profiles ?? []) as Array<{ id: string }>).map((p) => p.id);
@@ -24,8 +42,6 @@ async function schoolUserIds(db: any, schoolId: string): Promise<string[]> {
   const roleById = new Map(
     ((roles ?? []) as Array<{ user_id: string; role: string }>).map((r) => [r.user_id, r.role]),
   );
-  // A Superadmin account must never be deleted or demoted merely because an
-  // old profile row happens to reference a school.
   return ids.filter((id) => roleById.get(id) !== "super_admin");
 }
 
@@ -44,15 +60,11 @@ async function purgeSchool(db: any, schoolId: string) {
   await db.from("school_deleted_roles").delete().eq("school_id", schoolId);
   await db.from("school_codes").delete().eq("school_id", schoolId);
 
-  // After the 90-day recovery window, accounts attached exclusively to this
-  // school are permanently removed together with their profile-owned data.
   for (const userId of userIds) {
     const { error } = await db.auth.admin.deleteUser(userId);
     if (error) throw new Error(error.message);
   }
 
-  // Any protected Superadmin profile that referenced this school is detached
-  // so the school row can be deleted without violating the foreign key.
   await db.from("profiles").update({ school_id: null }).eq("school_id", schoolId);
 
   const { error: schoolError } = await db.from("schools").delete().eq("id", schoolId);
@@ -70,7 +82,10 @@ export const trashSchool = createServerFn({ method: "POST" })
       .select("id,name,deleted_at")
       .eq("id", data.schoolId)
       .maybeSingle();
-    if (schoolError) throw new Error(schoolError.message);
+    if (schoolError) {
+      if (isMissingTrashSchema(schoolError)) throw trashSchemaError();
+      throw new Error(schoolError.message);
+    }
     if (!school) throw new Error("School not found");
     if (school.name !== data.confirmName.trim()) throw new Error("School name does not match");
     if (school.deleted_at) return { ok: true };
@@ -79,7 +94,7 @@ export const trashSchool = createServerFn({ method: "POST" })
     if (userIds.length) {
       const { data: roles } = await db.from("user_roles").select("user_id,role").in("user_id", userIds);
       if ((roles ?? []).length) {
-        await db.from("school_deleted_roles").upsert(
+        const { error: savedRoleError } = await db.from("school_deleted_roles").upsert(
           (roles ?? []).map((r: { user_id: string; role: string }) => ({
             school_id: data.schoolId,
             user_id: r.user_id,
@@ -88,25 +103,34 @@ export const trashSchool = createServerFn({ method: "POST" })
           })),
           { onConflict: "school_id,user_id" },
         );
+        if (savedRoleError) {
+          if (isMissingTrashSchema(savedRoleError)) throw trashSchemaError();
+          throw new Error(savedRoleError.message);
+        }
       }
-      // Suspend all school-bound accounts during the recovery window without
-      // deleting them, so restoring the school can restore the original roles.
       await db.from("user_roles").update({ role: "student" }).in("user_id", userIds);
     }
 
     const now = new Date().toISOString();
     if (userIds.length) {
-      await db
+      const { error: classError } = await db
         .from("classes")
         .update({ is_deleted: true, deleted_at: now, school_deleted_at: now })
         .in("teacher_id", userIds);
+      if (classError) {
+        if (isMissingTrashSchema(classError)) throw trashSchemaError();
+        throw new Error(classError.message);
+      }
     }
 
     const { error } = await db
       .from("schools")
       .update({ is_active: false, deleted_at: now, deleted_by: context.userId })
       .eq("id", data.schoolId);
-    if (error) throw new Error(error.message);
+    if (error) {
+      if (isMissingTrashSchema(error)) throw trashSchemaError();
+      throw new Error(error.message);
+    }
     return { ok: true, restoreUntil: new Date(Date.now() + 90 * 86400000).toISOString() };
   });
 
@@ -121,15 +145,22 @@ export const restoreSchool = createServerFn({ method: "POST" })
       .select("id,deleted_at,billing_expiry_date")
       .eq("id", data.schoolId)
       .maybeSingle();
-    if (schoolError) throw new Error(schoolError.message);
+    if (schoolError) {
+      if (isMissingTrashSchema(schoolError)) throw trashSchemaError();
+      throw new Error(schoolError.message);
+    }
     if (!school?.deleted_at) throw new Error("School is not in trash");
     const deletedAt = new Date(school.deleted_at).getTime();
     if (Date.now() - deletedAt > 90 * 86400000) throw new Error("Restore period has expired");
 
-    const { data: savedRoles } = await db
+    const { data: savedRoles, error: savedRolesError } = await db
       .from("school_deleted_roles")
       .select("user_id,role")
       .eq("school_id", data.schoolId);
+    if (savedRolesError) {
+      if (isMissingTrashSchema(savedRolesError)) throw trashSchemaError();
+      throw new Error(savedRolesError.message);
+    }
     for (const row of (savedRoles ?? []) as Array<{ user_id: string; role: string }>) {
       await db
         .from("user_roles")
@@ -138,11 +169,15 @@ export const restoreSchool = createServerFn({ method: "POST" })
 
     const userIds = ((savedRoles ?? []) as Array<{ user_id: string }>).map((r) => r.user_id);
     if (userIds.length) {
-      await db
+      const { error: classError } = await db
         .from("classes")
         .update({ is_deleted: false, deleted_at: null, school_deleted_at: null })
         .in("teacher_id", userIds)
         .not("school_deleted_at", "is", null);
+      if (classError) {
+        if (isMissingTrashSchema(classError)) throw trashSchemaError();
+        throw new Error(classError.message);
+      }
     }
 
     const stillCurrent =
@@ -151,7 +186,10 @@ export const restoreSchool = createServerFn({ method: "POST" })
       .from("schools")
       .update({ is_active: stillCurrent, deleted_at: null, deleted_by: null })
       .eq("id", data.schoolId);
-    if (error) throw new Error(error.message);
+    if (error) {
+      if (isMissingTrashSchema(error)) throw trashSchemaError();
+      throw new Error(error.message);
+    }
     await db.from("school_deleted_roles").delete().eq("school_id", data.schoolId);
     return { ok: true };
   });
@@ -167,7 +205,16 @@ export const purgeExpiredSchools = createServerFn({ method: "POST" })
       .select("id")
       .not("deleted_at", "is", null)
       .lt("deleted_at", cutoff);
-    if (error) throw new Error(error.message);
+
+    // Critical compatibility fallback: if frontend code reaches production
+    // before the database migration, do not block listSchools(). The dashboard
+    // must continue showing all existing schools. Deletion simply remains
+    // unavailable until the migration is applied.
+    if (error) {
+      if (isMissingTrashSchema(error)) return { purged: 0, schemaReady: false };
+      throw new Error(error.message);
+    }
+
     for (const row of (expired ?? []) as Array<{ id: string }>) await purgeSchool(db, row.id);
-    return { purged: (expired ?? []).length };
+    return { purged: (expired ?? []).length, schemaReady: true };
   });
