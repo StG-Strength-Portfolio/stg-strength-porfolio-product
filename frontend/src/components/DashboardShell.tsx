@@ -93,6 +93,7 @@ export function DashboardShell({
   const preview = getSuperAdminPreview();
   const rolePreview = preview.mode === "teacher" || preview.mode === "principal";
   const deleteGuestSprints = useServerFn(deleteDemoSprintsForHost);
+  const isTeacherDashboard = links?.some((link) => link.to === "/teacher/sprint") ?? false;
 
   const demoText =
     language === "en"
@@ -318,7 +319,7 @@ export function DashboardShell({
             })}
           </nav>
 
-          <div>{children}</div>
+          <div className={cn(isTeacherDashboard && "space-y-6 [&>.grid]:gap-6")}>{children}</div>
 
           <p className="pt-6 text-xs opacity-50 md:hidden">{schoolName ?? ""}</p>
         </main>
