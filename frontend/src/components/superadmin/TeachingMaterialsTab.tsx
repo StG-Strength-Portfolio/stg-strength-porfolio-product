@@ -13,6 +13,7 @@ import { useLanguage, useTr } from "@/lib/i18n";
 import { STRENGTHS, getStrengthColor, getStrengthName } from "@/lib/strengths-i18n";
 import { pickLang, useTeachingMaterials } from "@/hooks/useTeachingMaterials";
 import { slidesId } from "@/lib/google-slides";
+import { normalizeTeachingThumbnailUrl } from "@/lib/teaching-thumbnail-url";
 import { ArticleView } from "@/components/teach/ArticleView";
 import {
   createTeachingCategory,
@@ -62,9 +63,14 @@ function visibleCategoryThumbnail(
   category: TeachingCategory,
   lang: "fi" | "en" | "sv",
 ): string | null {
-  if (lang === "en") return category.thumbnail_url_en;
-  if (lang === "sv") return category.thumbnail_url_sv;
-  return category.thumbnail_url_fi;
+  const raw =
+    lang === "en"
+      ? category.thumbnail_url_en
+      : lang === "sv"
+        ? category.thumbnail_url_sv
+        : category.thumbnail_url_fi;
+  const normalized = normalizeTeachingThumbnailUrl(raw);
+  return normalized || null;
 }
 
 export function TeachingMaterialsTab() {
@@ -344,41 +350,44 @@ function CategoryThumbnailEditor({
     <StickyNote seed={`tm-thumb-${category.id}`} className="space-y-4">
       <h3 className="text-xl font-bold">{tr("Kuva")} — {getStrengthName(Number(category.strength_id), "en")}</h3>
       <p className="text-sm opacity-70">
-        Paste a separate image URL for Finnish, English and Swedish. Leave a field empty to remove that language's thumbnail.
+        Paste a separate image URL for Finnish, English and Swedish. Normal Google Drive share links are supported automatically. Leave a field empty to remove that language's thumbnail.
       </p>
       <div className="grid grid-cols-3 gap-4">
-        {items.map((item) => (
-          <div key={item.code} className="space-y-2 rounded-2xl bg-white/70 p-3">
-            <Label>{item.code} thumbnail URL</Label>
-            <Input
-              type="url"
-              placeholder="https://..."
-              value={item.value}
-              onChange={(e) => item.setValue(e.target.value)}
-            />
-            {item.value.trim() ? (
-              <img
-                src={item.value.trim()}
-                alt={`${item.code} thumbnail preview`}
-                className="aspect-video w-full rounded-xl object-cover"
+        {items.map((item) => {
+          const previewUrl = normalizeTeachingThumbnailUrl(item.value);
+          return (
+            <div key={item.code} className="space-y-2 rounded-2xl bg-white/70 p-3">
+              <Label>{item.code} thumbnail URL</Label>
+              <Input
+                type="url"
+                placeholder="https://..."
+                value={item.value}
+                onChange={(e) => item.setValue(e.target.value)}
               />
-            ) : (
-              <div
-                className="aspect-video w-full rounded-xl"
-                style={{ background: getStrengthColor(Number(category.strength_id)) }}
-              />
-            )}
-            <Button
-              type="button"
-              variant="ghost"
-              className="rounded-full"
-              disabled={!item.value || busy}
-              onClick={() => item.setValue("")}
-            >
-              {tr("Poista")}
-            </Button>
-          </div>
-        ))}
+              {item.value.trim() ? (
+                <img
+                  src={previewUrl}
+                  alt={`${item.code} thumbnail preview`}
+                  className="aspect-video w-full rounded-xl object-cover"
+                />
+              ) : (
+                <div
+                  className="aspect-video w-full rounded-xl"
+                  style={{ background: getStrengthColor(Number(category.strength_id)) }}
+                />
+              )}
+              <Button
+                type="button"
+                variant="ghost"
+                className="rounded-full"
+                disabled={!item.value || busy}
+                onClick={() => item.setValue("")}
+              >
+                {tr("Poista")}
+              </Button>
+            </div>
+          );
+        })}
       </div>
       <div className="flex gap-2">
         <Button

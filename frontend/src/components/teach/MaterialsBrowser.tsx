@@ -9,15 +9,21 @@ import { useLanguage, useTr } from "@/lib/i18n";
 import { getStrengthColor, getStrengthName } from "@/lib/strengths-i18n";
 import { ArticleView } from "@/components/teach/ArticleView";
 import { pickLang, useTeachingMaterials } from "@/hooks/useTeachingMaterials";
+import { normalizeTeachingThumbnailUrl } from "@/lib/teaching-thumbnail-url";
 import type { TeachingCategory } from "@/lib/teaching.functions";
 
 function categoryThumbnail(
   category: TeachingCategory,
   lang: "fi" | "en" | "sv",
 ): string | null {
-  if (lang === "en") return category.thumbnail_url_en;
-  if (lang === "sv") return category.thumbnail_url_sv;
-  return category.thumbnail_url_fi;
+  const raw =
+    lang === "en"
+      ? category.thumbnail_url_en
+      : lang === "sv"
+        ? category.thumbnail_url_sv
+        : category.thumbnail_url_fi;
+  const normalized = normalizeTeachingThumbnailUrl(raw);
+  return normalized || null;
 }
 
 export function MaterialsBrowser({
@@ -187,7 +193,7 @@ export function MaterialsBrowser({
                 >
                   {a.thumbnail_url && (
                     <img
-                      src={a.thumbnail_url}
+                      src={normalizeTeachingThumbnailUrl(a.thumbnail_url)}
                       alt={pickLang(a as never, "title", lang)}
                       loading="lazy"
                       className="h-28 w-full rounded-xl object-cover"
