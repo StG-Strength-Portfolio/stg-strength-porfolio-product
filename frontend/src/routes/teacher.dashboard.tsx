@@ -9,6 +9,7 @@ import { StickyNote } from "@/components/StickyNote";
 import { StrengthPickerGrid } from "@/components/strengths/StrengthPickerGrid";
 import { DashboardShell } from "@/components/DashboardShell";
 import { ProfileSettings } from "@/components/ProfileSettings";
+import { ClassTeacherManager } from "@/components/classes/ClassTeacherManager";
 import { supabase } from "@/integrations/supabase/client";
 import { useRoleGuard } from "@/lib/role-guard";
 import { useLanguage, useTr, LANGUAGES, LANGUAGE_LABEL, type Language } from "@/lib/i18n";
@@ -91,6 +92,8 @@ function TeacherDashboardPage() {
   }
 
   const selectedStudent = students.find((s) => s.studentId === openStudent) ?? null;
+  const selectedClass = classes.find((c) => c.id === openClass) ?? null;
+  const ownedDeletedClasses = deletedClasses.filter((c) => c.teacher_id === guard.userId);
 
   return (
     <DashboardShell
@@ -121,11 +124,6 @@ function TeacherDashboardPage() {
         <TopStrengths students={students} classes={classes} assigned={assigned} />
       )}
 
-      {/* FIX: form "Luo luokka" (CreateClass) trước đây chỉ được render khi
-          tab === "settings" — nhưng KHÔNG có nút nào trong sidebar trỏ tới
-          tab đó (Profile trỏ sang route /teacher/profile riêng), nên form
-          này hoàn toàn không thể truy cập được qua UI. Chuyển nó lên đầu
-          tab "Classes" để giáo viên thấy và tạo lớp được ngay. */}
       {tab === "classes" && !openClass && <CreateClass onCreated={refresh} />}
 
       {tab === "classes" && !openClass && (
@@ -136,6 +134,7 @@ function TeacherDashboardPage() {
             const avg = inClass.length
               ? Math.round(inClass.reduce((a, s) => a + pctOf(s), 0) / inClass.length)
               : 0;
+            const isOwner = c.teacher_id === guard.userId;
             return (
               <StickyNote key={c.id} seed={`cls-${c.id}`} className="space-y-2">
                 <button
@@ -153,33 +152,34 @@ function TeacherDashboardPage() {
                   {tr("Opiskelijoita")}: {inClass.length} · {tr("Valmistuminen %")}: {avg} % ·{" "}
                   {tr("Luotu")}: {new Date(c.created_at).toLocaleDateString()}
                 </div>
-                <div className="pt-1">
-                  <DeleteClassButton
-                    klass={c}
-                    studentCount={inClass.length}
-                    teacherId={guard.userId}
-                    onDone={refresh}
-                  />
-                </div>
+                {isOwner && (
+                  <div className="pt-1">
+                    <DeleteClassButton
+                      klass={c}
+                      studentCount={inClass.length}
+                      teacherId={guard.userId}
+                      onDone={refresh}
+                    />
+                  </div>
+                )}
               </StickyNote>
             );
           })}
-          {deletedClasses.length > 0 && (
+          {ownedDeletedClasses.length > 0 && (
             <div className="md:col-span-2">
-              <DeletedClasses classes={deletedClasses} onDone={refresh} />
+              <DeletedClasses classes={ownedDeletedClasses} onDone={refresh} />
             </div>
           )}
         </div>
       )}
 
-      {tab === "classes" && openClass && (
-        <StickyNote seed={`cls-detail-${openClass}`} className="space-y-3 overflow-x-auto">
+      {tab === "classes" && openClass && selectedClass && (
+        <StickyNote seed={`cls-detail-${openClass}`} className="space-y-4 overflow-x-auto">
           <Button variant="outline" className="rounded-full" onClick={() => setOpenClass(null)}>
             {tr("Takaisin luokkiin")}
           </Button>
-          <h2 className="text-2xl font-bold">
-            {classes.find((c) => c.id === openClass)?.name ?? ""}
-          </h2>
+          <h2 className="text-2xl font-bold">{selectedClass.name}</h2>
+          {selectedClass.teacher_id === guard.userId && <ClassTeacherManager classId={openClass} />}
           <StudentTable
             students={students.filter((s) => s.classId === openClass)}
             onOpen={openStudentView}
