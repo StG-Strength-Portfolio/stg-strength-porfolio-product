@@ -5,6 +5,53 @@
 ALTER TABLE public.school_codes
   ADD COLUMN IF NOT EXISTS expires_at timestamptz;
 
+-- Pending staff registrations are created only after the school staff code has
+-- been validated. They are server-only and are consumed after the user confirms
+-- their email. No password is stored here.
+CREATE TABLE IF NOT EXISTS public.pending_staff_registrations (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  token_hash text NOT NULL UNIQUE,
+  email text NOT NULL,
+  display_name text NOT NULL,
+  school_id uuid NOT NULL REFERENCES public.schools(id) ON DELETE CASCADE,
+  language text,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  expires_at timestamptz NOT NULL DEFAULT (now() + interval '48 hours')
+);
+CREATE INDEX IF NOT EXISTS pending_staff_registrations_email_idx
+  ON public.pending_staff_registrations (lower(email));
+GRANT ALL ON public.pending_staff_registrations TO service_role;
+REVOKE ALL ON public.pending_staff_registrations FROM PUBLIC, anon, authenticated;
+ALTER TABLE public.pending_staff_registrations ENABLE ROW LEVEL SECURITY;
+
+-- Staff signups must not receive the normal default student role before their
+-- email address has been confirmed. Their profile row can still be created so
+-- the auth-user/profile FK relationship remains consistent. The teacher role
+-- and school are assigned only by the post-confirmation server flow.
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  INSERT INTO public.profiles (id, display_name)
+  VALUES (
+    NEW.id,
+    COALESCE(NEW.raw_user_meta_data->>'display_name', split_part(NEW.email, '@', 1))
+  )
+  ON CONFLICT (id) DO NOTHING;
+
+  IF COALESCE(NEW.raw_user_meta_data->>'registration_type', '') <> 'staff' THEN
+    INSERT INTO public.user_roles (user_id, role)
+    VALUES (NEW.id, 'student')
+    ON CONFLICT (user_id) DO NOTHING;
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
 -- Retire the old one-time teacher / school-admin onboarding codes. Keep the
 -- rows for history, but only code_type='staff' is accepted by the new flow.
 UPDATE public.school_codes
@@ -65,9 +112,8 @@ BEGIN
 END;
 $$;
 
--- Replace the old teacher registration RPC with the new reusable staff-code
--- behavior. Existing frontend callers keep working during rollout, but only
--- active staff codes are accepted. The code is deliberately NOT marked used.
+-- Compatibility RPC for any remaining authenticated caller. Only an active,
+-- unexpired reusable staff code can grant the teacher role and school.
 CREATE OR REPLACE FUNCTION public.register_teacher_with_any_code(p_code text)
 RETURNS jsonb
 LANGUAGE plpgsql
