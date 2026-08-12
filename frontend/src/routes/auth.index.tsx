@@ -5,7 +5,8 @@ import { CornerBlobs } from "@/components/CornerBlobs";
 import { StickyNote } from "@/components/StickyNote";
 import { Button } from "@/components/ui/button";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
-import { useT, useTr } from "@/lib/i18n";
+import { useLanguage, useT } from "@/lib/i18n";
+import { homeForRole, roleOfCurrentUser } from "@/lib/role-guard";
 import { z } from "zod";
 
 export const Route = createFileRoute("/auth/")({
@@ -17,11 +18,18 @@ function AuthLanding() {
   const navigate = useNavigate();
   const search = Route.useSearch();
   const t = useT();
-  const tr = useTr();
+  const { language } = useLanguage();
+  const staffLabel =
+    language === "en"
+      ? "Create staff account"
+      : language === "sv"
+        ? "Skapa personalkonto"
+        : "Luo henkilökunnan tili";
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/seikkailu", replace: true });
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (!data.session) return;
+      window.location.href = homeForRole(await roleOfCurrentUser());
     });
   }, [navigate]);
 
@@ -55,10 +63,10 @@ function AuthLanding() {
             {t("auth.landing.signupBtn")}
           </Button>
           <Button
-            onClick={() => navigate({ to: "/register-teacher" })}
+            onClick={() => navigate({ to: "/register-staff" })}
             className="w-full rounded-full bg-yellow hover:bg-yellow/90 text-ink font-bold py-6 text-base h-auto"
           >
-            {tr("Luo opettajatili")}
+            {staffLabel}
           </Button>
         </StickyNote>
       </div>

@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { createStaffCode } from "@/lib/staff-registration.functions";
 
 export type SchoolRow = {
   id: string;
@@ -29,9 +30,12 @@ export type SchoolUser = {
 export type SchoolCodeRow = {
   id: string;
   code: string;
+  code_type: string;
   is_used: boolean;
+  is_revoked: boolean;
   used_by: string | null;
   created_at: string;
+  expires_at: string | null;
 };
 
 async function assertSuperAdmin(supabase: any, userId: string) {
@@ -42,7 +46,6 @@ async function assertSuperAdmin(supabase: any, userId: string) {
     .eq("role", "super_admin")
     .maybeSingle();
 
-  // TEMPORARY DIAGNOSTIC — remove once the Forbidden issue is confirmed fixed.
   console.error(
     "[assertSuperAdmin][diag]",
     JSON.stringify({ userId, hasData: !!data, error: error ? error.message : null }),
@@ -86,13 +89,16 @@ export const listSchools = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false });
     const { data: profiles } = await db.from("profiles").select("id, display_name, school_id");
     const { data: roles } = await db.from("user_roles").select("user_id, role");
-    const { data: codes } = await db.from("school_codes").select("school_id, code");
+    const { data: codes } = await db
+      .from("school_codes")
+      .select("school_id, code")
+      .eq("code_type", "staff")
+      .eq("is_revoked", false)
+      .gt("expires_at", new Date().toISOString());
 
     const roleOf = new Map<string, string>();
     for (const r of roles ?? []) roleOf.set(r.user_id, r.role);
 
-    // Map class-joined students to their teacher's school so students without a
-    // school_id on their profile still show up in the counts.
     const schoolOfProfile = new Map<string, string>();
     for (const p of (profiles ?? []) as any[])
       if (p.school_id) schoolOfProfile.set(p.id, p.school_id);
@@ -143,12 +149,12 @@ export const createSchool = createServerFn({ method: "POST" })
     await assertSuperAdmin(context.supabase, context.userId);
     const db = await admin();
     const { data: existing } = await db.from("schools").select("code");
-    const code = nextCode(((existing ?? []) as any[]).map((r) => r.code));
+    const internalCode = nextCode(((existing ?? []) as any[]).map((r) => r.code));
     const { data: school, error } = await db
       .from("schools")
       .insert({
         name: data.name.trim(),
-        code,
+        code: internalCode,
         language: data.language,
         is_active: true,
         billing_start_date: data.start,
@@ -157,12 +163,8 @@ export const createSchool = createServerFn({ method: "POST" })
       .select()
       .single();
     if (error) throw new Error(error.message);
-    await db.from("school_codes").insert({
-      school_id: school.id,
-      code,
-      created_by_super_admin_id: context.userId,
-    });
-    return { code, id: school.id as string };
+    const staff = await createStaffCode(db, school.id, context.userId);
+    return { code: staff.code, id: school.id as string, expiresAt: staff.expiresAt };
   });
 
 export const updateSchool = createServerFn({ method: "POST" })
@@ -205,25 +207,13 @@ export const renewSchool = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/** Legacy export name kept for compatibility; now regenerates the shared staff code. */
 export const generateSchoolCode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { schoolId: string }) => d)
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.supabase, context.userId);
-    const db = await admin();
-    const { data: existing } = await db.from("school_codes").select("code");
-    const { data: schoolCodes } = await db.from("schools").select("code");
-    const code = nextCode([
-      ...((existing ?? []) as any[]).map((r) => r.code),
-      ...((schoolCodes ?? []) as any[]).map((r) => r.code),
-    ]);
-    const { error } = await db.from("school_codes").insert({
-      school_id: data.schoolId,
-      code,
-      created_by_super_admin_id: context.userId,
-    });
-    if (error) throw new Error(error.message);
-    return { code };
+    return createStaffCode(await admin(), data.schoolId, context.userId);
   });
 
 export const revokeSchoolCode = createServerFn({ method: "POST" })
@@ -232,7 +222,12 @@ export const revokeSchoolCode = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.supabase, context.userId);
     const db = await admin();
-    await db.from("school_codes").delete().eq("id", data.id);
+    const { error } = await db
+      .from("school_codes")
+      .update({ is_revoked: true })
+      .eq("id", data.id)
+      .eq("code_type", "staff");
+    if (error) throw new Error(error.message);
     return { ok: true };
   });
 
@@ -250,16 +245,15 @@ export const getSchoolDetail = createServerFn({ method: "GET" })
     const { data: roles } = await db.from("user_roles").select("user_id, role");
     const { data: codeRows } = await db
       .from("school_codes")
-      .select("id, code, is_used, used_by_admin_id, created_at")
+      .select("id, code, code_type, is_used, is_revoked, used_by_admin_id, created_at, expires_at")
       .eq("school_id", data.schoolId)
+      .eq("code_type", "staff")
       .order("created_at", { ascending: false });
 
     const emails = await emailMap(db);
     const roleOf = new Map<string, string>();
     for (const r of roles ?? []) roleOf.set(r.user_id, r.role);
 
-    // Students who joined through a class code have no school_id on their
-    // profile — find them through the classes owned by this school's teachers.
     const allProfiles: any[] = [...((profiles ?? []) as any[])];
     const teacherIds = allProfiles
       .filter((p) => roleOf.get(p.id) === "teacher" || roleOf.get(p.id) === "school_admin")
@@ -292,7 +286,6 @@ export const getSchoolDetail = createServerFn({ method: "GET" })
 
     const users: SchoolUser[] = allProfiles.map((p) => ({
       id: p.id,
-
       name: p.display_name,
       email: emails.get(p.id) ?? null,
       role: roleOf.get(p.id) ?? "student",
@@ -305,9 +298,12 @@ export const getSchoolDetail = createServerFn({ method: "GET" })
     const codes: SchoolCodeRow[] = ((codeRows ?? []) as any[]).map((c) => ({
       id: c.id,
       code: c.code,
+      code_type: c.code_type,
       is_used: c.is_used,
+      is_revoked: c.is_revoked,
       used_by: c.used_by_admin_id ? (nameOf.get(c.used_by_admin_id) ?? null) : null,
       created_at: c.created_at,
+      expires_at: c.expires_at ?? null,
     }));
 
     const monthAgo = Date.now() - 30 * 24 * 3600 * 1000;
@@ -395,7 +391,6 @@ export const listSuperAdmins = createServerFn({ method: "GET" })
     }));
   });
 
-/** Invite a new super admin: creates the account if needed, then grants the role. */
 export const inviteSuperAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { email: string; name?: string; password?: string }) => d)
@@ -433,7 +428,6 @@ export const inviteSuperAdmin = createServerFn({ method: "POST" })
     return { ok: true, userId };
   });
 
-/** Demote another super admin back to teacher. Never allows self-removal. */
 export const removeSuperAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { userId: string }) => d)

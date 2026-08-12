@@ -24,7 +24,7 @@ export interface RoleGuardState {
   preview: boolean;
 }
 
-/** Reads the current user's role (defaults to student). */
+/** Reads the current user's role. Pending staff deliberately have no role. */
 export async function roleOfCurrentUser(): Promise<AppRole | null> {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) return null;
@@ -33,7 +33,10 @@ export async function roleOfCurrentUser(): Promise<AppRole | null> {
     .select("role")
     .eq("user_id", userData.user.id)
     .maybeSingle();
-  return ((data as { role?: AppRole } | null)?.role ?? "student") as AppRole;
+  const role = (data as { role?: AppRole } | null)?.role;
+  if (role) return role;
+  if (userData.user.user_metadata?.registration_type === "staff") return null;
+  return "student";
 }
 
 /** Where a signed-in user belongs, by role. */
@@ -47,8 +50,10 @@ export function homeForRole(role: AppRole | null): string {
       return "/teacher/dashboard";
     case "admin":
       return "/opettaja";
-    default:
+    case "student":
       return "/seikkailu";
+    default:
+      return "/confirm-staff";
   }
 }
 
@@ -91,7 +96,12 @@ export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
         .select("role")
         .eq("user_id", user.id)
         .maybeSingle();
-      const role = ((roleRow as { role?: AppRole } | null)?.role ?? "student") as AppRole;
+      const storedRole = (roleRow as { role?: AppRole } | null)?.role;
+      if (!storedRole && user.user_metadata?.registration_type === "staff") {
+        window.location.href = "/confirm-staff";
+        return;
+      }
+      const role = (storedRole ?? "student") as AppRole;
 
       if (role === "super_admin") {
         const preview = getSuperAdminPreview();

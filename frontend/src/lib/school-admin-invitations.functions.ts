@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { createStaffCode } from "@/lib/staff-registration.functions";
 
 async function admin() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -16,58 +17,20 @@ async function assertSuperAdmin(supabase: any, userId: string) {
   if (error || !data) throw new Error("Forbidden");
 }
 
-function secureIndex(max: number): number {
-  const limit = Math.floor(256 / max) * max;
-  const byte = new Uint8Array(1);
-  do {
-    crypto.getRandomValues(byte);
-  } while (byte[0] >= limit);
-  return byte[0] % max;
-}
-
-function randomSchoolAdminCode(): string {
-  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  const digits = "0123456789";
-  let code = "";
-  for (let i = 0; i < 6; i++) code += letters[secureIndex(letters.length)];
-  for (let i = 0; i < 2; i++) code += digits[secureIndex(digits.length)];
-  return code;
-}
-
+/**
+ * Legacy export name kept so existing Superadmin screens stay compatible.
+ * It now creates the school's single reusable 28-day staff code.
+ */
 export async function createSchoolAdminInvitation(
   db: any,
   schoolId: string,
   createdBy: string,
 ): Promise<string> {
-  // Keep only one current unused school-admin invitation per school.
-  const { error: revokeError } = await db
-    .from("school_codes")
-    .update({ is_revoked: true })
-    .eq("school_id", schoolId)
-    .eq("code_type", "school")
-    .eq("is_used", false)
-    .eq("is_revoked", false);
-  if (revokeError) throw new Error(revokeError.message);
-
-  for (let attempt = 0; attempt < 5; attempt++) {
-    const code = randomSchoolAdminCode();
-    const { error } = await db.from("school_codes").insert({
-      school_id: schoolId,
-      code,
-      code_type: "school",
-      created_by_super_admin_id: createdBy,
-      created_by: createdBy,
-      is_used: false,
-      is_revoked: false,
-    });
-
-    if (!error) return code;
-    if ((error as { code?: string }).code !== "23505") throw new Error(error.message);
-  }
-
-  throw new Error("Could not generate a unique school admin code");
+  const result = await createStaffCode(db, schoolId, createdBy);
+  return result.code;
 }
 
+/** Current active staff code for each school. */
 export const getCurrentSchoolAdminCodes = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<Record<string, string>> => {
@@ -75,37 +38,40 @@ export const getCurrentSchoolAdminCodes = createServerFn({ method: "GET" })
     const db = await admin();
     const { data, error } = await db
       .from("school_codes")
-      .select("school_id, code, created_at")
-      .eq("code_type", "school")
-      .eq("is_used", false)
+      .select("school_id, code, created_at, expires_at")
+      .eq("code_type", "staff")
       .eq("is_revoked", false)
+      .gt("expires_at", new Date().toISOString())
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
 
     const current: Record<string, string> = {};
     for (const row of data ?? []) {
-      if (!current[row.school_id] && /^[A-Z]{6}[0-9]{2}$/.test(row.code)) {
-        current[row.school_id] = row.code;
-      }
+      if (!current[row.school_id]) current[row.school_id] = row.code;
     }
     return current;
   });
 
+/** Validate a staff code without consuming it. Kept under the legacy name for compatibility. */
 export const validateSchoolAdminCode = createServerFn({ method: "POST" })
   .inputValidator((d: { code: string }) => d)
   .handler(async ({ data }) => {
     const code = data.code.trim().toUpperCase();
-    if (!/^[A-Z]{6}[0-9]{2}$/.test(code)) return { valid: false as const };
-
     const db = await admin();
     const { data: invite, error } = await db
       .from("school_codes")
-      .select("school_id, is_used, is_revoked")
+      .select("school_id, is_revoked, expires_at")
       .eq("code", code)
-      .eq("code_type", "school")
+      .eq("code_type", "staff")
       .maybeSingle();
 
-    if (error || !invite || invite.is_used || invite.is_revoked) {
+    if (
+      error ||
+      !invite ||
+      invite.is_revoked ||
+      !invite.expires_at ||
+      new Date(invite.expires_at).getTime() <= Date.now()
+    ) {
       return { valid: false as const };
     }
 
@@ -114,11 +80,11 @@ export const validateSchoolAdminCode = createServerFn({ method: "POST" })
       .select("name, is_active")
       .eq("id", invite.school_id)
       .maybeSingle();
-
     if (schoolError || !school?.is_active) return { valid: false as const };
     return { valid: true as const, schoolName: school.name as string };
   });
 
+/** Legacy export name: Superadmin regenerates the school's shared staff code. */
 export const generateSecureSchoolAdminCode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { schoolId: string }) => d)
@@ -135,6 +101,5 @@ export const generateSecureSchoolAdminCode = createServerFn({ method: "POST" })
     if (!school?.id) throw new Error("School not found");
     if (!school.is_active) throw new Error("School is inactive");
 
-    const code = await createSchoolAdminInvitation(db, data.schoolId, context.userId);
-    return { code };
+    return createStaffCode(db, data.schoolId, context.userId);
   });

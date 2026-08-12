@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { matchStrengthId, strengthIdsFromResponses } from "@/lib/strength-jar-data";
+import { createStaffCode } from "@/lib/staff-registration.functions";
 import type { ReportEvent } from "@/lib/report-series";
 
 export interface SchoolAdminStudent {
@@ -34,6 +35,7 @@ export interface SchoolAdminCode {
   is_revoked: boolean;
   used_by: string | null;
   created_at: string;
+  expires_at: string | null;
 }
 
 export interface SchoolAdminClass {
@@ -101,13 +103,6 @@ async function resolveReadSchool(supabase: any, userId: string): Promise<string>
   return school.id as string;
 }
 
-function randomTeacherCode(): string {
-  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let s = "TEACH-";
-  for (let i = 0; i < 5; i++) s += alphabet[Math.floor(Math.random() * alphabet.length)];
-  return s;
-}
-
 export const getSchoolAdminData = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<SchoolAdminData> => {
@@ -124,8 +119,9 @@ export const getSchoolAdminData = createServerFn({ method: "GET" })
         db.from("user_roles").select("user_id, role"),
         db
           .from("school_codes")
-          .select("id, code, code_type, is_used, is_revoked, used_by_admin_id, created_at")
+          .select("id, code, code_type, is_used, is_revoked, used_by_admin_id, created_at, expires_at")
           .eq("school_id", schoolId)
+          .eq("code_type", "staff")
           .order("created_at", { ascending: false }),
       ]);
 
@@ -324,6 +320,7 @@ export const getSchoolAdminData = createServerFn({ method: "GET" })
         is_revoked: c.is_revoked,
         used_by: c.used_by_admin_id ? (nameOf.get(c.used_by_admin_id) ?? null) : null,
         created_at: c.created_at,
+        expires_at: c.expires_at ?? null,
       })),
       events,
       strengthCounts: Array.from(counts, ([strengthId, count]) => ({ strengthId, count })).sort(
@@ -332,23 +329,12 @@ export const getSchoolAdminData = createServerFn({ method: "GET" })
     };
   });
 
+/** Legacy export name kept for the existing dashboard; now regenerates the shared staff code. */
 export const createTeacherCode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const schoolId = await assertSchoolAdmin(context.supabase, context.userId);
-    const db = await admin();
-    for (let attempt = 0; attempt < 5; attempt++) {
-      const code = randomTeacherCode();
-      const { error } = await db.from("school_codes").insert({
-        school_id: schoolId,
-        code,
-        code_type: "teacher",
-        created_by: context.userId,
-      });
-      if (!error) return { code };
-      if ((error as any).code !== "23505") throw new Error(error.message);
-    }
-    throw new Error("Could not generate a unique code");
+    return createStaffCode(await admin(), schoolId, context.userId);
   });
 
 export const revokeTeacherCode = createServerFn({ method: "POST" })
@@ -361,7 +347,8 @@ export const revokeTeacherCode = createServerFn({ method: "POST" })
       .from("school_codes")
       .update({ is_revoked: true })
       .eq("id", data.id)
-      .eq("school_id", schoolId);
+      .eq("school_id", schoolId)
+      .eq("code_type", "staff");
     if (error) throw new Error(error.message);
     return { ok: true };
   });
