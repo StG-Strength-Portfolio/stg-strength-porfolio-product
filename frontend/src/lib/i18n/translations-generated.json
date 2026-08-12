@@ -441,12 +441,10 @@
     "en": "Start Game",
     "sv": "Starta spel"
   },
-
   "Aloita tästä": {
     "en": "Start here",
     "sv": "Börja här"
   },
-
   "Aloita sprintti": {
     "en": "Start Sprint",
     "sv": "Starta sprint"
@@ -1555,10 +1553,6 @@
     "en": "Compassion",
     "sv": "Medkänsla"
   },
-  "Myötätunto": {
-    "en": "Compassion",
-    "sv": "Medkänsla"
-  },
   "Maali": {
     "en": "Finish",
     "sv": "Mål"
@@ -2220,7 +2214,6 @@
     "en": "Future Memory – Think of a situation in your studies or free time where you can use your strengths in the near future.",
     "sv": "Framtidsminne – Tänk på en situation i dina studier eller på fritiden där du i den närmaste framtiden kan använda dina styrkor."
   },
-
   "Tulokset!": {
     "en": "Results!",
     "sv": "Resultat!"
@@ -2909,14 +2902,6 @@
     "en": "Practice recognizing positive actions in the people around you.\nMake noticing the good a habit.",
     "sv": "Öva på att känna igen positiva handlingar hos människorna omkring dig.\nGör det till en vana att lägga märke till det goda."
   },
-  "“Olit todella rohkea.” “Kiitos ystävällisyydestä”. “Sinussa on myötätuntoa”.": {
-    "en": "\"You were really brave.\" \"Thank you for your kindness.\" \"You have compassion.\"",
-    "sv": "\"Du var verkligen modig.\" \"Tack för din vänlighet.\" \"Du har medkänsla.\""
-  },
-  "“Olit rohkea. Huomasin, että uskalsit nostaa esille vaikeita asioita.”": {
-    "en": "\"You were brave. I noticed that you dared to bring up difficult things.\"",
-    "sv": "\"Du var modig. Jag märkte att du vågade lyfta fram svåra saker.\""
-  },
   "“Kiitos rohkeudestasi tänään. Tapasi toimia vaikuttaa myönteisesti koko ryhmään.\nOlen susta ylpeä.”": {
     "en": "\"Thank you for your courage today. The way you act has a positive effect on the whole group.\nI am proud of you.\"",
     "sv": "\"Tack för ditt mod idag. Ditt sätt att agera påverkar hela gruppen positivt.\nJag är stolt över dig.\""
@@ -3132,5 +3117,837 @@
   "Näissä paikoissa viihdyn ja pääsen käyttämään vahvuuksiani": {
     "en": "In these places I feel good and get to use my strengths",
     "sv": "På dessa platser trivs jag och får använda mina styrkor"
+  },
+  "Sähköposti": {
+    "en": "Email",
+    "sv": "Email"
+  },
+  "Kyllä": {
+    "en": "Yes",
+    "sv": "Yes"
+  },
+  "näyttöä täytetty": {
+    "en": "screens completed",
+    "sv": "screens completed"
+  },
+  "Nykyinen näyttö": {
+    "en": "Current screen",
+    "sv": "Current screen"
+  },
+  "Ei vielä vastauksia.": {
+    "en": "No responses yet.",
+    "sv": "No responses yet."
+  },
+  "Minä olen": {
+    "en": "I am",
+    "sv": "I am"
+  },
+  "Valitse vahvuus": {
+    "en": "Choose a strength",
+    "sv": "Choose a strength"
+  },
+  "Valitse ne vahvuudet, jotka tunnistat itsessäsi tai läheisissäsi. Voit palata muokkaamaan valintaasi myöhemmin.": {
+    "en": "Select the strengths you recognize in yourself or people close to you. You can come back and edit your choices later.",
+    "sv": "Select the strengths you recognize in yourself or people close to you. You can come back and edit your choices later."
+  },
+  "Luonteenvahvuudet, joita voit tunnistaa itsessäsi ja toisissa": {
+    "en": "Character strengths you can recognize in yourself and others",
+    "sv": "Character strengths you can recognize in yourself and others"
+  },
+  "Lukiolainen, aloita vahvuusmittarin täyttäminen": {
+    "en": "High school student, start filling in the strength meter",
+    "sv": "High school student, start filling in the strength meter"
+  },
+  "Voit selvittää omia ydinvahvuuksiasi käyttämällä alla olevaa vahvuusmittaria.": {
+    "en": "You can explore your core strengths by using the strength meter below.",
+    "sv": "You can explore your core strengths by using the strength meter below."
+  },
+  "Sinun kannattaa ennen mittarin täyttämistä valita viisi vahvuutta (vahvuuskarkit), jotka mielestäsi kuvaavat sinua parhaimmillasi.": {
+    "en": "Before filling in the meter, choose five strengths that you feel describe you at your best.",
+    "sv": "Before filling in the meter, choose five strengths that you feel describe you at your best."
+  },
+  "Pyydä myös muita ihmisiä miettimään, mitkä ovat heidän mielestään sinun vahvuuksiasi. Haastattele ystäviäsi, perheenjäseniä tai esimerkiksi valmentajaasi.": {
+    "en": "Ask other people to think about what they see as your strengths. Interview friends, family members, or for example your coach.",
+    "sv": "Ask other people to think about what they see as your strengths. Interview friends, family members, or for example your coach."
+  },
+  "Vertaa muiden arvioita omiisi ja lopuksi mittarista saamaasi tulokseen. Yllätyitkö?": {
+    "en": "Compare other people's views with your own and finally with your result from the meter. Were you surprised?",
+    "sv": "Compare other people's views with your own and finally with your result from the meter. Were you surprised?"
+  },
+  "Ovatko tulokset yhteneväiset mittarin ja omien valintojesi kanssa?": {
+    "en": "Do the results match the meter and your own choices?",
+    "sv": "Do the results match the meter and your own choices?"
+  },
+  "Antoiko mittari eri vastauksia kuin mitä itse valitsit? Entä opettajat, ystävät ja läheiset?": {
+    "en": "Did the meter give different answers than the ones you chose yourself? What about teachers, friends, and loved ones?",
+    "sv": "Did the meter give different answers than the ones you chose yourself? What about teachers, friends, and loved ones?"
+  },
+  "Tervetuloa tekemään omien vahvuuksien itsearviointia! Valitse kuhunkin otsikkona olevaan väittämään sinulle sopivin vaihtoehto.": {
+    "en": "Welcome to self-assess your strengths. For each statement, choose the option that fits you best.",
+    "sv": "Welcome to self-assess your strengths. For each statement, choose the option that fits you best."
+  },
+  "Kirjoita saamasi pisteet tähän listaan — mittari laskee summat puolestasi.": {
+    "en": "Enter your scores in this list. The meter will calculate the totals for you.",
+    "sv": "Enter your scores in this list. The meter will calculate the totals for you."
+  },
+  "Sait kenties 3–7 kohtaa, joiden pistemäärä on 9 tai 10. Nämä ovat tämän mittarin mukaan sinun ydinvahvuuksiasi. Joillain meistä näitä ydinvahvuuksia on paljon enemmän! Kirjoita ydinvahvuutesi ylös ja tarkastele niitä. Katso myös, mistä kohdista sait matalimmat pisteet. Nämä ovat todennäköisesti kasvuvahvuuksiasi, joita voit tarkastella kehittymisen näkökulmasta.": {
+    "en": "You may have 3-7 items with a score of 9 or 10. According to this meter, these are your core strengths. Some of us have many more core strengths. Write down your core strengths and look at them. Also notice where you scored lowest. These are likely growth strengths that you can view as opportunities to develop.",
+    "sv": "You may have 3-7 items with a score of 9 or 10. According to this meter, these are your core strengths. Some of us have many more core strengths. Write down your core strengths and look at them. Also notice where you scored lowest. These are likely growth strengths that you can view as opportunities to develop."
+  },
+  "Top 5 ydinvahvuuttani ja Top 3 kasvuvahvuuttani, joiden kehittämisestä on hyötyä.": {
+    "en": "My top 5 core strengths and top 3 growth strengths that would be useful to develop.",
+    "sv": "My top 5 core strengths and top 3 growth strengths that would be useful to develop."
+  },
+  "Vastasivatko mittarin tulokset omaa karkkikauppa-valintaasi? Vertaa Top 5 -listaa näytön 12 valintoihin ja pohdi yhtäläisyyksiä ja eroja.": {
+    "en": "Did the meter results match your candy-shop choices? Compare the Top 5 list with your choices on screen 12 and reflect on similarities and differences.",
+    "sv": "Did the meter results match your candy-shop choices? Compare the Top 5 list with your choices on screen 12 and reflect on similarities and differences."
+  },
+  "Huomaa hyvä!®": {
+    "en": "See the Good!®",
+    "sv": "See the Good!®"
+  },
+  "Kasvat eniten niillä alueilla, joilla olet jo vahva.": {
+    "en": "You grow the most in the areas where you are already strong.",
+    "sv": "You grow the most in the areas where you are already strong."
+  },
+  "Ajattele itseäsi tekemässä tavanomaisia ja arkisia asioita tai tehtäviä. Miten olet näissä tekemisissä käyttänyt ydinvahvuuksiasi? Kirjoita muutama esimerkki tilanteista.": {
+    "en": "Think of yourself doing ordinary everyday things or tasks. How have you used your core strengths in these situations? Write a few examples.",
+    "sv": "Think of yourself doing ordinary everyday things or tasks. How have you used your core strengths in these situations? Write a few examples."
+  },
+  "Missä onnistuit omia vahvuuksia hyödyntämällä?": {
+    "en": "Where did you succeed by using your own strengths?",
+    "sv": "Where did you succeed by using your own strengths?"
+  },
+  "Miten omien ydinvahvuuksien hyödyntäminen vaikutti itseesi tai toisiin?": {
+    "en": "How did using your core strengths affect you or others?",
+    "sv": "How did using your core strengths affect you or others?"
+  },
+  "Merkkaa tähän 5 vahvuuskarkkiasi!": {
+    "en": "Mark your 5 strength candies here!",
+    "sv": "Mark your 5 strength candies here!"
+  },
+  "Pohdi ja täydennä omien voimavarojesi sydämet": {
+    "en": "Reflect and complete the hearts for your own resources",
+    "sv": "Reflect and complete the hearts for your own resources"
+  },
+  "Vahvuuksien käyttökielto": {
+    "en": "A ban on using strengths",
+    "sv": "A ban on using strengths"
+  },
+  "Jokainen opiskelija tekee itsestään ja ydinvahvuuksistaan julisteen, jossa on oma kuva ja viisi ydinvahvuutta.": {
+    "en": "Each student creates a poster about themselves and their core strengths, including a photo and five core strengths.",
+    "sv": "Each student creates a poster about themselves and their core strengths, including a photo and five core strengths."
+  },
+  "Millä tavoin voisit tehdä ydinvahvuutesi näkyväksi muille hauskalla ja luovalla tavalla?": {
+    "en": "How could you make your core strengths visible to others in a fun and creative way?",
+    "sv": "How could you make your core strengths visible to others in a fun and creative way?"
+  },
+  "Miten haluat visualisoida omat vahvuutesi? Ne parhaat puolesi, jotka tulevat mukanasi päivittäin lukioon.": {
+    "en": "How do you want to visualize your strengths, the best sides of you that you bring to school every day?",
+    "sv": "How do you want to visualize your strengths, the best sides of you that you bring to school every day?"
+  },
+  "Mieti onnistumista, jossa pystyit tukemaan ja auttamaan toisia omia vahvuuksiasi hyödyntämällä? Mitä teit ja kenen kanssa olit? Kerro esimerkki.": {
+    "en": "Think of a success where you were able to support and help others by using your strengths. What did you do and who were you with? Give an example.",
+    "sv": "Think of a success where you were able to support and help others by using your strengths. What did you do and who were you with? Give an example."
+  },
+  "Mitä yhteistä hyvää vahvuutesi edistivät, miten?": {
+    "en": "What common good did your strengths promote, and how?",
+    "sv": "What common good did your strengths promote, and how?"
+  },
+  "Keskustele parin kanssa. Vastaa kysymyksiin. Käyttäkää omia vahvuuskarkkeja apuna keskustelussa.": {
+    "en": "Discuss with a partner. Answer the questions. Use your strength candies to support the conversation.",
+    "sv": "Discuss with a partner. Answer the questions. Use your strength candies to support the conversation."
+  },
+  "Asteikolla 1 täysin eri mieltä, 2.. 3.. 4.. ja 5 täysin samaa mieltä, vastaa seuraavaan mittariin vahvuuksien käytöstä.": {
+    "en": "On a scale from 1 strongly disagree to 5 strongly agree, answer the following meter about using strengths.",
+    "sv": "On a scale from 1 strongly disagree to 5 strongly agree, answer the following meter about using strengths."
+  },
+  "Tässä kokonaisuudessa pääset tutustumaan ja työstämään omia vahvuuksiasi lukiolaisena.": {
+    "en": "In this section, you will explore and work with your own strengths as a high school student.",
+    "sv": "In this section, you will explore and work with your own strengths as a high school student."
+  },
+  "Vahvuudet perheessä": {
+    "en": "Strengths in the family",
+    "sv": "Strengths in the family"
+  },
+  "Täydennä laput.": {
+    "en": "Complete the notes.",
+    "sv": "Complete the notes."
+  },
+  "Minä perheenjäsenenä": {
+    "en": "Me as a family member",
+    "sv": "Me as a family member"
+  },
+  "Haastattele perheenjäseniä ja kerää tietoa omista vahvuuksistasi. Täydennä lauseet:": {
+    "en": "Interview family members and collect information about your strengths. Complete the sentences:",
+    "sv": "Interview family members and collect information about your strengths. Complete the sentences:"
+  },
+  "Perheeni mielestä vahvuuksiani ovat": {
+    "en": "My family thinks my strengths are",
+    "sv": "My family thinks my strengths are"
+  },
+  "Perheenjäsenten vahvuuksia ovat minun mielestäni": {
+    "en": "I think my family members' strengths are",
+    "sv": "I think my family members' strengths are"
+  },
+  "Pyydä vanhempaasi täydentämään!": {
+    "en": "Ask your parent to complete this!",
+    "sv": "Ask your parent to complete this!"
+  },
+  "Olen huomannut, että käytät niitä, kun": {
+    "en": "I have noticed that you use them when",
+    "sv": "I have noticed that you use them when"
+  },
+  "Kun käytät vahvuuksiasi kotona, se vaikuttaa": {
+    "en": "When you use your strengths at home, it affects",
+    "sv": "When you use your strengths at home, it affects"
+  },
+  "käytöstä.": {
+    "en": "use.",
+    "sv": "use."
+  },
+  "Kun käytät vahvuuksiasi, näen sinut tulevaisuudessa": {
+    "en": "When you use your strengths, I see you in the future",
+    "sv": "When you use your strengths, I see you in the future"
+  },
+  "Minä vapaa-ajalla": {
+    "en": "Me in my free time",
+    "sv": "Me in my free time"
+  },
+  "Kirjoita itsellesi muistiin mitä teet vapaa-ajallasi ja millaisia vahvuuksia hyödynnät.": {
+    "en": "Write down what you do in your free time and what strengths you use.",
+    "sv": "Write down what you do in your free time and what strengths you use."
+  },
+  "Mitkä asiat päätyvät sinun love-to-do listalle? Tee lista viidestä asiasta, joita rakastat tehdä vapaa-ajalla.": {
+    "en": "What belongs on your love-to-do list? Make a list of five things you love doing in your free time.",
+    "sv": "What belongs on your love-to-do list? Make a list of five things you love doing in your free time."
+  },
+  "Mieti seuraavaksi, kuinka vahvuutesi liittyvät näihin tekemisiin.": {
+    "en": "Next, think about how your strengths connect to these activities.",
+    "sv": "Next, think about how your strengths connect to these activities."
+  },
+  "Ps. Todennäköisesti harrastukset ja tekemiset, joista pidät eniten, ovat myös tyydyttäviä, koska ne tarjoavat sinulle mahdollisuuden hyödyntää vahvuuksiasi.": {
+    "en": "P.S. The hobbies and activities you enjoy most are probably also satisfying because they give you a chance to use your strengths.",
+    "sv": "P.S. The hobbies and activities you enjoy most are probably also satisfying because they give you a chance to use your strengths."
+  },
+  "Kirjoita viisi asiaa, joita rakastat tehdä vapaa-ajallasi. Merkkaa sydämiin miten paljon teet kyseistä asiaa.": {
+    "en": "Write five things you love doing in your free time. Mark in the hearts how much you do each thing.",
+    "sv": "Write five things you love doing in your free time. Mark in the hearts how much you do each thing."
+  },
+  "Asia, jota rakastan tehdä…": {
+    "en": "Something I love doing...",
+    "sv": "Something I love doing..."
+  },
+  "Kuvittele, että voisit tehdä eniten rakastamaasi asiaa enemmän — miltä se konkreettisesti tuntuisi? Mihin haluaisit käyttää enemmän aikaa?": {
+    "en": "Imagine you could do more of the thing you love most. What would that feel like in concrete terms? What would you like to spend more time on?",
+    "sv": "Imagine you could do more of the thing you love most. What would that feel like in concrete terms? What would you like to spend more time on?"
+  },
+  "Kirjoita mitä vahvuuksiasi hyödynnät tehdessäsi rakastamiasi asioita vapaa-ajalla!": {
+    "en": "Write which strengths you use when doing the things you love in your free time!",
+    "sv": "Write which strengths you use when doing the things you love in your free time!"
+  },
+  "Mitkä asiat sinua kiinnostavat vapaa-ajalla? Miksi?": {
+    "en": "What interests you in your free time? Why?",
+    "sv": "What interests you in your free time? Why?"
+  },
+  "Jutelkaa ystävien kanssa vahvuuksistanne ja kiinnostuksen kohteistanne!": {
+    "en": "Talk with friends about your strengths and interests!",
+    "sv": "Talk with friends about your strengths and interests!"
+  },
+  "Mitä valitsin": {
+    "en": "What I chose",
+    "sv": "What I chose"
+  },
+  "Mitä vahvuuksia kiinnostuksen kohteeni ovat kehittäneet?": {
+    "en": "What strengths have my interests developed?",
+    "sv": "What strengths have my interests developed?"
+  },
+  "Mitä uusia taitoja olet oppinut kiinnostuksen kohteiden parissa?": {
+    "en": "What new skills have you learned through your interests?",
+    "sv": "What new skills have you learned through your interests?"
+  },
+  "Minä ystävänä": {
+    "en": "Me as a friend",
+    "sv": "Me as a friend"
+  },
+  "Haastattele ystäviäsi. Pyydä heitä kertomaan tai lähettämään viesti. Täydennä lauseet:": {
+    "en": "Interview your friends. Ask them to tell you or send you a message. Complete the sentences:",
+    "sv": "Interview your friends. Ask them to tell you or send you a message. Complete the sentences:"
+  },
+  "Ystävieni mielestä vahvuuksiani ovat": {
+    "en": "My friends think my strengths are",
+    "sv": "My friends think my strengths are"
+  },
+  "Parasta ystävissäni on": {
+    "en": "The best thing about my friends is",
+    "sv": "The best thing about my friends is"
+  },
+  "Vahvuuspalaute ystäviltä": {
+    "en": "Strength feedback from friends",
+    "sv": "Strength feedback from friends"
+  },
+  "Kirjoita palautetta ja kehuja ystäviesi kesken. Kerätkää yhdessä 2–4 ystävältä palautetta vahvuuksistanne. Käytä sivua 11 pohjana. Nimetkää ne vahvuudet, joita toisissanne arvostatte. Kertokaa myös, missä toisen vahvuudet erityisesti näkyvät ja miten positiivisesti ne vaikuttavat ystävyyssuhteissa.": {
+    "en": "Write feedback and compliments with your friends. Collect feedback about your strengths from 2-4 friends. Use page 11 as a base. Name the strengths you appreciate in each other. Also describe where the other person's strengths show up and how they positively affect friendships.",
+    "sv": "Write feedback and compliments with your friends. Collect feedback about your strengths from 2-4 friends. Use page 11 as a base. Name the strengths you appreciate in each other. Also describe where the other person's strengths show up and how they positively affect friendships."
+  },
+  "Millaisista asioista ystäväni muistavat minut parhaiten?": {
+    "en": "What kinds of things do my friends remember me for best?",
+    "sv": "What kinds of things do my friends remember me for best?"
+  },
+  "Mikä on parasta ystävissäni?": {
+    "en": "What is best about my friends?",
+    "sv": "What is best about my friends?"
+  },
+  "Kokoa saamasi palautteet. Kirjoita ylös vahvuudet joita sinussa on huomattu eri ympäristöissä.": {
+    "en": "Collect the feedback you have received. Write down the strengths that others have noticed in you in different environments.",
+    "sv": "Collect the feedback you have received. Write down the strengths that others have noticed in you in different environments."
+  },
+  "Pohdi ja hyödynnä saamaasi palautetta": {
+    "en": "Reflect on and use the feedback you received",
+    "sv": "Reflect on and use the feedback you received"
+  },
+  "MITÄ VAHVUUKSIA SINUSSA NÄHTIIN": {
+    "en": "WHAT STRENGTHS WERE SEEN IN YOU",
+    "sv": "WHAT STRENGTHS WERE SEEN IN YOU"
+  },
+  "Tämä sivu kannustaa kokoamaan toisilta saadut vahvuushavainnot näkyväksi — esimerkiksi luokassa, perheessä tai ystäväpiirissä.": {
+    "en": "This page encourages you to make visible the strength observations you have received from others, for example in class, family, or your circle of friends.",
+    "sv": "This page encourages you to make visible the strength observations you have received from others, for example in class, family, or your circle of friends."
+  },
+  "Anna itse itsellesi vahvuuspalautetta. Mitä vahvuuksia olet bongannut itsestäsi erityisesti?": {
+    "en": "Give yourself strength feedback. What strengths have you especially noticed in yourself?",
+    "sv": "Give yourself strength feedback. What strengths have you especially noticed in yourself?"
+  },
+  "5 vinkkiä sinulle": {
+    "en": "5 tips for you",
+    "sv": "5 tips for you"
+  },
+  "Minkä vahvuuksien kehittämisestä olisi sinulle eniten iloa?": {
+    "en": "Which strengths would bring you the most joy to develop?",
+    "sv": "Which strengths would bring you the most joy to develop?"
+  },
+  "Missä tilanteissa ja ympäristöissä pääset käyttämään vahvuuksiasi päivittäin?": {
+    "en": "In what situations and environments can you use your strengths every day?",
+    "sv": "In what situations and environments can you use your strengths every day?"
+  },
+  "Miten sinun kannattaisi toimia, jos haluaisit hyödyntää vahvuuksiasi enemmän — opinnoissa, vapaa-ajalla ja ystävyyssuhteissa?": {
+    "en": "What could you do if you wanted to use your strengths more in studies, free time, and friendships?",
+    "sv": "What could you do if you wanted to use your strengths more in studies, free time, and friendships?"
+  },
+  "Vahvuusseikkailu päättyy": {
+    "en": "The Strength Adventure ends",
+    "sv": "The Strength Adventure ends"
+  },
+  "Täydennä vahvuusmittari ja vertaa tuloksia itse valitsemiisi vahvuuskarkkeihin.": {
+    "en": "Complete the strength meter and compare the results with the strength candies you chose yourself.",
+    "sv": "Complete the strength meter and compare the results with the strength candies you chose yourself."
+  },
+  "Mitä huomaat?": {
+    "en": "What do you notice?",
+    "sv": "What do you notice?"
+  },
+  "Suurin osa meistä ihmisistä pystyy tunnistamaan helposti ainakin osan omista ydinvahvuuksistaan. Tämä on osa itsetuntemusta, joka on yhteydessä hyvinvointiin.": {
+    "en": "Most of us can easily recognize at least some of our core strengths. This is part of self-knowledge, which is connected to well-being.",
+    "sv": "Most of us can easily recognize at least some of our core strengths. This is part of self-knowledge, which is connected to well-being."
+  },
+  "Olet käynyt läpi koko Vahvuusportfolion. Voit aina palata aiempiin sivuihin ja täydentää vastauksiasi — tallennukset säilyvät.": {
+    "en": "You have gone through the whole Strength Portfolio. You can always return to earlier pages and add to your answers. Your saved work will remain.",
+    "sv": "You have gone through the whole Strength Portfolio. You can always return to earlier pages and add to your answers. Your saved work will remain."
+  },
+  "Vahvuusportfoliosi on nyt koossa. Käytä sitä esimerkiksi kesätyönhaussa, jatko-opintoihin hakeutuessa tai aina kun haluat muistuttaa itseäsi siitä, millainen olet parhaimmillasi.": {
+    "en": "Your Strength Portfolio is now complete. Use it, for example, when applying for summer jobs, further studies, or whenever you want to remind yourself what you are like at your best.",
+    "sv": "Your Strength Portfolio is now complete. Use it, for example, when applying for summer jobs, further studies, or whenever you want to remind yourself what you are like at your best."
+  },
+  "3. Mitä opit?": {
+    "en": "3. What did you learn?",
+    "sv": "3. What did you learn?"
+  },
+  "2. Mitä tapahtui seuraavaksi?": {
+    "en": "2. What happened next?",
+    "sv": "2. What happened next?"
+  },
+  "4. Miten hyödynnät oppimaasi?": {
+    "en": "4. How will you use what you learned?",
+    "sv": "4. How will you use what you learned?"
+  },
+  "1. Mitä teit?": {
+    "en": "1. What did you do?",
+    "sv": "1. What did you do?"
+  },
+  "Nimi ei voi olla tyhjä": {
+    "en": "Name cannot be empty",
+    "sv": "Name cannot be empty"
+  },
+  "Salasanan pitää olla vähintään 8 merkkiä": {
+    "en": "Password must be at least 8 characters",
+    "sv": "Password must be at least 8 characters"
+  },
+  "Salasanat eivät täsmää": {
+    "en": "Passwords do not match",
+    "sv": "Passwords do not match"
+  },
+  "Vahvista uusi sähköposti postilaatikostasi": {
+    "en": "Confirm the new email in your inbox",
+    "sv": "Confirm the new email in your inbox"
+  },
+  "Et ole vielä valinnut vahvuuksia karkkikaupasta.": {
+    "en": "You have not chosen strengths from the candy shop yet.",
+    "sv": "You have not chosen strengths from the candy shop yet."
+  },
+  "Et ole vielä saanut vahvuuksia opettajalta.": {
+    "en": "You have not received strengths from your teacher yet.",
+    "sv": "You have not received strengths from your teacher yet."
+  },
+  "Tämä koulukoodi on jo käytössä.": {
+    "en": "This school code is already in use.",
+    "sv": "This school code is already in use."
+  },
+  "Koulu lisätty onnistuneesti!": {
+    "en": "School added successfully!",
+    "sv": "School added successfully!"
+  },
+  "Luo ja hallinnoi koulukoodeja opettajien rekisteröitymistä varten": {
+    "en": "Create and manage school codes for teacher registration",
+    "sv": "Create and manage school codes for teacher registration"
+  },
+  "Lisää koulu": {
+    "en": "Add school",
+    "sv": "Add school"
+  },
+  "Ei kouluja vielä.": {
+    "en": "No schools yet.",
+    "sv": "No schools yet."
+  },
+  "Poista käytöstä": {
+    "en": "Deactivate",
+    "sv": "Deactivate"
+  },
+  "Luo opettajatili": {
+    "en": "Create teacher account",
+    "sv": "Create teacher account"
+  },
+  "Tarkista sähköpostiosoite.": {
+    "en": "Check the email address.",
+    "sv": "Check the email address."
+  },
+  "Tämä sähköposti on jo käytössä.": {
+    "en": "This email is already in use.",
+    "sv": "This email is already in use."
+  },
+  "Virheellinen koulukoodi. Tarkista koodi ja yritä uudelleen.": {
+    "en": "Invalid school code. Check the code and try again.",
+    "sv": "Invalid school code. Check the code and try again."
+  },
+  "etunimi.sukunimi@koulu.fi": {
+    "en": "firstname.lastname@school.edu",
+    "sv": "firstname.lastname@school.edu"
+  },
+  "Luo vahva salasana": {
+    "en": "Create a strong password",
+    "sv": "Create a strong password"
+  },
+  "Vähintään 8 merkkiä. Sisällytä kirjaimia, numeroita ja erikoismerkkejä.": {
+    "en": "At least 8 characters. Include letters, numbers, and special characters.",
+    "sv": "At least 8 characters. Include letters, numbers, and special characters."
+  },
+  "Sait koulukoodin koulusi yhteyshenkilöltä.": {
+    "en": "You received the school code from your school's contact person.",
+    "sv": "You received the school code from your school's contact person."
+  },
+  "Rekisteröidytään…": {
+    "en": "Registering...",
+    "sv": "Registering..."
+  },
+  "Rekisteröidy opettajaksi": {
+    "en": "Register as a teacher",
+    "sv": "Register as a teacher"
+  },
+  "Kirjaudu sisään": {
+    "en": "Log in",
+    "sv": "Log in"
+  },
+  "Opiskelijoiden määrä": {
+    "en": "Number of students",
+    "sv": "Number of students"
+  },
+  "Opettajien määrä": {
+    "en": "Number of teachers",
+    "sv": "Number of teachers"
+  },
+  "Aktiiviset tässä kuussa": {
+    "en": "Active this month",
+    "sv": "Active this month"
+  },
+  "Keskimääräinen valmistuminen": {
+    "en": "Average completion",
+    "sv": "Average completion"
+  },
+  "Luo opettajakoodi": {
+    "en": "Create teacher code",
+    "sv": "Create teacher code"
+  },
+  "Ei vielä koodeja.": {
+    "en": "No codes yet.",
+    "sv": "No codes yet."
+  },
+  "Käyttäjä": {
+    "en": "User",
+    "sv": "User"
+  },
+  "Käytetty": {
+    "en": "Used",
+    "sv": "Used"
+  },
+  "Käyttämätön": {
+    "en": "Unused",
+    "sv": "Unused"
+  },
+  "Riskissä olevat opiskelijat": {
+    "en": "Students at risk",
+    "sv": "Students at risk"
+  },
+  "Ei aktiivinen 14 päivään": {
+    "en": "Not active for 14 days",
+    "sv": "Not active for 14 days"
+  },
+  "Näytä luokat": {
+    "en": "Show classes",
+    "sv": "Show classes"
+  },
+  "Nimeä adminiksi": {
+    "en": "Assign as admin",
+    "sv": "Assign as admin"
+  },
+  "Järjestä": {
+    "en": "Sort",
+    "sv": "Sort"
+  },
+  "Koulu lisätty! Koodi: ": {
+    "en": "School added! Code: ",
+    "sv": "School added! Code: "
+  },
+  "Tilin vanhentumispäivä": {
+    "en": "Account expiration date",
+    "sv": "Account expiration date"
+  },
+  "Päivitetty!": {
+    "en": "Updated!",
+    "sv": "Updated!"
+  },
+  "Ylläpito": {
+    "en": "Admin",
+    "sv": "Admin"
+  },
+  "Näy hyvää! ylläpitojakso": {
+    "en": "See the Good! admin period",
+    "sv": "See the Good! admin period"
+  },
+  "Laskutuksen aloituspäivä": {
+    "en": "Billing start date",
+    "sv": "Billing start date"
+  },
+  "Näytä": {
+    "en": "View",
+    "sv": "View"
+  },
+  "Luo koodi": {
+    "en": "Create code",
+    "sv": "Create code"
+  },
+  "Käyttäjät": {
+    "en": "Users",
+    "sv": "Users"
+  },
+  "Avaa koulu nähdäksesi ja muokataksesi sen käyttäjiä.": {
+    "en": "Open a school to view and edit its users.",
+    "sv": "Open a school to view and edit its users."
+  },
+  "Avaa koulu nähdäksesi tarkemmat käyttötiedot.": {
+    "en": "Open a school to view detailed usage data.",
+    "sv": "Open a school to view detailed usage data."
+  },
+  "Kirjautuminen epäonnistui.": {
+    "en": "Login failed.",
+    "sv": "Login failed."
+  },
+  "Sinulla ei ole ylläpito-oikeuksia.": {
+    "en": "You do not have admin permissions.",
+    "sv": "You do not have admin permissions."
+  },
+  "Ylläpidon kirjautuminen": {
+    "en": "Admin login",
+    "sv": "Admin login"
+  },
+  "Kirjaudu ylläpitoon": {
+    "en": "Log in to admin",
+    "sv": "Log in to admin"
+  },
+  "Takaisin pääsivulle": {
+    "en": "Back to main page",
+    "sv": "Back to main page"
+  },
+  "Ei käyttäjiä.": {
+    "en": "No users.",
+    "sv": "No users."
+  },
+  "Muuta käyttäjän tunnistetiedot": {
+    "en": "Change user credentials",
+    "sv": "Change user credentials"
+  },
+  "Nimeä koulun admin": {
+    "en": "Assign school admin",
+    "sv": "Assign school admin"
+  },
+  "Poista admin-oikeudet": {
+    "en": "Remove admin permissions",
+    "sv": "Remove admin permissions"
+  },
+  "Aktiiviset käyttäjät": {
+    "en": "Active users",
+    "sv": "Active users"
+  },
+  "Uusi sähköposti": {
+    "en": "New email",
+    "sv": "New email"
+  },
+  "Päivitä": {
+    "en": "Update",
+    "sv": "Update"
+  },
+  "Valitse opiskelija": {
+    "en": "Select student",
+    "sv": "Select student"
+  },
+  "esim. Osoitit hienoa rohkeutta tänään!": {
+    "en": "e.g. You showed great courage today!",
+    "sv": "e.g. You showed great courage today!"
+  },
+  "Päivämäärä": {
+    "en": "Date",
+    "sv": "Date"
+  },
+  "Luo luokka": {
+    "en": "Create class",
+    "sv": "Create class"
+  },
+  "Koulukulttuurissa ja opinnoissa virheiden ja puutteiden tunnistaminen tapahtuu kuin itsestään, mutta sen vastavoima, eli vahvuudet ja onnistumiset, eivät tavallisesti pääsekään esiin arvolleen kuuluvalla tavalla. Opiskelussa huomio saattaa kiinnittyä kaikkeen siihen, mitä ei vielä osaa, missä ei ole onnistunut ja mitä kaikkea pitäisi vielä kehittää ja oppia.": {
+    "en": "In school culture and studies, noticing mistakes and gaps often happens almost automatically. Their counterbalance, strengths and successes, does not usually get the attention it deserves. In studying, attention may focus on what you cannot do yet, where you have not succeeded, and everything you still need to develop and learn.",
+    "sv": "In school culture and studies, noticing mistakes and gaps often happens almost automatically. Their counterbalance, strengths and successes, does not usually get the attention it deserves. In studying, attention may focus on what you cannot do yet, where you have not succeeded, and everything you still need to develop and learn."
+  },
+  "Kasvamme ja kehitymme ihmisenä läpi opintojen ja koko elämän. On hyvä muistaa, että luonteenvahvuudet eivät ole syntymässä fiksattuja ominaisuuksia, vaan niitä voi tavoitteellisesti kehittää. Lähtökohta on, että opit tunnistamaan omat vahvuutesi opiskelijana jotta voit hyödyntää niitä osana opintoja.": {
+    "en": "We grow and develop as people throughout our studies and our whole lives. It is good to remember that character strengths are not fixed traits from birth; they can be developed intentionally. The starting point is learning to recognize your own strengths as a student so you can use them as part of your studies.",
+    "sv": "We grow and develop as people throughout our studies and our whole lives. It is good to remember that character strengths are not fixed traits from birth; they can be developed intentionally. The starting point is learning to recognize your own strengths as a student so you can use them as part of your studies."
+  },
+  "Listaa seuraavalle sivulle aivan kaikki vahvuutesi opiskelijana, myös sellaiset, jotka saattavat tuntua sinulle itsestään selvyydeltä. Oletko hyvä kielissä, keksitkö luovia ratkaisuja ongelmiin, autatko mielelläsi toisia, keksitkö parhaat vitsit, kiitätkö toisia, oletko ryhmähengen luoja?": {
+    "en": "On the next page, list all your strengths as a student, including the ones that may feel obvious to you. Are you good at languages, do you come up with creative solutions to problems, do you enjoy helping others, do you tell the best jokes, do you thank others, are you someone who builds group spirit?",
+    "sv": "On the next page, list all your strengths as a student, including the ones that may feel obvious to you. Are you good at languages, do you come up with creative solutions to problems, do you enjoy helping others, do you tell the best jokes, do you thank others, are you someone who builds group spirit?"
+  },
+  "Pohdi ensin seuraavia kysymyksiä ja selvitä, mitä oikeasti rakastat tehdä ja missä olet erityisen hyvä. Mieti, millä uudella tavalla voit hyödyntää vahvuuksiasi lukiossa.": {
+    "en": "First, reflect on the following questions and find out what you truly love doing and where you are especially good. Think about a new way you could use your strengths in high school.",
+    "sv": "First, reflect on the following questions and find out what you truly love doing and where you are especially good. Think about a new way you could use your strengths in high school."
+  },
+  "Kirjoita palautetta ja kehuja ryhmässä 2–4 opiskelukaverin kanssa. Käytä sivua 10 pohjana. Nimetkää ne vahvuudet, joita toisissanne arvostatte. Kertokaa myös, missä vahvuudet näkyvät ja miten ne vaikuttavat kanssaihmisiin.": {
+    "en": "Write feedback and compliments in a group of 2-4 classmates. Use page 10 as a base. Name the strengths you appreciate in each other. Also describe where those strengths show up and how they affect the people around you.",
+    "sv": "Write feedback and compliments in a group of 2-4 classmates. Use page 10 as a base. Name the strengths you appreciate in each other. Also describe where those strengths show up and how they affect the people around you."
+  },
+  "Yhdistä {name} tiliisi": {
+    "en": "Connect {name} to your account",
+    "sv": "Connect {name} to your account"
+  },
+  "{name} pyytää lupaa käyttää Huomaa Hyvä -sovellusta sinun nimissäsi. Näkyviin tulevat vain sinun omat tietosi.": {
+    "en": "{name} is requesting permission to use the Huomaa Hyvä app on your behalf. Only your own data will be visible.",
+    "sv": "{name} is requesting permission to use the Huomaa Hyvä app on your behalf. Only your own data will be visible."
+  },
+  "Hyväksy": {
+    "en": "Approve",
+    "sv": "Approve"
+  },
+  "Hylkää": {
+    "en": "Deny",
+    "sv": "Deny"
+  },
+  "Mikä on parasta perheessäsi? Miten erilaiset vahvuudet näkyvät perheen vuorovaikutuksessa?": {
+    "en": "What is the best thing about your family? How do different strengths show up in your family interactions?",
+    "sv": "Vad är det bästa med din familj? Hur syns olika styrkor i familjens samspel?"
+  },
+  "Mistä innostut?": {
+    "en": "What excites you?",
+    "sv": "What excites you?"
+  },
+  "Minkä tekeminen tuntuu kevyeltä?": {
+    "en": "What feels easy or light to do?",
+    "sv": "What feels easy or light to do?"
+  },
+  "Mistä luonteenvahvuuksista saat kiitosta ja palautetta toisilta?": {
+    "en": "Which character strengths do others thank you for or give you feedback on?",
+    "sv": "Which character strengths do others thank you for or give you feedback on?"
+  },
+  "Mitä rakastat tehdä vapaa-ajalla?": {
+    "en": "What do you love doing in your free time?",
+    "sv": "What do you love doing in your free time?"
+  },
+  "Minkä alkamista odotat eniten päivässäsi?": {
+    "en": "What do you look forward to most in your day?",
+    "sv": "What do you look forward to most in your day?"
+  },
+  "Mitä tehdessä aika ja paikka unohtuvat ja pääset flow-tilaan?": {
+    "en": "When do you lose track of time and place and get into a flow state?",
+    "sv": "When do you lose track of time and place and get into a flow state?"
+  },
+  "Mitkä vahvuudet vahvistavat sinua vapaa-ajalla?": {
+    "en": "Which strengths support you in your free time?",
+    "sv": "Which strengths support you in your free time?"
+  },
+  "Mitkä vahvuudet tulevat lukioon, kun sinä tulet paikalle?": {
+    "en": "Which strengths come to school when you arrive?",
+    "sv": "Which strengths come to school when you arrive?"
+  },
+  "Mitä vahvuuksia arvostat eniten itsessäsi?": {
+    "en": "Which strengths do you value most in yourself?",
+    "sv": "Which strengths do you value most in yourself?"
+  },
+  "Minusta tuntuu tällä hetkellä tältä, kun muistelen kokemaani": {
+    "en": "This is how I feel right now when I remember what I experienced",
+    "sv": "This is how I feel right now when I remember what I experienced"
+  },
+  "Löysin itsestäni tilanteessa uusia tai yllättäviä puolia": {
+    "en": "In the situation, I discovered new or surprising sides of myself",
+    "sv": "In the situation, I discovered new or surprising sides of myself"
+  },
+  "Mikä on parasta opinnoissa?": {
+    "en": "What is the best thing about studying?",
+    "sv": "What is the best thing about studying?"
+  },
+  "Mitkä asiat päätyvät love-to-do -listalle?": {
+    "en": "What things end up on your love-to-do list?",
+    "sv": "What things end up on your love-to-do list?"
+  },
+  "Mitä samoja vahvuuksia sinussa oli jo lapsena?": {
+    "en": "Which of the same strengths did you already have as a child?",
+    "sv": "Which of the same strengths did you already have as a child?"
+  },
+  "Mitä luonteenvahvuuksia hyödynnät eniten vapaalla?": {
+    "en": "Which character strengths do you use most in your free time?",
+    "sv": "Which character strengths do you use most in your free time?"
+  },
+  "Läheisissäni parasta on": {
+    "en": "The best thing about the people close to me is",
+    "sv": "The best thing about the people close to me is"
+  },
+  "Osaan hyvin ja tykkään tehdä": {
+    "en": "I am good at and enjoy doing",
+    "sv": "I am good at and enjoy doing"
+  },
+  "Lempitekemistä": {
+    "en": "Favorite things to do",
+    "sv": "Favorite things to do"
+  },
+  "Minkälaisia asioita opit nopeasti ja helposti?": {
+    "en": "What kinds of things do you learn quickly and easily?",
+    "sv": "What kinds of things do you learn quickly and easily?"
+  },
+  "Mistä sait rohkaisevaa palautetta peruskoulussa opettajilta entä luokkakavereilta?": {
+    "en": "What encouraging feedback did you receive in comprehensive school from teachers and classmates?",
+    "sv": "What encouraging feedback did you receive in comprehensive school from teachers and classmates?"
+  },
+  "Mistä tykkäsit koulussa ala-asteella, entä yläasteella?": {
+    "en": "What did you enjoy at school in primary grades and lower secondary school?",
+    "sv": "What did you enjoy at school in primary grades and lower secondary school?"
+  },
+  "Mikä onnistuminen sinulle on jäänyt mieleen peruskoulusta?": {
+    "en": "What success from comprehensive school has stayed in your mind?",
+    "sv": "What success from comprehensive school has stayed in your mind?"
+  },
+  "1. Tavoitteeni ja miksi se on minulle tärkeä": {
+    "en": "1. My goal and why it matters to me",
+    "sv": "1. My goal and why it matters to me"
+  },
+  "3. Miten hyödynnän vahvuuksia": {
+    "en": "3. How I use my strengths",
+    "sv": "3. How I use my strengths"
+  },
+  "4. Mitä muita taitoja tarvitsen": {
+    "en": "4. What other skills I need",
+    "sv": "4. What other skills I need"
+  },
+  "Mitä hyvää vahvuuteni tuovat yhteisööni?": {
+    "en": "What good do my strengths bring to my community?",
+    "sv": "What good do my strengths bring to my community?"
+  },
+  "Minkälaisia vahvuuksia sinulla on perheenjäsenenä? Miten ne näkyvät?": {
+    "en": "What kinds of strengths do you have as a family member? How do they show?",
+    "sv": "What kinds of strengths do you have as a family member? How do they show?"
+  },
+  "Mitä tykkäätte tehdä yhdessä?": {
+    "en": "What do you like doing together?",
+    "sv": "What do you like doing together?"
+  },
+  "Mieti, millainen toiminta oli minulle tyypillistä lapsena?": {
+    "en": "Think about what kind of activities were typical for me as a child.",
+    "sv": "Think about what kind of activities were typical for me as a child."
+  },
+  "Mikä oli minulle tärkeää?": {
+    "en": "What was important to me?",
+    "sv": "What was important to me?"
+  },
+  "Mitä rakastin tehdä, mihin uppouduin?": {
+    "en": "What did I love doing, and what absorbed me?",
+    "sv": "What did I love doing, and what absorbed me?"
+  },
+  "Mikä myönteinen muisto sinulle on jäänyt erityisen vahvasti mieleen minusta?": {
+    "en": "What positive memory of me has stayed especially strongly in your mind?",
+    "sv": "What positive memory of me has stayed especially strongly in your mind?"
+  },
+  "Mitä samoja vahvuuksia minulla on nykyään?": {
+    "en": "Which of the same strengths do I have today?",
+    "sv": "Which of the same strengths do I have today?"
+  },
+  "Mitä tykkäät tehdä vapaa-ajalla?": {
+    "en": "What do you like doing in your free time?",
+    "sv": "What do you like doing in your free time?"
+  },
+  "Mitä harrastuksia sinulla on?": {
+    "en": "What hobbies do you have?",
+    "sv": "What hobbies do you have?"
+  },
+  "Mitä vahvuuksia tunnistat itsessäsi vapaa-ajalla ja harrastuksissa?": {
+    "en": "What strengths do you recognize in yourself in your free time and hobbies?",
+    "sv": "What strengths do you recognize in yourself in your free time and hobbies?"
+  },
+  "Mitä vahvuuksiasi haluaisit hyödyntää enemmän vapaa-ajallasi?": {
+    "en": "Which of your strengths would you like to use more in your free time?",
+    "sv": "Which of your strengths would you like to use more in your free time?"
+  },
+  "Perheeltä": {
+    "en": "From family",
+    "sv": "From family"
+  },
+  "Ystäviltä": {
+    "en": "From friends",
+    "sv": "From friends"
+  },
+  "Mitä samaa niissä on?": {
+    "en": "What do they have in common?",
+    "sv": "What do they have in common?"
+  },
+  "Mitä vahvuuksia sinussa huomataan?": {
+    "en": "What strengths do others notice in you?",
+    "sv": "What strengths do others notice in you?"
+  },
+  "Mikä palautteissa yllätti?": {
+    "en": "What surprised you in the feedback?",
+    "sv": "What surprised you in the feedback?"
+  },
+  "Mitä haluat muistaa palautteista?": {
+    "en": "What do you want to remember from the feedback?",
+    "sv": "What do you want to remember from the feedback?"
+  },
+  "Tämän haluan muistaa ainakin…": {
+    "en": "At least this is what I want to remember...",
+    "sv": "At least this is what I want to remember..."
+  },
+  "Minulle on tärkeää…": {
+    "en": "What matters to me is...",
+    "sv": "What matters to me is..."
   }
 }
