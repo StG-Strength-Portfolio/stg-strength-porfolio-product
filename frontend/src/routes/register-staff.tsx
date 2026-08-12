@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -9,7 +9,7 @@ import { CornerBlobs } from "@/components/CornerBlobs";
 import { StickyNote } from "@/components/StickyNote";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
 import { supabase } from "@/integrations/supabase/client";
-import { useLanguage, isLanguage } from "@/lib/i18n";
+import { useLanguage } from "@/lib/i18n";
 import { registerStaffAccount } from "@/lib/staff-registration.functions";
 
 export const Route = createFileRoute("/register-staff")({
@@ -37,6 +37,9 @@ const copy = {
     emailUsed: "Tämä sähköpostiosoite on jo käytössä. Kirjaudu sisään olemassa olevalla tilillä.",
     login: "Kirjaudu sisään",
     back: "Takaisin",
+    sentTitle: "Vahvista sähköpostiosoitteesi",
+    sentBody: "Lähetimme vahvistuslinkin osoitteeseen",
+    sentHint: "Avaa sähköposti ja napsauta vahvistuslinkkiä. Sen jälkeen pääset suoraan opettajan hallintapaneeliin.",
   },
   en: {
     title: "Create staff account",
@@ -58,6 +61,9 @@ const copy = {
     emailUsed: "This email address is already in use. Sign in with your existing account.",
     login: "Sign in",
     back: "Back",
+    sentTitle: "Confirm your email address",
+    sentBody: "We sent a confirmation link to",
+    sentHint: "Open the email and click the confirmation link. You will then go directly to the Teacher Dashboard.",
   },
   sv: {
     title: "Skapa personalkonto",
@@ -79,12 +85,14 @@ const copy = {
     emailUsed: "Den här e-postadressen används redan. Logga in med ditt befintliga konto.",
     login: "Logga in",
     back: "Tillbaka",
+    sentTitle: "Bekräfta din e-postadress",
+    sentBody: "Vi skickade en bekräftelselänk till",
+    sentHint: "Öppna e-postmeddelandet och klicka på bekräftelselänken. Därefter går du direkt till lärarpanelen.",
   },
 } as const;
 
 function RegisterStaff() {
-  const navigate = useNavigate();
-  const { language, setLanguage } = useLanguage();
+  const { language } = useLanguage();
   const text = copy[language];
   const register = useServerFn(registerStaffAccount);
   const [name, setName] = useState("");
@@ -92,14 +100,14 @@ function RegisterStaff() {
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
+  const [sentTo, setSentTo] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     try {
-      const result = await register({
-        data: { name, email, password, code, language },
-      });
+      const normalizedEmail = email.trim().toLowerCase();
+      const result = await register({ data: { name, email: normalizedEmail, password, code, language } });
       if (!result.ok) {
         const messages = {
           name: text.nameError,
@@ -114,19 +122,53 @@ function RegisterStaff() {
         return;
       }
 
-      const normalizedEmail = email.trim().toLowerCase();
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error: signUpError } = await supabase.auth.signUp({
         email: normalizedEmail,
         password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/confirm-staff`,
+          data: {
+            display_name: name.trim(),
+            name: name.trim(),
+            registration_type: "staff",
+            pending_staff_token: result.pendingToken,
+          },
+        },
       });
-      if (error) throw error;
-      if (isLanguage(result.language)) setLanguage(result.language);
-      navigate({ to: "/teacher/dashboard", replace: true });
+      if (signUpError) {
+        const message = signUpError.message.toLowerCase();
+        if (message.includes("already") || message.includes("registered")) toast.error(text.emailUsed);
+        else toast.error(signUpError.message);
+        return;
+      }
+
+      // Access is intentionally withheld until the confirmation link is used.
+      await supabase.auth.signOut();
+      setSentTo(normalizedEmail);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Error");
     } finally {
       setBusy(false);
     }
+  }
+
+  if (sentTo) {
+    return (
+      <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-10 text-foreground">
+        <CornerBlobs />
+        <AuthLanguageSwitcher />
+        <div className="relative z-10 w-full max-w-md">
+          <StickyNote seed="staff-confirmation-sent" className="space-y-4 text-center">
+            <h1 className="text-3xl font-bold">{text.sentTitle}</h1>
+            <p>{text.sentBody} <strong>{sentTo}</strong>.</p>
+            <p className="text-sm opacity-75">{text.sentHint}</p>
+            <Link to="/auth/login" className="inline-block font-semibold text-[color:var(--purple)] underline">
+              {text.login}
+            </Link>
+          </StickyNote>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -143,75 +185,30 @@ function RegisterStaff() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="staff-name">{text.name}</Label>
-              <Input
-                id="staff-name"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                autoComplete="name"
-              />
+              <Input id="staff-name" required value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" />
             </div>
-
             <div className="space-y-1.5">
               <Label htmlFor="staff-email">{text.email}</Label>
-              <Input
-                id="staff-email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                placeholder="firstname.lastname@school.fi"
-              />
+              <Input id="staff-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" placeholder="firstname.lastname@school.fi" />
             </div>
-
             <div className="space-y-1.5">
               <Label htmlFor="staff-password">{text.password}</Label>
-              <Input
-                id="staff-password"
-                type="password"
-                required
-                minLength={8}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="new-password"
-              />
+              <Input id="staff-password" type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" />
               <p className="text-sm text-muted-foreground">{text.passwordHint}</p>
             </div>
-
             <div className="space-y-1.5">
               <Label htmlFor="staff-code">{text.code}</Label>
-              <Input
-                id="staff-code"
-                required
-                maxLength={8}
-                value={code}
-                onChange={(e) =>
-                  setCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8))
-                }
-                placeholder="K7PM4Q2X"
-                className="font-mono uppercase tracking-[0.18em]"
-                autoComplete="off"
-              />
+              <Input id="staff-code" required maxLength={8} value={code} onChange={(e) => setCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8))} placeholder="K7PM4Q2X" className="font-mono uppercase tracking-[0.18em]" autoComplete="off" />
               <p className="text-sm text-muted-foreground">{text.codeHint}</p>
             </div>
-
-            <Button
-              type="submit"
-              disabled={busy}
-              className="h-auto w-full rounded-full bg-[color:var(--coral)] py-6 text-base font-bold text-white hover:bg-[color:var(--coral)]/90"
-            >
+            <Button type="submit" disabled={busy} className="h-auto w-full rounded-full bg-[color:var(--coral)] py-6 text-base font-bold text-white hover:bg-[color:var(--coral)]/90">
               {busy ? text.busy : text.submit}
             </Button>
           </form>
 
           <div className="mt-5 flex justify-between text-xs text-muted-foreground">
-            <Link to="/auth" className="font-semibold text-[color:var(--purple)] underline">
-              {text.back}
-            </Link>
-            <Link to="/auth/login" className="font-semibold text-[color:var(--purple)] underline">
-              {text.login}
-            </Link>
+            <Link to="/auth" className="font-semibold text-[color:var(--purple)] underline">{text.back}</Link>
+            <Link to="/auth/login" className="font-semibold text-[color:var(--purple)] underline">{text.login}</Link>
           </div>
         </StickyNote>
       </div>
