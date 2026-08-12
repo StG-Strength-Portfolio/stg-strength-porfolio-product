@@ -10,7 +10,7 @@ import { StrengthPickerGrid } from "@/components/strengths/StrengthPickerGrid";
 import { DashboardShell } from "@/components/DashboardShell";
 import { ProfileSettings } from "@/components/ProfileSettings";
 import { ClassTeacherManager } from "@/components/classes/ClassTeacherManager";
-import { SchoolTopStrengths } from "@/components/strengths/SchoolTopStrengths";
+import { TeacherStrengthSummary } from "@/components/strengths/TeacherStrengthSummary";
 import { supabase } from "@/integrations/supabase/client";
 import { useRoleGuard } from "@/lib/role-guard";
 import { useLanguage, useTr, LANGUAGES, LANGUAGE_LABEL, type Language } from "@/lib/i18n";
@@ -58,6 +58,12 @@ export const Route = createFileRoute("/teacher/dashboard")({
   component: TeacherDashboardPage,
 });
 
+const SUMMARY_LABEL = {
+  fi: "Yhteenveto",
+  en: "Summary",
+  sv: "Sammanfattning",
+} as const;
+
 const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function randomCode(): string {
   let s = "LK-";
@@ -71,8 +77,9 @@ function pctOf(s: TeacherStudent): number {
 
 function TeacherDashboardPage() {
   const tr = useTr();
+  const { language } = useLanguage();
   const guard = useRoleGuard(["teacher"]);
-  const [tab, setTab] = useState("classes");
+  const [tab, setTab] = useState("overview");
   const [openClass, setOpenClass] = useState<string | null>(null);
   const [openStudent, setOpenStudent] = useState<string | null>(null);
   const { classes, deletedClasses, students, assigned, events, refresh } = useTeacherData();
@@ -80,6 +87,7 @@ function TeacherDashboardPage() {
   if (!guard.ready) return null;
 
   const tabs = [
+    { id: "overview", label: SUMMARY_LABEL[language] },
     { id: "classes", label: tr("Luokat") },
     { id: "students", label: tr("Opiskelijat") },
     { id: "strengths", label: tr("Vahvuuksien antaminen") },
@@ -103,6 +111,7 @@ function TeacherDashboardPage() {
       onSelect={(id) => {
         setTab(id);
         setOpenStudent(null);
+        if (id !== "classes") setOpenClass(null);
       }}
       schoolName={guard.schoolName}
       /* @lovable-new */
@@ -120,7 +129,7 @@ function TeacherDashboardPage() {
         },
       ]}
     >
-      {tab === "classes" && !openClass && <SchoolTopStrengths />}
+      {tab === "overview" && <TeacherStrengthSummary />}
 
       {tab === "classes" && !openClass && <CreateClass onCreated={refresh} />}
 
