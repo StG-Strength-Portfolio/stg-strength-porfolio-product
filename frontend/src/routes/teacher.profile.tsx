@@ -121,33 +121,35 @@ function TeacherProfilePage() {
       schoolName={guard.schoolName}
       links={[{ to: "/teacher/dashboard", label: tr("Takaisin") }]}
     >
-      <ProfileSettings
-        schoolName={guard.schoolName}
-        displayName={guard.displayName}
-        email={guard.email}
-      />
+      <div className="space-y-6">
+        <ProfileSettings
+          schoolName={guard.schoolName}
+          displayName={guard.displayName}
+          email={guard.email}
+        />
 
-      <StickyNote seed="profile-top5" className="space-y-3">
-        <h3 className="text-xl font-bold">{tr("Saamani Top 5 vahvuudet")}</h3>
-        {top5.length === 0 ? (
-          <p className="text-sm opacity-70">{tr("Et ole vielä saanut vahvuuksia.")}</p>
-        ) : (
-          <TopStrengthCards items={top5} lang={lang} />
-        )}
-      </StickyNote>
+        <StickyNote seed="profile-top5" className="space-y-3">
+          <h3 className="text-xl font-bold">{tr("Saamani Top 5 vahvuudet")}</h3>
+          {top5.length === 0 ? (
+            <p className="text-sm opacity-70">{tr("Et ole vielä saanut vahvuuksia.")}</p>
+          ) : (
+            <TopStrengthCards items={top5} lang={lang} />
+          )}
+        </StickyNote>
 
-      <Feed
-        title={tr("Oppilailta saadut")}
-        rows={fromStudents}
-        lang={lang}
-        empty={tr("Ei vielä vahvuuksia.")}
-      />
-      <Feed
-        title={tr("Rehtorilta saadut")}
-        rows={fromPrincipal}
-        lang={lang}
-        empty={tr("Ei vielä vahvuuksia.")}
-      />
+        <Feed
+          title={tr("Oppilailta saadut")}
+          rows={fromStudents}
+          lang={lang}
+          empty={tr("Ei vielä vahvuuksia.")}
+        />
+        <Feed
+          title={tr("Rehtorilta saadut")}
+          rows={fromPrincipal}
+          lang={lang}
+          empty={tr("Ei vielä vahvuuksia.")}
+        />
+      </div>
     </DashboardShell>
   );
 }
