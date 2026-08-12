@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,26 +8,85 @@ import { CornerBlobs } from "@/components/CornerBlobs";
 import { StickyNote } from "@/components/StickyNote";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
 import { toast } from "sonner";
-import { useT, useTr } from "@/lib/i18n";
+import { useLanguage } from "@/lib/i18n";
 import { z } from "zod";
 
 // How long we wait for Supabase to parse the recovery token out of the URL
 // hash and establish a session before concluding the link is missing/expired.
 const RECOVERY_WAIT_MS = 4000;
 
+const RESET_COPY = {
+  fi: {
+    title: "Salasanan palautus",
+    checking: "Tarkistetaan palautuslinkkiä…",
+    invalid: "Palautuslinkki on vanhentunut tai jo käytetty.",
+    requestNew: "Pyydä uusi palautuslinkki",
+    done: "Salasana vaihdettu! Voit nyt kirjautua sisään.",
+    login: "Kirjaudu sisään",
+    newPassword: "Uusi salasana",
+    confirmPassword: "Vahvista salasana",
+    save: "Tallenna",
+    saving: "Tallennetaan…",
+    passwordShort: "Salasanan tulee olla vähintään 6 merkkiä.",
+    passwordMismatch: "Salasanat eivät täsmää.",
+    genericError: "Salasanan vaihtaminen epäonnistui. Yritä uudelleen.",
+    browserTitle: "Salasanan palautus — Vahvuusseikkailu",
+    description: "Aseta uusi salasana Vahvuusseikkailu-tilillesi.",
+  },
+  en: {
+    title: "Password Reset",
+    checking: "Checking the reset link…",
+    invalid: "The reset link has expired or has already been used.",
+    requestNew: "Request a new reset link",
+    done: "Password changed successfully! You can now log in.",
+    login: "Log in",
+    newPassword: "New password",
+    confirmPassword: "Confirm password",
+    save: "Save",
+    saving: "Saving…",
+    passwordShort: "Password must be at least 6 characters.",
+    passwordMismatch: "Passwords do not match.",
+    genericError: "The password could not be changed. Please try again.",
+    browserTitle: "Password Reset — Strength Portfolio",
+    description: "Set a new password for your Strength Portfolio account.",
+  },
+  sv: {
+    title: "Återställ lösenord",
+    checking: "Kontrollerar återställningslänken…",
+    invalid: "Återställningslänken har gått ut eller har redan använts.",
+    requestNew: "Begär en ny återställningslänk",
+    done: "Lösenordet har ändrats! Du kan nu logga in.",
+    login: "Logga in",
+    newPassword: "Nytt lösenord",
+    confirmPassword: "Bekräfta lösenord",
+    save: "Spara",
+    saving: "Sparar…",
+    passwordShort: "Lösenordet måste innehålla minst 6 tecken.",
+    passwordMismatch: "Lösenorden matchar inte.",
+    genericError: "Lösenordet kunde inte ändras. Försök igen.",
+    browserTitle: "Återställ lösenord — Styrkeportfolio",
+    description: "Ange ett nytt lösenord för ditt Styrkeportfolio-konto.",
+  },
+} as const;
+
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
-      { title: "Salasanan palautus — Vahvuusseikkailu" },
-      { name: "description", content: "Aseta uusi salasana Vahvuusseikkailu-tilillesi." },
-      { property: "og:title", content: "Salasanan palautus — Vahvuusseikkailu" },
-      { property: "og:description", content: "Aseta uusi salasana Vahvuusseikkailu-tilillesi." },
+      { title: "Password Reset — Strength Portfolio" },
+      { name: "description", content: "Set a new password for your Strength Portfolio account." },
+      { property: "og:title", content: "Password Reset — Strength Portfolio" },
+      {
+        property: "og:description",
+        content: "Set a new password for your Strength Portfolio account.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  // ?source=superadmin keeps Super Admin recovery inside the Super Admin
-  // surface (post-reset redirect target, "request a new link" link, etc).
+  // Keep the query parameter for backwards compatibility with existing reset
+  // links. Successful Superadmin recovery also detects the role from the
+  // established session, so the flow no longer depends on the query surviving
+  // Supabase/email redirects.
   validateSearch: (search: Record<string, unknown>) =>
     z
       .object({
@@ -44,11 +103,13 @@ export const Route = createFileRoute("/reset-password")({
 type SessionState = "checking" | "ready" | "invalid";
 
 function ResetPasswordPage() {
-  const t = useT();
-  const tr = useTr();
+  const { language } = useLanguage();
+  const copy = RESET_COPY[language];
   const navigate = useNavigate();
   const { source } = Route.useSearch();
-  const isSuperAdmin = source === "superadmin";
+
+  const [detectedSuperAdmin, setDetectedSuperAdmin] = useState(source === "superadmin");
+  const isSuperAdmin = source === "superadmin" || detectedSuperAdmin;
   const loginTo = isSuperAdmin ? "/superadmin/login" : "/auth/login";
 
   const [password, setPassword] = useState("");
@@ -57,21 +118,50 @@ function ResetPasswordPage() {
   const [done, setDone] = useState(false);
   const [sessionState, setSessionState] = useState<SessionState>("checking");
 
-  // Supabase-js parses the #access_token=...&type=recovery hash on mount and
-  // fires an auth event once the recovery session is established. We can't
-  // just check getSession() once on mount — that races the hash parsing — so
-  // we listen for the event AND poll getSession(), and only give up after a
-  // grace period (covers a genuinely missing/expired/already-used link, or
-  // someone landing here with no token at all).
+  useEffect(() => {
+    document.title = copy.browserTitle;
+    const description = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+    if (description) description.content = copy.description;
+  }, [copy.browserTitle, copy.description]);
+
+  const acceptSession = useMemo(
+    () =>
+      async (session: { user: { id: string } } | null) => {
+        if (!session) return;
+        setSessionState("ready");
+
+        // Superadmin invitation/reset links have historically used
+        // ?source=superadmin, but some email/auth redirect paths can remove the
+        // query string. Detecting the actual role keeps the post-reset routing
+        // correct even when that happens.
+        if (source !== "superadmin") {
+          const { data } = await supabase
+            .from("user_roles" as never)
+            .select("role")
+            .eq("user_id", session.user.id)
+            .eq("role", "super_admin")
+            .maybeSingle();
+          if ((data as { role?: string } | null)?.role === "super_admin") {
+            setDetectedSuperAdmin(true);
+          }
+        }
+      },
+    [source],
+  );
+
+  // Supabase-js parses the recovery token out of the URL and fires an auth
+  // event once the recovery session is established. We listen for that event
+  // and also check an already-established session, then only give up after a
+  // grace period.
   useEffect(() => {
     let cancelled = false;
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!cancelled && session) setSessionState("ready");
+      if (!cancelled && session) void acceptSession(session);
     });
 
     void supabase.auth.getSession().then(({ data }) => {
-      if (!cancelled && data.session) setSessionState("ready");
+      if (!cancelled && data.session) void acceptSession(data.session);
     });
 
     const timeout = setTimeout(() => {
@@ -85,16 +175,16 @@ function ResetPasswordPage() {
       sub.subscription.unsubscribe();
       clearTimeout(timeout);
     };
-  }, []);
+  }, [acceptSession]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (password.length < 6) {
-      toast.error(tr("Salasanan tulee olla vähintään 6 merkkiä."));
+      toast.error(copy.passwordShort);
       return;
     }
     if (password !== confirm) {
-      toast.error(tr("Salasanat eivät täsmää."));
+      toast.error(copy.passwordMismatch);
       return;
     }
     setBusy(true);
@@ -104,16 +194,16 @@ function ResetPasswordPage() {
         const m = error.message.toLowerCase();
         if (m.includes("expired") || m.includes("invalid") || m.includes("session")) {
           setSessionState("invalid");
-          toast.error(tr("Palautuslinkki on vanhentunut tai jo käytetty."));
+          toast.error(copy.invalid);
         } else if (m.includes("weak") || m.includes("password") || m.includes("short")) {
-          toast.error(tr("Salasanan tulee olla vähintään 6 merkkiä."));
+          toast.error(copy.passwordShort);
         } else {
-          toast.error(error.message);
+          toast.error(copy.genericError);
         }
         return;
       }
       setDone(true);
-      toast.success(tr("Salasana vaihdettu! Voit nyt kirjautua sisään."));
+      toast.success(copy.done);
       setTimeout(() => {
         void navigate({ to: loginTo, replace: true });
       }, 3000);
@@ -127,38 +217,34 @@ function ResetPasswordPage() {
       <CornerBlobs />
       <AuthLanguageSwitcher />
       <div className="relative z-10 w-full max-w-md space-y-6">
-        <h1 className="text-center text-3xl font-bold">{tr("Salasanan palautus")}</h1>
+        <h1 className="text-center text-3xl font-bold">{copy.title}</h1>
         <StickyNote seed="reset-card">
           {sessionState === "checking" ? (
-            <p className="text-center font-semibold opacity-70">{t("common.loading")}</p>
+            <p className="text-center font-semibold opacity-70">{copy.checking}</p>
           ) : sessionState === "invalid" ? (
             <div className="space-y-4 text-center">
-              <p className="font-semibold">
-                {tr("Palautuslinkki on vanhentunut tai jo käytetty.")}
-              </p>
+              <p className="font-semibold">{copy.invalid}</p>
               <Link
                 to={loginTo}
                 className="inline-block rounded-full bg-[color:var(--purple)] px-5 py-2 text-sm font-bold text-white"
               >
-                {tr("Pyydä uusi palautuslinkki")}
+                {copy.requestNew}
               </Link>
             </div>
           ) : done ? (
             <div className="space-y-4 text-center">
-              <p className="font-semibold">
-                {tr("Salasana vaihdettu! Voit nyt kirjautua sisään.")}
-              </p>
+              <p className="font-semibold">{copy.done}</p>
               <Link
                 to={loginTo}
                 className="inline-block rounded-full bg-[color:var(--purple)] px-5 py-2 text-sm font-bold text-white"
               >
-                {t("common.login")}
+                {copy.login}
               </Link>
             </div>
           ) : (
             <form onSubmit={submit} className="space-y-4">
               <div className="space-y-1.5">
-                <Label htmlFor="new-password">{tr("Uusi salasana")}</Label>
+                <Label htmlFor="new-password">{copy.newPassword}</Label>
                 <Input
                   id="new-password"
                   type="password"
@@ -171,7 +257,7 @@ function ResetPasswordPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="confirm-password">{tr("Vahvista salasana")}</Label>
+                <Label htmlFor="confirm-password">{copy.confirmPassword}</Label>
                 <Input
                   id="confirm-password"
                   type="password"
@@ -187,7 +273,7 @@ function ResetPasswordPage() {
                 disabled={busy}
                 className="h-auto w-full rounded-full bg-[color:var(--purple)] py-6 text-base font-bold text-white hover:bg-[color:var(--purple)]/90"
               >
-                {busy ? t("auth.login.busy") : tr("Tallenna")}
+                {busy ? copy.saving : copy.save}
               </Button>
             </form>
           )}
