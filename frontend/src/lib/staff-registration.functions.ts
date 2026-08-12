@@ -17,6 +17,14 @@ const PERSONAL_EMAIL_DOMAINS = new Set([
   "protonmail.com",
 ]);
 
+export type StaffCodeInfo = {
+  id: string;
+  code: string;
+  createdAt: string;
+  expiresAt: string;
+  isRevoked: boolean;
+};
+
 async function admin() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   return supabaseAdmin as any;
@@ -53,6 +61,16 @@ export function isWorkEmail(email: string): boolean {
   const parts = normalized.split("@");
   if (parts.length !== 2 || !parts[0] || !parts[1] || !parts[1].includes(".")) return false;
   return !PERSONAL_EMAIL_DOMAINS.has(parts[1]);
+}
+
+function mapCodeRows(rows: any[]): StaffCodeInfo[] {
+  return rows.map((row) => ({
+    id: row.id as string,
+    code: row.code as string,
+    createdAt: row.created_at as string,
+    expiresAt: row.expires_at as string,
+    isRevoked: Boolean(row.is_revoked),
+  }));
 }
 
 export async function createStaffCode(
@@ -113,6 +131,32 @@ async function schoolForSchoolAdmin(supabase: any, userId: string): Promise<stri
   if (!profile?.school_id) throw new Error("No school assigned");
   return profile.school_id as string;
 }
+
+async function listStaffCodes(db: any, schoolId: string): Promise<StaffCodeInfo[]> {
+  const { data, error } = await db
+    .from("school_codes")
+    .select("id, code, created_at, expires_at, is_revoked")
+    .eq("school_id", schoolId)
+    .eq("code_type", "staff")
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(error.message);
+  return mapCodeRows((data ?? []).filter((row: any) => Boolean(row.expires_at)));
+}
+
+export const getStaffCodesForSuperAdmin = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { schoolId: string }) => d)
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.supabase, context.userId);
+    return listStaffCodes(await admin(), data.schoolId);
+  });
+
+export const getStaffCodesForSchoolAdmin = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const schoolId = await schoolForSchoolAdmin(context.supabase, context.userId);
+    return listStaffCodes(await admin(), schoolId);
+  });
 
 export const generateStaffCodeForSuperAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -194,6 +238,9 @@ export const registerStaffAccount = createServerFn({ method: "POST" })
       user_metadata: { display_name: name, name, role: "teacher" },
     });
     if (createError || !created?.user?.id) {
+      if (createError?.message?.toLowerCase().includes("already")) {
+        return { ok: false as const, error: "email_used" as const };
+      }
       throw new Error(createError?.message ?? "Could not create account");
     }
 
