@@ -58,30 +58,13 @@ async function teacherSchoolId(db: any, teacherId: string): Promise<string> {
   return profile.school_id as string;
 }
 
-async function assertSameSchoolTeacher(db: any, ownerId: string, targetId: string) {
-  const ownerSchoolId = await teacherSchoolId(db, ownerId);
-  const { data: targetProfile, error: profileError } = await db
-    .from("profiles")
-    .select("school_id")
-    .eq("id", targetId)
-    .maybeSingle();
-  if (profileError) throw new Error(profileError.message);
-  if (!targetProfile?.school_id || targetProfile.school_id !== ownerSchoolId) {
-    throw new Error("Teacher must belong to the same school");
-  }
-
-  const { data: targetRole, error: roleError } = await db
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", targetId)
-    .maybeSingle();
-  if (roleError) throw new Error(roleError.message);
-  if (targetRole?.role !== "teacher") throw new Error("Target is not a teacher");
-}
-
 function normalizeTeacherTableError(error: any): never {
   const message = String(error?.message ?? "Teacher management database error");
-  if (error?.code === "42P01" || /class_teachers.*does not exist/i.test(message)) {
+  if (
+    error?.code === "42P01" ||
+    /class_teachers.*does not exist/i.test(message) ||
+    /add_class_teacher|remove_class_teacher|transfer_class_ownership/i.test(message)
+  ) {
     throw new Error("class_teachers database migration is not applied");
   }
   throw new Error(message);
@@ -95,8 +78,8 @@ export const getClassTeacherManagement = createServerFn({ method: "GET" })
     const db = await admin();
     const klass = await requireOwnedClass(db, data.classId, context.userId);
 
-    // The classroom owner is authoritative in classes.teacher_id. If an older
-    // classroom is missing its class_teachers backfill row, repair it here.
+    // classes.teacher_id is the source of truth for ownership. Repair the
+    // membership row automatically for classrooms created before this feature.
     const { error: ownerUpsertError } = await db
       .from("class_teachers")
       .upsert(
@@ -170,18 +153,13 @@ export const addClassTeacher = createServerFn({ method: "POST" })
     await requireTeacher(context.supabase, context.userId);
     const db = await admin();
     await requireOwnedClass(db, data.classId, context.userId);
-    await assertSameSchoolTeacher(db, context.userId, data.teacherId);
 
-    const { error } = await db.from("class_teachers").upsert(
-      {
-        class_id: data.classId,
-        teacher_id: data.teacherId,
-        role: "co_teacher",
-      },
-      { onConflict: "class_id,teacher_id", ignoreDuplicates: true },
-    );
+    const { data: result, error } = await context.supabase.rpc("add_class_teacher", {
+      p_class_id: data.classId,
+      p_teacher_id: data.teacherId,
+    });
     if (error) normalizeTeacherTableError(error);
-    return { ok: true };
+    return result as { ok: boolean };
   });
 
 export const removeClassTeacher = createServerFn({ method: "POST" })
@@ -191,16 +169,13 @@ export const removeClassTeacher = createServerFn({ method: "POST" })
     await requireTeacher(context.supabase, context.userId);
     const db = await admin();
     await requireOwnedClass(db, data.classId, context.userId);
-    if (data.teacherId === context.userId) throw new Error("Owner cannot be removed");
 
-    const { error } = await db
-      .from("class_teachers")
-      .delete()
-      .eq("class_id", data.classId)
-      .eq("teacher_id", data.teacherId)
-      .eq("role", "co_teacher");
+    const { data: result, error } = await context.supabase.rpc("remove_class_teacher", {
+      p_class_id: data.classId,
+      p_teacher_id: data.teacherId,
+    });
     if (error) normalizeTeacherTableError(error);
-    return { ok: true };
+    return result as { ok: boolean };
   });
 
 export const transferClassOwnership = createServerFn({ method: "POST" })
@@ -210,32 +185,11 @@ export const transferClassOwnership = createServerFn({ method: "POST" })
     await requireTeacher(context.supabase, context.userId);
     const db = await admin();
     await requireOwnedClass(db, data.classId, context.userId);
-    if (data.teacherId === context.userId) return { ok: true };
-    await assertSameSchoolTeacher(db, context.userId, data.teacherId);
 
-    const { error: targetError } = await db.from("class_teachers").upsert(
-      {
-        class_id: data.classId,
-        teacher_id: data.teacherId,
-        role: "owner",
-      },
-      { onConflict: "class_id,teacher_id" },
-    );
-    if (targetError) normalizeTeacherTableError(targetError);
-
-    const { error: oldOwnerError } = await db
-      .from("class_teachers")
-      .update({ role: "co_teacher" })
-      .eq("class_id", data.classId)
-      .eq("teacher_id", context.userId);
-    if (oldOwnerError) normalizeTeacherTableError(oldOwnerError);
-
-    const { error: classError } = await db
-      .from("classes")
-      .update({ teacher_id: data.teacherId })
-      .eq("id", data.classId)
-      .eq("teacher_id", context.userId);
-    if (classError) throw new Error(classError.message);
-
-    return { ok: true };
+    const { data: result, error } = await context.supabase.rpc("transfer_class_ownership", {
+      p_class_id: data.classId,
+      p_new_owner_id: data.teacherId,
+    });
+    if (error) normalizeTeacherTableError(error);
+    return result as { ok: boolean };
   });
