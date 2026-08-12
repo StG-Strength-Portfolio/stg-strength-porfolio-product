@@ -13,28 +13,34 @@ WHERE code_type IN ('school', 'teacher')
   AND is_revoked = false;
 
 -- Backfill one staff code for every active school that does not already have
--- one. gen_random_uuid() gives an unpredictable source; retry until the code
--- contains both a letter and a number and is globally unique.
+-- one. Codes use an easy-to-type alphabet without O/0 or I/1.
 DO $$
 DECLARE
   s record;
   candidate text;
+  alphabet constant text := 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  random_bytes bytea;
+  i integer;
 BEGIN
   FOR s IN
-    SELECT id
-    FROM public.schools
-    WHERE is_active = true
+    SELECT school.id
+    FROM public.schools AS school
+    WHERE school.is_active = true
       AND NOT EXISTS (
         SELECT 1
         FROM public.school_codes c
-        WHERE c.school_id = schools.id
+        WHERE c.school_id = school.id
           AND c.code_type = 'staff'
           AND c.is_revoked = false
           AND c.expires_at > now()
       )
   LOOP
     LOOP
-      candidate := upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 8));
+      random_bytes := gen_random_bytes(8);
+      candidate := '';
+      FOR i IN 0..7 LOOP
+        candidate := candidate || substr(alphabet, (get_byte(random_bytes, i) % length(alphabet)) + 1, 1);
+      END LOOP;
       EXIT WHEN candidate ~ '[A-Z]'
         AND candidate ~ '[0-9]'
         AND NOT EXISTS (SELECT 1 FROM public.school_codes WHERE code = candidate);
