@@ -83,12 +83,14 @@ function CopyCode({ code }: { code: string }) {
 function SuperAdminDashboard() {
   const tr = useTr();
   const { language } = useLanguage();
-  const schoolAdminCodeLabel =
+  const staffCodeLabel =
+    language === "en" ? "Staff code" : language === "sv" ? "Personalkod" : "Henkilökunnan koodi";
+  const generateCodeLabel =
     language === "en"
-      ? "School admin code"
+      ? "Generate new staff code"
       : language === "sv"
-        ? "Kod för skoladministratör"
-        : "Koulun admin-koodi";
+        ? "Skapa ny personalkod"
+        : "Luo uusi henkilökunnan koodi";
   const noActiveCodeLabel =
     language === "en" ? "No active code" : language === "sv" ? "Ingen aktiv kod" : "Ei aktiivista koodia";
   const searchLabel = language === "en" ? "Find school" : language === "sv" ? "Sök skola" : "Etsi koulu";
@@ -103,7 +105,7 @@ function SuperAdminDashboard() {
   const tab: Tab = Route.useSearch().tab ?? "schools";
 
   const fetchSchools = useServerFn(listSchools);
-  const fetchAdminCodes = useServerFn(getCurrentSchoolAdminCodes);
+  const fetchStaffCodes = useServerFn(getCurrentSchoolAdminCodes);
   const addSchool = useServerFn(createSchool);
   const renew = useServerFn(renewSchool);
   const edit = useServerFn(updateSchool);
@@ -113,7 +115,7 @@ function SuperAdminDashboard() {
   const purgeTrash = useServerFn(purgeExpiredSchools);
 
   const [schools, setSchools] = useState<SchoolListRow[]>([]);
-  const [adminCodes, setAdminCodes] = useState<Record<string, string>>({});
+  const [staffCodes, setStaffCodes] = useState<Record<string, string>>({});
   const [name, setName] = useState("");
   const [start, setStart] = useState(today());
   const [expiry, setExpiry] = useState("");
@@ -124,13 +126,13 @@ function SuperAdminDashboard() {
   const load = useCallback(async () => {
     try {
       await purgeTrash();
-      const [schoolRows, currentCodes] = await Promise.all([fetchSchools(), fetchAdminCodes()]);
+      const [schoolRows, currentCodes] = await Promise.all([fetchSchools(), fetchStaffCodes()]);
       setSchools(schoolRows as SchoolListRow[]);
-      setAdminCodes(currentCodes);
+      setStaffCodes(currentCodes);
     } catch (e) {
       toast.error((e as Error).message);
     }
-  }, [fetchAdminCodes, fetchSchools, purgeTrash]);
+  }, [fetchStaffCodes, fetchSchools, purgeTrash]);
 
   useEffect(() => {
     if (ready) void load();
@@ -151,8 +153,7 @@ function SuperAdminDashboard() {
           expiry: new Date(expiry).toISOString(),
         },
       });
-      const invite = await genCode({ data: { schoolId: res.id } });
-      toast.success(`${tr("Koulu lisätty! Koodi: ")}${invite.code}`);
+      toast.success(`${tr("Koulu lisätty! Koodi: ")}${res.code}`);
       setName("");
       setExpiry("");
       await load();
@@ -234,10 +235,7 @@ function SuperAdminDashboard() {
     const isDeleted = !!s.deleted_at;
     if (isDeleted !== showDeleted) return false;
     if (!query) return true;
-    return [s.name, adminCodes[s.id] ?? "", ...s.adminNames]
-      .join(" ")
-      .toLowerCase()
-      .includes(query);
+    return [s.name, staffCodes[s.id] ?? "", ...s.adminNames].join(" ").toLowerCase().includes(query);
   });
   const activeSchools = schools.filter((s) => !s.deleted_at);
   const totalTeachers = activeSchools.reduce((a, s) => a + s.teacherCount, 0);
@@ -384,7 +382,7 @@ function SuperAdminDashboard() {
                     <thead>
                       <tr className="border-b border-black/10">
                         <th className="py-2 pr-3">{tr("Koulun nimi")}</th>
-                        <th className="py-2 pr-3">{schoolAdminCodeLabel}</th>
+                        <th className="py-2 pr-3">{staffCodeLabel}</th>
                         <th className="py-2 pr-3">{tr("Tila")}</th>
                         <th className="py-2 pr-3">{tr("Laskutus aloitus")}</th>
                         <th className="py-2 pr-3">{tr("Vanhentuminen")}</th>
@@ -401,8 +399,8 @@ function SuperAdminDashboard() {
                           <tr key={s.id} className="border-b border-black/5 align-top">
                             <td className="py-2 pr-3 font-medium">{s.name}</td>
                             <td className="py-2 pr-3">
-                              {!isDeleted && adminCodes[s.id] ? (
-                                <CopyCode code={adminCodes[s.id]} />
+                              {!isDeleted && staffCodes[s.id] ? (
+                                <CopyCode code={staffCodes[s.id]} />
                               ) : (
                                 <span className="text-xs opacity-60">{noActiveCodeLabel}</span>
                               )}
@@ -488,7 +486,7 @@ function SuperAdminDashboard() {
                                     className="rounded-full"
                                     onClick={() => void onGenerate(s)}
                                   >
-                                    {tr("Luo koodi")}
+                                    {generateCodeLabel}
                                   </Button>
                                   <Button
                                     size="sm"
