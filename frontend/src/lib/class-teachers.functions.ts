@@ -25,12 +25,49 @@ async function admin() {
 }
 
 async function requireTeacher(supabase: any, userId: string) {
-  const { data: role } = await supabase
+  const { data: role, error } = await supabase
     .from("user_roles")
     .select("role")
     .eq("user_id", userId)
     .maybeSingle();
+  if (error) throw new Error(error.message);
   if (role?.role !== "teacher") throw new Error("Forbidden");
+}
+
+async function requireOwnedClass(db: any, classId: string, userId: string) {
+  const { data: klass, error } = await db
+    .from("classes")
+    .select("id, teacher_id")
+    .eq("id", classId)
+    .eq("is_deleted", false)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!klass) throw new Error("Class not found");
+  if (klass.teacher_id !== userId) throw new Error("Forbidden");
+  return klass as { id: string; teacher_id: string };
+}
+
+async function teacherSchoolId(db: any, teacherId: string): Promise<string> {
+  const { data: profile, error } = await db
+    .from("profiles")
+    .select("school_id")
+    .eq("id", teacherId)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!profile?.school_id) throw new Error("Teacher is not assigned to a school");
+  return profile.school_id as string;
+}
+
+function normalizeTeacherTableError(error: any): never {
+  const message = String(error?.message ?? "Teacher management database error");
+  if (
+    error?.code === "42P01" ||
+    /class_teachers.*does not exist/i.test(message) ||
+    /add_class_teacher|remove_class_teacher|transfer_class_ownership/i.test(message)
+  ) {
+    throw new Error("class_teachers database migration is not applied");
+  }
+  throw new Error(message);
 }
 
 export const getClassTeacherManagement = createServerFn({ method: "GET" })
@@ -39,34 +76,30 @@ export const getClassTeacherManagement = createServerFn({ method: "GET" })
   .handler(async ({ data, context }): Promise<ClassroomTeacherManagement> => {
     await requireTeacher(context.supabase, context.userId);
     const db = await admin();
+    const klass = await requireOwnedClass(db, data.classId, context.userId);
 
-    const { data: klass, error: classError } = await db
-      .from("classes")
-      .select("id, teacher_id")
-      .eq("id", data.classId)
-      .eq("is_deleted", false)
-      .maybeSingle();
-    if (classError) throw new Error(classError.message);
-    if (!klass) throw new Error("Class not found");
-
-    const { data: callerMembership } = await db
+    // classes.teacher_id is the source of truth for ownership. Repair the
+    // membership row automatically for classrooms created before this feature.
+    const { error: ownerUpsertError } = await db
       .from("class_teachers")
-      .select("teacher_id")
-      .eq("class_id", data.classId)
-      .eq("teacher_id", context.userId)
-      .maybeSingle();
-    if (!callerMembership) throw new Error("Forbidden");
+      .upsert(
+        { class_id: data.classId, teacher_id: klass.teacher_id, role: "owner" },
+        { onConflict: "class_id,teacher_id" },
+      );
+    if (ownerUpsertError) normalizeTeacherTableError(ownerUpsertError);
 
     const { data: assignments, error: assignmentsError } = await db
       .from("class_teachers")
       .select("teacher_id, role")
       .eq("class_id", data.classId);
-    if (assignmentsError) throw new Error(assignmentsError.message);
+    if (assignmentsError) normalizeTeacherTableError(assignmentsError);
 
     const assignedIds = ((assignments ?? []) as any[]).map((item) => item.teacher_id as string);
-    const { data: assignedProfiles } = assignedIds.length
+    const { data: assignedProfiles, error: assignedProfilesError } = assignedIds.length
       ? await db.from("profiles").select("id, display_name").in("id", assignedIds)
-      : { data: [] as any[] };
+      : { data: [] as any[], error: null };
+    if (assignedProfilesError) throw new Error(assignedProfilesError.message);
+
     const nameById = new Map<string, string | null>(
       ((assignedProfiles ?? []) as any[]).map((profile) => [profile.id, profile.display_name]),
     );
@@ -85,20 +118,11 @@ export const getClassTeacherManagement = createServerFn({ method: "GET" })
         return (a.name ?? "").localeCompare(b.name ?? "");
       });
 
-    const isOwner = klass.teacher_id === context.userId;
-    if (!isOwner) return { isOwner, teachers, available: [] };
-
-    const { data: ownerProfile } = await db
-      .from("profiles")
-      .select("school_id")
-      .eq("id", context.userId)
-      .maybeSingle();
-    if (!ownerProfile?.school_id) return { isOwner, teachers, available: [] };
-
+    const schoolId = await teacherSchoolId(db, context.userId);
     const { data: schoolProfiles, error: profilesError } = await db
       .from("profiles")
       .select("id, display_name")
-      .eq("school_id", ownerProfile.school_id);
+      .eq("school_id", schoolId);
     if (profilesError) throw new Error(profilesError.message);
 
     const schoolIds = ((schoolProfiles ?? []) as any[]).map((profile) => profile.id as string);
@@ -119,7 +143,7 @@ export const getClassTeacherManagement = createServerFn({ method: "GET" })
       .map((profile) => ({ id: profile.id, name: profile.display_name ?? null }))
       .sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
 
-    return { isOwner, teachers, available };
+    return { isOwner: true, teachers, available };
   });
 
 export const addClassTeacher = createServerFn({ method: "POST" })
@@ -127,11 +151,14 @@ export const addClassTeacher = createServerFn({ method: "POST" })
   .inputValidator((data: { classId: string; teacherId: string }) => data)
   .handler(async ({ data, context }) => {
     await requireTeacher(context.supabase, context.userId);
+    const db = await admin();
+    await requireOwnedClass(db, data.classId, context.userId);
+
     const { data: result, error } = await context.supabase.rpc("add_class_teacher", {
       p_class_id: data.classId,
       p_teacher_id: data.teacherId,
     });
-    if (error) throw new Error(error.message);
+    if (error) normalizeTeacherTableError(error);
     return result as { ok: boolean };
   });
 
@@ -140,11 +167,14 @@ export const removeClassTeacher = createServerFn({ method: "POST" })
   .inputValidator((data: { classId: string; teacherId: string }) => data)
   .handler(async ({ data, context }) => {
     await requireTeacher(context.supabase, context.userId);
+    const db = await admin();
+    await requireOwnedClass(db, data.classId, context.userId);
+
     const { data: result, error } = await context.supabase.rpc("remove_class_teacher", {
       p_class_id: data.classId,
       p_teacher_id: data.teacherId,
     });
-    if (error) throw new Error(error.message);
+    if (error) normalizeTeacherTableError(error);
     return result as { ok: boolean };
   });
 
@@ -153,10 +183,13 @@ export const transferClassOwnership = createServerFn({ method: "POST" })
   .inputValidator((data: { classId: string; teacherId: string }) => data)
   .handler(async ({ data, context }) => {
     await requireTeacher(context.supabase, context.userId);
+    const db = await admin();
+    await requireOwnedClass(db, data.classId, context.userId);
+
     const { data: result, error } = await context.supabase.rpc("transfer_class_ownership", {
       p_class_id: data.classId,
       p_new_owner_id: data.teacherId,
     });
-    if (error) throw new Error(error.message);
+    if (error) normalizeTeacherTableError(error);
     return result as { ok: boolean };
   });
