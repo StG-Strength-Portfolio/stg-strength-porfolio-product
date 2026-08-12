@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PortfolioPresentation } from "@/components/portfolio/PortfolioPresentation";
 import { useRoleGuard } from "@/lib/role-guard";
 
-export const Route = createFileRoute("/teacher/teach/portfolio")({
+export const Route = createFileRoute("/school-admin/teach/portfolio")({
   head: () => ({
     meta: [
       { title: "Strength Portfolio presentation — Vahvuusseikkailu" },
@@ -19,12 +19,17 @@ export const Route = createFileRoute("/teacher/teach/portfolio")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: TeachPortfolioPage,
+  component: SchoolAdminTeachPortfolioPage,
 });
 
-function TeachPortfolioPage() {
-  const guard = useRoleGuard(["teacher"]);
+function SchoolAdminTeachPortfolioPage() {
+  const guard = useRoleGuard(["school_admin"]);
   if (!guard.ready) return null;
 
-  return <PortfolioPresentation backTo="/teacher/dashboard" persistLanguage />;
+  return (
+    <PortfolioPresentation
+      backTo={guard.preview ? "/superadmin/demo/principal" : "/school-admin/dashboard"}
+      persistLanguage={!guard.preview}
+    />
+  );
 }
