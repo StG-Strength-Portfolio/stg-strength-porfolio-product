@@ -8867,33 +8867,30 @@ function Screen38(_props: Props) {
 function Screen39({ onSaveStateChange }: Props) {
   const tr = useTr();
 
-  const boxes: Array<{
-    k: string;
-    label: string;
-    className: string;
-    tall?: boolean;
-  }> = [
+  const boxes = [
     {
       k: "screen_36_tavoite",
       label: "1. Tavoitteeni ja miksi se on minulle tärkeä",
-      className: "left-[2%] top-[25%] w-[31%]",
-      tall: true,
+      position: "left-[5%] top-[20%] w-[22%]",
+      height: 190,
     },
     {
       k: "screen_36_vahvuudet",
       label: "2. Vaaditut vahvuudet",
-      className: "left-[2%] top-[76%] w-[31%]",
+      position: "left-[5%] top-[57%] w-[22%]",
+      height: 180,
     },
     {
       k: "screen_36_hyodynnan",
       label: "3. Miten hyödynnän vahvuuksia",
-      className: "right-[2%] top-[25%] w-[31%]",
-      tall: true,
+      position: "right-[5%] top-[20%] w-[22%]",
+      height: 190,
     },
     {
       k: "screen_36_taidot",
       label: "4. Mitä muita taitoja tarvitsen",
-      className: "right-[2%] top-[76%] w-[31%]",
+      position: "right-[5%] top-[57%] w-[22%]",
+      height: 180,
     },
   ];
 
@@ -8914,172 +8911,241 @@ function Screen39({ onSaveStateChange }: Props) {
         className="
           relative
           mx-auto
-          min-h-[980px]
+          min-h-[760px]
           w-full
           max-w-[1500px]
-          px-[6%]
-          pb-28
-          pt-10
+          overflow-hidden
+          px-[5%]
+          pb-10
+          pt-6
         "
       >
-        {/* =========================
-            TITLE
-        ========================== */}
-
+        {/* TITLE */}
         <h1
           className="
             relative
             z-30
             font-display
-            text-[clamp(38px,4vw,64px)]
+            text-[clamp(38px,3.6vw,56px)]
             font-semibold
-            leading-[1.08]
+            leading-[1.05]
+            tracking-[-0.02em]
             text-[#ffd33f]
           "
         >
           {tr("Tavoitteeni opiskelijana 2/2")}
         </h1>
 
-        {/* =========================
-            ICEBERG
-        ========================== */}
+        {/* WATER LINE */}
+        <div
+          aria-hidden="true"
+          className="
+            pointer-events-none
+            absolute
+            left-[5%]
+            right-[5%]
+            top-[54%]
+            z-[1]
+            border-t-[2px]
+            border-dashed
+            border-[#b7dfe0]
+          "
+        />
 
+        {/* ICEBERG */}
         <svg
           className="
             pointer-events-none
             absolute
             left-1/2
-            top-[17%]
-            z-0
-            h-[560px]
-            w-[470px]
+            top-[13%]
+            z-[2]
+            h-[590px]
+            w-[510px]
             -translate-x-1/2
             select-none
           "
-          viewBox="0 0 470 560"
+          viewBox="0 0 510 590"
           aria-hidden="true"
         >
           <defs>
             <linearGradient id="screen39Ice" x1="0" x2="1" y1="0" y2="1">
-              <stop offset="0%" stopColor="#d8fbfb" />
-              <stop offset="100%" stopColor="#91d8d8" />
+              <stop offset="0%" stopColor="#c5e9e9" />
+              <stop offset="100%" stopColor="#9dd5d5" />
             </linearGradient>
           </defs>
 
           {/* ICEBERG ABOVE WATER */}
           <path
             d="
-              M84 212
-              C94 174 138 126 162 91
-              C171 78 176 112 187 102
-              C204 54 232 25 248 11
-              C263 44 271 78 284 60
-              C296 43 306 37 317 79
-              C326 112 338 154 350 176
-              C360 193 374 162 383 184
-              C390 205 393 230 407 239
-              C421 248 420 270 419 278
-              C332 288 190 287 84 280
-              C78 267 78 236 84 212
+              M70 290
+              C74 260 100 222 124 190
+              C148 158 173 118 194 81
+              C206 61 212 112 227 93
+              C244 70 252 22 273 12
+              C291 45 297 93 316 75
+              C332 59 340 26 354 74
+              C366 112 372 157 389 184
+              C401 202 414 167 427 194
+              C439 219 440 253 453 262
+              C464 269 469 282 468 294
+              C375 303 167 303 70 294
+              C68 292 68 291 70 290
               Z
             "
             fill="url(#screen39Ice)"
-            opacity="0.92"
-          />
-
-          {/* WATER / DASHED LINE */}
-          <path
-            d="M10 296 C126 300 315 300 460 296"
-            fill="none"
-            stroke="#bde7ea"
-            strokeDasharray="8 10"
-            strokeWidth="3"
           />
 
           {/* ICEBERG BELOW WATER */}
           <path
             d="
-              M78 315
-              C118 305 350 308 406 315
-              C421 342 417 367 455 389
-              C428 410 430 451 418 479
-              C387 469 382 519 355 538
-              C320 528 305 496 277 516
-              C259 531 248 553 224 544
-              C200 548 192 493 164 490
-              C143 519 137 550 112 516
-              C92 498 74 505 51 479
-              C35 459 48 423 23 393
-              C51 372 48 337 78 315
+              M64 315
+              C105 306 389 307 451 315
+              C463 326 467 344 475 356
+              C487 373 501 375 507 388
+              C486 402 478 412 479 432
+              C481 447 487 462 476 470
+              C461 477 451 462 442 478
+              C427 505 431 543 409 551
+              C390 557 381 530 366 546
+              C348 566 337 579 320 572
+              C301 563 290 543 273 552
+              C253 563 244 586 224 577
+              C206 569 202 518 183 504
+              C169 494 158 546 141 527
+              C129 513 121 489 105 484
+              C88 479 74 474 61 458
+              C45 439 56 414 38 395
+              C22 378 32 350 49 338
+              C55 332 57 323 64 315
               Z
             "
             fill="url(#screen39Ice)"
-            opacity="0.92"
           />
 
           {/* ARROW */}
           <path
             d="
-              M0 44
-              C98 -10 193 -20 232 16
-              C246 29 251 45 252 58
+              M8 68
+              C90 24 181 -6 240 2
+              C276 6 295 22 305 44
             "
             fill="none"
             stroke="#b89ae8"
             strokeLinecap="round"
-            strokeWidth="3"
+            strokeWidth="2.5"
           />
 
-          <path d="M252 58 L239 48 L255 44 Z" fill="#b89ae8" />
+          <path d="M305 44 L295 34 L311 36 Z" fill="#b89ae8" />
         </svg>
 
-        {/* =========================
-            QUESTION BOXES
-        ========================== */}
+        {/* QUESTIONS + TEXTBOXES */}
+        {boxes.map((box) => {
+          const isRight = box.position.includes("right-");
 
-        {boxes.map((b) => (
-          <section key={b.k} className={cn("absolute z-20", b.className)}>
-            {/* QUESTION */}
-
-            <h2
-              className="
-                min-h-[66px]
-                font-display
-                text-[clamp(19px,1.55vw,27px)]
-                font-semibold
-                leading-[1.12]
-                text-white
-              "
+          return (
+            <section
+              key={box.k}
+              className={`
+                absolute
+                z-20
+                flex
+                flex-col
+                ${isRight ? "items-end" : "items-start"}
+                ${box.position}
+              `}
             >
-              {tr(b.label)}
-            </h2>
-
-            {/* TEXTBOX */}
-
-            <div
-              className="
-                mt-3
-                overflow-hidden
-                rounded-[24px]
-                border-[5px]
-                border-black
-                bg-[#fffdf8]
-                shadow-[inset_0_6px_0_0_#000,0_8px_0_rgba(0,0,0,0.16)]
-              "
-            >
-              <FlatReflectionTextarea
-                fieldKey={b.k}
-                rows={b.tall ? 10 : 6}
-                minHeight={b.tall ? 290 : 172}
-                textClass="
-                  text-[16px]
-                  bg-[repeating-linear-gradient(to_bottom,transparent_0,transparent_27px,#e7d8ff_28px,#e7d8ff_29px)]
+              {/* QUESTION */}
+              <h2
+                className="
+                  w-full
+                  max-w-[290px]
+                  font-display
+                  text-[clamp(16px,1.2vw,21px)]
+                  font-semibold
+                  leading-[1.12]
+                  text-white
                 "
-                onSaveStateChange={onSaveStateChange}
-              />
-            </div>
-          </section>
-        ))}
+              >
+                {tr(box.label)}
+              </h2>
+
+              {/* TEXTBOX */}
+              <div
+                className="
+                  relative
+                  mt-1
+                  w-full
+                  max-w-[290px]
+                  overflow-hidden
+                  rounded-[20px]
+                  border-[4px]
+                  border-solid
+                  border-black
+                  bg-transparent
+                "
+                style={{
+                  height: `${box.height}px`,
+                }}
+              >
+                <div
+                  className="
+                    h-full
+                    w-full
+
+                    [&_label]:hidden
+
+                    [&>div]:h-full
+                    [&>div]:w-full
+                    [&>div]:border-0
+                    [&>div]:bg-transparent
+                    [&>div]:p-0
+                    [&>div]:shadow-none
+                    [&>div]:outline-none
+                    [&>div]:ring-0
+
+                    [&_div]:border-0
+                    [&_div]:bg-transparent
+                    [&_div]:shadow-none
+
+                    [&_textarea]:block
+                    [&_textarea]:h-full
+                    [&_textarea]:min-h-0
+                    [&_textarea]:w-full
+                    [&_textarea]:resize-none
+                    [&_textarea]:rounded-[16px]
+                    [&_textarea]:border-0
+                    [&_textarea]:bg-transparent
+                    [&_textarea]:px-4
+                    [&_textarea]:py-3
+                    [&_textarea]:font-display
+                    [&_textarea]:text-[15px]
+                    [&_textarea]:font-normal
+                    [&_textarea]:leading-[27px]
+                    [&_textarea]:text-white
+                    [&_textarea]:outline-none
+                    [&_textarea]:shadow-none
+                    [&_textarea]:ring-0
+
+                    [&_textarea::placeholder]:text-white/50
+
+                    [&_textarea:focus]:border-0
+                    [&_textarea:focus]:outline-none
+                    [&_textarea:focus]:shadow-none
+                    [&_textarea:focus]:ring-0
+                  "
+                >
+                  <ReflectionTextarea
+                    fieldKey={box.k}
+                    label=""
+                    rows={6}
+                    onSaveStateChange={onSaveStateChange}
+                  />
+                </div>
+              </div>
+            </section>
+          );
+        })}
       </div>
     </div>
   );
