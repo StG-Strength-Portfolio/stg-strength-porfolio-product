@@ -18,6 +18,8 @@ export interface TeacherClass {
   join_code: string;
   language: Language;
   created_at: string;
+  /** The classroom owner. Optional only for legacy/demo data. */
+  teacher_id?: string;
   is_deleted?: boolean;
   deleted_at?: string | null;
 }
@@ -71,10 +73,11 @@ export function useTeacherData() {
       if (!u.user) return;
       const teacherId = u.user.id;
 
+      // RLS now returns both classrooms this teacher owns and classrooms where
+      // they are an assigned co-teacher. Do not filter by teacher_id here.
       const { data: cls } = await supabase
         .from("classes" as never)
-        .select("id,name,join_code,created_at,language,is_deleted,deleted_at")
-        .eq("teacher_id", teacherId as never)
+        .select("id,name,join_code,created_at,language,is_deleted,deleted_at,teacher_id")
         .order("created_at", { ascending: false });
       const allRows = (cls ?? []) as unknown as TeacherClass[];
       const classRows = allRows.filter((c) => !c.is_deleted);
