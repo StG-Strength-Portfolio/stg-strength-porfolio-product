@@ -17,6 +17,7 @@ import { EmailTemplatesTab } from "@/components/superadmin/EmailTemplatesTab";
 import { EmailAnalyticsTab } from "@/components/superadmin/EmailAnalyticsTab";
 import { TeachingMaterialsTab } from "@/components/superadmin/TeachingMaterialsTab";
 import { SuperAdminsTab } from "@/components/superadmin/SuperAdminsTab";
+import { SuperAdminSettingsTab } from "@/components/superadmin/SuperAdminSettingsTab";
 import { setStudentViewMode } from "@/lib/progression";
 import { setSuperAdminPreview } from "@/lib/superadmin-preview";
 import {
@@ -597,14 +598,7 @@ function SuperAdminDashboard() {
             </StickyNote>
           )}
 
-          {tab === "settings" && (
-            <StickyNote seed="sa-settings">
-              <h2 className="text-2xl font-bold">{tr("Asetukset")}</h2>
-              <p className="mt-2 text-sm opacity-70">
-                {tr("Ylläpitäjätilit luodaan vain ylläpidon kautta.")}
-              </p>
-            </StickyNote>
-          )}
+          {tab === "settings" && <SuperAdminSettingsTab />}
         </main>
       </div>
     </div>
