@@ -3,9 +3,39 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useT, useTr } from "@/lib/i18n";
+import { useLanguage } from "@/lib/i18n";
 
 const RESEND_COOLDOWN_SECONDS = 60;
+
+const FORGOT_PASSWORD_COPY = {
+  fi: {
+    title: "Salasanan palautus",
+    sent: "Jos sähköposti löytyy järjestelmästä, palautuslinkki on lähetetty.",
+    resend: "Lähetä uudelleen",
+    email: "Sähköpostiosoitteesi",
+    send: "Lähetä palautuslinkki",
+    sending: "Lähetetään…",
+    close: "Sulje",
+  },
+  en: {
+    title: "Password Reset",
+    sent: "If the email exists in the system, a reset link has been sent.",
+    resend: "Send again",
+    email: "Email address",
+    send: "Send reset link",
+    sending: "Sending…",
+    close: "Close",
+  },
+  sv: {
+    title: "Återställ lösenord",
+    sent: "Om e-postadressen finns i systemet har en återställningslänk skickats.",
+    resend: "Skicka igen",
+    email: "E-postadress",
+    send: "Skicka återställningslänk",
+    sending: "Skickar…",
+    close: "Stäng",
+  },
+} as const;
 
 /**
  * Forgot-password dialog. Shared by the regular login page and the Super
@@ -19,8 +49,8 @@ export function ForgotPasswordDialog({
   onClose: () => void;
   source?: "superadmin";
 }) {
-  const t = useT();
-  const tr = useTr();
+  const { language } = useLanguage();
+  const copy = FORGOT_PASSWORD_COPY[language];
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
@@ -82,21 +112,19 @@ export function ForgotPasswordDialog({
         aria-labelledby="forgot-password-title"
       >
         <h2 id="forgot-password-title" className="font-display text-xl">
-          {tr("Salasanan palautus")}
+          {copy.title}
         </h2>
 
         {sent ? (
           <div className="mt-3 space-y-4">
-            <p className="text-sm">
-              {tr("Jos sähköposti löytyy järjestelmästä, palautuslinkki on lähetetty.")}
-            </p>
+            <p className="text-sm">{copy.sent}</p>
             <button
               type="button"
               onClick={() => void sendResetEmail()}
               disabled={cooldown > 0 || busy}
               className="text-xs font-semibold text-[color:var(--purple)] underline disabled:cursor-not-allowed disabled:opacity-50 disabled:no-underline"
             >
-              {tr("Lähetä uudelleen")}
+              {copy.resend}
               {cooldown > 0 ? ` (${cooldown}s)` : ""}
             </button>
           </div>
@@ -109,7 +137,7 @@ export function ForgotPasswordDialog({
             className="mt-4 space-y-3"
           >
             <div className="space-y-1.5">
-              <Label htmlFor="forgot-email">{tr("Sähköpostiosoitteesi")}</Label>
+              <Label htmlFor="forgot-email">{copy.email}</Label>
               <Input
                 id="forgot-email"
                 ref={inputRef}
@@ -125,12 +153,12 @@ export function ForgotPasswordDialog({
               disabled={busy}
               className="w-full rounded-full bg-[color:var(--purple)] font-bold text-white hover:bg-[color:var(--purple)]/90"
             >
-              {busy ? t("auth.login.busy") : tr("Lähetä palautuslinkki")}
+              {busy ? copy.sending : copy.send}
             </Button>
           </form>
         )}
         <Button variant="ghost" className="mt-3 w-full rounded-full" onClick={onClose}>
-          {tr("Sulje")}
+          {copy.close}
         </Button>
       </div>
     </div>
