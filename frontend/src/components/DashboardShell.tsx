@@ -110,6 +110,24 @@ export function DashboardShell({
     principal: language === "en" ? "Principal" : language === "sv" ? "Rektor" : "Rehtori",
   };
 
+  const effectiveSections = (sections ?? []).map((section) => {
+    const hasSchoolAdminMaterials = section.links.some(
+      (link) => link.to === "/school-admin/teach/materials",
+    );
+    const hasSchoolAdminPortfolio = section.links.some(
+      (link) => link.to === "/school-admin/teach/portfolio",
+    );
+    if (!hasSchoolAdminMaterials || hasSchoolAdminPortfolio) return section;
+
+    return {
+      ...section,
+      links: [
+        { to: "/school-admin/teach/portfolio", label: tr("Vahvuusportfolio") },
+        ...section.links,
+      ],
+    };
+  });
+
   async function signOut() {
     await supabase.auth.signOut();
     navigate({ to: "/auth/login", replace: true });
@@ -231,7 +249,7 @@ export function DashboardShell({
                 ))}
               </nav>
             )}
-            {sections?.map((sec) => (
+            {effectiveSections.map((sec) => (
               <nav key={sec.label} className="mt-3 space-y-1.5 border-t border-white/20 pt-3">
                 <p className="px-4 pb-1 text-xs font-bold uppercase tracking-wider text-white/60">
                   {sec.label}
