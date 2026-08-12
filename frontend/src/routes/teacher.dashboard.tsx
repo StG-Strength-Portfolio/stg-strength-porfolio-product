@@ -64,6 +64,12 @@ const SUMMARY_LABEL = {
   sv: "Sammanfattning",
 } as const;
 
+const STUDENT_SEARCH_PLACEHOLDER = {
+  fi: "Etsi opiskelijoita…",
+  en: "Search students…",
+  sv: "Sök elever…",
+} as const;
+
 const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function randomCode(): string {
   let s = "LK-";
@@ -82,6 +88,9 @@ function TeacherDashboardPage() {
   const [tab, setTab] = useState("overview");
   const [openClass, setOpenClass] = useState<string | null>(null);
   const [openStudent, setOpenStudent] = useState<string | null>(null);
+  const [studentSearch, setStudentSearch] = useState("");
+  const [classDetailTab, setClassDetailTab] = useState<"teachers" | "students">("students");
+  const [classTeacherCount, setClassTeacherCount] = useState(1);
   const { classes, deletedClasses, students, assigned, events, refresh } = useTeacherData();
 
   if (!guard.ready) return null;
@@ -101,6 +110,17 @@ function TeacherDashboardPage() {
 
   const selectedStudent = students.find((s) => s.studentId === openStudent) ?? null;
   const selectedClass = classes.find((c) => c.id === openClass) ?? null;
+  const selectedClassStudents = selectedClass
+    ? students.filter((student) => student.classId === selectedClass.id)
+    : [];
+  const searchTerm = studentSearch.trim().toLocaleLowerCase();
+  const filteredStudents = searchTerm
+    ? students.filter((student) =>
+        [student.displayName, student.className, student.email]
+          .filter(Boolean)
+          .some((value) => String(value).toLocaleLowerCase().includes(searchTerm)),
+      )
+    : students;
   const ownedDeletedClasses = deletedClasses.filter((c) => c.teacher_id === guard.userId);
 
   return (
@@ -111,6 +131,7 @@ function TeacherDashboardPage() {
       onSelect={(id) => {
         setTab(id);
         setOpenStudent(null);
+        if (id !== "students") setStudentSearch("");
         if (id !== "classes") setOpenClass(null);
       }}
       schoolName={guard.schoolName}
@@ -134,7 +155,7 @@ function TeacherDashboardPage() {
       {tab === "classes" && !openClass && <CreateClass onCreated={refresh} />}
 
       {tab === "classes" && !openClass && (
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2">
           {classes.length === 0 && <p className="opacity-70">{tr("Ei luokkia.")}</p>}
           {classes.map((c) => {
             const inClass = students.filter((s) => s.classId === c.id);
@@ -146,7 +167,11 @@ function TeacherDashboardPage() {
               <StickyNote key={c.id} seed={`cls-${c.id}`} className="space-y-2">
                 <button
                   type="button"
-                  onClick={() => setOpenClass(c.id)}
+                  onClick={() => {
+                    setOpenClass(c.id);
+                    setClassDetailTab("students");
+                    setClassTeacherCount(1);
+                  }}
                   className="text-left text-xl font-bold underline-offset-2 hover:underline"
                 >
                   {c.name}
@@ -190,17 +215,71 @@ function TeacherDashboardPage() {
             {tr("Takaisin luokkiin")}
           </Button>
           <h2 className="text-2xl font-bold">{selectedClass.name}</h2>
-          {selectedClass.teacher_id === guard.userId && <ClassTeacherManager classId={openClass} />}
-          <StudentTable
-            students={students.filter((s) => s.classId === openClass)}
-            onOpen={openStudentView}
-          />
+
+          {selectedClass.teacher_id === guard.userId ? (
+            <div className="space-y-4">
+              <div className="flex flex-wrap gap-2 border-b border-black/10 pb-3">
+                <button
+                  type="button"
+                  onClick={() => setClassDetailTab("teachers")}
+                  className={cn(
+                    "rounded-full border border-[color:var(--purple)] px-4 py-2 text-sm font-bold transition-colors",
+                    classDetailTab === "teachers"
+                      ? "bg-[color:var(--purple)] text-white"
+                      : "bg-white text-[color:var(--purple)] hover:bg-[color:var(--purple)]/10",
+                  )}
+                >
+                  {tr("Opettajat")} ({classTeacherCount})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setClassDetailTab("students")}
+                  className={cn(
+                    "rounded-full border border-[color:var(--purple)] px-4 py-2 text-sm font-bold transition-colors",
+                    classDetailTab === "students"
+                      ? "bg-[color:var(--purple)] text-white"
+                      : "bg-white text-[color:var(--purple)] hover:bg-[color:var(--purple)]/10",
+                  )}
+                >
+                  {tr("Opiskelijat")} ({selectedClassStudents.length})
+                </button>
+              </div>
+
+              <div className={classDetailTab === "teachers" ? "" : "hidden"}>
+                <ClassTeacherManager
+                  classId={openClass}
+                  showTitle={false}
+                  onTeacherCountChange={setClassTeacherCount}
+                />
+              </div>
+
+              {classDetailTab === "students" && (
+                <StudentTable students={selectedClassStudents} onOpen={openStudentView} />
+              )}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <h3 className="text-lg font-bold">
+                {tr("Opiskelijat")} ({selectedClassStudents.length})
+              </h3>
+              <StudentTable students={selectedClassStudents} onOpen={openStudentView} />
+            </div>
+          )}
         </StickyNote>
       )}
 
       {tab === "students" && !selectedStudent && (
         <StickyNote seed="teacher-students" className="overflow-x-auto">
-          <StudentTable students={students} onOpen={openStudentView} showClass />
+          <div className="mb-4 max-w-md">
+            <Input
+              value={studentSearch}
+              onChange={(event) => setStudentSearch(event.target.value)}
+              placeholder={STUDENT_SEARCH_PLACEHOLDER[language]}
+              aria-label={STUDENT_SEARCH_PLACEHOLDER[language]}
+              className="bg-white text-[color:var(--ink)] placeholder:text-[color:var(--ink)]/45"
+            />
+          </div>
+          <StudentTable students={filteredStudents} onOpen={openStudentView} showClass />
         </StickyNote>
       )}
 
@@ -338,7 +417,7 @@ function StudentDetail({
         <Link
           to="/opettaja/oppilas/$userId"
           params={{ userId: student.studentId }}
-          className="inline-flex items-center gap-1 rounded-full bg-[color:var(--purple)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--purple)]/90"
+          className="inline-flex items-center gap-1 rounded-full bg-[color:var(--yellow)] px-4 py-2 text-sm font-bold text-[color:var(--ink)] shadow hover:brightness-95"
         >
           {tr("Avaa portfolio")} <ExternalLink className="h-3 w-3" />
         </Link>

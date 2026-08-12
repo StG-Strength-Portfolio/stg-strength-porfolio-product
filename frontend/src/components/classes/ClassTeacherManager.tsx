@@ -74,7 +74,15 @@ const COPY = {
 
 type LoadState = "loading" | "ready" | "error";
 
-export function ClassTeacherManager({ classId }: { classId: string }) {
+export function ClassTeacherManager({
+  classId,
+  showTitle = true,
+  onTeacherCountChange,
+}: {
+  classId: string;
+  showTitle?: boolean;
+  onTeacherCountChange?: (count: number) => void;
+}) {
   const { language } = useLanguage();
   const text = COPY[language];
   const getManagement = useServerFn(getClassTeacherManagement);
@@ -100,6 +108,7 @@ export function ClassTeacherManager({ classId }: { classId: string }) {
     try {
       const result = await getManagement({ data: { classId } });
       setTeachers(result.teachers);
+      onTeacherCountChange?.(result.teachers.length);
       setAvailable(result.available);
       setSelectedTeacherId("");
       setLoadState("ready");
@@ -143,10 +152,12 @@ export function ClassTeacherManager({ classId }: { classId: string }) {
 
   return (
     <section className="space-y-3 rounded-2xl border border-black/10 bg-white/55 p-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-lg font-bold">{text.title}</h3>
-        <span className="text-xs opacity-60">{teachers.length}</span>
-      </div>
+      {showTitle && (
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h3 className="text-lg font-bold">{text.title}</h3>
+          <span className="text-xs opacity-60">{teachers.length}</span>
+        </div>
+      )}
 
       <div className="space-y-2">
         {teachers.map((teacher) => (
@@ -208,7 +219,7 @@ export function ClassTeacherManager({ classId }: { classId: string }) {
             <select
               value={selectedTeacherId}
               onChange={(event) => setSelectedTeacherId(event.target.value)}
-              className="h-10 w-full rounded-full border border-[color:var(--purple)] bg-[color:var(--purple)] px-4 text-sm font-medium text-white outline-none focus:ring-2 focus:ring-[color:var(--purple)]/30 sm:w-[28rem] sm:flex-none"
+              className="h-10 w-full rounded-full border border-[color:var(--purple)] bg-[color:var(--purple)] px-4 text-sm font-medium text-white outline-none focus:ring-2 focus:ring-[color:var(--purple)]/30 sm:w-64 sm:flex-none"
             >
               <option value="" className="bg-white text-slate-900">
                 {text.chooseTeacher}
