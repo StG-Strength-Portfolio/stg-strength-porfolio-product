@@ -10,6 +10,7 @@ import { StrengthPickerGrid } from "@/components/strengths/StrengthPickerGrid";
 import { DashboardShell } from "@/components/DashboardShell";
 import { ProfileSettings } from "@/components/ProfileSettings";
 import { ClassTeacherManager } from "@/components/classes/ClassTeacherManager";
+import { SchoolTopStrengths } from "@/components/strengths/SchoolTopStrengths";
 import { supabase } from "@/integrations/supabase/client";
 import { useRoleGuard } from "@/lib/role-guard";
 import { useLanguage, useTr, LANGUAGES, LANGUAGE_LABEL, type Language } from "@/lib/i18n";
@@ -27,7 +28,6 @@ import {
   type TeacherStudent,
   type TeacherClass,
 } from "@/lib/teacher-dashboard-data";
-import { ALL_STRENGTHS } from "@/lib/strength-jar-data";
 import { getStrengthName } from "@/lib/strengths-i18n";
 import { cn } from "@/lib/utils";
 import { WorldIcon } from "@/components/icons/AppIcons";
@@ -120,9 +120,7 @@ function TeacherDashboardPage() {
         },
       ]}
     >
-      {tab === "classes" && !openClass && (
-        <TopStrengths students={students} classes={classes} assigned={assigned} />
-      )}
+      {tab === "classes" && !openClass && <SchoolTopStrengths />}
 
       {tab === "classes" && !openClass && <CreateClass onCreated={refresh} />}
 
@@ -175,7 +173,11 @@ function TeacherDashboardPage() {
 
       {tab === "classes" && openClass && selectedClass && (
         <StickyNote seed={`cls-detail-${openClass}`} className="space-y-4 overflow-x-auto">
-          <Button variant="outline" className="rounded-full" onClick={() => setOpenClass(null)}>
+          <Button
+            variant="outline"
+            className="rounded-full border-transparent bg-[color:var(--purple)] text-white hover:bg-[color:var(--purple)]/90 hover:text-white"
+            onClick={() => setOpenClass(null)}
+          >
             {tr("Takaisin luokkiin")}
           </Button>
           <h2 className="text-2xl font-bold">{selectedClass.name}</h2>
@@ -548,82 +550,6 @@ function countStrengths(
   return [...counts.entries()]
     .map(([id, e]) => ({ id, total: e.total, students: e.students.size }))
     .sort((a, b) => b.total - a.total || a.id - b.id);
-}
-
-function TopStrengths({
-  students,
-  classes,
-  assigned,
-}: {
-  students: TeacherStudent[];
-  classes: TeacherClass[];
-  assigned: { student_id: string; strength_id: string }[];
-}) {
-  const tr = useTr();
-  const { language } = useLanguage();
-  const lang = language === "sv" ? "sv" : language === "en" ? "en" : "fi";
-  const top = useMemo(() => countStrengths(students, assigned).slice(0, 5), [students, assigned]);
-
-  const colorOf = (id: number) => ALL_STRENGTHS.find((s) => s.id === id)?.color ?? "var(--purple)";
-
-  return (
-    <StickyNote seed="t-top-strengths" className="space-y-4 md:col-span-2">
-      <h2 className="text-2xl font-bold">{tr("Ryhmän suosituimmat vahvuudet")}</h2>
-      {top.length === 0 ? (
-        <p className="opacity-70">{tr("Opiskelijasi eivät ole vielä keränneet vahvuuksia.")}</p>
-      ) : (
-        <TopStrengthCards
-          items={top.map((x) => ({
-            id: x.id,
-            count: x.total,
-            caption: `${x.students} ${tr("opiskelijaa")}`,
-          }))}
-          lang={lang}
-        />
-      )}
-
-      {classes.length > 0 && (
-        <div className="grid gap-3 md:grid-cols-2">
-          {classes.map((c) => {
-            const inClass = students.filter((s) => s.classId === c.id);
-            const list = countStrengths(inClass, assigned);
-            return (
-              <div key={c.id} className="rounded-2xl bg-white/70 p-3 text-slate-900">
-                <div className="font-bold">{c.name}</div>
-                {list.length === 0 ? (
-                  <p className="text-sm opacity-70">
-                    {tr("Opiskelijasi eivät ole vielä keränneet vahvuuksia.")}
-                  </p>
-                ) : (
-                  <>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {list.slice(0, 3).map((s, i) => (
-                        <span
-                          key={s.id}
-                          className="flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-medium shadow-sm"
-                        >
-                          <span className="opacity-60">#{i + 1}</span>
-                          <span
-                            className="h-3 w-3 rounded-full"
-                            style={{ background: colorOf(s.id) }}
-                            aria-hidden
-                          />
-                          {getStrengthName(s.id, lang)} ×{s.total}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="mt-2 text-xs opacity-70">
-                      {list.length}/26 · {tr("uusia vahvuuksia kerätty")}
-                    </div>
-                  </>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </StickyNote>
-  );
 }
 
 function TeacherReports({

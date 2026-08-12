@@ -65,7 +65,7 @@ const COPY = {
     loadError: "Läraruppgifterna kunde inte laddas.",
     databaseUpdate: "Databasuppdateringen för lärarhantering saknas. Kontakta administratören.",
     added: "Läraren har lagts till i klassen.",
-    removed: "Läraren har tagits bort från klassen.",
+    removed: "Läraren har tagits bort ur klassen.",
     transferred: "Klassens ägarskap har överförts.",
     confirmRemove: "Ta bort den här läraren från klassen?",
     confirmTransfer: "Överför klassens ägarskap till",
@@ -204,15 +204,17 @@ export function ClassTeacherManager({ classId }: { classId: string }) {
       <div className="space-y-2 border-t border-black/10 pt-3">
         <h4 className="font-semibold">{text.addTeacher}</h4>
         {available.length > 0 ? (
-          <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <select
               value={selectedTeacherId}
               onChange={(event) => setSelectedTeacherId(event.target.value)}
-              className="h-10 min-w-0 flex-1 rounded-md border border-input bg-background px-3 text-sm"
+              className="h-10 w-full rounded-full border border-[color:var(--purple)] bg-[color:var(--purple)] px-4 text-sm font-medium text-white outline-none focus:ring-2 focus:ring-[color:var(--purple)]/30 sm:w-[28rem] sm:flex-none"
             >
-              <option value="">{text.chooseTeacher}</option>
+              <option value="" className="bg-white text-slate-900">
+                {text.chooseTeacher}
+              </option>
               {available.map((teacher) => (
-                <option key={teacher.id} value={teacher.id}>
+                <option key={teacher.id} value={teacher.id} className="bg-white text-slate-900">
                   {teacher.name || teacher.id.slice(0, 8)}
                 </option>
               ))}
@@ -227,7 +229,7 @@ export function ClassTeacherManager({ classId }: { classId: string }) {
                   text.added,
                 );
               }}
-              className="rounded-full bg-[color:var(--purple)] font-bold text-white hover:bg-[color:var(--purple)]/90"
+              className="self-start rounded-full bg-[color:var(--purple)] font-bold text-white hover:bg-[color:var(--purple)]/90 sm:self-auto"
             >
               {text.add}
             </Button>
