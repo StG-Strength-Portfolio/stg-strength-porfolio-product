@@ -1,8 +1,8 @@
 /**
  * @lovable-new 2026-07-31
  * Strength Sprint — teacher/host view. Create → waiting room → live progress
- * → podium, driven by Supabase Realtime for real teachers and entirely local
- * fictional state while a Superadmin is demonstrating the product.
+ * → podium, driven by Supabase Realtime for real teachers and a temporary
+ * guest Sprint when a Superadmin is demonstrating the product.
  */
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { StickyNote } from "@/components/StickyNote";
 import { DashboardShell } from "@/components/DashboardShell";
+import { DemoGuestSprintHost } from "@/components/demo/DemoGuestSprintHost";
 import { supabase } from "@/integrations/supabase/client";
 import { useRoleGuard } from "@/lib/role-guard";
 import { useLanguage, useTr } from "@/lib/i18n";
@@ -33,7 +34,7 @@ function TeacherSprintPage() {
   const lang = language === "sv" ? "sv" : language === "en" ? "en" : "fi";
   const guard = useRoleGuard(["teacher"]);
   const navigate = useNavigate();
-  const { classes, students } = useTeacherData();
+  const { classes } = useTeacherData();
 
   const [classId, setClassId] = useState("");
   const [sprintId, setSprintId] = useState<string | null>(null);
@@ -99,24 +100,6 @@ function TeacherSprintPage() {
     setBusy(true);
     try {
       const klass = classes.find((c) => c.id === classId);
-      if (guard.preview) {
-        const demoPlayers = students
-          .filter((student) => student.classId === classId)
-          .slice(0, 12)
-          .map((student, index) => ({
-            studentId: student.studentId,
-            name: student.displayName ?? `Student ${index + 1}`,
-            isCompleted: false,
-          }));
-        setSprintId(`demo-sprint-${Date.now()}`);
-        setCode(`NB${String(Math.floor(1000 + Math.random() * 9000))}`);
-        setPlayers(demoPlayers);
-        setSent([]);
-        setStatus("waiting");
-        toast.success(`${tr("Vahvuussprintti")} — ${klass?.name ?? ""}`);
-        return;
-      }
-
       const { data: gen, error: genErr } = await supabase.rpc("generate_sprint_code" as never);
       if (genErr) throw genErr;
       const joinCode = String(gen);
@@ -146,23 +129,6 @@ function TeacherSprintPage() {
 
   async function setSprintStatus(next: Status) {
     if (!sprintId) return;
-    if (guard.preview) {
-      setStatus(next);
-      if (next === "active") {
-        setPlayers((current) => current.map((player, index) => ({ ...player, isCompleted: index < Math.ceil(current.length * 0.75) })));
-        const demoSent: Array<{ strength_id: string }> = [];
-        const total = players.length * Math.max(players.length - 1, 0);
-        for (let i = 0; i < Math.max(18, Math.round(total * 0.78)); i++) {
-          demoSent.push({ strength_id: String(((i * 5 + 6) % 26) + 1) });
-        }
-        setSent(demoSent);
-      }
-      if (next === "completed") {
-        setPlayers((current) => current.map((player) => ({ ...player, isCompleted: true })));
-      }
-      return;
-    }
-
     const patch: Record<string, unknown> = { status: next };
     if (next === "active") patch["started_at"] = new Date().toISOString();
     if (next === "completed") patch["ended_at"] = new Date().toISOString();
@@ -179,9 +145,7 @@ function TeacherSprintPage() {
 
   async function cancelSprint() {
     if (!sprintId) return;
-    if (!guard.preview) {
-      await supabase.from("sprint_sessions" as never).delete().eq("id", sprintId);
-    }
+    await supabase.from("sprint_sessions" as never).delete().eq("id", sprintId);
     setSprintId(null);
     setCode("");
     setPlayers([]);
@@ -202,6 +166,25 @@ function TeacherSprintPage() {
   }, [sent]);
 
   if (!guard.ready) return null;
+
+  if (guard.preview) {
+    return (
+      <DashboardShell
+        title={tr("Vahvuussprintti")}
+        tabs={[]}
+        active=""
+        onSelect={() => undefined}
+        schoolName={guard.schoolName}
+        persistLanguage={false}
+        links={[
+          { to: "/teacher/dashboard", label: tr("Takaisin") },
+          { to: "/teacher/profile", label: tr("Profiili") },
+        ]}
+      >
+        <DemoGuestSprintHost />
+      </DashboardShell>
+    );
+  }
 
   return (
     <DashboardShell

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { CornerBlobs } from "@/components/CornerBlobs";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -28,6 +29,7 @@ import {
 } from "@/lib/superadmin-preview";
 import { setStudentViewMode } from "@/lib/progression";
 import { resetDemoState } from "@/lib/demo-store";
+import { deleteDemoSprintsForHost } from "@/lib/demo-sprint.functions";
 
 export interface ShellTab {
   id: string;
@@ -90,6 +92,7 @@ export function DashboardShell({
   const navigate = useNavigate();
   const preview = getSuperAdminPreview();
   const rolePreview = preview.mode === "teacher" || preview.mode === "principal";
+  const deleteGuestSprints = useServerFn(deleteDemoSprintsForHost);
 
   const demoText =
     language === "en"
@@ -129,6 +132,19 @@ export function DashboardShell({
           : "/school-admin/dashboard";
   }
 
+  async function resetPreview() {
+    // Closing the temporary guest Sprint first ensures every QR/passcode from
+    // the reset demo becomes invalid immediately. Exiting/switching roles does
+    // not call this, so an in-progress workshop survives navigation/refreshes.
+    try {
+      await deleteGuestSprints();
+    } catch (error) {
+      console.warn("[demo-reset] guest Sprint cleanup", error);
+    }
+    resetDemoState();
+    window.location.reload();
+  }
+
   return (
     <div className="relative min-h-screen bg-background text-foreground">
       <CornerBlobs />
@@ -153,10 +169,7 @@ export function DashboardShell({
             ))}
             <button
               type="button"
-              onClick={() => {
-                resetDemoState();
-                window.location.reload();
-              }}
+              onClick={() => void resetPreview()}
               className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[color:var(--purple)] shadow-sm"
             >
               {resetLabel}
