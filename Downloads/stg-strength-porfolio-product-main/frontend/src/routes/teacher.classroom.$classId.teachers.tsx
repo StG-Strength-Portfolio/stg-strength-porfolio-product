@@ -161,10 +161,16 @@ function ClassroomTeachersPage() {
   if (!guard.ready) return null;
 
   return (
-    <DashboardShell title={text.pageTitle} schoolName={guard.schoolName}>
+    <DashboardShell
+      title={text.pageTitle}
+      tabs={[]}
+      active=""
+      onSelect={() => undefined}
+      schoolName={guard.schoolName}
+    >
       <StickyNote seed={`class-teachers-${classId}`} className="space-y-5">
         <Link
-          to="/teacher/dashboard"
+          to="/teacher/classrooms/teachers"
           className="inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold"
         >
           {text.back}
