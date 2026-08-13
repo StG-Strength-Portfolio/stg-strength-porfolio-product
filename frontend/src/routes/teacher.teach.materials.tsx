@@ -5,6 +5,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DashboardShell } from "@/components/DashboardShell";
 import { MaterialsBrowser } from "@/components/teach/MaterialsBrowser";
+import { ExternalTeachingContentGate } from "@/components/privacy/ExternalTeachingContentGate";
 import { useRoleGuard } from "@/lib/role-guard";
 import { useTr } from "@/lib/i18n";
 
@@ -45,7 +46,14 @@ function TeacherMaterialsPage() {
         { to: "/teacher/teach/portfolio", label: tr("Vahvuusportfolio") },
       ]}
     >
-      <MaterialsBrowser />
+      <ExternalTeachingContentGate
+        userId={guard.userId}
+        schoolId={guard.schoolId}
+        privacyRegion={guard.privacyRegion}
+        preview={guard.preview}
+      >
+        <MaterialsBrowser />
+      </ExternalTeachingContentGate>
     </DashboardShell>
   );
 }

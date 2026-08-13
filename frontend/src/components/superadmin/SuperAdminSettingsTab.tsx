@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { StickyNote } from "@/components/StickyNote";
+import { SchoolPrivacyRegionsSettings } from "@/components/superadmin/SchoolPrivacyRegionsSettings";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/lib/i18n";
 
@@ -176,76 +177,80 @@ export function SuperAdminSettingsTab() {
   }
 
   return (
-    <StickyNote seed="sa-settings" className="space-y-5">
-      <div>
-        <h2 className="text-2xl font-bold">{copy.title}</h2>
-        <p className="mt-1 text-sm opacity-70">{copy.account}</p>
-      </div>
+    <div className="space-y-6">
+      <StickyNote seed="sa-settings" className="space-y-5">
+        <div>
+          <h2 className="text-2xl font-bold">{copy.title}</h2>
+          <p className="mt-1 text-sm opacity-70">{copy.account}</p>
+        </div>
 
-      {loading ? (
-        <p className="text-sm opacity-70">{copy.loading}</p>
-      ) : (
-        <form onSubmit={save} className="space-y-5">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="sa-settings-name">{copy.name}</Label>
-              <Input
-                id="sa-settings-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                autoComplete="name"
-                required
-              />
+        {loading ? (
+          <p className="text-sm opacity-70">{copy.loading}</p>
+        ) : (
+          <form onSubmit={save} className="space-y-5">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="sa-settings-name">{copy.name}</Label>
+                <Input
+                  id="sa-settings-name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  autoComplete="name"
+                  required
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="sa-settings-email">{copy.email}</Label>
+                <Input
+                  id="sa-settings-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                  required
+                />
+                <p className="text-xs opacity-60">{copy.emailHint}</p>
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="sa-settings-email">{copy.email}</Label>
-              <Input
-                id="sa-settings-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                required
-              />
-              <p className="text-xs opacity-60">{copy.emailHint}</p>
-            </div>
-          </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="sa-settings-password">{copy.newPassword}</Label>
-              <Input
-                id="sa-settings-password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="new-password"
-                minLength={6}
-              />
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="sa-settings-password">{copy.newPassword}</Label>
+                <Input
+                  id="sa-settings-password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="new-password"
+                  minLength={6}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="sa-settings-password-confirm">{copy.confirmPassword}</Label>
+                <Input
+                  id="sa-settings-password-confirm"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  autoComplete="new-password"
+                  minLength={6}
+                />
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="sa-settings-password-confirm">{copy.confirmPassword}</Label>
-              <Input
-                id="sa-settings-password-confirm"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                autoComplete="new-password"
-                minLength={6}
-              />
-            </div>
-          </div>
-          <p className="text-xs opacity-60">{copy.passwordHint}</p>
+            <p className="text-xs opacity-60">{copy.passwordHint}</p>
 
-          <Button
-            type="submit"
-            disabled={busy}
-            className="rounded-full bg-[color:var(--purple)] px-6 font-bold text-white hover:bg-[color:var(--purple)]/90"
-          >
-            {busy ? copy.saving : copy.save}
-          </Button>
-        </form>
-      )}
-    </StickyNote>
+            <Button
+              type="submit"
+              disabled={busy}
+              className="rounded-full bg-[color:var(--purple)] px-6 font-bold text-white hover:bg-[color:var(--purple)]/90"
+            >
+              {busy ? copy.saving : copy.save}
+            </Button>
+          </form>
+        )}
+      </StickyNote>
+
+      <SchoolPrivacyRegionsSettings />
+    </div>
   );
 }
