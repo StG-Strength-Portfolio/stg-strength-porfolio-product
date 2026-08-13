@@ -33,6 +33,13 @@ import { cn } from "@/lib/utils";
 import { WorldIcon } from "@/components/icons/AppIcons";
 import { TopStrengthCards } from "@/components/strengths/TopStrengthCards";
 import { StudentDetailReport } from "@/components/students/StudentDetailReport";
+import { getSuperAdminPreview } from "@/lib/superadmin-preview";
+import {
+  createDemoClass,
+  deleteDemoClass,
+  giveDemoStudentStrength,
+  restoreDemoClass,
+} from "@/lib/demo-store";
 
 import { ReportTrends, RangeSelector } from "@/components/reports/ReportTrends";
 import type { RangeDays, ReportEvent } from "@/lib/report-series";
@@ -135,7 +142,6 @@ function TeacherDashboardPage() {
         if (id !== "classes") setOpenClass(null);
       }}
       schoolName={guard.schoolName}
-      /* @lovable-new */
       links={[
         { to: "/teacher/sprint", label: tr("Vahvuussprintti") },
         { to: "/teacher/profile", label: tr("Profiili") },
@@ -485,15 +491,19 @@ function AssignStrengths({
     if (!ok) return;
     setBusy(true);
     try {
-      const { error } = await supabase.from("teacher_assigned_strengths" as never).insert(
-        strengthIds.map((id) => ({
-          teacher_id: teacherId,
-          student_id: studentId,
-          strength_id: String(id),
-          message: message.trim() || null,
-        })) as never,
-      );
-      if (error) throw error;
+      if (getSuperAdminPreview().mode === "teacher") {
+        giveDemoStudentStrength(studentId, strengthIds, message);
+      } else {
+        const { error } = await supabase.from("teacher_assigned_strengths" as never).insert(
+          strengthIds.map((id) => ({
+            teacher_id: teacherId,
+            student_id: studentId,
+            strength_id: String(id),
+            message: message.trim() || null,
+          })) as never,
+        );
+        if (error) throw error;
+      }
       toast.success(`${strengthIds.length} ${tr("vahvuutta lähetetty!")}`);
       setMessage("");
       setStrengthIds([]);
@@ -613,7 +623,6 @@ function AssignStrengths({
   );
 }
 
-/** Counts every collected strength id for a set of students (+ teacher gifts). */
 function countStrengths(
   students: TeacherStudent[],
   assigned: { student_id: string; strength_id: string }[],
@@ -781,15 +790,19 @@ function CreateClass({
     if (!name.trim()) return;
     setBusy(true);
     try {
-      const { data: u } = await supabase.auth.getUser();
-      if (!u.user) return;
-      const { error } = await supabase.from("classes" as never).insert({
-        name: name.trim(),
-        teacher_id: u.user.id,
-        join_code: randomCode(),
-        language,
-      } as never);
-      if (error) throw error;
+      if (getSuperAdminPreview().mode === "teacher") {
+        createDemoClass(name.trim(), language);
+      } else {
+        const { data: u } = await supabase.auth.getUser();
+        if (!u.user) return;
+        const { error } = await supabase.from("classes" as never).insert({
+          name: name.trim(),
+          teacher_id: u.user.id,
+          join_code: randomCode(),
+          language,
+        } as never);
+        if (error) throw error;
+      }
       setName("");
       toast.success(tr("Tallennettu!"));
       await onCreated();
@@ -862,15 +875,19 @@ function DeleteClassButton({
     if (!ok) return;
     setBusy(true);
     try {
-      const { error } = await supabase
-        .from("classes" as never)
-        .update({
-          is_deleted: true,
-          deleted_at: new Date().toISOString(),
-          deleted_by: teacherId,
-        } as never)
-        .eq("id", klass.id);
-      if (error) throw error;
+      if (getSuperAdminPreview().mode === "teacher") {
+        deleteDemoClass(klass.id);
+      } else {
+        const { error } = await supabase
+          .from("classes" as never)
+          .update({
+            is_deleted: true,
+            deleted_at: new Date().toISOString(),
+            deleted_by: teacherId,
+          } as never)
+          .eq("id", klass.id);
+        if (error) throw error;
+      }
       toast.success(tr("Luokka poistettu."));
       await onDone();
     } catch (e) {
@@ -912,11 +929,15 @@ function DeletedClasses({
   async function restore(id: string) {
     setBusy(id);
     try {
-      const { error } = await supabase
-        .from("classes" as never)
-        .update({ is_deleted: false, deleted_at: null, deleted_by: null } as never)
-        .eq("id", id);
-      if (error) throw error;
+      if (getSuperAdminPreview().mode === "teacher") {
+        restoreDemoClass(id);
+      } else {
+        const { error } = await supabase
+          .from("classes" as never)
+          .update({ is_deleted: false, deleted_at: null, deleted_by: null } as never)
+          .eq("id", id);
+        if (error) throw error;
+      }
       toast.success(tr("Luokka palautettu."));
       await onDone();
     } catch (e) {
