@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { CornerBlobs } from "@/components/CornerBlobs";
@@ -37,6 +37,7 @@ export interface ShellTab {
 }
 
 type IconCmp = (p: { size?: number; className?: string }) => ReactNode;
+type ShellLink = { to: string; label: string };
 
 const TAB_ICONS: Record<string, IconCmp> = {
   overview: HomeIcon,
@@ -66,6 +67,35 @@ export function iconForRoute(to: string): IconCmp {
 
 const HeartOrGift: IconCmp = GiftIcon;
 
+function mergeCommunityLinks(
+  current: ShellLink[] | undefined,
+  area: "teacher" | "school-admin" | null,
+  labels: { give: string; sprint: string; profile: string },
+): ShellLink[] {
+  const base = current ?? [];
+  if (!area) return base;
+
+  const prefix = area === "teacher" ? "/teacher" : "/school-admin";
+  const communityPaths = new Set([
+    `${prefix}/give-strength`,
+    `${prefix}/sprint`,
+    `${prefix}/profile`,
+  ]);
+  const backPath = `${prefix}/dashboard`;
+  const backLinks = base.filter((link) => link.to === backPath);
+  const otherLinks = base.filter(
+    (link) => link.to !== backPath && !communityPaths.has(link.to),
+  );
+
+  return [
+    ...backLinks,
+    { to: `${prefix}/give-strength`, label: labels.give },
+    { to: `${prefix}/sprint`, label: labels.sprint },
+    { to: `${prefix}/profile`, label: labels.profile },
+    ...otherLinks,
+  ];
+}
+
 export function DashboardShell({
   title,
   tabs,
@@ -83,17 +113,30 @@ export function DashboardShell({
   onSelect: (id: string) => void;
   schoolName?: string | null;
   persistLanguage?: boolean;
-  links?: Array<{ to: string; label: string }>;
-  sections?: Array<{ label: string; links: Array<{ to: string; label: string }> }>;
+  links?: ShellLink[];
+  sections?: Array<{ label: string; links: ShellLink[] }>;
   children: ReactNode;
 }) {
   const tr = useTr();
   const { language } = useLanguage();
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const preview = getSuperAdminPreview();
   const rolePreview = preview.mode === "teacher" || preview.mode === "principal";
   const deleteGuestSprints = useServerFn(deleteDemoSprintsForHost);
-  const isTeacherDashboard = links?.some((link) => link.to === "/teacher/sprint") ?? false;
+
+  const area = pathname.startsWith("/teacher")
+    ? "teacher"
+    : pathname.startsWith("/school-admin")
+      ? "school-admin"
+      : null;
+  const communityLabels = {
+    give: language === "en" ? "Give a strength" : language === "sv" ? "Ge en styrka" : "Anna vahvuus",
+    sprint: language === "en" ? "Strength Sprint" : language === "sv" ? "Styrkesprint" : "Vahvuussprintti",
+    profile: language === "en" ? "Profile" : language === "sv" ? "Profil" : "Profiili",
+  };
+  const effectiveLinks = mergeCommunityLinks(links, area, communityLabels);
+  const isTeacherDashboard = area === "teacher";
 
   const demoText =
     language === "en"
@@ -229,41 +272,41 @@ export function DashboardShell({
                 );
               })}
             </nav>
-            {links && links.length > 0 && (
+            {effectiveLinks.length > 0 && (
               <nav className="mt-3 space-y-1.5 border-t border-white/20 pt-3">
-                {links.map((l) => (
+                {effectiveLinks.map((link) => (
                   <Link
-                    key={l.to}
-                    to={l.to}
+                    key={link.to}
+                    to={link.to}
                     className="flex w-full items-center gap-2 rounded-2xl px-4 py-2.5 text-left text-sm font-semibold text-white/90 transition-all hover:bg-white/15"
                     activeProps={{ className: "bg-white text-[color:var(--purple)] shadow-md" }}
                   >
                     {(() => {
-                      const Icon = iconForRoute(l.to);
+                      const Icon = iconForRoute(link.to);
                       return <Icon size={18} className="shrink-0" />;
                     })()}
-                    <span className="min-w-0 break-words">{l.label}</span>
+                    <span className="min-w-0 break-words">{link.label}</span>
                   </Link>
                 ))}
               </nav>
             )}
-            {effectiveSections.map((sec) => (
-              <nav key={sec.label} className="mt-3 space-y-1.5 border-t border-white/20 pt-3">
+            {effectiveSections.map((section) => (
+              <nav key={section.label} className="mt-3 space-y-1.5 border-t border-white/20 pt-3">
                 <p className="px-4 pb-1 text-xs font-bold uppercase tracking-wider text-white/60">
-                  {sec.label}
+                  {section.label}
                 </p>
-                {sec.links.map((l) => (
+                {section.links.map((link) => (
                   <Link
-                    key={l.to}
-                    to={l.to}
+                    key={link.to}
+                    to={link.to}
                     className="flex w-full items-center gap-2 rounded-2xl px-4 py-2.5 text-left text-sm font-semibold text-white/90 transition-all hover:bg-white/15"
                     activeProps={{ className: "bg-white text-[color:var(--purple)] shadow-md" }}
                   >
                     {(() => {
-                      const Icon = iconForRoute(l.to);
+                      const Icon = iconForRoute(link.to);
                       return <Icon size={18} className="shrink-0" />;
                     })()}
-                    <span className="min-w-0 break-words">{l.label}</span>
+                    <span className="min-w-0 break-words">{link.label}</span>
                   </Link>
                 ))}
               </nav>
@@ -318,6 +361,25 @@ export function DashboardShell({
               );
             })}
           </nav>
+
+          {effectiveLinks.length > 0 && (
+            <nav className="flex flex-wrap gap-2 md:hidden">
+              {effectiveLinks.map((link) => {
+                const Icon = iconForRoute(link.to);
+                return (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    className="flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 text-xs font-semibold text-foreground"
+                    activeProps={{ className: "bg-[color:var(--purple)] text-white shadow" }}
+                  >
+                    <Icon size={14} />
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </nav>
+          )}
 
           <div className={cn(isTeacherDashboard && "space-y-6 [&>.grid]:gap-6")}>{children}</div>
 

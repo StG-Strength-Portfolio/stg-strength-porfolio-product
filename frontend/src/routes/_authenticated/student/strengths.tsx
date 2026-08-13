@@ -20,12 +20,12 @@ export const Route = createFileRoute("/_authenticated/student/strengths")({
       { title: "Vahvuuteni — Vahvuusseikkailu" },
       {
         name: "description",
-        content: "Katso valitsemasi, keräämäsi ja opettajilta saamasi vahvuudet.",
+        content: "Katso valitsemasi, keräämäsi ja saamasi vahvuudet.",
       },
       { property: "og:title", content: "Vahvuuteni — Vahvuusseikkailu" },
       {
         property: "og:description",
-        content: "Katso valitsemasi, keräämäsi ja opettajilta saamasi vahvuudet.",
+        content: "Katso valitsemasi, keräämäsi ja saamasi vahvuudet.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -33,9 +33,28 @@ export const Route = createFileRoute("/_authenticated/student/strengths")({
   }),
 });
 
+const RECEIVED_COPY = {
+  fi: {
+    title: "Saadut vahvuudet",
+    empty: "Et ole vielä saanut vahvuuksia.",
+    giver: "Vahvuuden antaja",
+  },
+  en: {
+    title: "Received strengths",
+    empty: "You have not received any strengths yet.",
+    giver: "Giver",
+  },
+  sv: {
+    title: "Mottagna styrkor",
+    empty: "Du har inte fått några styrkor ännu.",
+    giver: "Givare",
+  },
+} as const;
+
 function StudentStrengthsPage() {
   const tr = useTr();
   const { language } = useLanguage();
+  const receivedText = RECEIVED_COPY[language];
   const lang = language === "sv" ? "sv" : language === "en" ? "en" : "fi";
   const { selected, collected } = useStrengthJar();
   const { gifts } = useReceivedGifts();
@@ -50,7 +69,7 @@ function StudentStrengthsPage() {
         const res = (await fetchPeers()) as PeerTopStrengths;
         if (!cancelled) setPeers(res);
       } catch {
-        /* peers are optional extra context */
+        // Peers are optional extra context.
       }
     })();
     return () => {
@@ -58,8 +77,7 @@ function StudentStrengthsPage() {
     };
   }, [fetchPeers]);
 
-  // How many times each strength has been earned: candy-shop picks, jar
-  // discoveries anywhere in the adventure, and each teacher gift.
+  // Every received community/Sprint gift contributes to the same collection.
   const counts = new Map<number, number>();
   const bump = (id: number) => {
     if (!Number.isFinite(id)) return;
@@ -67,7 +85,7 @@ function StudentStrengthsPage() {
   };
   selected.forEach(bump);
   collected.forEach(bump);
-  gifts.forEach((g) => bump(Number(g.strength_id)));
+  gifts.forEach((gift) => bump(Number(gift.strength_id)));
 
   const uniqueCount = ALL_STRENGTHS.filter((s) => (counts.get(s.id) ?? 0) > 0).length;
   const totalCount = Array.from(counts.values()).reduce((a, b) => a + b, 0);
@@ -89,15 +107,15 @@ function StudentStrengthsPage() {
     return (
       <div className="flex flex-wrap gap-2">
         {ids.map((id) => {
-          const s = ALL_STRENGTHS.find((x) => x.id === id);
-          if (!s) return null;
+          const strength = ALL_STRENGTHS.find((x) => x.id === id);
+          if (!strength) return null;
           return (
             <span
               key={id}
               className="flex items-center gap-2 rounded-full border-l-4 bg-white/90 px-3 py-1.5 text-xs font-medium text-slate-900 shadow-sm"
-              style={{ borderLeftColor: s.color }}
+              style={{ borderLeftColor: strength.color }}
             >
-              <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: s.color }} />
+              <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: strength.color }} />
               {getStrengthName(id, lang)}
             </span>
           );
@@ -106,8 +124,12 @@ function StudentStrengthsPage() {
     );
   }
 
-  const top5 = ALL_STRENGTHS.map((s) => ({ id: s.id, color: s.color, n: counts.get(s.id) ?? 0 }))
-    .filter((s) => s.n > 0)
+  const top5 = ALL_STRENGTHS.map((strength) => ({
+    id: strength.id,
+    color: strength.color,
+    n: counts.get(strength.id) ?? 0,
+  }))
+    .filter((strength) => strength.n > 0)
     .sort((a, b) => b.n - a.n || a.id - b.id)
     .slice(0, 5);
 
@@ -180,28 +202,28 @@ function StudentStrengthsPage() {
         </p>
 
         <ul className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
-          {ALL_STRENGTHS.map((s) => {
-            const n = counts.get(s.id) ?? 0;
+          {ALL_STRENGTHS.map((strength) => {
+            const n = counts.get(strength.id) ?? 0;
             const tier = tierOf(n);
             return (
               <li
-                key={s.id}
+                key={strength.id}
                 className={
                   "flex items-center justify-between gap-2 rounded-xl border-l-4 bg-white/90 px-3 py-2 text-sm text-slate-900 shadow-sm transition-all " +
                   (n === 0 ? "opacity-40 " : "") +
                   (tier.glow ? "ring-2 ring-[color:var(--yellow)] shadow-md" : "")
                 }
-                style={{ borderLeftColor: s.color }}
+                style={{ borderLeftColor: strength.color }}
               >
                 <span className="flex min-w-0 items-center gap-2">
                   <span
                     className="h-2.5 w-2.5 shrink-0 rounded-full"
-                    style={{ background: s.color }}
+                    style={{ background: strength.color }}
                     aria-hidden
                   />
                   <span className="break-words text-xs leading-snug">
                     {tier.Badge && <tier.Badge size={14} className="mr-1 inline align-[-2px]" />}
-                    {getStrengthName(s.id, lang)}
+                    {getStrengthName(strength.id, lang)}
                   </span>
                 </span>
                 <span className="shrink-0 text-right">
@@ -266,28 +288,28 @@ function StudentStrengthsPage() {
       </StickyNote>
 
       <StickyNote seed="student-strengths-gifts" className="space-y-3">
-        <h2 className="font-display text-xl">{tr("Opettajalta saadut vahvuudet")}</h2>
+        <h2 className="font-display text-xl">{receivedText.title}</h2>
         {gifts.length === 0 ? (
-          <p className="text-sm opacity-70">{tr("Et ole vielä saanut vahvuuksia opettajalta.")}</p>
+          <p className="text-sm opacity-70">{receivedText.empty}</p>
         ) : (
           <ul className="grid gap-3 sm:grid-cols-2">
-            {gifts.map((g) => {
-              const id = Number(g.strength_id);
-              const s = ALL_STRENGTHS.find((x) => x.id === id);
+            {gifts.map((gift) => {
+              const id = Number(gift.strength_id);
+              const strength = ALL_STRENGTHS.find((x) => x.id === id);
               return (
                 <li
-                  key={g.id}
+                  key={gift.id}
                   className="rounded-2xl border-l-4 bg-white/90 p-4 text-slate-900 shadow-sm"
-                  style={{ borderLeftColor: s?.color ?? "var(--purple)" }}
+                  style={{ borderLeftColor: strength?.color ?? "var(--purple)" }}
                 >
                   <div className="font-display text-lg">
                     <CandyIcon size={18} className="mr-1 inline align-[-3px]" />
-                    {Number.isFinite(id) ? getStrengthName(id, lang) : g.strength_id}
+                    {Number.isFinite(id) ? getStrengthName(id, lang) : gift.strength_id}
                   </div>
-                  {g.message && <p className="mt-1 text-sm">{g.message}</p>}
+                  {gift.message && <p className="mt-1 text-sm">{gift.message}</p>}
                   <div className="mt-2 text-xs opacity-60">
-                    {g.teacher_name ?? tr("Opettaja")} ·{" "}
-                    {new Date(g.created_at).toLocaleDateString()}
+                    {receivedText.giver}: {gift.teacher_name ?? "—"} ·{" "}
+                    {new Date(gift.created_at).toLocaleDateString()}
                   </div>
                 </li>
               );
