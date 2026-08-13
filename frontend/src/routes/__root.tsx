@@ -13,6 +13,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { LanguageProvider, useLanguage } from "@/lib/i18n";
 
 import appCss from "../styles.css?url";
+import schoolAdminMetricsCss from "../styles/school-admin-metrics.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 const DOCUMENT_TITLE = {
@@ -144,6 +145,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "stylesheet",
         href: appCss,
+      },
+      {
+        rel: "stylesheet",
+        href: schoolAdminMetricsCss,
       },
     ],
   }),
