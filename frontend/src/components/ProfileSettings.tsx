@@ -8,6 +8,7 @@ import { ExternalContentPrivacySettings } from "@/components/privacy/ExternalCon
 import { supabase } from "@/integrations/supabase/client";
 import { useTr } from "@/lib/i18n";
 import { getSuperAdminPreview } from "@/lib/superadmin-preview";
+import { updateDemoProfile } from "@/lib/demo-community";
 import type { PrivacyRegion } from "@/lib/external-content-preferences";
 
 /** Own-profile settings shared by the School Admin and Teacher dashboards. */
@@ -90,9 +91,11 @@ export function ProfileSettings({
     e.preventDefault();
     setBusy(true);
     try {
-      // Sales demo profile fields are intentionally editable for presentation,
-      // but never update the signed-in Superadmin account or customer data.
-      if (getSuperAdminPreview().mode) {
+      const previewMode = getSuperAdminPreview().mode;
+      // Sales demo profile fields are session-only and never update the signed-in
+      // Superadmin account or customer data. Password input is simulated only.
+      if (previewMode === "teacher" || previewMode === "principal") {
+        updateDemoProfile(previewMode, { name, email: mail });
         setPassword("");
         toast.success(tr("Tallennettu!"));
         return;
