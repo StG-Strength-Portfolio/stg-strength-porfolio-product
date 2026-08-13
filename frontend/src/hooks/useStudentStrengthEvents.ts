@@ -4,6 +4,7 @@ import { matchStrengthId, strengthIdsFromResponses } from "@/lib/strength-jar-da
 import type { ReportEvent } from "@/lib/report-series";
 import { getSuperAdminPreview } from "@/lib/superadmin-preview";
 import { getDemoStudentStrengthEvents, onDemoStateChange } from "@/lib/demo-store";
+import { getDemoStudentCommunityEvents } from "@/lib/demo-community";
 
 export function useStudentStrengthEvents() {
   const [events, setEvents] = useState<ReportEvent[]>([]);
@@ -12,7 +13,7 @@ export function useStudentStrengthEvents() {
   const refresh = useCallback(async () => {
     try {
       if (getSuperAdminPreview().mode === "student") {
-        setEvents(getDemoStudentStrengthEvents());
+        setEvents([...getDemoStudentStrengthEvents(), ...getDemoStudentCommunityEvents()]);
         return;
       }
 
