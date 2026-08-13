@@ -137,7 +137,13 @@ export function DashboardShell({
   };
   const effectiveLinks = mergeCommunityLinks(links, area, communityLabels);
   const isTeacherDashboard = area === "teacher";
-  const visibleTabs = isTeacherDashboard ? tabs.filter((tab) => tab.id !== "strengths") : tabs;
+  const isSchoolAdminDashboard = area === "school-admin";
+  const hasDashboardCardSpacing = isTeacherDashboard || isSchoolAdminDashboard;
+  const visibleTabs = tabs.filter((tab) => {
+    if (isTeacherDashboard && tab.id === "strengths") return false;
+    if (isSchoolAdminDashboard && tab.id === "settings") return false;
+    return true;
+  });
 
   const demoText =
     language === "en"
@@ -382,7 +388,14 @@ export function DashboardShell({
             </nav>
           )}
 
-          <div className={cn(isTeacherDashboard && "space-y-6 [&>.grid]:gap-6")}>{children}</div>
+          <div
+            className={cn(
+              hasDashboardCardSpacing &&
+                "space-y-6 [&>.grid]:gap-6 [&_button.inline-flex:not(.bg-red-600):not(.bg-red-700)]:bg-[color:var(--yellow)] [&_button.inline-flex:not(.bg-red-600):not(.bg-red-700)]:text-[color:var(--ink)] [&_button.inline-flex:not(.bg-red-600):not(.bg-red-700)]:hover:bg-[color:var(--yellow)] [&_button.inline-flex:not(.bg-red-600):not(.bg-red-700)]:hover:text-[color:var(--ink)] [&_button.inline-flex:not(.bg-red-600):not(.bg-red-700)]:hover:brightness-95",
+            )}
+          >
+            {children}
+          </div>
 
           <p className="pt-6 text-xs opacity-50 md:hidden">{schoolName ?? ""}</p>
         </main>
