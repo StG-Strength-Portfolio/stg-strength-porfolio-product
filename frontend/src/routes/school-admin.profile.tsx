@@ -9,6 +9,8 @@ import { useRoleGuard } from "@/lib/role-guard";
 import { useLanguage } from "@/lib/i18n";
 import { getStrengthColor, getStrengthName } from "@/lib/strengths-i18n";
 import { getMyReceivedStrengths, type ReceivedStrength } from "@/lib/give-strength.functions";
+import { getDemoReceivedStrengths } from "@/lib/demo-community";
+import { onDemoStateChange } from "@/lib/demo-store";
 
 export const Route = createFileRoute("/school-admin/profile")({ component: SchoolAdminProfilePage });
 
@@ -96,20 +98,22 @@ function SchoolAdminProfilePage() {
   const [rows, setRows] = useState<ReceivedStrength[]>([]);
 
   const refresh = useCallback(async () => {
-    if (guard.preview) {
-      setRows([]);
-      return;
-    }
     try {
-      setRows(await load());
+      if (guard.preview && guard.userId) {
+        setRows(getDemoReceivedStrengths(guard.userId, language));
+      } else {
+        setRows(await load());
+      }
     } catch (error) {
       console.error("[school-admin-profile]", error);
     }
-  }, [guard.preview, load]);
+  }, [guard.preview, guard.userId, language, load]);
 
   useEffect(() => {
     if (guard.ready) void refresh();
-  }, [guard.ready, refresh]);
+    if (!guard.preview) return;
+    return onDemoStateChange(() => void refresh());
+  }, [guard.preview, guard.ready, refresh]);
 
   const top5 = useMemo(() => {
     const count = new Map<number, number>();
