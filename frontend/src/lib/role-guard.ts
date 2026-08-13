@@ -8,9 +8,8 @@ import {
   DEMO_SCHOOL_ID,
   DEMO_SCHOOL_NAME,
   DEMO_TEACHER_ID,
-  demoPrincipalName,
-  demoTeacherName,
 } from "@/lib/demo-store";
+import { getDemoProfile } from "@/lib/demo-community";
 import { DEFAULT_LANGUAGE, isLanguage } from "@/lib/i18n";
 import type { PrivacyRegion } from "@/lib/external-content-preferences";
 
@@ -26,7 +25,6 @@ export interface RoleGuardState {
   preview: boolean;
 }
 
-/** Reads the current user's role. Pending staff deliberately have no role. */
 export async function roleOfCurrentUser(): Promise<AppRole | null> {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) return null;
@@ -41,7 +39,6 @@ export async function roleOfCurrentUser(): Promise<AppRole | null> {
   return "student";
 }
 
-/** Where a signed-in user belongs, by role. */
 export function homeForRole(role: AppRole | null): string {
   switch (role) {
     case "super_admin":
@@ -65,12 +62,6 @@ function demoLanguage() {
   return isLanguage(raw) ? raw : DEFAULT_LANGUAGE;
 }
 
-/**
- * Client-side gate for role-scoped dashboards. Superadmins may enter the
- * teacher or principal demo UI only when the explicit session preview mode
- * matches. The principal dashboard itself is client-only, while principal
- * subpages may still reuse the real product routes with fictional identities.
- */
 export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
   const navigate = useNavigate();
   const [state, setState] = useState<RoleGuardState>({
@@ -113,10 +104,7 @@ export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
         const language = demoLanguage();
 
         if (wantsPrincipal) {
-          if (window.location.pathname === "/school-admin/dashboard") {
-            window.location.href = "/superadmin/demo/principal";
-            return;
-          }
+          const profile = getDemoProfile("principal", language);
           if (cancelled) return;
           setState({
             ready: true,
@@ -125,14 +113,15 @@ export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
             schoolId: DEMO_SCHOOL_ID,
             schoolName: DEMO_SCHOOL_NAME,
             privacyRegion: null,
-            displayName: demoPrincipalName(language),
-            email: "principal@northbridge.demo",
+            displayName: profile.name,
+            email: profile.email,
             preview: true,
           });
           return;
         }
 
         if (wantsTeacher) {
+          const profile = getDemoProfile("teacher", language);
           if (cancelled) return;
           setState({
             ready: true,
@@ -141,8 +130,8 @@ export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
             schoolId: DEMO_SCHOOL_ID,
             schoolName: DEMO_SCHOOL_NAME,
             privacyRegion: null,
-            displayName: demoTeacherName(language),
-            email: "emma.johnson@northbridge.demo",
+            displayName: profile.name,
+            email: profile.email,
             preview: true,
           });
           return;
