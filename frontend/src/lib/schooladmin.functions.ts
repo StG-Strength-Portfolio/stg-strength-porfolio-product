@@ -3,6 +3,11 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { matchStrengthId, strengthIdsFromResponses } from "@/lib/strength-jar-data";
 import { createStaffCode } from "@/lib/staff-registration.functions";
 import type { ReportEvent } from "@/lib/report-series";
+import {
+  DEMO_SCHOOL_ID,
+  getDemoSchoolAdminData,
+  getDemoState,
+} from "@/lib/demo-store";
 
 export interface SchoolAdminStudent {
   id: string;
@@ -63,13 +68,18 @@ async function admin() {
   return supabaseAdmin as any;
 }
 
-async function assertSchoolAdmin(supabase: any, userId: string): Promise<string> {
-  const { data: role } = await supabase
+async function currentRole(supabase: any, userId: string): Promise<string | null> {
+  const { data } = await supabase
     .from("user_roles")
     .select("role")
     .eq("user_id", userId)
     .maybeSingle();
-  if (role?.role !== "school_admin") throw new Error("Forbidden");
+  return data?.role ?? null;
+}
+
+async function assertSchoolAdmin(supabase: any, userId: string): Promise<string> {
+  const role = await currentRole(supabase, userId);
+  if (role !== "school_admin") throw new Error("Forbidden");
   const db = await admin();
   const { data: profile } = await db
     .from("profiles")
@@ -80,33 +90,22 @@ async function assertSchoolAdmin(supabase: any, userId: string): Promise<string>
   return profile.school_id as string;
 }
 
-/** Read access for a real principal or a Superadmin principal preview. */
+/** Read access for a real principal or a Superadmin fictional principal preview. */
 async function resolveReadSchool(supabase: any, userId: string): Promise<string> {
-  const { data: role } = await supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userId)
-    .maybeSingle();
-  if (role?.role === "school_admin") return assertSchoolAdmin(supabase, userId);
-  if (role?.role !== "super_admin") throw new Error("Forbidden");
-
-  const db = await admin();
-  const { data: school, error } = await db
-    .from("schools")
-    .select("id")
-    .eq("is_active", true)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (error) throw new Error(error.message);
-  if (!school?.id) throw new Error("No active school available for preview");
-  return school.id as string;
+  const role = await currentRole(supabase, userId);
+  if (role === "school_admin") return assertSchoolAdmin(supabase, userId);
+  if (role === "super_admin") return DEMO_SCHOOL_ID;
+  throw new Error("Forbidden");
 }
 
 export const getSchoolAdminData = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<SchoolAdminData> => {
     const schoolId = await resolveReadSchool(context.supabase, context.userId);
+    if (schoolId === DEMO_SCHOOL_ID) {
+      return getDemoSchoolAdminData("en");
+    }
+
     const db = await admin();
 
     const [{ data: school }, { data: profiles }, { data: roles }, { data: codes }] =
@@ -336,10 +335,14 @@ export const getSchoolAdminData = createServerFn({ method: "GET" })
     };
   });
 
-/** Legacy export name kept for the existing dashboard; now regenerates the shared staff code. */
+/** Legacy export name kept for the existing dashboard; demo calls never write customer data. */
 export const createTeacherCode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    const role = await currentRole(context.supabase, context.userId);
+    if (role === "super_admin") {
+      return { code: `TEACH-DEMO${Math.floor(100 + Math.random() * 900)}` };
+    }
     const schoolId = await assertSchoolAdmin(context.supabase, context.userId);
     return createStaffCode(await admin(), schoolId, context.userId);
   });
@@ -348,6 +351,9 @@ export const revokeTeacherCode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { id: string }) => d)
   .handler(async ({ data, context }) => {
+    const role = await currentRole(context.supabase, context.userId);
+    if (role === "super_admin") return { ok: true };
+
     const schoolId = await assertSchoolAdmin(context.supabase, context.userId);
     const db = await admin();
     const { error } = await db
@@ -364,6 +370,9 @@ export const promoteToSchoolAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { userId: string }) => d)
   .handler(async ({ data, context }) => {
+    const role = await currentRole(context.supabase, context.userId);
+    if (role === "super_admin") return { ok: true };
+
     const schoolId = await assertSchoolAdmin(context.supabase, context.userId);
     const db = await admin();
     const { data: target } = await db
@@ -390,11 +399,25 @@ export const getStudentPortfolio = createServerFn({ method: "GET" })
     }): Promise<{
       name: string | null;
       currentScreen: number | null;
-      responses: { field_key: string; value: string | null }[];
+      responses: { field_key: string; value: unknown }[];
     }> => {
       const schoolId = await resolveReadSchool(context.supabase, context.userId);
-      const db = await admin();
+      if (schoolId === DEMO_SCHOOL_ID) {
+        const demo = getDemoState();
+        const student = demo.students.find((item) => item.id === data.userId);
+        if (!student) throw new Error("Demo student not found");
+        const responses =
+          data.userId === "demo-student-primary"
+            ? Object.entries(demo.studentResponses).map(([field_key, value]) => ({ field_key, value }))
+            : student.filledKeys.map((field_key) => ({ field_key, value: "Demo response" }));
+        return {
+          name: student.name,
+          currentScreen: student.currentScreen,
+          responses,
+        };
+      }
 
+      const db = await admin();
       const { data: profile } = await db
         .from("profiles")
         .select("id, display_name, current_screen, school_id")
@@ -432,7 +455,7 @@ export const getStudentPortfolio = createServerFn({ method: "GET" })
         currentScreen: profile.current_screen ?? null,
         responses: ((rows ?? []) as any[]).map((r) => ({
           field_key: r.field_key as string,
-          value: (r.value ?? null) as string | null,
+          value: r.value ?? null,
         })),
       };
     },
