@@ -21,6 +21,22 @@ const DOCUMENT_TITLE = {
   sv: "Styrkeportfolio",
 } as const;
 
+const LANGUAGE_STORAGE_KEY = "student_language";
+const FINNISH_DOMAIN = "vahvuusportfolio.fi";
+
+function applyHostnameLanguageDefault() {
+  if (typeof window === "undefined") return;
+  if (window.localStorage.getItem(LANGUAGE_STORAGE_KEY)) return;
+
+  const hostname = window.location.hostname.toLowerCase().replace(/\.$/, "");
+  const isFinnishDomain =
+    hostname === FINNISH_DOMAIN || hostname.endsWith(`.${FINNISH_DOMAIN}`);
+
+  if (isFinnishDomain) {
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, "fi");
+  }
+}
+
 function LocalizedDocumentTitle() {
   const { language } = useLanguage();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
@@ -153,6 +169,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  applyHostnameLanguageDefault();
 
   return (
     <QueryClientProvider client={queryClient}>
