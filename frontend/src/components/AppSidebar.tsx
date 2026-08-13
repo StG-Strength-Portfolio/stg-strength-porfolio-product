@@ -6,8 +6,8 @@ import {
   CandyIcon,
   UserIcon,
   WorldIcon,
-  PlayIcon, // @lovable-new
-  StarIcon, // @lovable-new
+  PlayIcon,
+  StarIcon,
 } from "@/components/icons/AppIcons";
 import { toast } from "sonner";
 import {
@@ -24,9 +24,14 @@ import {
 import { WORLDS } from "@/lib/screens";
 import { LevelProgressBar } from "@/components/LevelProgressBar";
 import { supabase } from "@/integrations/supabase/client";
-import { useT, useTr } from "@/lib/i18n";
-// @lovable-new 2026-08-08 — shared progression rules (level locking)
+import { useLanguage, useT, useTr } from "@/lib/i18n";
 import { useProgression } from "@/lib/progression";
+
+const COMMUNITY_COPY = {
+  fi: { sprint: "Vahvuussprintti", give: "Anna vahvuus" },
+  en: { sprint: "Strength Sprint", give: "Give a strength" },
+  sv: { sprint: "Styrkesprint", give: "Ge en styrka" },
+} as const;
 
 export function AppSidebar() {
   const path = useRouterState({ select: (r) => r.location.pathname });
@@ -35,6 +40,8 @@ export function AppSidebar() {
   const [schoolName, setSchoolName] = useState<string | null>(null);
   const t = useT();
   const tr = useTr();
+  const { language } = useLanguage();
+  const communityText = COMMUNITY_COPY[language];
   const hint = t("nav.finishFirst");
 
   useEffect(() => {
@@ -95,13 +102,11 @@ export function AppSidebar() {
                     <CandyIcon size={18} /> <span>{tr("Vahvuuteni")}</span>
                   </Link>
                 </SidebarMenuButton>
-                {/* My strengths stays as a plain navigation row. */}
               </SidebarMenuItem>
-              {/* @lovable-new */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={path === "/student/sprint"}>
                   <Link to="/student/sprint" className="flex items-center gap-2">
-                    <PlayIcon size={18} /> <span>{tr("Vahvuuspeli")}</span>
+                    <PlayIcon size={18} /> <span>{communityText.sprint}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -110,7 +115,7 @@ export function AppSidebar() {
                   <Link to="/student/give-strength" className="flex items-start gap-2">
                     <StarIcon size={18} className="mt-0.5 shrink-0" />
                     <span className="min-w-0 break-words whitespace-normal leading-snug">
-                      {tr("Anna vahvuus opettajallesi")}
+                      {communityText.give}
                     </span>
                   </Link>
                 </SidebarMenuButton>
@@ -131,9 +136,7 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {WORLDS.map((w) => {
-                const inWorld =
-                  activeScreen != null && activeScreen >= w.start && activeScreen <= w.end;
-                /* @lovable-new 2026-08-08 — one shared progression rule */
+                const inWorld = activeScreen != null && activeScreen >= w.start && activeScreen <= w.end;
                 const locked = !progression.canAccessLevel(w);
                 const target = locked
                   ? w.start
@@ -143,8 +146,9 @@ export function AppSidebar() {
                 const title = tr(w.title);
                 const subtitle = tr(w.subtitle);
                 const stats = progression.byWorld?.[w.id];
-                const pct =
-                  stats && stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0;
+                const pct = stats && stats.total > 0
+                  ? Math.round((stats.completed / stats.total) * 100)
+                  : 0;
 
                 return (
                   <SidebarMenuItem key={w.id}>
@@ -154,8 +158,6 @@ export function AppSidebar() {
                       className="h-auto items-start py-2"
                     >
                       <a
-                        /* @lovable-new 2026-08-08 — locked levels are not links:
-                           no href, not focusable, not keyboard-activatable. */
                         href={locked ? undefined : `/seikkailu/${target}`}
                         onClick={go(target, locked)}
                         className={`flex items-start gap-2 whitespace-normal ${locked ? "cursor-not-allowed opacity-60" : ""}`}

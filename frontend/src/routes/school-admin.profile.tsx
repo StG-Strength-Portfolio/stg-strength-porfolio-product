@@ -1,17 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { StickyNote } from "@/components/StickyNote";
 import { DashboardShell } from "@/components/DashboardShell";
 import { ProfileSettings } from "@/components/ProfileSettings";
+import { StickyNote } from "@/components/StickyNote";
 import { TopStrengthCards } from "@/components/strengths/TopStrengthCards";
 import { useRoleGuard } from "@/lib/role-guard";
 import { useLanguage } from "@/lib/i18n";
 import { getStrengthColor, getStrengthName } from "@/lib/strengths-i18n";
 import { getMyReceivedStrengths, type ReceivedStrength } from "@/lib/give-strength.functions";
-import { getPreviewTeacherReceivedStrengths } from "@/lib/superadmin-preview.functions";
 
-export const Route = createFileRoute("/teacher/profile")({ component: TeacherProfilePage });
+export const Route = createFileRoute("/school-admin/profile")({ component: SchoolAdminProfilePage });
 
 const COPY = {
   fi: {
@@ -22,7 +21,7 @@ const COPY = {
     top5: "Saamani Top 5 vahvuudet",
     students: "Oppilailta saadut",
     teachers: "Opettajilta saadut",
-    admins: "Koulun adminilta saadut",
+    admins: "Muilta koulun admineilta saadut",
     empty: "Ei vielä vahvuuksia.",
     noStrengths: "Et ole vielä saanut vahvuuksia.",
     sprintLabel: "Vahvuussprintistä",
@@ -35,7 +34,7 @@ const COPY = {
     top5: "My Top 5 Received Strengths",
     students: "From students",
     teachers: "From teachers",
-    admins: "From principal / school admin",
+    admins: "From other school admins",
     empty: "No strengths yet.",
     noStrengths: "You have not received strengths yet.",
     sprintLabel: "From Strength Sprint",
@@ -48,20 +47,14 @@ const COPY = {
     top5: "Mina 5 främsta mottagna styrkor",
     students: "Från elever",
     teachers: "Från lärare",
-    admins: "Från rektor / skoladministratör",
+    admins: "Från andra skoladministratörer",
     empty: "Inga styrkor ännu.",
     noStrengths: "Du har inte fått några styrkor ännu.",
     sprintLabel: "Från Styrkesprint",
   },
 } as const;
 
-function Feed({
-  title,
-  rows,
-  lang,
-  empty,
-  sprintLabel,
-}: {
+function Feed({ title, rows, lang, empty, sprintLabel }: {
   title: string;
   rows: ReceivedStrength[];
   lang: "fi" | "sv" | "en";
@@ -69,7 +62,7 @@ function Feed({
   sprintLabel: string;
 }) {
   return (
-    <StickyNote seed={`feed-${title}`} className="space-y-3">
+    <StickyNote seed={`admin-feed-${title}`} className="space-y-3">
       <h3 className="text-xl font-bold">{title}</h3>
       {rows.length === 0 && <p className="text-sm opacity-70">{empty}</p>}
       <ul className="space-y-2">
@@ -94,26 +87,25 @@ function Feed({
   );
 }
 
-function TeacherProfilePage() {
-  const guard = useRoleGuard(["teacher"]);
+function SchoolAdminProfilePage() {
+  const guard = useRoleGuard(["school_admin"]);
   const { language } = useLanguage();
   const text = COPY[language];
   const lang = language === "sv" ? "sv" : language === "en" ? "en" : "fi";
   const load = useServerFn(getMyReceivedStrengths);
-  const loadPreview = useServerFn(getPreviewTeacherReceivedStrengths);
   const [rows, setRows] = useState<ReceivedStrength[]>([]);
 
   const refresh = useCallback(async () => {
-    try {
-      if (guard.preview && guard.userId) {
-        setRows(await loadPreview({ data: { teacherId: guard.userId } }));
-      } else {
-        setRows(await load());
-      }
-    } catch (error) {
-      console.error("[teacher-profile]", error);
+    if (guard.preview) {
+      setRows([]);
+      return;
     }
-  }, [guard.preview, guard.userId, load, loadPreview]);
+    try {
+      setRows(await load());
+    } catch (error) {
+      console.error("[school-admin-profile]", error);
+    }
+  }, [guard.preview, load]);
 
   useEffect(() => {
     if (guard.ready) void refresh();
@@ -144,9 +136,9 @@ function TeacherProfilePage() {
       onSelect={() => undefined}
       schoolName={guard.schoolName}
       links={[
-        { to: "/teacher/dashboard", label: text.back },
-        { to: "/teacher/give-strength", label: text.give },
-        { to: "/teacher/sprint", label: text.sprint },
+        { to: "/school-admin/dashboard", label: text.back },
+        { to: "/school-admin/give-strength", label: text.give },
+        { to: "/school-admin/sprint", label: text.sprint },
       ]}
     >
       <div className="space-y-6">
@@ -156,7 +148,7 @@ function TeacherProfilePage() {
           email={guard.email}
         />
 
-        <StickyNote seed="profile-top5" className="space-y-3">
+        <StickyNote seed="school-admin-profile-top5" className="space-y-3">
           <h3 className="text-xl font-bold">{text.top5}</h3>
           {top5.length === 0 ? (
             <p className="text-sm opacity-70">{text.noStrengths}</p>

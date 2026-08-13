@@ -164,6 +164,7 @@ export const getSchoolAdminData = createServerFn({ method: "GET" })
       if ((roleOf.get(m.student_id) ?? "student") === "student") studentIdSet.add(m.student_id);
     }
     const studentIds = Array.from(studentIdSet);
+    const communityIdSet = new Set<string>([...memberIds, ...studentIds]);
 
     const extraProfiles: any[] = [];
     const missingIds = studentIds.filter((id) => !nameOf.has(id));
@@ -215,19 +216,24 @@ export const getSchoolAdminData = createServerFn({ method: "GET" })
 
     const { data: assigned } = await db
       .from("teacher_assigned_strengths")
-      .select("strength_id, student_id, created_at");
+      .select("strength_id, student_id, teacher_id, from_user_id, to_user_id, created_at");
     const counts = new Map<string, number>();
     const giftsPer = new Map<string, number[]>();
     for (const a of (assigned ?? []) as any[]) {
-      if (!studentIds.includes(a.student_id)) continue;
+      const linkedToSchool = [a.from_user_id, a.to_user_id, a.teacher_id, a.student_id]
+        .filter(Boolean)
+        .some((id) => communityIdSet.has(id));
+      if (!linkedToSchool) continue;
+
       counts.set(a.strength_id, (counts.get(a.strength_id) ?? 0) + 1);
       const id = Number.isFinite(Number(a.strength_id))
         ? Number(a.strength_id)
         : matchStrengthId(String(a.strength_id));
-      if (id && id >= 1 && id <= 26) {
-        const list = giftsPer.get(a.student_id) ?? [];
+      const recipientId = a.to_user_id ?? a.student_id;
+      if (id && id >= 1 && id <= 26 && studentIdSet.has(recipientId)) {
+        const list = giftsPer.get(recipientId) ?? [];
         list.push(id);
-        giftsPer.set(a.student_id, list);
+        giftsPer.set(recipientId, list);
       }
     }
 
@@ -250,13 +256,14 @@ export const getSchoolAdminData = createServerFn({ method: "GET" })
       });
     }
     for (const a of (assigned ?? []) as any[]) {
-      if (!studentIdSet.has(a.student_id) || !a.created_at) continue;
+      const recipientId = a.to_user_id ?? a.student_id;
+      if (!studentIdSet.has(recipientId) || !a.created_at) continue;
       const giftId = Number.isFinite(Number(a.strength_id))
         ? Number(a.strength_id)
         : matchStrengthId(String(a.strength_id));
       events.push({
-        userId: a.student_id,
-        classId: classIdOfStudent.get(a.student_id) ?? null,
+        userId: recipientId,
+        classId: classIdOfStudent.get(recipientId) ?? null,
         at: a.created_at,
         strengths: 1,
         strengthIds: giftId ? [giftId] : [],

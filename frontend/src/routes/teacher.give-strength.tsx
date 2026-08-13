@@ -5,8 +5,8 @@ import { SchoolGiftPanel } from "@/components/strengths/SchoolGiftPanel";
 import { useRoleGuard } from "@/lib/role-guard";
 import { useLanguage } from "@/lib/i18n";
 
-export const Route = createFileRoute("/school-admin/give-strength")({
-  component: SchoolAdminGiveStrengthPage,
+export const Route = createFileRoute("/teacher/give-strength")({
+  component: TeacherGiveStrengthPage,
 });
 
 const COPY = {
@@ -33,8 +33,8 @@ const COPY = {
   },
 } as const;
 
-function SchoolAdminGiveStrengthPage() {
-  const guard = useRoleGuard(["school_admin"]);
+function TeacherGiveStrengthPage() {
+  const guard = useRoleGuard(["teacher"]);
   const { language } = useLanguage();
   const text = COPY[language];
   if (!guard.ready) return null;
@@ -47,13 +47,13 @@ function SchoolAdminGiveStrengthPage() {
       onSelect={() => undefined}
       schoolName={guard.schoolName}
       links={[
-        { to: "/school-admin/dashboard", label: text.back },
-        { to: "/school-admin/sprint", label: text.sprint },
-        { to: "/school-admin/profile", label: text.profile },
+        { to: "/teacher/dashboard", label: text.back },
+        { to: "/teacher/sprint", label: text.sprint },
+        { to: "/teacher/profile", label: text.profile },
       ]}
     >
       {guard.preview ? (
-        <StickyNote seed="school-admin-give-strength-preview">
+        <StickyNote seed="teacher-give-strength-preview">
           <p className="text-sm opacity-75">{text.demo}</p>
         </StickyNote>
       ) : (

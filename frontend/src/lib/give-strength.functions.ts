@@ -1,8 +1,14 @@
 /**
- * @lovable-new 2026-07-31
- * Bidirectional strength assignment: student → teacher, school admin → teacher,
- * plus the teacher's "received strengths" feed. All reads/writes are verified
- * server-side; students and teachers never read each other's tables directly.
+ * Same-school strength giving and personal received-strength collections.
+ *
+ * Direct-gift rules:
+ * - student -> teacher / school_admin
+ * - teacher -> student / teacher / school_admin
+ * - school_admin -> student / teacher / school_admin
+ *
+ * Strength Sprint has its own stricter session-participant boundary. Sprint
+ * gifts land in this same permanent collection only when the creator ends the
+ * session.
  */
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -14,9 +20,18 @@ async function admin() {
   return supabaseAdmin as any;
 }
 
+export type SchoolCommunityRole = "student" | "teacher" | "school_admin";
+
 export interface PersonRef {
   id: string;
   name: string;
+  role?: SchoolCommunityRole;
+}
+
+export interface SchoolStrengthRecipient {
+  id: string;
+  name: string;
+  role: SchoolCommunityRole;
 }
 
 export interface ReceivedStrength {
@@ -26,184 +41,156 @@ export interface ReceivedStrength {
   createdAt: string;
   fromName: string;
   fromRole: string;
+  sprintId?: string | null;
 }
 
-/** The signed-in student's class teacher (first active class). */
-export const getMyTeacher = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<PersonRef | null> => {
-    const db = await admin();
-    const { data: memberships } = await db
-      .from("class_members")
-      .select("class_id")
-      .eq("student_id", context.userId);
-    const classIds = ((memberships ?? []) as Array<{ class_id: string }>).map((m) => m.class_id);
-    if (classIds.length === 0) return null;
-    const { data: classes } = await db
-      .from("classes")
-      .select("teacher_id, created_at")
-      .in("id", classIds)
-      .eq("is_deleted", false)
-      .order("created_at", { ascending: false })
-      .limit(1);
-    const teacherId = ((classes ?? []) as Array<{ teacher_id: string }>)[0]?.teacher_id;
-    if (!teacherId) return null;
-    const { data: profile } = await db
-      .from("profiles")
-      .select("display_name")
-      .eq("id", teacherId)
-      .maybeSingle();
-    return { id: teacherId, name: (profile?.display_name as string) ?? "—" };
-  });
-
-/** 1–3 unique strength ids per gift. */
 function pickIds(ids: number[] | undefined): number[] {
-  const list = [...new Set(ids ?? [])].filter((n) => Number.isFinite(n));
+  const list = [...new Set(ids ?? [])].filter((id) => Number.isInteger(id) && id >= 1 && id <= 26);
   if (list.length === 0) throw new Error("No strengths selected");
   return list.slice(0, 3);
 }
 
-async function insertStrength(
-  db: any,
-  args: {
-    fromId: string;
-    toId: string;
-    strengthId: number;
-    message: string | null;
-    fromRole: string;
-    toRole: string;
-  },
-) {
-  const { error } = await db.from("teacher_assigned_strengths").insert({
-    teacher_id: args.toRole === "teacher" ? args.toId : args.fromId,
-    student_id: args.toRole === "teacher" ? args.fromId : args.toId,
-    from_user_id: args.fromId,
-    to_user_id: args.toId,
-    from_role: args.fromRole,
-    to_role: args.toRole,
-    strength_id: String(args.strengthId),
-    message: args.message,
-  });
+async function roleOf(db: any, userId: string): Promise<SchoolCommunityRole> {
+  const { data, error } = await db.rpc("sprint_user_role", { _user_id: userId });
   if (error) throw new Error(error.message);
+  if (data !== "student" && data !== "teacher" && data !== "school_admin") {
+    throw new Error("Unsupported role");
+  }
+  return data;
 }
 
-/** Student gifts a strength to their own class teacher. */
-export const giveStrengthToMyTeacher = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((d: { strengthIds: number[]; message?: string | null }) => d)
-  .handler(async ({ data, context }): Promise<{ ok: true }> => {
-    const db = await admin();
-    const { data: memberships } = await db
-      .from("class_members")
-      .select("class_id")
-      .eq("student_id", context.userId);
-    const classIds = ((memberships ?? []) as Array<{ class_id: string }>).map((m) => m.class_id);
-    if (classIds.length === 0) throw new Error("No class");
+async function schoolOf(db: any, userId: string): Promise<string> {
+  const { data, error } = await db.rpc("user_school_id", { _user_id: userId });
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("No school");
+  return String(data);
+}
+
+async function giveThroughDatabase(
+  supabase: any,
+  recipientId: string,
+  strengthIds: number[],
+  message?: string | null,
+) {
+  const { data, error } = await supabase.rpc("give_school_strength", {
+    p_to_user_id: recipientId,
+    p_strength_ids: pickIds(strengthIds),
+    p_message: message?.trim() || null,
+  });
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+async function schoolCommunity(db: any, userId: string): Promise<{
+  callerRole: SchoolCommunityRole;
+  schoolId: string;
+  people: SchoolStrengthRecipient[];
+}> {
+  const callerRole = await roleOf(db, userId);
+  const schoolId = await schoolOf(db, userId);
+
+  const { data: staffProfiles, error: staffError } = await db
+    .from("profiles")
+    .select("id, display_name")
+    .eq("school_id", schoolId);
+  if (staffError) throw new Error(staffError.message);
+
+  const staffRows = (staffProfiles ?? []) as Array<{ id: string; display_name: string | null }>;
+  const staffIds = staffRows.map((row) => row.id);
+
+  // Students currently inherit school through classroom membership rather than profiles.school_id.
+  const { data: ownerProfiles } = await db.from("profiles").select("id").eq("school_id", schoolId);
+  const ownerIds = ((ownerProfiles ?? []) as Array<{ id: string }>).map((row) => row.id);
+  let studentIds: string[] = [];
+  if (ownerIds.length > 0) {
     const { data: classes } = await db
       .from("classes")
-      .select("teacher_id")
-      .in("id", classIds)
-      .eq("is_deleted", false)
-      .limit(1);
-    const teacherId = ((classes ?? []) as Array<{ teacher_id: string }>)[0]?.teacher_id;
-    if (!teacherId) throw new Error("No teacher");
-    for (const strengthId of pickIds(data.strengthIds)) {
-      await insertStrength(db, {
-        fromId: context.userId,
-        toId: teacherId,
-        strengthId,
-        message: data.message?.trim() || null,
-        fromRole: "student",
-        toRole: "teacher",
-      });
+      .select("id")
+      .in("teacher_id", ownerIds)
+      .eq("is_deleted", false);
+    const classIds = ((classes ?? []) as Array<{ id: string }>).map((row) => row.id);
+    if (classIds.length > 0) {
+      const { data: members } = await db
+        .from("class_members")
+        .select("student_id")
+        .in("class_id", classIds);
+      studentIds = [...new Set(((members ?? []) as Array<{ student_id: string }>).map((row) => row.student_id))];
     }
-    return { ok: true };
-  });
+  }
 
-/** Teachers of the signed-in school admin's school. */
-export const listSchoolTeachers = createServerFn({ method: "GET" })
+  const allIds = [...new Set([...staffIds, ...studentIds])];
+  if (allIds.length === 0) return { callerRole, schoolId, people: [] };
+
+  const [{ data: allProfiles }, { data: roleRows }] = await Promise.all([
+    db.from("profiles").select("id, display_name").in("id", allIds),
+    db.from("user_roles").select("user_id, role").in("user_id", allIds),
+  ]);
+
+  const names = new Map(
+    ((allProfiles ?? []) as Array<{ id: string; display_name: string | null }>).map((row) => [
+      row.id,
+      row.display_name?.trim() || "—",
+    ]),
+  );
+  const rolePriority = new Map<string, SchoolCommunityRole>();
+  for (const row of (roleRows ?? []) as Array<{ user_id: string; role: string }>) {
+    const role = row.role as SchoolCommunityRole;
+    const current = rolePriority.get(row.user_id);
+    if (role === "school_admin" || (!current && (role === "teacher" || role === "student"))) {
+      rolePriority.set(row.user_id, role);
+    } else if (role === "teacher" && current === "student") {
+      rolePriority.set(row.user_id, role);
+    }
+  }
+
+  const people = allIds
+    .filter((id) => id !== userId)
+    .map((id) => ({ id, name: names.get(id) ?? "—", role: rolePriority.get(id) }))
+    .filter((person): person is SchoolStrengthRecipient =>
+      person.role === "student" || person.role === "teacher" || person.role === "school_admin",
+    )
+    .filter((person) => callerRole !== "student" || person.role !== "student")
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  return { callerRole, schoolId, people };
+}
+
+/** Recipient picker for the signed-in user's same-school direct-gift rules. */
+export const listSchoolStrengthRecipients = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<PersonRef[]> => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "school_admin",
-    });
-    if (!isAdmin) throw new Error("Forbidden");
+  .handler(async ({ context }): Promise<SchoolStrengthRecipient[]> => {
     const db = await admin();
-    const { data: me } = await db
-      .from("profiles")
-      .select("school_id")
-      .eq("id", context.userId)
-      .maybeSingle();
-    const schoolId = me?.school_id as string | undefined;
-    if (!schoolId) return [];
-    const { data: profiles } = await db
-      .from("profiles")
-      .select("id, display_name")
-      .eq("school_id", schoolId);
-    const rows = (profiles ?? []) as Array<{ id: string; display_name: string | null }>;
-    if (rows.length === 0) return [];
-    const { data: roles } = await db
-      .from("user_roles")
-      .select("user_id, role")
-      .in(
-        "user_id",
-        rows.map((r) => r.id),
-      )
-      .eq("role", "teacher");
-    const teacherIds = new Set(((roles ?? []) as Array<{ user_id: string }>).map((r) => r.user_id));
-    return rows
-      .filter((r) => teacherIds.has(r.id))
-      .map((r) => ({ id: r.id, name: r.display_name ?? "—" }))
-      .sort((a, b) => a.name.localeCompare(b.name));
+    return (await schoolCommunity(db, context.userId)).people;
   });
 
-/** School admin (principal) gifts a strength to a teacher of their school. */
-export const giveStrengthToTeacher = createServerFn({ method: "POST" })
+/** Generic direct gift. The database re-checks role + same-school rules atomically. */
+export const giveStrengthToSchoolMember = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { teacherId: string; strengthIds: number[]; message?: string | null }) => d)
+  .inputValidator(
+    (data: { recipientId: string; strengthIds: number[]; message?: string | null }) => data,
+  )
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "school_admin",
-    });
-    if (!isAdmin) throw new Error("Forbidden");
-    const db = await admin();
-    const { data: me } = await db
-      .from("profiles")
-      .select("school_id")
-      .eq("id", context.userId)
-      .maybeSingle();
-    const { data: target } = await db
-      .from("profiles")
-      .select("school_id")
-      .eq("id", data.teacherId)
-      .maybeSingle();
-    if (!me?.school_id || me.school_id !== target?.school_id) throw new Error("Forbidden");
-    for (const strengthId of pickIds(data.strengthIds)) {
-      await insertStrength(db, {
-        fromId: context.userId,
-        toId: data.teacherId,
-        strengthId,
-        message: data.message?.trim() || null,
-        fromRole: "school_admin",
-        toRole: "teacher",
-      });
-    }
+    await giveThroughDatabase(
+      context.supabase as any,
+      data.recipientId,
+      data.strengthIds,
+      data.message,
+    );
     return { ok: true };
   });
 
-/** Everything the signed-in teacher has received (from students and principal). */
-export const getTeacherReceivedStrengths = createServerFn({ method: "GET" })
+/** Every strength received by the signed-in user, regardless of role/source. */
+export const getMyReceivedStrengths = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<ReceivedStrength[]> => {
     const db = await admin();
-    const { data } = await db
+    const { data, error } = await db
       .from("teacher_assigned_strengths")
-      .select("id, strength_id, message, created_at, from_user_id, from_role")
+      .select("id, strength_id, message, created_at, from_user_id, from_role, sprint_id")
       .eq("to_user_id", context.userId)
-      .eq("to_role", "teacher")
       .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+
     const rows = (data ?? []) as Array<{
       id: string;
       strength_id: string;
@@ -211,21 +198,90 @@ export const getTeacherReceivedStrengths = createServerFn({ method: "GET" })
       created_at: string;
       from_user_id: string;
       from_role: string;
+      sprint_id: string | null;
     }>;
-    const ids = [...new Set(rows.map((r) => r.from_user_id))];
+    const ids = [...new Set(rows.map((row) => row.from_user_id).filter(Boolean))];
     const names = new Map<string, string>();
     if (ids.length > 0) {
       const { data: profiles } = await db.from("profiles").select("id, display_name").in("id", ids);
-      for (const p of (profiles ?? []) as Array<{ id: string; display_name: string | null }>) {
-        names.set(p.id, p.display_name ?? "—");
+      for (const profile of (profiles ?? []) as Array<{ id: string; display_name: string | null }>) {
+        names.set(profile.id, profile.display_name?.trim() || "—");
       }
     }
-    return rows.map((r) => ({
-      id: r.id,
-      strengthId: Number(r.strength_id),
-      message: r.message,
-      createdAt: r.created_at,
-      fromName: names.get(r.from_user_id) ?? "—",
-      fromRole: r.from_role,
+
+    return rows.map((row) => ({
+      id: row.id,
+      strengthId: Number(row.strength_id),
+      message: row.message,
+      createdAt: row.created_at,
+      fromName: names.get(row.from_user_id) ?? "—",
+      fromRole: row.from_role,
+      sprintId: row.sprint_id,
     }));
+  });
+
+// Backwards-compatible export used by the existing teacher Profile route.
+export const getTeacherReceivedStrengths = getMyReceivedStrengths;
+
+/** Backwards-compatible single-teacher lookup for older UI/demo code. */
+export const getMyTeacher = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<PersonRef | null> => {
+    const db = await admin();
+    const people = (await schoolCommunity(db, context.userId)).people.filter(
+      (person) => person.role === "teacher",
+    );
+    return people[0] ?? null;
+  });
+
+/** Backwards-compatible student -> first available teacher action. */
+export const giveStrengthToMyTeacher = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { strengthIds: number[]; message?: string | null }) => data)
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    const db = await admin();
+    const community = await schoolCommunity(db, context.userId);
+    if (community.callerRole !== "student") throw new Error("Forbidden");
+    const teacher = community.people.find((person) => person.role === "teacher");
+    if (!teacher) throw new Error("No teacher");
+    await giveThroughDatabase(
+      context.supabase as any,
+      teacher.id,
+      data.strengthIds,
+      data.message,
+    );
+    return { ok: true };
+  });
+
+/** Backwards-compatible school-admin teacher list. */
+export const listSchoolTeachers = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<PersonRef[]> => {
+    const db = await admin();
+    const community = await schoolCommunity(db, context.userId);
+    if (community.callerRole !== "school_admin") throw new Error("Forbidden");
+    return community.people.filter((person) => person.role === "teacher");
+  });
+
+/** Backwards-compatible principal -> teacher gift action. */
+export const giveStrengthToTeacher = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (data: { teacherId: string; strengthIds: number[]; message?: string | null }) => data,
+  )
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    const db = await admin();
+    const community = await schoolCommunity(db, context.userId);
+    if (community.callerRole !== "school_admin") throw new Error("Forbidden");
+    const teacher = community.people.find(
+      (person) => person.id === data.teacherId && person.role === "teacher",
+    );
+    if (!teacher) throw new Error("Forbidden");
+    await giveThroughDatabase(
+      context.supabase as any,
+      teacher.id,
+      data.strengthIds,
+      data.message,
+    );
+    return { ok: true };
   });

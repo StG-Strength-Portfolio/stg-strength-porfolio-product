@@ -5,7 +5,7 @@ import { StaffSprintHub } from "@/components/sprint/StaffSprintHub";
 import { useRoleGuard } from "@/lib/role-guard";
 import { useLanguage } from "@/lib/i18n";
 
-export const Route = createFileRoute("/teacher/sprint")({ component: TeacherSprintPage });
+export const Route = createFileRoute("/school-admin/sprint")({ component: SchoolAdminSprintPage });
 
 const COPY = {
   fi: { sprint: "Vahvuussprintti", back: "Takaisin", give: "Anna vahvuus", profile: "Profiili" },
@@ -13,8 +13,8 @@ const COPY = {
   sv: { sprint: "Styrkesprint", back: "Tillbaka", give: "Ge en styrka", profile: "Profil" },
 } as const;
 
-function TeacherSprintPage() {
-  const guard = useRoleGuard(["teacher"]);
+function SchoolAdminSprintPage() {
+  const guard = useRoleGuard(["school_admin"]);
   const { language } = useLanguage();
   const text = COPY[language];
   if (!guard.ready) return null;
@@ -28,9 +28,9 @@ function TeacherSprintPage() {
       schoolName={guard.schoolName}
       persistLanguage={!guard.preview}
       links={[
-        { to: "/teacher/dashboard", label: text.back },
-        { to: "/teacher/give-strength", label: text.give },
-        { to: "/teacher/profile", label: text.profile },
+        { to: "/school-admin/dashboard", label: text.back },
+        { to: "/school-admin/give-strength", label: text.give },
+        { to: "/school-admin/profile", label: text.profile },
       ]}
     >
       {guard.preview ? (
