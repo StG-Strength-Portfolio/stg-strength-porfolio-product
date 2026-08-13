@@ -7,6 +7,7 @@ import { meterContentFor } from "@/lib/meter-content";
 import { METER_FIRST_SCREEN, METER_TOP } from "@/lib/meter-data";
 import { Screen6Strengths } from "@/components/screens/Screen6Strengths";
 import { Screen10Strengths } from "@/components/screens/Screen10Strengths";
+import { Screen31Intro } from "@/components/screens/Screen31Intro";
 import { Screen32Strengths } from "@/components/screens/Screen32Strengths";
 
 export type PortfolioScreenMode = "student" | "teacher-preview";
@@ -37,6 +38,8 @@ export function PortfolioScreen({
     content = <Screen6Strengths onSaveStateChange={saveHandler} />;
   } else if (n === 10) {
     content = <Screen10Strengths onSaveStateChange={saveHandler} />;
+  } else if (n === 31) {
+    content = <Screen31Intro />;
   } else if (n === 32) {
     content = <Screen32Strengths onSaveStateChange={saveHandler} />;
   } else if (n >= METER_FIRST_SCREEN && n <= METER_TOP) {
