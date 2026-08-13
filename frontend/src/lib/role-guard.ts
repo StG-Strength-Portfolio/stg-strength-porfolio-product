@@ -10,6 +10,7 @@ import {
   DEMO_TEACHER_ID,
 } from "@/lib/demo-store";
 import { getDemoProfile } from "@/lib/demo-community";
+import { normalizeDemoStateForCurrentUi } from "@/lib/demo-normalize";
 import { DEFAULT_LANGUAGE, isLanguage } from "@/lib/i18n";
 import type { PrivacyRegion } from "@/lib/external-content-preferences";
 
@@ -121,6 +122,7 @@ export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
         }
 
         if (wantsTeacher) {
+          normalizeDemoStateForCurrentUi();
           const profile = getDemoProfile("teacher", language);
           if (cancelled) return;
           setState({
