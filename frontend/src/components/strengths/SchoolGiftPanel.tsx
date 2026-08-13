@@ -99,11 +99,6 @@ export function SchoolGiftPanel({ title }: { title?: string }) {
     void load();
   }, [load]);
 
-  const availableRoles = useMemo(
-    () => [...new Set(recipients.map((recipient) => recipient.role))],
-    [recipients],
-  );
-
   const filtered = useMemo(() => {
     const q = query.trim().toLocaleLowerCase();
     return recipients.filter((recipient) => {
@@ -151,9 +146,9 @@ export function SchoolGiftPanel({ title }: { title?: string }) {
 
   const filterOptions: Array<{ id: FilterRole; label: string }> = [
     { id: "all", label: text.all },
-    ...(["student", "teacher", "school_admin"] as const)
-      .filter((role) => availableRoles.includes(role))
-      .map((role) => ({ id: role, label: text[role] })),
+    { id: "student", label: text.student },
+    { id: "teacher", label: text.teacher },
+    { id: "school_admin", label: text.school_admin },
   ];
 
   return (
@@ -172,6 +167,7 @@ export function SchoolGiftPanel({ title }: { title?: string }) {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={text.search}
+              aria-label={text.search}
               className="max-w-md bg-white text-[color:var(--ink)]"
             />
 
@@ -191,6 +187,26 @@ export function SchoolGiftPanel({ title }: { title?: string }) {
                 </button>
               ))}
             </div>
+
+            {query.trim() && filtered.length > 0 && (
+              <div className="max-w-md space-y-1 rounded-2xl border border-black/10 bg-white p-1.5 shadow-sm">
+                {filtered.slice(0, 8).map((recipient) => (
+                  <button
+                    key={recipient.id}
+                    type="button"
+                    onClick={() => setRecipientId(recipient.id)}
+                    className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left text-sm transition-colors ${
+                      recipientId === recipient.id
+                        ? "bg-[color:var(--purple)] text-white"
+                        : "text-[color:var(--ink)] hover:bg-black/5"
+                    }`}
+                  >
+                    <span className="min-w-0 truncate font-semibold">{recipient.name}</span>
+                    <span className="shrink-0 text-xs opacity-75">{text[recipient.role]}</span>
+                  </button>
+                ))}
+              </div>
+            )}
 
             <div className="max-w-md space-y-1.5">
               <Label htmlFor="school-gift-recipient">{text.choose}</Label>

@@ -137,6 +137,7 @@ export function DashboardShell({
   };
   const effectiveLinks = mergeCommunityLinks(links, area, communityLabels);
   const isTeacherDashboard = area === "teacher";
+  const visibleTabs = isTeacherDashboard ? tabs.filter((tab) => tab.id !== "strengths") : tabs;
 
   const demoText =
     language === "en"
@@ -251,7 +252,7 @@ export function DashboardShell({
               <span className="break-words">{title}</span>
             </p>
             <nav className="space-y-1.5">
-              {tabs.map((tb) => {
+              {visibleTabs.map((tb) => {
                 const Icon = TAB_ICONS[tb.id] ?? SparkleIcon;
                 const isActive = active === tb.id;
                 return (
@@ -341,7 +342,7 @@ export function DashboardShell({
           </header>
 
           <nav className="flex flex-wrap gap-2 md:hidden">
-            {tabs.map((tb) => {
+            {visibleTabs.map((tb) => {
               const Icon = TAB_ICONS[tb.id] ?? SparkleIcon;
               return (
                 <button
