@@ -9,7 +9,8 @@ import { useRoleGuard } from "@/lib/role-guard";
 import { useLanguage } from "@/lib/i18n";
 import { getStrengthColor, getStrengthName } from "@/lib/strengths-i18n";
 import { getMyReceivedStrengths, type ReceivedStrength } from "@/lib/give-strength.functions";
-import { getPreviewTeacherReceivedStrengths } from "@/lib/superadmin-preview.functions";
+import { getDemoReceivedStrengths } from "@/lib/demo-community";
+import { onDemoStateChange } from "@/lib/demo-store";
 
 export const Route = createFileRoute("/teacher/profile")({ component: TeacherProfilePage });
 
@@ -100,24 +101,25 @@ function TeacherProfilePage() {
   const text = COPY[language];
   const lang = language === "sv" ? "sv" : language === "en" ? "en" : "fi";
   const load = useServerFn(getMyReceivedStrengths);
-  const loadPreview = useServerFn(getPreviewTeacherReceivedStrengths);
   const [rows, setRows] = useState<ReceivedStrength[]>([]);
 
   const refresh = useCallback(async () => {
     try {
       if (guard.preview && guard.userId) {
-        setRows(await loadPreview({ data: { teacherId: guard.userId } }));
+        setRows(getDemoReceivedStrengths(guard.userId, language));
       } else {
         setRows(await load());
       }
     } catch (error) {
       console.error("[teacher-profile]", error);
     }
-  }, [guard.preview, guard.userId, load, loadPreview]);
+  }, [guard.preview, guard.userId, language, load]);
 
   useEffect(() => {
     if (guard.ready) void refresh();
-  }, [guard.ready, refresh]);
+    if (!guard.preview) return;
+    return onDemoStateChange(() => void refresh());
+  }, [guard.preview, guard.ready, refresh]);
 
   const top5 = useMemo(() => {
     const count = new Map<number, number>();
