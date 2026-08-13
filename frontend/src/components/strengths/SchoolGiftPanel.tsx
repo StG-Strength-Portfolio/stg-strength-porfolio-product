@@ -14,6 +14,12 @@ import {
   type SchoolCommunityRole,
   type SchoolStrengthRecipient,
 } from "@/lib/give-strength.functions";
+import { getSuperAdminPreview } from "@/lib/superadmin-preview";
+import {
+  giveDemoCommunityStrength,
+  listDemoStrengthRecipients,
+  type DemoPreviewMode,
+} from "@/lib/demo-community";
 
 const COPY = {
   fi: {
@@ -74,6 +80,9 @@ export function SchoolGiftPanel({ title }: { title?: string }) {
   const lang = language === "sv" ? "sv" : language === "en" ? "en" : "fi";
   const loadRecipients = useServerFn(listSchoolStrengthRecipients);
   const give = useServerFn(giveStrengthToSchoolMember);
+  const preview = getSuperAdminPreview().mode;
+  const demoMode: DemoPreviewMode | null =
+    preview === "student" || preview === "teacher" || preview === "principal" ? preview : null;
 
   const [recipients, setRecipients] = useState<SchoolStrengthRecipient[]>([]);
   const [recipientId, setRecipientId] = useState("");
@@ -87,13 +96,17 @@ export function SchoolGiftPanel({ title }: { title?: string }) {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      setRecipients(await loadRecipients());
+      if (demoMode) {
+        setRecipients(listDemoStrengthRecipients(demoMode, language));
+      } else {
+        setRecipients(await loadRecipients());
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Error");
     } finally {
       setLoading(false);
     }
-  }, [loadRecipients]);
+  }, [demoMode, language, loadRecipients]);
 
   useEffect(() => {
     void load();
@@ -127,13 +140,23 @@ export function SchoolGiftPanel({ title }: { title?: string }) {
     if (!recipientId || selected.length === 0) return;
     setBusy(true);
     try {
-      await give({
-        data: {
+      if (demoMode) {
+        giveDemoCommunityStrength(
+          demoMode,
           recipientId,
-          strengthIds: selected,
-          message: message.trim() || null,
-        },
-      });
+          selected,
+          message.trim() || null,
+          language,
+        );
+      } else {
+        await give({
+          data: {
+            recipientId,
+            strengthIds: selected,
+            message: message.trim() || null,
+          },
+        });
+      }
       toast.success(text.sent);
       setSelected([]);
       setMessage("");
