@@ -17,7 +17,7 @@ import {
   getDemoClassTeacherManagement,
   removeDemoClassTeacher,
   transferDemoClassOwnership,
-} from "@/lib/demo-class-teachers";
+} from "@/lib/demo-class-teachers-current";
 
 const COPY = {
   fi: {
