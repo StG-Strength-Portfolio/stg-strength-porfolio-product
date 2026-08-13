@@ -16,7 +16,7 @@ export function normalizeDemoStateForCurrentUi() {
   const state = getDemoState() as DemoStateWithCurrentClassShape;
   let changed = false;
   for (const klass of state.classes) {
-    if (klass.teacher_id !== klass.teacherId) {
+    if (!klass.teacher_id) {
       klass.teacher_id = klass.teacherId;
       changed = true;
     }
