@@ -38,6 +38,14 @@ import {
   type SchoolAdminData,
   type SchoolAdminClass,
 } from "@/lib/schooladmin.functions";
+import {
+  createDemoTeacherCode,
+  getDemoSchoolAdminData,
+  onDemoStateChange,
+  promoteDemoTeacher,
+  revokeDemoTeacherCode,
+} from "@/lib/demo-store";
+import { getDemoStudentPortfolio } from "@/lib/demo-community";
 import { ReportTrends, RangeSelector } from "@/components/reports/ReportTrends";
 import type { RangeDays, ReportEvent } from "@/lib/report-series";
 
@@ -86,15 +94,21 @@ function SchoolAdminDashboard() {
 
   const load = useCallback(async () => {
     try {
+      if (guard.preview) {
+        setData(getDemoSchoolAdminData(language));
+        return;
+      }
       setData(await fetchData());
     } catch (e) {
       toast.error((e as Error).message);
     }
-  }, [fetchData]);
+  }, [fetchData, guard.preview, language]);
 
   useEffect(() => {
-    if (guard.ready) void load();
-  }, [guard.ready, load]);
+    if (!guard.ready) return;
+    void load();
+    if (guard.preview) return onDemoStateChange(() => void load());
+  }, [guard.preview, guard.ready, load]);
 
   const derived = useMemo(() => {
     const students = data?.students ?? [];
@@ -142,6 +156,12 @@ function SchoolAdminDashboard() {
 
   async function onGenerate() {
     try {
+      if (guard.preview) {
+        const code = createDemoTeacherCode();
+        toast.success(`${tr("Koodi luotu!")} ${code}`);
+        await load();
+        return;
+      }
       const res = await genCode({});
       toast.success(`${tr("Koodi luotu!")} ${res.code}`);
       await load();
@@ -161,7 +181,6 @@ function SchoolAdminDashboard() {
         setOpenStudent(null);
       }}
       schoolName={data?.school?.name ?? guard.schoolName}
-      /* @lovable-new */
       links={[{ to: "/school-admin/give-strength", label: tr("Anna vahvuus opettajalle") }]}
       sections={[
         {
@@ -234,6 +253,7 @@ function SchoolAdminDashboard() {
       {openStudent && showPortfolio && (tab === "classes" || tab === "students") && (
         <SchoolAdminPortfolio
           userId={openStudent}
+          preview={guard.preview}
           crumbs={
             tab === "classes"
               ? [tr("Luokat"), data?.classes.find((c) => c.id === openClass)?.name ?? ""]
@@ -364,7 +384,11 @@ function SchoolAdminDashboard() {
                     teacher={t}
                     onPromote={async () => {
                       try {
-                        await promote({ data: { userId: t.id } });
+                        if (guard.preview) {
+                          promoteDemoTeacher(t.id);
+                        } else {
+                          await promote({ data: { userId: t.id } });
+                        }
                         toast.success(tr("Sinut on nimitetty koulun adminiksi!"));
                         await load();
                       } catch (e) {
@@ -439,7 +463,11 @@ function SchoolAdminDashboard() {
                             variant="outline"
                             className="rounded-full"
                             onClick={async () => {
-                              await revoke({ data: { id: c.id } });
+                              if (guard.preview) {
+                                revokeDemoTeacherCode(c.id);
+                              } else {
+                                await revoke({ data: { id: c.id } });
+                              }
                               await load();
                             }}
                           >
@@ -701,10 +729,12 @@ function SchoolAdminPortfolio({
   userId,
   crumbs,
   onBack,
+  preview,
 }: {
   userId: string;
   crumbs: string[];
   onBack: () => void;
+  preview: boolean;
 }) {
   const tr = useTr();
   const fetchPortfolio = useServerFn(getStudentPortfolio);
@@ -718,11 +748,13 @@ function SchoolAdminPortfolio({
     let cancelled = false;
     (async () => {
       try {
-        const res = (await fetchPortfolio({ data: { userId } })) as {
-          name: string | null;
-          currentScreen: number | null;
-          responses: { field_key: string; value: unknown }[];
-        };
+        const res = preview
+          ? getDemoStudentPortfolio(userId)
+          : ((await fetchPortfolio({ data: { userId } })) as {
+              name: string | null;
+              currentScreen: number | null;
+              responses: { field_key: string; value: unknown }[];
+            });
         if (cancelled) return;
         const m = new Map<string, unknown>();
         for (const r of res.responses) m.set(r.field_key, r.value);
@@ -734,7 +766,7 @@ function SchoolAdminPortfolio({
     return () => {
       cancelled = true;
     };
-  }, [fetchPortfolio, userId]);
+  }, [fetchPortfolio, preview, userId]);
 
   if (!state) return <p className="opacity-70">{tr("Ladataan…")}</p>;
 
@@ -747,9 +779,9 @@ function SchoolAdminPortfolio({
         <div className="space-y-2">
           <Breadcrumbs
             items={[
-              ...crumbs.map((c, i) => ({
+              ...crumbs.map((c) => ({
                 label: c,
-                onClick: i === crumbs.length - 1 ? onBack : onBack,
+                onClick: onBack,
               })),
               { label: `${state.name ?? tr("Opiskelija")} — ${tr("Portfolio")}` },
             ]}
@@ -762,8 +794,6 @@ function SchoolAdminPortfolio({
     />
   );
 }
-
-/* ---------- School admin: full class report ---------- */
 
 interface ClassRow {
   id: string;
@@ -873,8 +903,6 @@ function SchoolAdminClassReport({
         totalRequired={TOTAL_REQUIRED}
         seedPrefix={`sa-cls-${cls?.id ?? "x"}`}
       />
-
-      {/* Level completion lives inside <ReportTrends /> — no duplicate card here. */}
 
       <StickyNote seed={`sa-cls-students-${cls?.id ?? "x"}`} className="space-y-3 overflow-x-auto">
         <div className="flex flex-wrap items-center justify-between gap-2">
