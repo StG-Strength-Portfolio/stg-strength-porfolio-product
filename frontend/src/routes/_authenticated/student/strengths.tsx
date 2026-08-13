@@ -12,6 +12,9 @@ import { TopStrengthCards } from "@/components/strengths/TopStrengthCards";
 import { getPeerTopStrengths, type PeerTopStrengths } from "@/lib/student-strengths.functions";
 import { StrengthGrowthChart } from "@/components/reports/StrengthGrowthChart";
 import { useStudentStrengthEvents } from "@/hooks/useStudentStrengthEvents";
+import { getSuperAdminPreview } from "@/lib/superadmin-preview";
+import { getDemoStudentPeerTopStrengths } from "@/lib/demo-community";
+import { onDemoStateChange } from "@/lib/demo-store";
 
 export const Route = createFileRoute("/_authenticated/student/strengths")({
   component: StudentStrengthsPage,
@@ -64,16 +67,24 @@ function StudentStrengthsPage() {
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
+    const isDemo = getSuperAdminPreview().mode === "student";
+
+    const loadPeers = async () => {
       try {
-        const res = (await fetchPeers()) as PeerTopStrengths;
+        const res = isDemo
+          ? getDemoStudentPeerTopStrengths()
+          : ((await fetchPeers()) as PeerTopStrengths);
         if (!cancelled) setPeers(res);
       } catch {
         // Peers are optional extra context.
       }
-    })();
+    };
+
+    void loadPeers();
+    const offDemo = isDemo ? onDemoStateChange(() => void loadPeers()) : () => undefined;
     return () => {
       cancelled = true;
+      offDemo();
     };
   }, [fetchPeers]);
 
