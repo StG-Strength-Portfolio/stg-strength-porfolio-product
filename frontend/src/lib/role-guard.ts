@@ -12,6 +12,7 @@ import {
   demoTeacherName,
 } from "@/lib/demo-store";
 import { DEFAULT_LANGUAGE, isLanguage } from "@/lib/i18n";
+import type { PrivacyRegion } from "@/lib/external-content-preferences";
 
 export interface RoleGuardState {
   ready: boolean;
@@ -19,6 +20,7 @@ export interface RoleGuardState {
   userId: string | null;
   schoolId: string | null;
   schoolName: string | null;
+  privacyRegion: PrivacyRegion | null;
   displayName: string | null;
   email: string | null;
   preview: boolean;
@@ -77,6 +79,7 @@ export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
     userId: null,
     schoolId: null,
     schoolName: null,
+    privacyRegion: null,
     displayName: null,
     email: null,
     preview: false,
@@ -121,6 +124,7 @@ export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
             userId: DEMO_PRINCIPAL_ID,
             schoolId: DEMO_SCHOOL_ID,
             schoolName: DEMO_SCHOOL_NAME,
+            privacyRegion: null,
             displayName: demoPrincipalName(language),
             email: "principal@northbridge.demo",
             preview: true,
@@ -136,6 +140,7 @@ export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
             userId: DEMO_TEACHER_ID,
             schoolId: DEMO_SCHOOL_ID,
             schoolName: DEMO_SCHOOL_NAME,
+            privacyRegion: null,
             displayName: demoTeacherName(language),
             email: "emma.johnson@northbridge.demo",
             preview: true,
@@ -156,13 +161,16 @@ export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
       const p = profile as { display_name?: string | null; school_id?: string | null } | null;
 
       let schoolName: string | null = null;
+      let privacyRegion: PrivacyRegion | null = null;
       if (p?.school_id) {
         const { data: school } = await supabase
           .from("schools" as never)
-          .select("name")
+          .select("name, privacy_region")
           .eq("id", p.school_id)
           .maybeSingle();
-        schoolName = (school as { name?: string } | null)?.name ?? null;
+        const s = school as { name?: string; privacy_region?: string | null } | null;
+        schoolName = s?.name ?? null;
+        privacyRegion = s?.privacy_region === "us" ? "us" : "eu_eea";
       }
 
       if (cancelled) return;
@@ -172,6 +180,7 @@ export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
         userId: user.id,
         schoolId: p?.school_id ?? null,
         schoolName,
+        privacyRegion,
         displayName: p?.display_name ?? null,
         email: user.email ?? null,
         preview: false,
