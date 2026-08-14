@@ -11,6 +11,13 @@ import {
   type AvailableClassroomTeacher,
   type ClassroomTeacher,
 } from "@/lib/class-teachers.functions";
+import { getSuperAdminPreview } from "@/lib/superadmin-preview";
+import {
+  addDemoClassTeacher,
+  getDemoClassTeacherManagement,
+  removeDemoClassTeacher,
+  transferDemoClassOwnership,
+} from "@/lib/demo-class-teachers-current";
 
 const COPY = {
   fi: {
@@ -85,6 +92,7 @@ export function ClassTeacherManager({
 }) {
   const { language } = useLanguage();
   const text = COPY[language];
+  const isDemo = getSuperAdminPreview().mode === "teacher";
   const getManagement = useServerFn(getClassTeacherManagement);
   const addTeacher = useServerFn(addClassTeacher);
   const removeTeacher = useServerFn(removeClassTeacher);
@@ -106,7 +114,9 @@ export function ClassTeacherManager({
     setLoadState("loading");
     setErrorMessage("");
     try {
-      const result = await getManagement({ data: { classId } });
+      const result = isDemo
+        ? getDemoClassTeacherManagement(classId, language)
+        : await getManagement({ data: { classId } });
       setTeachers(result.teachers);
       onTeacherCountChange?.(result.teachers.length);
       setAvailable(result.available);
@@ -122,9 +132,9 @@ export function ClassTeacherManager({
   useEffect(() => {
     void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [classId]);
+  }, [classId, language, isDemo]);
 
-  async function run(action: () => Promise<unknown>, successMessage: string) {
+  async function run(action: () => Promise<unknown> | unknown, successMessage: string) {
     setBusy(true);
     try {
       await action();
@@ -183,7 +193,10 @@ export function ClassTeacherManager({
                     const name = teacher.name || teacher.id.slice(0, 8);
                     if (!window.confirm(`${text.confirmTransfer} ${name}?`)) return;
                     void run(
-                      () => transferOwner({ data: { classId, teacherId: teacher.id } }),
+                      () =>
+                        isDemo
+                          ? transferDemoClassOwnership(classId, teacher.id)
+                          : transferOwner({ data: { classId, teacherId: teacher.id } }),
                       text.transferred,
                     );
                   }}
@@ -198,7 +211,10 @@ export function ClassTeacherManager({
                   onClick={() => {
                     if (!window.confirm(text.confirmRemove)) return;
                     void run(
-                      () => removeTeacher({ data: { classId, teacherId: teacher.id } }),
+                      () =>
+                        isDemo
+                          ? removeDemoClassTeacher(classId, teacher.id)
+                          : removeTeacher({ data: { classId, teacherId: teacher.id } }),
                       text.removed,
                     );
                   }}
@@ -236,7 +252,10 @@ export function ClassTeacherManager({
               onClick={() => {
                 if (!selectedTeacher) return;
                 void run(
-                  () => addTeacher({ data: { classId, teacherId: selectedTeacher.id } }),
+                  () =>
+                    isDemo
+                      ? addDemoClassTeacher(classId, selectedTeacher.id)
+                      : addTeacher({ data: { classId, teacherId: selectedTeacher.id } }),
                   text.added,
                 );
               }}

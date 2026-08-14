@@ -7,6 +7,9 @@ import {
   getTeacherStrengthSummary,
   type TeacherStrengthSummaryData,
 } from "@/lib/teacher-strength-summary.functions";
+import { getSuperAdminPreview } from "@/lib/superadmin-preview";
+import { getDemoTeacherStrengthSummary } from "@/lib/demo-teacher-summary";
+import { onDemoStateChange } from "@/lib/demo-store";
 
 const COPY = {
   fi: {
@@ -48,6 +51,7 @@ const EMPTY_SUMMARY: TeacherStrengthSummaryData = {
 export function TeacherStrengthSummary() {
   const { language } = useLanguage();
   const text = COPY[language];
+  const isDemo = getSuperAdminPreview().mode === "teacher";
   const getSummary = useServerFn(getTeacherStrengthSummary);
   const [summary, setSummary] = useState<TeacherStrengthSummaryData>(EMPTY_SUMMARY);
   const [state, setState] = useState<LoadState>("loading");
@@ -58,7 +62,7 @@ export function TeacherStrengthSummary() {
     async function load() {
       setState("loading");
       try {
-        const result = await getSummary();
+        const result = isDemo ? getDemoTeacherStrengthSummary() : await getSummary();
         if (cancelled) return;
         setSummary(result);
         setState("ready");
@@ -69,10 +73,12 @@ export function TeacherStrengthSummary() {
     }
 
     void load();
+    const offDemo = isDemo ? onDemoStateChange(() => void load()) : () => undefined;
     return () => {
       cancelled = true;
+      offDemo();
     };
-  }, [getSummary]);
+  }, [getSummary, isDemo]);
 
   const lang = language === "sv" ? "sv" : language === "en" ? "en" : "fi";
 

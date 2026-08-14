@@ -26,6 +26,8 @@ import { LevelProgressBar } from "@/components/LevelProgressBar";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage, useT, useTr } from "@/lib/i18n";
 import { useProgression } from "@/lib/progression";
+import { getSuperAdminPreview } from "@/lib/superadmin-preview";
+import { DEMO_SCHOOL_NAME } from "@/lib/demo-store";
 
 const COMMUNITY_COPY = {
   fi: { sprint: "Vahvuussprintti", give: "Anna vahvuus" },
@@ -45,6 +47,11 @@ export function AppSidebar() {
   const hint = t("nav.finishFirst");
 
   useEffect(() => {
+    if (getSuperAdminPreview().mode === "student") {
+      setSchoolName(DEMO_SCHOOL_NAME);
+      return;
+    }
+
     (async () => {
       const { data } = await supabase.auth.getUser();
       const uid = data.user?.id ?? null;
