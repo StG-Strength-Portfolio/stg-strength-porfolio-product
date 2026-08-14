@@ -11,6 +11,8 @@ import { homeForRole } from "@/lib/role-guard";
 import { ProgressionProvider } from "@/lib/progression";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage, useT, isLanguage } from "@/lib/i18n";
+import { getSuperAdminPreview } from "@/lib/superadmin-preview";
+import { DEMO_STUDENT_ID } from "@/lib/demo-store";
 
 export const Route = createFileRoute("/_authenticated/student")({
   component: StudentLayout,
@@ -27,8 +29,17 @@ function StudentLayout() {
   useEffect(() => {
     (async () => {
       const role = await getCurrentRole();
-      if (role && role !== "student") {
+      const isStudentDemo = role === "super_admin" && getSuperAdminPreview().mode === "student";
+
+      if (role && role !== "student" && !isStudentDemo) {
         window.location.href = homeForRole(role);
+        return;
+      }
+
+      if (isStudentDemo) {
+        setUserId(DEMO_STUDENT_ID);
+        setBlocked(false);
+        setReady(true);
         return;
       }
 
