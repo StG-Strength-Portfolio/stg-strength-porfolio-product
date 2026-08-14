@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DashboardShell } from "@/components/DashboardShell";
-import { StickyNote } from "@/components/StickyNote";
 import { SchoolGiftPanel } from "@/components/strengths/SchoolGiftPanel";
 import { useRoleGuard } from "@/lib/role-guard";
 import { useLanguage } from "@/lib/i18n";
@@ -15,21 +14,18 @@ const COPY = {
     back: "Takaisin",
     profile: "Profiili",
     sprint: "Vahvuussprintti",
-    demo: "Demotilassa vahvuuksien lähettäminen oikeille käyttäjille on poistettu käytöstä.",
   },
   en: {
     title: "Give a strength",
     back: "Back",
     profile: "Profile",
     sprint: "Strength Sprint",
-    demo: "Sending strengths to real users is disabled in demo mode.",
   },
   sv: {
     title: "Ge en styrka",
     back: "Tillbaka",
     profile: "Profil",
     sprint: "Styrkesprint",
-    demo: "Att skicka styrkor till riktiga användare är avstängt i demoläget.",
   },
 } as const;
 
@@ -52,13 +48,7 @@ function SchoolAdminGiveStrengthPage() {
         { to: "/school-admin/profile", label: text.profile },
       ]}
     >
-      {guard.preview ? (
-        <StickyNote seed="school-admin-give-strength-preview">
-          <p className="text-sm opacity-75">{text.demo}</p>
-        </StickyNote>
-      ) : (
-        <SchoolGiftPanel />
-      )}
+      <SchoolGiftPanel />
     </DashboardShell>
   );
 }
