@@ -99,7 +99,8 @@ export function AppSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={isMap}>
                   <Link to="/seikkailu" className="flex items-center gap-2">
-                    <MapIcon size={18} /> <span>{t("sidebar.worldmap")}</span>
+                    <MapIcon size={18} />
+                    <span>{language === "fi" ? "Lukiolaisen vahvuusportfolio" : t("sidebar.worldmap")}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
