@@ -10,7 +10,7 @@ export const Route = createFileRoute("/school-admin/give-strength")({
 
 const COPY = {
   fi: {
-    title: "Anna vahvuus",
+    title: "Lähetä vahvuus",
     back: "Takaisin",
     profile: "Profiili",
     sprint: "Vahvuussprintti",
