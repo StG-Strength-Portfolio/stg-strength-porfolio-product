@@ -131,7 +131,7 @@ export function DashboardShell({
       ? "school-admin"
       : null;
   const communityLabels = {
-    give: language === "en" ? "Give a strength" : language === "sv" ? "Ge en styrka" : "Anna vahvuus",
+    give: language === "en" ? "Give a strength" : language === "sv" ? "Ge en styrka" : "Lähetä vahvuus",
     sprint: language === "en" ? "Strength Sprint" : language === "sv" ? "Styrkesprint" : "Vahvuussprintti",
     profile: language === "en" ? "Profile" : language === "sv" ? "Profil" : "Profiili",
   };
