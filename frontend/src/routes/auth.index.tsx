@@ -89,7 +89,9 @@ function AuthLanding() {
       <AuthLanguageSwitcher />
       <div className="relative z-10 w-full max-w-md space-y-6">
         <div className="text-center">
-          <h1 className="text-5xl font-bold">{t("app.title")}</h1>
+          <h1 className="text-5xl font-bold">
+            {language === "fi" ? "Vahvuusportfolio" : t("app.title")}
+          </h1>
           <p className="mt-2 opacity-90">{t("app.tagline")}</p>
         </div>
 
