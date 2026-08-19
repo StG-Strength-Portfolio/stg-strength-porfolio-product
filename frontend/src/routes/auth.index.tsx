@@ -7,10 +7,16 @@ import { Button } from "@/components/ui/button";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
 import { useLanguage, useT } from "@/lib/i18n";
 import { homeForRole, roleOfCurrentUser } from "@/lib/role-guard";
+import { otherStrengthPortfolioOrigin } from "@/lib/cross-domain-auth";
 import { z } from "zod";
 
 export const Route = createFileRoute("/auth/")({
-  validateSearch: z.object({ idle: z.enum(["1"]).optional() }).parse,
+  validateSearch: z
+    .object({
+      idle: z.enum(["1"]).optional(),
+      sso: z.enum(["miss"]).optional(),
+    })
+    .parse,
   component: AuthLanding,
 });
 
@@ -28,10 +34,22 @@ function AuthLanding() {
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
-      if (!data.session) return;
-      window.location.href = homeForRole(await roleOfCurrentUser());
+      if (data.session) {
+        window.location.href = homeForRole(await roleOfCurrentUser());
+        return;
+      }
+
+      if (search.sso === "miss") return;
+
+      const otherOrigin = otherStrengthPortfolioOrigin(window.location.origin);
+      if (!otherOrigin) return;
+
+      const bridge = new URL("/auth/cross-domain", otherOrigin);
+      bridge.searchParams.set("target", window.location.origin);
+      bridge.searchParams.set("returnTo", "/auth");
+      window.location.replace(bridge.toString());
     });
-  }, [navigate]);
+  }, [navigate, search.sso]);
 
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-hidden flex items-center justify-center px-4 py-10">
