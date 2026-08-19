@@ -30,7 +30,7 @@ import { getSuperAdminPreview } from "@/lib/superadmin-preview";
 import { DEMO_SCHOOL_NAME } from "@/lib/demo-store";
 
 const COMMUNITY_COPY = {
-  fi: { sprint: "Vahvuussprintti", give: "Anna vahvuus" },
+  fi: { sprint: "Vahvuussprintti", give: "Lähetä vahvuus" },
   en: { sprint: "Strength Sprint", give: "Give a strength" },
   sv: { sprint: "Styrkesprint", give: "Ge en styrka" },
 } as const;
