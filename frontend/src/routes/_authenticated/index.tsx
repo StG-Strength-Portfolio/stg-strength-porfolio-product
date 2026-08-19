@@ -7,7 +7,7 @@ import { useTr } from "@/lib/i18n";
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
     meta: [
-      { title: "Vahvuusseikkailu" },
+      { title: "Vahvuusportfolio" },
       { name: "description", content: "Digitaalinen vahvuusportfolio lukiolaiselle." },
     ],
   }),
