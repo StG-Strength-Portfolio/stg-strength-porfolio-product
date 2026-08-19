@@ -51,11 +51,9 @@ async function loadAgeo() {
     const face = new FontFace("Ageo", `url(${blobUrl})`, {
       style: "normal",
       weight: "400",
-      display: "swap",
     });
     await face.load();
     document.fonts.add(face);
-    installAgeoOverrides();
   } finally {
     URL.revokeObjectURL(blobUrl);
   }
@@ -63,10 +61,11 @@ async function loadAgeo() {
 
 export function ensureAgeoFont(): Promise<void> {
   if (typeof document === "undefined") return Promise.resolve();
-  if (document.fonts.check('16px "Ageo"')) {
-    installAgeoOverrides();
-    return Promise.resolve();
-  }
+
+  installAgeoOverrides();
+
+  if (document.fonts.check('16px "Ageo"')) return Promise.resolve();
+
   if (!loading) {
     loading = loadAgeo().catch((error) => {
       loading = null;
