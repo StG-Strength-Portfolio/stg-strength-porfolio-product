@@ -11,6 +11,7 @@ import { ForgotPasswordDialog } from "@/components/ForgotPasswordDialog";
 import { toast } from "sonner";
 import { useLanguage, useT, useTr } from "@/lib/i18n";
 import { homeForRole, roleOfCurrentUser } from "@/lib/role-guard";
+import { otherStrengthPortfolioOrigin } from "@/lib/cross-domain-auth";
 import { z } from "zod";
 
 export const Route = createFileRoute("/auth/login")({
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/auth/login")({
         .string()
         .refine((v) => v.startsWith("/") && !v.startsWith("//"))
         .optional(),
+      sso: z.enum(["miss"]).optional(),
     })
     .default({}),
   component: LoginPage,
@@ -33,7 +35,8 @@ const unconfirmedEmailCopy = {
 
 function LoginPage() {
   const navigate = useNavigate();
-  const next = Route.useSearch().next ?? "";
+  const search = Route.useSearch();
+  const next = search.next ?? "";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -44,14 +47,26 @@ function LoginPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
-      if (!data.session) return;
-      if (next) {
-        window.location.href = next;
+      if (data.session) {
+        if (next) {
+          window.location.href = next;
+          return;
+        }
+        window.location.href = homeForRole(await roleOfCurrentUser());
         return;
       }
-      window.location.href = homeForRole(await roleOfCurrentUser());
+
+      if (search.sso === "miss") return;
+
+      const otherOrigin = otherStrengthPortfolioOrigin(window.location.origin);
+      if (!otherOrigin) return;
+
+      const bridge = new URL("/auth/cross-domain", otherOrigin);
+      bridge.searchParams.set("target", window.location.origin);
+      bridge.searchParams.set("returnTo", "/auth/login");
+      window.location.replace(bridge.toString());
     });
-  }, [navigate, next]);
+  }, [navigate, next, search.sso]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
