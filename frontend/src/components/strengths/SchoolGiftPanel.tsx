@@ -23,7 +23,7 @@ import {
 
 const COPY = {
   fi: {
-    title: "Anna vahvuus",
+    title: "Lähetä vahvuus",
     intro: "Valitse kouluyhteisöstä henkilö, jolle haluat antaa vahvuuspalautetta.",
     search: "Etsi nimellä…",
     all: "Kaikki",
