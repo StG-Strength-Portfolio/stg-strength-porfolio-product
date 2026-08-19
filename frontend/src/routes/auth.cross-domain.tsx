@@ -59,7 +59,7 @@ function CrossDomainAuthBridge() {
         return;
       }
 
-      const callback = new URL("/auth/cross-domain-complete", targetOrigin);
+      const callback = new URL("/auth", targetOrigin);
       callback.searchParams.set("token_hash", tokenHash);
       callback.searchParams.set("type", verificationType);
       callback.searchParams.set("returnTo", returnPath);
