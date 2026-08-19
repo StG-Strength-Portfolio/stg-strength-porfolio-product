@@ -18,7 +18,7 @@ import schoolAdminMetricsCss from "../styles/school-admin-metrics.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 const DOCUMENT_TITLE = {
-  fi: "Vahvuusseikkailu",
+  fi: "Vahvuusportfolio",
   en: "Strength Portfolio",
   sv: "Styrkeportfolio",
 } as const;
@@ -118,12 +118,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Strength Portfolio" },
       { name: "description", content: "Digitaalinen vahvuusportfolio lukiolaiselle." },
-      { property: "og:title", content: "Vahvuusseikkailu" },
+      { property: "og:title", content: "Vahvuusportfolio" },
       { property: "og:description", content: "Digitaalinen vahvuusportfolio lukiolaiselle." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Vahvuusseikkailu" },
+      { name: "twitter:title", content: "Vahvuusportfolio" },
       { name: "twitter:description", content: "Digitaalinen vahvuusportfolio lukiolaiselle." },
       {
         property: "og:image",
