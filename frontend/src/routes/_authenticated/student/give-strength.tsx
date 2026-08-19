@@ -5,7 +5,7 @@ import { useLanguage } from "@/lib/i18n";
 export const Route = createFileRoute("/_authenticated/student/give-strength")({
   head: () => ({
     meta: [
-      { title: "Give a strength — Vahvuusseikkailu" },
+      { title: "Give a strength — Vahvuusportfolio" },
       {
         name: "description",
         content: "Give strength feedback to a teacher or school admin in your school.",
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/_authenticated/student/give-strength")({
 });
 
 const TITLE = {
-  fi: "Anna vahvuus opettajalle tai koulun adminille",
+  fi: "Lähetä vahvuus opettajalle tai koulun adminille",
   en: "Give a strength to a teacher or school admin",
   sv: "Ge en styrka till en lärare eller skoladministratör",
 } as const;
