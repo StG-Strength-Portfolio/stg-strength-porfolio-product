@@ -26,7 +26,9 @@ function installAgeoOverrides() {
     select,
     optgroup,
     .font-display,
-    .font-sans {
+    .font-sans,
+    .ns,
+    .ns * {
       font-family: "Ageo", system-ui, sans-serif !important;
     }
   `;
