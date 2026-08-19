@@ -11,8 +11,6 @@ import { toast } from "sonner";
 import { useLanguage } from "@/lib/i18n";
 import { z } from "zod";
 
-// How long we wait for Supabase to parse the recovery token out of the URL
-// hash and establish a session before concluding the link is missing/expired.
 const RECOVERY_WAIT_MS = 4000;
 
 const RESET_COPY = {
@@ -30,8 +28,8 @@ const RESET_COPY = {
     passwordShort: "Salasanan tulee olla vähintään 6 merkkiä.",
     passwordMismatch: "Salasanat eivät täsmää.",
     genericError: "Salasanan vaihtaminen epäonnistui. Yritä uudelleen.",
-    browserTitle: "Salasanan palautus — Vahvuusseikkailu",
-    description: "Aseta uusi salasana Vahvuusseikkailu-tilillesi.",
+    browserTitle: "Salasanan palautus — Vahvuusportfolio",
+    description: "Aseta uusi salasana Vahvuusportfolio-tilillesi.",
   },
   en: {
     title: "Password Reset",
@@ -83,10 +81,6 @@ export const Route = createFileRoute("/reset-password")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  // Keep the query parameter for backwards compatibility with existing reset
-  // links. Successful Superadmin recovery also detects the role from the
-  // established session, so the flow no longer depends on the query surviving
-  // Supabase/email redirects.
   validateSearch: (search: Record<string, unknown>) =>
     z
       .object({
@@ -130,10 +124,6 @@ function ResetPasswordPage() {
         if (!session) return;
         setSessionState("ready");
 
-        // Superadmin invitation/reset links have historically used
-        // ?source=superadmin, but some email/auth redirect paths can remove the
-        // query string. Detecting the actual role keeps the post-reset routing
-        // correct even when that happens.
         if (source !== "superadmin") {
           const { data } = await supabase
             .from("user_roles" as never)
@@ -149,10 +139,6 @@ function ResetPasswordPage() {
     [source],
   );
 
-  // Supabase-js parses the recovery token out of the URL and fires an auth
-  // event once the recovery session is established. We listen for that event
-  // and also check an already-established session, then only give up after a
-  // grace period.
   useEffect(() => {
     let cancelled = false;
 
