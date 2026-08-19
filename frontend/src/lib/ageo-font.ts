@@ -24,7 +24,9 @@ function installAgeoOverrides() {
     input,
     textarea,
     select,
-    optgroup {
+    optgroup,
+    .font-display,
+    .font-sans {
       font-family: "Ageo", system-ui, sans-serif !important;
     }
   `;
@@ -64,13 +66,12 @@ export function ensureAgeoFont(): Promise<void> {
 
   installAgeoOverrides();
 
-  if (document.fonts.check('16px "Ageo"')) return Promise.resolve();
-
   if (!loading) {
     loading = loadAgeo().catch((error) => {
       loading = null;
       console.error("[font] Failed to load Ageo", error);
     });
   }
+
   return loading;
 }
