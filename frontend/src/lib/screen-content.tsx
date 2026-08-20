@@ -4472,8 +4472,8 @@ export function Screen19({ onSaveStateChange }: Props) {
                       h-full
                       min-h-[225px]
                       w-full
-                      grid-cols-[minmax(0,1fr)_150px]
-                      gap-3
+                      grid-cols-[minmax(0,1fr)_124px]
+                      gap-2
                     "
                   >
                     <div
@@ -4483,7 +4483,8 @@ export function Screen19({ onSaveStateChange }: Props) {
                         border-2
                         border-black
                         rounded-[18px]
-                        bg-white
+                        bg-[#fffdf6]
+                        screen19-lined-textarea
 
                         [&_label]:hidden
                         [&>div]:h-full
@@ -4498,13 +4499,8 @@ export function Screen19({ onSaveStateChange }: Props) {
                         [&_textarea]:min-h-[225px]
                         [&_textarea]:w-full
                         [&_textarea]:resize-none
-                        [&_textarea]:rounded-[18px]
+                        [&_textarea]:rounded-[16px]
                         [&_textarea]:border-0
-                        [&_textarea]:bg-transparent
-                        [&_textarea]:px-4
-                        [&_textarea]:py-4
-                        [&_textarea]:text-[15px]
-                        [&_textarea]:leading-[1.55]
                         [&_textarea]:text-[#241b3f]
                         [&_textarea]:outline-none
                         [&_textarea]:shadow-none
@@ -4534,7 +4530,7 @@ export function Screen19({ onSaveStateChange }: Props) {
                         border-black
                         rounded-[18px]
                         bg-white
-                        px-4
+                        px-2.5
                         py-5
                       "
                     >
@@ -4548,17 +4544,18 @@ export function Screen19({ onSaveStateChange }: Props) {
                           text-[#4b3a66]
                         "
                       >
-                        {trLines(tr, "Merkitse\nvahvuutesi")}
+                        {trLines(tr, "Väritä\nsydämet")}
                       </p>
 
                       <div
                         className="
                           grid
                           grid-cols-2
-                          gap-4
+                          gap-x-3
+                          gap-y-2
                         "
                       >
-                        {[1, 2, 3, 4].map((score) => {
+                        {[1, 2, 3, 4, 5, 6].map((score) => {
                           const isSelected = selectedScores.includes(score);
 
                           return (
@@ -4569,24 +4566,24 @@ export function Screen19({ onSaveStateChange }: Props) {
                               aria-pressed={isSelected}
                               onClick={() => selectScore(group.fieldKey, score)}
                               className={`
+                                relative
                                 flex
-                                h-[48px]
-                                w-[48px]
+                                h-[43px]
+                                w-[43px]
                                 cursor-pointer
                                 items-center
                                 justify-center
-                                rounded-[8px]
-                                border-[3px]
-                                text-[31px]
+                                border-0
+                                bg-transparent
+                                text-[#241b3f]
                                 font-semibold
-                                leading-[1.12]
                                 transition-all
                                 duration-150
 
                                 ${
                                   isSelected
-                                    ? "border-black bg-[#eee8f8] text-[#241b3f] shadow-[0_3px_0_rgba(68,42,105,0.18)]"
-                                    : "border-black bg-white text-transparent hover:bg-[#f7f3fb]"
+                                    ? "drop-shadow-[0_2px_0_rgba(0,0,0,0.18)]"
+                                    : "hover:text-[#ef706e]"
                                 }
 
                                 focus-visible:outline-none
@@ -4594,28 +4591,16 @@ export function Screen19({ onSaveStateChange }: Props) {
                                 focus-visible:ring-[#d9ccec]
                               `}
                             >
-                              {isSelected ? "✓" : ""}
+                              <Heart
+                                aria-hidden="true"
+                                className="h-[36px] w-[36px]"
+                                strokeWidth={2.8}
+                                fill={isSelected ? "#ef706e" : "transparent"}
+                                color={isSelected ? "#ef706e" : "#241b3f"}
+                              />
                             </button>
                           );
                         })}
-                      </div>
-
-                      <div
-                        className="
-                          mt-2
-                          grid
-                          grid-cols-4
-                          gap-[25px]
-                          text-center
-                          text-[11px]
-                          font-semibold
-                          text-[#7654ad]
-                        "
-                      >
-                        <span>1</span>
-                        <span>2</span>
-                        <span>3</span>
-                        <span>4</span>
                       </div>
                     </div>
                   </div>
