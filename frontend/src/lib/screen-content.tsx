@@ -16,6 +16,7 @@ import { useReportCompletion } from "@/lib/screen-completion";
 import { cn } from "@/lib/utils";
 import { useTr, useLanguage } from "@/lib/i18n";
 import { getStrengthColor, getStrengthName } from "@/lib/strengths-i18n";
+import { Heart } from "lucide-react";
 
 // Screens 1–22: content sourced verbatim from the workbook PDF
 // "Vahvuusportfolio lukiolaiselle" (Huomaa hyvä!®).
