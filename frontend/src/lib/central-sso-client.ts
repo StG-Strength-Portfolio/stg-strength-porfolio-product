@@ -39,6 +39,19 @@ export function startAuthorityCheck(returnCode: SsoReturnCode): boolean {
   return true;
 }
 
+export function startLegacyAuthorityDiscovery(returnCode: SsoReturnCode): boolean {
+  if (typeof window === "undefined" || !isSsoAuthorityOrigin(window.location.origin)) return false;
+  if (!claimSsoNavigation()) return false;
+
+  postSsoMessage(portfolioOriginForCode("fi"), {
+    action: "legacy-check",
+    authority: "en",
+    fallback: "sv",
+    returnCode,
+  });
+  return true;
+}
+
 export async function seedAuthorityAndContinue(
   session: Session,
   returnPath: string,
