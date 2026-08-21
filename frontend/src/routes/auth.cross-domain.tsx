@@ -41,6 +41,20 @@ function parsePostedMessage(raw: string): SsoMessage | null {
     }
 
     if (
+      value.action === "legacy-check" &&
+      value.authority === "en" &&
+      (value.fallback === "sv" || value.fallback === null) &&
+      isReturnCode(value.returnCode)
+    ) {
+      return {
+        action: "legacy-check",
+        authority: "en",
+        fallback: value.fallback,
+        returnCode: value.returnCode,
+      };
+    }
+
+    if (
       value.action === "receive" &&
       typeof value.tokenHash === "string" &&
       value.tokenHash.length > 0 &&
@@ -141,6 +155,32 @@ function CrossDomainAuthBridge() {
   useEffect(() => {
     let cancelled = false;
 
+    async function createHandoff(targetOrigin: string, returnCode: SsoReturnCode) {
+      const { data, error } = await supabase.functions.invoke("cross-domain-session", {
+        body: { targetOrigin },
+      });
+      if (cancelled) return false;
+
+      const tokenHash = typeof data?.tokenHash === "string" ? data.tokenHash : "";
+      const verificationType =
+        data?.verificationType === "magiclink" || data?.verificationType === "email"
+          ? data.verificationType
+          : "email";
+
+      if (error || !tokenHash) {
+        console.warn("[central-sso] Could not create handoff", error ?? data);
+        return false;
+      }
+
+      postSsoMessage(targetOrigin, {
+        action: "receive",
+        tokenHash,
+        verificationType,
+        returnCode,
+      });
+      return true;
+    }
+
     async function run() {
       const message = consumeSsoMessage();
       if (!message) {
@@ -170,6 +210,34 @@ function CrossDomainAuthBridge() {
         return;
       }
 
+      if (message.action === "legacy-check") {
+        const authorityOrigin = portfolioOriginForCode(message.authority);
+        if (isSsoAuthorityOrigin(window.location.origin)) {
+          markAuthorityMiss();
+          window.location.replace(authPathForReturnCode(message.returnCode));
+          return;
+        }
+
+        const { data: current } = await supabase.auth.getSession();
+        if (current.session) {
+          const ok = await createHandoff(authorityOrigin, message.returnCode);
+          if (ok || cancelled) return;
+        }
+
+        if (message.fallback) {
+          postSsoMessage(portfolioOriginForCode(message.fallback), {
+            action: "legacy-check",
+            authority: "en",
+            fallback: null,
+            returnCode: message.returnCode,
+          });
+          return;
+        }
+
+        postSsoMessage(authorityOrigin, { action: "miss", returnCode: message.returnCode });
+        return;
+      }
+
       if (message.action === "check") {
         const targetOrigin = portfolioOriginForCode(message.target);
         if (!isSsoAuthorityOrigin(window.location.origin) || targetOrigin === window.location.origin) {
@@ -191,29 +259,10 @@ function CrossDomainAuthBridge() {
           return;
         }
 
-        const { data, error } = await supabase.functions.invoke("cross-domain-session", {
-          body: { targetOrigin },
-        });
-        if (cancelled) return;
-
-        const tokenHash = typeof data?.tokenHash === "string" ? data.tokenHash : "";
-        const verificationType =
-          data?.verificationType === "magiclink" || data?.verificationType === "email"
-            ? data.verificationType
-            : "email";
-
-        if (error || !tokenHash) {
-          console.warn("[central-sso] Could not create target handoff", error ?? data);
+        const ok = await createHandoff(targetOrigin, message.returnCode);
+        if (!ok && !cancelled) {
           postSsoMessage(targetOrigin, { action: "miss", returnCode: message.returnCode });
-          return;
         }
-
-        postSsoMessage(targetOrigin, {
-          action: "receive",
-          tokenHash,
-          verificationType,
-          returnCode: message.returnCode,
-        });
         return;
       }
 
