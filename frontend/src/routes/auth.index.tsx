@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { CornerBlobs } from "@/components/CornerBlobs";
 import { StickyNote } from "@/components/StickyNote";
@@ -31,6 +31,7 @@ function cleanLegacyAuthUrl(idle?: "1") {
 function AuthLanding() {
   const navigate = useNavigate();
   const search = Route.useSearch();
+  const [resolving, setResolving] = useState(true);
   const t = useT();
   const { language } = useLanguage();
   const staffLabel =
@@ -54,8 +55,12 @@ function AuthLanding() {
         return;
       }
 
-      if (isSsoAuthorityOrigin(window.location.origin) || hasRecentAuthorityMiss()) return;
-      startAuthorityCheck("auth");
+      if (isSsoAuthorityOrigin(window.location.origin) || hasRecentAuthorityMiss()) {
+        setResolving(false);
+        return;
+      }
+
+      if (!startAuthorityCheck("auth")) setResolving(false);
     }
 
     void resolveAuth();
@@ -63,6 +68,10 @@ function AuthLanding() {
       cancelled = true;
     };
   }, [search.idle]);
+
+  if (resolving) {
+    return <div className="min-h-screen bg-background" aria-hidden="true" />;
+  }
 
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-hidden flex items-center justify-center px-4 py-10">
