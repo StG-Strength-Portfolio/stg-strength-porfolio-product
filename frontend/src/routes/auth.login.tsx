@@ -48,6 +48,7 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [forgotOpen, setForgotOpen] = useState(false);
+  const [resolving, setResolving] = useState(true);
   const t = useT();
   const tr = useTr();
   const { language } = useLanguage();
@@ -69,8 +70,11 @@ function LoginPage() {
         return;
       }
 
-      if (isSsoAuthorityOrigin(window.location.origin) || hasRecentAuthorityMiss()) return;
-      startAuthorityCheck("login");
+      if (isSsoAuthorityOrigin(window.location.origin) || hasRecentAuthorityMiss()) {
+        setResolving(false);
+        return;
+      }
+      if (!startAuthorityCheck("login")) setResolving(false);
     }
 
     void resolveAuth();
@@ -103,6 +107,10 @@ function LoginPage() {
     } finally {
       setBusy(false);
     }
+  }
+
+  if (resolving) {
+    return <div className="min-h-screen bg-background" aria-hidden="true" />;
   }
 
   return (
