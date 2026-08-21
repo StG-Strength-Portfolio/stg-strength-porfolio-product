@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -11,11 +11,8 @@ import { ForgotPasswordDialog } from "@/components/ForgotPasswordDialog";
 import { toast } from "sonner";
 import { useLanguage, useT, useTr } from "@/lib/i18n";
 import { homeForRole, roleOfCurrentUser } from "@/lib/role-guard";
-import {
-  appendTriedStrengthPortfolioOrigin,
-  nextStrengthPortfolioOrigin,
-  parseTriedStrengthPortfolioOrigins,
-} from "@/lib/cross-domain-auth";
+import { hasRecentAuthorityMiss, isSsoAuthorityOrigin } from "@/lib/cross-domain-auth";
+import { seedAuthorityAndContinue, startAuthorityCheck } from "@/lib/central-sso-client";
 import { z } from "zod";
 
 export const Route = createFileRoute("/auth/login")({
@@ -25,8 +22,6 @@ export const Route = createFileRoute("/auth/login")({
         .string()
         .refine((v) => v.startsWith("/") && !v.startsWith("//"))
         .optional(),
-      sso: z.enum(["miss"]).optional(),
-      ssoTried: z.string().optional(),
     })
     .default({}),
   component: LoginPage,
@@ -38,8 +33,15 @@ const unconfirmedEmailCopy = {
   sv: "Din e-postadress är inte bekräftad ännu. Öppna e-postmeddelandet och klicka på bekräftelselänken. Länken öppnar tjänsten automatiskt.",
 } as const;
 
+function cleanLegacyLoginUrl(next: string) {
+  if (typeof window === "undefined" || !window.location.search) return;
+  const clean = next ? `/auth/login?next=${encodeURIComponent(next)}` : "/auth/login";
+  if (`${window.location.pathname}${window.location.search}` !== clean) {
+    window.history.replaceState({}, "", clean);
+  }
+}
+
 function LoginPage() {
-  const navigate = useNavigate();
   const search = Route.useSearch();
   const next = search.next ?? "";
   const [email, setEmail] = useState("");
@@ -51,34 +53,37 @@ function LoginPage() {
   const { language } = useLanguage();
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data }) => {
+    let cancelled = false;
+
+    async function resolveAuth() {
+      cleanLegacyLoginUrl(next);
+      const { data } = await supabase.auth.getSession();
+      if (cancelled) return;
+
       if (data.session) {
         if (next) {
-          window.location.href = next;
+          window.location.replace(next);
           return;
         }
-        window.location.href = homeForRole(await roleOfCurrentUser());
+        window.location.replace(homeForRole(await roleOfCurrentUser()));
         return;
       }
 
-      const triedOrigins = parseTriedStrengthPortfolioOrigins(search.ssoTried);
-      const otherOrigin = nextStrengthPortfolioOrigin(window.location.origin, triedOrigins);
-      if (!otherOrigin) return;
+      if (isSsoAuthorityOrigin(window.location.origin) || hasRecentAuthorityMiss()) return;
+      startAuthorityCheck("login");
+    }
 
-      const nextTriedOrigins = appendTriedStrengthPortfolioOrigin(triedOrigins, otherOrigin);
-      const bridge = new URL("/auth/cross-domain", otherOrigin);
-      bridge.searchParams.set("target", window.location.origin);
-      bridge.searchParams.set("returnTo", "/auth/login");
-      bridge.searchParams.set("tried", nextTriedOrigins.join(","));
-      window.location.replace(bridge.toString());
-    });
-  }, [navigate, next, search.sso, search.ssoTried]);
+    void resolveAuth();
+    return () => {
+      cancelled = true;
+    };
+  }, [next]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         const errorText = `${error.code ?? ""} ${error.message}`.toLowerCase();
         const isUnconfirmed =
@@ -88,11 +93,13 @@ function LoginPage() {
         toast.error(isUnconfirmed ? unconfirmedEmailCopy[language] : t("auth.login.wrong"));
         return;
       }
-      if (next) {
-        window.location.href = next;
-        return;
+
+      const returnPath = next || homeForRole(await roleOfCurrentUser());
+      if (data.session && !isSsoAuthorityOrigin(window.location.origin)) {
+        const seeding = await seedAuthorityAndContinue(data.session, returnPath, true);
+        if (seeding) return;
       }
-      window.location.href = homeForRole(await roleOfCurrentUser());
+      window.location.replace(returnPath);
     } finally {
       setBusy(false);
     }
