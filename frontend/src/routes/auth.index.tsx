@@ -8,7 +8,11 @@ import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
 import { useLanguage, useT } from "@/lib/i18n";
 import { homeForRole, roleOfCurrentUser } from "@/lib/role-guard";
 import { hasRecentAuthorityMiss, isSsoAuthorityOrigin } from "@/lib/cross-domain-auth";
-import { startAuthorityCheck } from "@/lib/central-sso-client";
+import {
+  seedAuthorityAndContinue,
+  startAuthorityCheck,
+  startLegacyAuthorityDiscovery,
+} from "@/lib/central-sso-client";
 import { z } from "zod";
 
 export const Route = createFileRoute("/auth/")({
@@ -51,12 +55,22 @@ function AuthLanding() {
       if (cancelled) return;
 
       if (data.session) {
-        window.location.replace(homeForRole(await roleOfCurrentUser()));
+        const home = homeForRole(await roleOfCurrentUser());
+        if (!isSsoAuthorityOrigin(window.location.origin)) {
+          const seeding = await seedAuthorityAndContinue(data.session, home);
+          if (seeding || cancelled) return;
+        }
+        window.location.replace(home);
         return;
       }
 
-      if (isSsoAuthorityOrigin(window.location.origin) || hasRecentAuthorityMiss()) {
+      if (hasRecentAuthorityMiss()) {
         setResolving(false);
+        return;
+      }
+
+      if (isSsoAuthorityOrigin(window.location.origin)) {
+        if (!startLegacyAuthorityDiscovery("auth")) setResolving(false);
         return;
       }
 
