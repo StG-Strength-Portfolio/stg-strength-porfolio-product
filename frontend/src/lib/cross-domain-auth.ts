@@ -14,6 +14,12 @@ export type SsoVerificationType = "email" | "magiclink";
 export type SsoMessage =
   | { action: "check"; target: PortfolioDomainCode; returnCode: SsoReturnCode }
   | {
+      action: "legacy-check";
+      authority: "en";
+      fallback: "sv" | null;
+      returnCode: SsoReturnCode;
+    }
+  | {
       action: "receive";
       tokenHash: string;
       verificationType: SsoVerificationType;
