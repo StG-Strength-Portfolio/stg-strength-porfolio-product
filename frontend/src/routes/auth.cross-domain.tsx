@@ -3,8 +3,10 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import {
+  appendTriedStrengthPortfolioOrigin,
   crossDomainMissUrl,
   isStrengthPortfolioOrigin,
+  nextStrengthPortfolioOrigin,
   parseTriedStrengthPortfolioOrigins,
   safeAuthReturnPath,
 } from "@/lib/cross-domain-auth";
@@ -39,6 +41,18 @@ function CrossDomainAuthBridge() {
       const session = sessionData.session;
 
       if (!session) {
+        const nextOrigin = nextStrengthPortfolioOrigin(targetOrigin, triedOrigins);
+
+        if (nextOrigin) {
+          const nextTriedOrigins = appendTriedStrengthPortfolioOrigin(triedOrigins, nextOrigin);
+          const nextBridge = new URL("/auth/cross-domain", nextOrigin);
+          nextBridge.searchParams.set("target", targetOrigin);
+          nextBridge.searchParams.set("returnTo", returnPath);
+          nextBridge.searchParams.set("tried", nextTriedOrigins.join(","));
+          window.location.replace(nextBridge.toString());
+          return;
+        }
+
         window.location.replace(crossDomainMissUrl(targetOrigin, returnPath, triedOrigins));
         return;
       }
