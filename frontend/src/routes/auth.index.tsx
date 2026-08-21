@@ -7,28 +7,26 @@ import { Button } from "@/components/ui/button";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
 import { useLanguage, useT } from "@/lib/i18n";
 import { homeForRole, roleOfCurrentUser } from "@/lib/role-guard";
-import {
-  appendTriedStrengthPortfolioOrigin,
-  crossDomainMissUrl,
-  nextStrengthPortfolioOrigin,
-  parseTriedStrengthPortfolioOrigins,
-  safeAuthReturnPath,
-} from "@/lib/cross-domain-auth";
+import { hasRecentAuthorityMiss, isSsoAuthorityOrigin } from "@/lib/cross-domain-auth";
+import { startAuthorityCheck } from "@/lib/central-sso-client";
 import { z } from "zod";
 
 export const Route = createFileRoute("/auth/")({
   validateSearch: z
     .object({
       idle: z.enum(["1"]).optional(),
-      sso: z.enum(["miss"]).optional(),
-      ssoTried: z.string().optional(),
-      token_hash: z.string().optional(),
-      type: z.enum(["email", "magiclink"]).optional(),
-      returnTo: z.enum(["/auth", "/auth/login"]).optional(),
     })
     .parse,
   component: AuthLanding,
 });
+
+function cleanLegacyAuthUrl(idle?: "1") {
+  if (typeof window === "undefined" || !window.location.search) return;
+  const clean = idle === "1" ? "/auth?idle=1" : "/auth";
+  if (`${window.location.pathname}${window.location.search}` !== clean) {
+    window.history.replaceState({}, "", clean);
+  }
+}
 
 function AuthLanding() {
   const navigate = useNavigate();
@@ -46,57 +44,25 @@ function AuthLanding() {
     let cancelled = false;
 
     async function resolveAuth() {
-      const triedOrigins = parseTriedStrengthPortfolioOrigins(search.ssoTried);
-
-      if (search.token_hash && search.type) {
-        const { error } = await supabase.auth.verifyOtp({
-          token_hash: search.token_hash,
-          type: search.type,
-        });
-
-        if (cancelled) return;
-
-        if (error) {
-          console.error("[cross-domain-auth] Handoff verification failed", error);
-          window.location.replace(
-            crossDomainMissUrl(
-              window.location.origin,
-              safeAuthReturnPath(search.returnTo),
-              triedOrigins,
-            ),
-          );
-          return;
-        }
-
-        window.history.replaceState({}, "", "/auth");
-        window.location.replace(homeForRole(await roleOfCurrentUser()));
-        return;
-      }
+      cleanLegacyAuthUrl(search.idle);
 
       const { data } = await supabase.auth.getSession();
       if (cancelled) return;
 
       if (data.session) {
-        window.location.href = homeForRole(await roleOfCurrentUser());
+        window.location.replace(homeForRole(await roleOfCurrentUser()));
         return;
       }
 
-      const otherOrigin = nextStrengthPortfolioOrigin(window.location.origin, triedOrigins);
-      if (!otherOrigin) return;
-
-      const nextTriedOrigins = appendTriedStrengthPortfolioOrigin(triedOrigins, otherOrigin);
-      const bridge = new URL("/auth/cross-domain", otherOrigin);
-      bridge.searchParams.set("target", window.location.origin);
-      bridge.searchParams.set("returnTo", "/auth");
-      bridge.searchParams.set("tried", nextTriedOrigins.join(","));
-      window.location.replace(bridge.toString());
+      if (isSsoAuthorityOrigin(window.location.origin) || hasRecentAuthorityMiss()) return;
+      startAuthorityCheck("auth");
     }
 
     void resolveAuth();
     return () => {
       cancelled = true;
     };
-  }, [navigate, search.returnTo, search.sso, search.ssoTried, search.token_hash, search.type]);
+  }, [search.idle]);
 
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-hidden flex items-center justify-center px-4 py-10">
