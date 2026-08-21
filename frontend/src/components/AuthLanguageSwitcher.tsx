@@ -1,4 +1,5 @@
 import { LANGUAGES, useLanguage, type Language } from "@/lib/i18n";
+import { rememberDomainLanguagePreference } from "@/lib/domain-language";
 import { cn } from "@/lib/utils";
 
 const ORDER: Language[] = ["fi", "sv", "en"];
@@ -7,6 +8,11 @@ const ORDER: Language[] = ["fi", "sv", "en"];
 export function AuthLanguageSwitcher({ className }: { className?: string }) {
   const { language, setLanguage } = useLanguage();
   const items = ORDER.filter((l) => LANGUAGES.includes(l));
+
+  function pick(l: Language) {
+    rememberDomainLanguagePreference(l);
+    setLanguage(l);
+  }
 
   return (
     <div
@@ -19,7 +25,7 @@ export function AuthLanguageSwitcher({ className }: { className?: string }) {
         <span key={l} className="flex items-center gap-1">
           <button
             type="button"
-            onClick={() => setLanguage(l)}
+            onClick={() => pick(l)}
             aria-pressed={language === l}
             className={cn(
               "rounded-full px-2 py-0.5 transition-colors",
