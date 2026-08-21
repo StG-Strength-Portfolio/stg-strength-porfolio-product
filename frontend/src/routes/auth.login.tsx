@@ -12,7 +12,11 @@ import { toast } from "sonner";
 import { useLanguage, useT, useTr } from "@/lib/i18n";
 import { homeForRole, roleOfCurrentUser } from "@/lib/role-guard";
 import { hasRecentAuthorityMiss, isSsoAuthorityOrigin } from "@/lib/cross-domain-auth";
-import { seedAuthorityAndContinue, startAuthorityCheck } from "@/lib/central-sso-client";
+import {
+  seedAuthorityAndContinue,
+  startAuthorityCheck,
+  startLegacyAuthorityDiscovery,
+} from "@/lib/central-sso-client";
 import { z } from "zod";
 
 export const Route = createFileRoute("/auth/login")({
@@ -62,18 +66,25 @@ function LoginPage() {
       if (cancelled) return;
 
       if (data.session) {
-        if (next) {
-          window.location.replace(next);
-          return;
+        const returnPath = next || homeForRole(await roleOfCurrentUser());
+        if (!isSsoAuthorityOrigin(window.location.origin)) {
+          const seeding = await seedAuthorityAndContinue(data.session, returnPath);
+          if (seeding || cancelled) return;
         }
-        window.location.replace(homeForRole(await roleOfCurrentUser()));
+        window.location.replace(returnPath);
         return;
       }
 
-      if (isSsoAuthorityOrigin(window.location.origin) || hasRecentAuthorityMiss()) {
+      if (hasRecentAuthorityMiss()) {
         setResolving(false);
         return;
       }
+
+      if (isSsoAuthorityOrigin(window.location.origin)) {
+        if (!startLegacyAuthorityDiscovery("login")) setResolving(false);
+        return;
+      }
+
       if (!startAuthorityCheck("login")) setResolving(false);
     }
 
