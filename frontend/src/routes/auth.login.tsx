@@ -11,7 +11,11 @@ import { ForgotPasswordDialog } from "@/components/ForgotPasswordDialog";
 import { toast } from "sonner";
 import { useLanguage, useT, useTr } from "@/lib/i18n";
 import { homeForRole, roleOfCurrentUser } from "@/lib/role-guard";
-import { otherStrengthPortfolioOrigin } from "@/lib/cross-domain-auth";
+import {
+  appendTriedStrengthPortfolioOrigin,
+  nextStrengthPortfolioOrigin,
+  parseTriedStrengthPortfolioOrigins,
+} from "@/lib/cross-domain-auth";
 import { z } from "zod";
 
 export const Route = createFileRoute("/auth/login")({
@@ -22,6 +26,7 @@ export const Route = createFileRoute("/auth/login")({
         .refine((v) => v.startsWith("/") && !v.startsWith("//"))
         .optional(),
       sso: z.enum(["miss"]).optional(),
+      ssoTried: z.string().optional(),
     })
     .default({}),
   component: LoginPage,
@@ -56,17 +61,18 @@ function LoginPage() {
         return;
       }
 
-      if (search.sso === "miss") return;
-
-      const otherOrigin = otherStrengthPortfolioOrigin(window.location.origin);
+      const triedOrigins = parseTriedStrengthPortfolioOrigins(search.ssoTried);
+      const otherOrigin = nextStrengthPortfolioOrigin(window.location.origin, triedOrigins);
       if (!otherOrigin) return;
 
+      const nextTriedOrigins = appendTriedStrengthPortfolioOrigin(triedOrigins, otherOrigin);
       const bridge = new URL("/auth/cross-domain", otherOrigin);
       bridge.searchParams.set("target", window.location.origin);
       bridge.searchParams.set("returnTo", "/auth/login");
+      bridge.searchParams.set("tried", nextTriedOrigins.join(","));
       window.location.replace(bridge.toString());
     });
-  }, [navigate, next, search.sso]);
+  }, [navigate, next, search.sso, search.ssoTried]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
