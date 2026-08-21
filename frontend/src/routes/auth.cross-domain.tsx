@@ -7,6 +7,7 @@ import {
   authPathForReturnCode,
   consumeSsoMessage,
   isSsoAuthorityOrigin,
+  isStrengthPortfolioOrigin,
   markAuthorityMiss,
   markAuthoritySeededFor,
   portfolioOriginForCode,
@@ -107,6 +108,7 @@ function postedMessageResponse(message: SsoMessage): Response {
       "Referrer-Policy": "no-referrer",
       "X-Content-Type-Options": "nosniff",
       "X-Robots-Tag": "noindex, nofollow",
+      "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'",
     },
   });
 }
@@ -115,6 +117,11 @@ export const Route = createFileRoute("/auth/cross-domain")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        const requestOrigin = request.headers.get("origin") ?? "";
+        if (!isStrengthPortfolioOrigin(requestOrigin)) {
+          return new Response("Forbidden", { status: 403 });
+        }
+
         const contentType = request.headers.get("content-type") ?? "";
         if (!contentType.includes("application/x-www-form-urlencoded") && !contentType.includes("multipart/form-data")) {
           return new Response("Bad Request", { status: 400 });
