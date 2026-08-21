@@ -42,11 +42,12 @@ export function startAuthorityCheck(returnCode: SsoReturnCode): boolean {
 export async function seedAuthorityAndContinue(
   session: Session,
   returnPath: string,
+  force = false,
 ): Promise<boolean> {
   if (typeof window === "undefined" || isSsoAuthorityOrigin(window.location.origin)) return false;
 
   const source = portfolioDomainCode(window.location.origin);
-  if (!source || !canAttemptAuthoritySeed(session.user.id)) return false;
+  if (!source || (!force && !canAttemptAuthoritySeed(session.user.id))) return false;
 
   noteAuthoritySeedAttempt(session.user.id);
   const { data, error } = await supabase.functions.invoke("cross-domain-session", {
