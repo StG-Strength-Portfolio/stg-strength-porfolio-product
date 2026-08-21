@@ -61,6 +61,10 @@ function LoginPage() {
         return;
       }
 
+      // A completed SSO miss means the other portfolio domains have already
+      // been checked. Do not repeat the same cross-domain scan on this route.
+      if (search.sso === "miss") return;
+
       const triedOrigins = parseTriedStrengthPortfolioOrigins(search.ssoTried);
       const otherOrigin = nextStrengthPortfolioOrigin(window.location.origin, triedOrigins);
       if (!otherOrigin) return;

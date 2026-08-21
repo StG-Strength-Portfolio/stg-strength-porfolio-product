@@ -118,7 +118,15 @@ function AuthLanding() {
 
         <StickyNote seed="landing-card" className="space-y-4 text-center">
           <Button
-            onClick={() => navigate({ to: "/auth/login" })}
+            onClick={() =>
+              navigate({
+                to: "/auth/login",
+                search:
+                  search.sso === "miss"
+                    ? { sso: "miss", ssoTried: search.ssoTried }
+                    : {},
+              })
+            }
             className="w-full rounded-full bg-[color:var(--purple)] hover:bg-[color:var(--purple)]/90 text-white font-bold py-6 text-base h-auto"
           >
             {t("auth.landing.loginBtn")}
