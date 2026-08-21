@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import {
+  crossDomainMissUrl,
   isStrengthPortfolioOrigin,
+  parseTriedStrengthPortfolioOrigins,
   safeAuthReturnPath,
 } from "@/lib/cross-domain-auth";
 
@@ -11,12 +13,13 @@ export const Route = createFileRoute("/auth/cross-domain")({
   validateSearch: z.object({
     target: z.string(),
     returnTo: z.enum(["/auth", "/auth/login"]).optional(),
+    tried: z.string().optional(),
   }).parse,
   component: CrossDomainAuthBridge,
 });
 
 function CrossDomainAuthBridge() {
-  const { target, returnTo } = Route.useSearch();
+  const { target, returnTo, tried } = Route.useSearch();
   const [message, setMessage] = useState("Checking your session…");
 
   useEffect(() => {
@@ -25,6 +28,7 @@ function CrossDomainAuthBridge() {
     async function run() {
       const targetOrigin = target;
       const returnPath = safeAuthReturnPath(returnTo);
+      const triedOrigins = parseTriedStrengthPortfolioOrigins(tried);
 
       if (!isStrengthPortfolioOrigin(targetOrigin) || targetOrigin === window.location.origin) {
         window.location.replace("/auth");
@@ -35,7 +39,7 @@ function CrossDomainAuthBridge() {
       const session = sessionData.session;
 
       if (!session) {
-        window.location.replace(`${targetOrigin}${returnPath}?sso=miss`);
+        window.location.replace(crossDomainMissUrl(targetOrigin, returnPath, triedOrigins));
         return;
       }
 
@@ -55,7 +59,7 @@ function CrossDomainAuthBridge() {
 
       if (error || !tokenHash) {
         console.error("[cross-domain-auth] Could not create handoff", error ?? data);
-        window.location.replace(`${targetOrigin}${returnPath}?sso=miss`);
+        window.location.replace(crossDomainMissUrl(targetOrigin, returnPath, triedOrigins));
         return;
       }
 
@@ -63,6 +67,9 @@ function CrossDomainAuthBridge() {
       callback.searchParams.set("token_hash", tokenHash);
       callback.searchParams.set("type", verificationType);
       callback.searchParams.set("returnTo", returnPath);
+      if (triedOrigins.length > 0) {
+        callback.searchParams.set("ssoTried", triedOrigins.join(","));
+      }
       window.location.replace(callback.toString());
     }
 
@@ -70,7 +77,7 @@ function CrossDomainAuthBridge() {
     return () => {
       cancelled = true;
     };
-  }, [returnTo, target]);
+  }, [returnTo, target, tried]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 text-foreground">

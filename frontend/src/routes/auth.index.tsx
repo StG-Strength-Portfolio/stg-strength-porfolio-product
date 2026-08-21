@@ -7,7 +7,13 @@ import { Button } from "@/components/ui/button";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
 import { useLanguage, useT } from "@/lib/i18n";
 import { homeForRole, roleOfCurrentUser } from "@/lib/role-guard";
-import { otherStrengthPortfolioOrigin, safeAuthReturnPath } from "@/lib/cross-domain-auth";
+import {
+  appendTriedStrengthPortfolioOrigin,
+  crossDomainMissUrl,
+  nextStrengthPortfolioOrigin,
+  parseTriedStrengthPortfolioOrigins,
+  safeAuthReturnPath,
+} from "@/lib/cross-domain-auth";
 import { z } from "zod";
 
 export const Route = createFileRoute("/auth/")({
@@ -15,6 +21,7 @@ export const Route = createFileRoute("/auth/")({
     .object({
       idle: z.enum(["1"]).optional(),
       sso: z.enum(["miss"]).optional(),
+      ssoTried: z.string().optional(),
       token_hash: z.string().optional(),
       type: z.enum(["email", "magiclink"]).optional(),
       returnTo: z.enum(["/auth", "/auth/login"]).optional(),
@@ -39,6 +46,8 @@ function AuthLanding() {
     let cancelled = false;
 
     async function resolveAuth() {
+      const triedOrigins = parseTriedStrengthPortfolioOrigins(search.ssoTried);
+
       if (search.token_hash && search.type) {
         const { error } = await supabase.auth.verifyOtp({
           token_hash: search.token_hash,
@@ -49,7 +58,13 @@ function AuthLanding() {
 
         if (error) {
           console.error("[cross-domain-auth] Handoff verification failed", error);
-          window.location.replace(`${safeAuthReturnPath(search.returnTo)}?sso=miss`);
+          window.location.replace(
+            crossDomainMissUrl(
+              window.location.origin,
+              safeAuthReturnPath(search.returnTo),
+              triedOrigins,
+            ),
+          );
           return;
         }
 
@@ -66,14 +81,14 @@ function AuthLanding() {
         return;
       }
 
-      if (search.sso === "miss") return;
-
-      const otherOrigin = otherStrengthPortfolioOrigin(window.location.origin);
+      const otherOrigin = nextStrengthPortfolioOrigin(window.location.origin, triedOrigins);
       if (!otherOrigin) return;
 
+      const nextTriedOrigins = appendTriedStrengthPortfolioOrigin(triedOrigins, otherOrigin);
       const bridge = new URL("/auth/cross-domain", otherOrigin);
       bridge.searchParams.set("target", window.location.origin);
       bridge.searchParams.set("returnTo", "/auth");
+      bridge.searchParams.set("tried", nextTriedOrigins.join(","));
       window.location.replace(bridge.toString());
     }
 
@@ -81,7 +96,7 @@ function AuthLanding() {
     return () => {
       cancelled = true;
     };
-  }, [navigate, search.returnTo, search.sso, search.token_hash, search.type]);
+  }, [navigate, search.returnTo, search.sso, search.ssoTried, search.token_hash, search.type]);
 
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-hidden flex items-center justify-center px-4 py-10">

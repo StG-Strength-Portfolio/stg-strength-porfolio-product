@@ -11,6 +11,10 @@ import {
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { LanguageProvider, useLanguage } from "@/lib/i18n";
+import {
+  domainDefaultLanguage,
+  readDomainLanguagePreference,
+} from "@/lib/domain-language";
 import { ensureAgeoFont } from "@/lib/ageo-font";
 
 import appCss from "../styles.css?url";
@@ -24,19 +28,35 @@ const DOCUMENT_TITLE = {
 } as const;
 
 const LANGUAGE_STORAGE_KEY = "student_language";
-const FINNISH_DOMAIN = "vahvuusportfolio.fi";
 
 function applyHostnameLanguageDefault() {
   if (typeof window === "undefined") return;
+
+  const manualPreference = readDomainLanguagePreference();
+  if (manualPreference) {
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, manualPreference);
+    return;
+  }
+
   if (window.localStorage.getItem(LANGUAGE_STORAGE_KEY)) return;
 
-  const hostname = window.location.hostname.toLowerCase().replace(/\.$/, "");
-  const isFinnishDomain =
-    hostname === FINNISH_DOMAIN || hostname.endsWith(`.${FINNISH_DOMAIN}`);
-
-  if (isFinnishDomain) {
-    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, "fi");
+  const defaultLanguage = domainDefaultLanguage(window.location.hostname);
+  if (defaultLanguage) {
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, defaultLanguage);
   }
+}
+
+function DomainLanguagePreferenceSync() {
+  const { language, setLanguage } = useLanguage();
+
+  useEffect(() => {
+    const manualPreference = readDomainLanguagePreference();
+    if (manualPreference && manualPreference !== language) {
+      setLanguage(manualPreference);
+    }
+  }, [language, setLanguage]);
+
+  return null;
 }
 
 function LocalizedDocumentTitle() {
@@ -178,6 +198,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
+        <DomainLanguagePreferenceSync />
         <LocalizedDocumentTitle />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />

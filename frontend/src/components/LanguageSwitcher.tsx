@@ -1,4 +1,5 @@
 import { LANGUAGES, useLanguage, type Language } from "@/lib/i18n";
+import { rememberDomainLanguagePreference } from "@/lib/domain-language";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -6,7 +7,7 @@ const ORDER: Language[] = ["fi", "sv", "en"];
 
 /**
  * FI | SV | EN switcher for staff surfaces (Super Admin, School Admin, Teacher).
- * Always persists to localStorage; optionally also to the user's profile row.
+ * Always persists locally for this domain; optionally also to the user's profile row.
  */
 export function LanguageSwitcher({
   className,
@@ -19,6 +20,7 @@ export function LanguageSwitcher({
   const items = ORDER.filter((l) => LANGUAGES.includes(l));
 
   async function pick(l: Language) {
+    rememberDomainLanguagePreference(l);
     setLanguage(l);
     if (!persistToProfile) return;
     const { data } = await supabase.auth.getUser();
