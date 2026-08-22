@@ -4958,22 +4958,25 @@ function Screen20({ onSaveStateChange }: Props) {
 
 // ----- Screen21 (PDF p23): Vahvuuksien käyttökielto -----
 // FIX: title và heading câu hỏi 2 (đổi <br/> thành trLines) giờ đều qua tr()
+// ----- Screen21 (PDF p23): Vahvuuksien käyttökielto -----
 function Screen21({ onSaveStateChange }: Props) {
   const tr = useTr();
 
   const pages = [
     {
+      label: "21/1",
       fieldKey: "screen_18_tunne",
       question: "Miltä se tuntuisi?",
     },
     {
+      label: "21/2",
       fieldKey: "screen_18_vaikutus",
       question: "Miten tämä vaikuttaisi arkeesi, entä opintoihin?",
     },
   ] as const;
 
-  const [rawStep] = useScreenSubPages(pages.length);
-  const step = Number.isFinite(rawStep) && rawStep >= 0 && rawStep < pages.length ? rawStep : 0;
+  // Không dùng useScreenSubPages nữa
+  const [step, setStep] = useState<0 | 1>(0);
 
   const page = pages[step];
 
@@ -4998,12 +5001,15 @@ function Screen21({ onSaveStateChange }: Props) {
           w-full
           max-w-[1500px]
           overflow-hidden
-          px-[9%]
-          pb-28
-          pt-14
+          px-[8%]
+          pb-32
+          pt-12
         "
       >
-        {/* ILLUSTRATION */}
+        {/* =====================================================
+            LARGE ILLUSTRATION
+        ====================================================== */}
+
         <img
           src="/illustrations/s18-can.png"
           alt=""
@@ -5011,95 +5017,124 @@ function Screen21({ onSaveStateChange }: Props) {
           className="
             pointer-events-none
             absolute
-            right-[3%]
-            top-[52px]
+            right-[4%]
+            top-[70px]
             z-10
-            h-[390px]
+            h-[500px]
             w-auto
-            max-w-[29%]
-            object-contain
+            max-w-[33%]
             select-none
+            object-contain
           "
         />
 
-        {/* HEADER */}
-        <div className="relative z-20 max-w-[980px] pr-[30%]">
+        {/* =====================================================
+            CONTENT
+        ====================================================== */}
+
+        <div
+          className="
+            relative
+            z-20
+            max-w-[850px]
+            pr-[10%]
+          "
+        >
+          {/* 21/1 OR 21/2 */}
+
           <div
             className="
               mb-5
               inline-flex
               items-center
+              justify-center
               rounded-full
               border-2
               border-black
               bg-[#FFE77A]
               px-4
               py-1.5
+              font-display
               text-[15px]
               font-semibold
               text-[#241b3f]
-              shadow-[0_4px_0_rgba(0,0,0,0.14)]
+              shadow-[0_4px_0_rgba(0,0,0,0.15)]
             "
           >
-            {`21/${step + 1}`}
+            {page.label}
           </div>
+
+          {/* TITLE */}
 
           <h1
             className="
               font-display
-              text-[clamp(42px,3.5vw,58px)]
+              text-[clamp(42px,3.6vw,60px)]
               font-semibold
-              leading-[1.06]
+              leading-[1.05]
               text-[#FFE77A]
             "
           >
             {tr("Vahvuuksien käyttökielto")}
           </h1>
 
+          {/* INTRO */}
+
           <p
             className="
-              mt-10
-              max-w-[980px]
+              mt-9
+              max-w-[820px]
               font-display
-              text-[clamp(22px,1.8vw,30px)]
+              text-[clamp(21px,1.7vw,28px)]
               font-semibold
               leading-[1.35]
               text-[#FFE77A]
             "
           >
-            {tr("Kuvittele tilanne, jossa ydinvahvuutesi on kielletty seuraavaksi kuukaudeksi.")}
+            {tr(
+              "Kuvittele tilanne, jossa ydinvahvuutesi on kielletty seuraavaksi kuukaudeksi.",
+            )}
           </p>
+
+          {/* QUESTION */}
 
           <h2
             className="
-              mt-10
-              max-w-[760px]
+              mt-9
+              max-w-[700px]
               font-display
-              text-[clamp(28px,2.2vw,40px)]
+              text-[clamp(26px,2vw,36px)]
               font-semibold
-              leading-[1.22]
+              leading-[1.2]
               text-white
             "
           >
             {tr(page.question)}
           </h2>
-        </div>
 
-        {/* SINGLE TEXTBOX */}
-        <div className="relative z-20 mt-7 max-w-[760px] pr-[8%]">
+          {/* =====================================================
+              ONE TEXTBOX ONLY
+          ====================================================== */}
+
           <div
             className="
-              min-h-[420px]
+              relative
+              mt-6
+              h-[380px]
+              w-full
+              max-w-[700px]
               overflow-hidden
               rounded-[22px]
-              border-2
+              border-[3px]
               border-black
-              bg-[#fcfbfe]
+              bg-[#fffdf8]
               shadow-[0_7px_0_rgba(0,0,0,0.16)]
 
               [&_label]:hidden
+
               [&>div]:h-full
               [&>div]:min-h-0
+              [&>div]:w-full
 
               [&_div]:border-0
               [&_div]:bg-transparent
@@ -5107,39 +5142,116 @@ function Screen21({ onSaveStateChange }: Props) {
               [&_div]:shadow-none
 
               [&_textarea]:h-full
-              [&_textarea]:min-h-[420px]
+              [&_textarea]:min-h-[380px]
               [&_textarea]:w-full
               [&_textarea]:resize-none
-              [&_textarea]:rounded-[22px]
+              [&_textarea]:rounded-[18px]
               [&_textarea]:border-0
               [&_textarea]:bg-transparent
               [&_textarea]:px-6
               [&_textarea]:py-5
+              [&_textarea]:font-display
               [&_textarea]:text-[18px]
-              [&_textarea]:leading-[1.65]
+              [&_textarea]:leading-[1.6]
               [&_textarea]:text-[#241b3f]
               [&_textarea]:outline-none
               [&_textarea]:shadow-none
               [&_textarea]:ring-0
-              [&_textarea]:placeholder:text-[#a7a0b5]
 
               [&_textarea:focus]:outline-none
               [&_textarea:focus]:ring-0
             "
           >
             <ReflectionTextarea
+              key={page.fieldKey}
               fieldKey={page.fieldKey}
               label=""
-              rows={14}
+              rows={12}
               onSaveStateChange={onSaveStateChange}
             />
+          </div>
+
+          {/* =====================================================
+              SUBPAGE NAVIGATION
+          ====================================================== */}
+
+          <div
+            className="
+              mt-7
+              flex
+              max-w-[700px]
+              items-center
+              justify-between
+            "
+          >
+            <button
+              type="button"
+              disabled={step === 0}
+              onClick={() => setStep(0)}
+              className="
+                rounded-full
+                border-2
+                border-white
+                px-5
+                py-2.5
+                font-display
+                text-[16px]
+                font-semibold
+                text-white
+                transition
+
+                disabled:cursor-not-allowed
+                disabled:opacity-30
+
+                enabled:hover:bg-white
+                enabled:hover:text-[#56368f]
+              "
+            >
+              ← {tr("Takaisin")}
+            </button>
+
+            {/* SUBPAGE DOT / NUMBER */}
+
+            <div
+              className="
+                font-display
+                text-[16px]
+                font-semibold
+                text-white
+              "
+            >
+              {step + 1} / 2
+            </div>
+
+            <button
+              type="button"
+              disabled={step === 1}
+              onClick={() => setStep(1)}
+              className="
+                rounded-full
+                bg-[#ff6c6b]
+                px-5
+                py-2.5
+                font-display
+                text-[16px]
+                font-semibold
+                text-white
+                transition
+
+                disabled:cursor-not-allowed
+                disabled:opacity-30
+
+                enabled:hover:brightness-95
+              "
+            >
+              {tr("Seuraava sivu")} →
+            </button>
           </div>
         </div>
       </div>
     </div>
   );
 }
-
 // ----- Screen22 (PDF p24): Idea: Vahvuusjulisteet — informational, no required input -----
 // FIX: 3 đoạn <p> giờ qua tr()
 function Screen22() {
