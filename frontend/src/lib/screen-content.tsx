@@ -8054,9 +8054,10 @@ function Screen33({ onSaveStateChange }: Props) {
 }
 
 // ----- Screen34 (PDF p37): Unelmien tiekartta opinnoissa -----
-// FIX: h1 và mảng qs giờ qua tr()
+
 function Screen34({ onSaveStateChange }: Props) {
   const tr = useTr();
+
   const qs = [
     "Keneltä saan tukea ja opastusta?",
     "Mitä vahvuuksiani voin hyödyntää?",
@@ -8093,220 +8094,377 @@ function Screen34({ onSaveStateChange }: Props) {
         h-full
         min-h-0
         w-full
+
         overflow-x-hidden
-        overflow-y-auto
-        px-[1.5%]
-        pb-24
-        pt-5
+        overflow-y-scroll
+        overscroll-y-contain
+
         text-black
+
         [scrollbar-gutter:stable]
+        [-webkit-overflow-scrolling:touch]
       "
     >
-      <div className="relative mx-auto h-[720px] w-full max-w-[1450px]">
-        <h1
+      {/* =====================================================
+          SCROLL CONTENT
+
+ 
+      ====================================================== */}
+
+      <div
+        className="
+          relative
+          mx-auto
+          min-h-[980px]
+          w-full
+          max-w-[1500px]
+
+          px-[1.5%]
+          pb-[180px]
+          pt-5
+        "
+      >
+        {/* =====================================================
+            DESIGN CANVAS
+
+           
+        ====================================================== */}
+
+        <div
           className="
-            absolute
-            left-[1.5%]
-            top-[5%]
-            z-30
-            max-w-[360px]
-            text-left
-            font-display
-            text-[clamp(34px,2.8vw,52px)]
-            font-semibold
-            leading-[1.03]
-            text-white
+            relative
+            mx-auto
+            h-[720px]
+            w-full
+            max-w-[1450px]
+            overflow-visible
           "
         >
-          {tr("Unelmien tiekartta opinnoissa")}
-        </h1>
+          {/* =================================================
+              TITLE
+          ================================================== */}
 
-        <svg
-          aria-hidden="true"
-          viewBox={`0 0 ${CANVAS_WIDTH} ${CANVAS_HEIGHT}`}
-          preserveAspectRatio="xMidYMid meet"
-          className="pointer-events-none absolute inset-0 z-0 h-full w-full overflow-visible"
-        >
-          <path
-            d={roadPath}
-            fill="none"
-            stroke="rgba(0,0,0,0.15)"
-            strokeWidth="62"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d={roadPath}
-            fill="none"
-            stroke="#fffdfc"
-            strokeWidth="48"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d={roadPath}
-            fill="none"
-            stroke="rgba(118,84,173,0.22)"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeDasharray="12 18"
-          />
+          <h1
+            className="
+              absolute
+              left-[1.5%]
+              top-[5%]
+              z-30
 
-          <g transform="translate(32 425)">
+              max-w-[360px]
+
+              text-left
+              font-display
+              text-[clamp(34px,2.8vw,52px)]
+              font-semibold
+              leading-[1.03]
+
+              text-white
+            "
+          >
+            {tr("Unelmien tiekartta opinnoissa")}
+          </h1>
+
+          {/* =================================================
+              ROAD
+          ================================================== */}
+
+          <svg
+            aria-hidden="true"
+            viewBox={`0 0 ${CANVAS_WIDTH} ${CANVAS_HEIGHT}`}
+            preserveAspectRatio="xMidYMid meet"
+            className="
+              pointer-events-none
+              absolute
+              inset-0
+              z-0
+
+              h-full
+              w-full
+
+              overflow-visible
+            "
+          >
+            {/* ROAD SHADOW */}
+
             <path
-              d="M 0 0 H 100 L 118 24 L 100 48 H 0 Z"
-              fill="#f3cbd1"
-              stroke="#241b3f"
-              strokeWidth="2"
+              d={roadPath}
+              fill="none"
+              stroke="rgba(0,0,0,0.15)"
+              strokeWidth="62"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
-            <text x="56" y="30" textAnchor="middle" fontSize="13" fontWeight="700" fill="#7654ad">
-              {tr("Aloita tästä")}
-            </text>
-          </g>
 
-          <g transform="translate(1345 208)">
-            <line
-              x1="8"
-              y1="0"
-              x2="8"
-              y2="62"
-              stroke="#241b3f"
+            {/* WHITE ROAD */}
+
+            <path
+              d={roadPath}
+              fill="none"
+              stroke="#fffdfc"
+              strokeWidth="48"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+
+            {/* CENTER DASHED LINE */}
+
+            <path
+              d={roadPath}
+              fill="none"
+              stroke="rgba(118,84,173,0.22)"
               strokeWidth="3"
               strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeDasharray="12 18"
             />
-            <rect
-              x="10"
-              y="0"
-              width="82"
-              height="36"
-              rx="9"
-              fill="#ffd95d"
-              stroke="#241b3f"
-              strokeWidth="2"
-            />
-            <text x="51" y="23" textAnchor="middle" fontSize="13" fontWeight="700" fill="#7654ad">
-              {tr("Maali")}
-            </text>
-          </g>
-        </svg>
 
-        {qs.map((q, i) => {
-          const box = boxes[i];
-          if (!box) return null;
+            {/* ===============================================
+                START
+            ================================================ */}
 
-          const left = ((box.cx - box.w / 2) / CANVAS_WIDTH) * 100;
-          const top = ((box.cy - box.h / 2) / CANVAS_HEIGHT) * 100;
-          const width = (box.w / CANVAS_WIDTH) * 100;
-          const height = (box.h / CANVAS_HEIGHT) * 100;
+            <g transform="translate(32 425)">
+              <path
+                d="
+                  M 0 0
+                  H 100
+                  L 118 24
+                  L 100 48
+                  H 0
+                  Z
+                "
+                fill="#f3cbd1"
+                stroke="#241b3f"
+                strokeWidth="2"
+              />
 
-          return (
-            <section
-              key={q}
-              className="
-                absolute
-                z-20
-                flex
-                min-w-0
-                flex-col
-                overflow-hidden
-                bg-[#f8f6f1]
-                px-4
-                pb-4
-                pt-3
-                text-black
-                transition-transform
-                duration-200
-                hover:z-30
-                hover:-translate-y-1
-                focus-within:z-30
-              "
-              style={{
-                left: `${left}%`,
-                top: `${top}%`,
-                width: `${width}%`,
-                height: `${height}%`,
-                minWidth: "0",
-                minHeight: "0",
-                border: "5px solid #111",
-                borderRadius: i % 2 === 0 ? "30px 26px 32px 27px" : "26px 31px 26px 32px",
-                boxShadow: "5px 6px 0 rgba(0,0,0,0.12)",
-                transform: `rotate(${i % 2 === 0 ? "-0.35deg" : "0.3deg"})`,
-              }}
-            >
-              <p className="mb-3 shrink-0 text-left font-display text-[12px] font-semibold leading-[1.2] text-[#6c50a8]">
-                {i + 1}. {tr(q)}
-              </p>
+              <text x="56" y="30" textAnchor="middle" fontSize="13" fontWeight="700" fill="#7654ad">
+                {tr("Aloita tästä")}
+              </text>
+            </g>
 
-              <div
+            {/* ===============================================
+                FINISH
+            ================================================ */}
+
+            <g transform="translate(1345 208)">
+              <line
+                x1="8"
+                y1="0"
+                x2="8"
+                y2="62"
+                stroke="#241b3f"
+                strokeWidth="3"
+                strokeLinecap="round"
+              />
+
+              <rect
+                x="10"
+                y="0"
+                width="82"
+                height="36"
+                rx="9"
+                fill="#ffd95d"
+                stroke="#241b3f"
+                strokeWidth="2"
+              />
+
+              <text x="51" y="23" textAnchor="middle" fontSize="13" fontWeight="700" fill="#7654ad">
+                {tr("Maali")}
+              </text>
+            </g>
+          </svg>
+
+          {/* =================================================
+              QUESTION BOXES
+          ================================================== */}
+
+          {qs.map((q, i) => {
+            const box = boxes[i];
+
+            if (!box) return null;
+
+            const left = ((box.cx - box.w / 2) / CANVAS_WIDTH) * 100;
+
+            const top = ((box.cy - box.h / 2) / CANVAS_HEIGHT) * 100;
+
+            const width = (box.w / CANVAS_WIDTH) * 100;
+
+            const height = (box.h / CANVAS_HEIGHT) * 100;
+
+            return (
+              <section
+                key={q}
                 className="
-                  relative
-                  mt-1
-                  min-h-0
-                  flex-1
+                  absolute
+                  z-20
+
+                  flex
+                  min-w-0
+                  flex-col
+
                   overflow-hidden
-                  rounded-[18px]
-                  border-[5px]
-                  border-black
+
                   bg-[#f8f6f1]
 
-                  [&_label]:hidden
-                  [&>div]:h-full
-                  [&>div]:min-h-0
-                  [&>div]:border-0
-                  [&>div]:shadow-none
-                  [&>div]:outline-none
-                  [&>div]:ring-0
-                  [&_div]:border-0
-                  [&_div]:bg-transparent
-                  [&_div]:p-0
-                  [&_div]:shadow-none
-                  [&_textarea]:relative
-                  [&_textarea]:z-10
-                  [&_textarea]:h-full
-                  [&_textarea]:min-h-[92px]
-                  [&_textarea]:w-full
-                  [&_textarea]:resize-none
-                  [&_textarea]:rounded-[14px]
-                  [&_textarea]:border-0
-                  [&_textarea]:bg-transparent
-                  [&_textarea]:px-3
-                  [&_textarea]:py-2
-                  [&_textarea]:font-display
-                  [&_textarea]:text-[13px]
-                  [&_textarea]:font-normal
-                  [&_textarea]:leading-[28px]
-                  [&_textarea]:text-[#241b3f]
-                  [&_textarea]:outline-none
-                  [&_textarea]:shadow-none
-                  [&_textarea]:ring-0
-                  [&_textarea:focus]:outline-none
-                  [&_textarea:focus]:ring-0
+                  px-4
+                  pb-4
+                  pt-3
+
+                  text-black
+
+                  transition-transform
+                  duration-200
+
+                  hover:z-30
+                  hover:-translate-y-1
+
+                  focus-within:z-30
                 "
+                style={{
+                  left: `${left}%`,
+                  top: `${top}%`,
+                  width: `${width}%`,
+                  height: `${height}%`,
+
+                  minWidth: "0",
+                  minHeight: "0",
+
+                  border: "5px solid #111",
+
+                  borderRadius: i % 2 === 0 ? "30px 26px 32px 27px" : "26px 31px 26px 32px",
+
+                  boxShadow: "5px 6px 0 rgba(0,0,0,0.12)",
+
+                  transform: `rotate(${i % 2 === 0 ? "-0.35deg" : "0.3deg"})`,
+                }}
               >
-                <div
-                  aria-hidden="true"
+                {/* ===========================================
+                    QUESTION
+                ============================================ */}
+
+                <p
                   className="
-                    pointer-events-none
-                    absolute
-                    inset-0
-                    z-0
-                    opacity-75
-                    [background-image:repeating-linear-gradient(to_bottom,transparent_0,transparent_26px,#d9ccef_27px,#d9ccef_29px)]
+                    mb-3
+                    shrink-0
+
+                    text-left
+                    font-display
+                    text-[12px]
+                    font-semibold
+                    leading-[1.2]
+
+                    text-[#6c50a8]
                   "
-                />
-                <div className="relative z-10 h-full">
-                  <ReflectionTextarea
-                    fieldKey={`screen_31_tiekartta_${i + 1}`}
-                    label=""
-                    rows={4}
-                    onSaveStateChange={onSaveStateChange}
+                >
+                  {i + 1}. {tr(q)}
+                </p>
+
+                {/* ===========================================
+                    TEXTBOX
+                ============================================ */}
+
+                <div
+                  className="
+                    relative
+                    mt-1
+
+                    min-h-0
+                    flex-1
+
+                    overflow-hidden
+
+                    rounded-[18px]
+                    border-[5px]
+                    border-black
+
+                    bg-[#f8f6f1]
+
+                    [&_label]:hidden
+
+                    [&>div]:h-full
+                    [&>div]:min-h-0
+                    [&>div]:border-0
+                    [&>div]:shadow-none
+                    [&>div]:outline-none
+                    [&>div]:ring-0
+
+                    [&_div]:border-0
+                    [&_div]:bg-transparent
+                    [&_div]:p-0
+                    [&_div]:shadow-none
+
+                    [&_textarea]:relative
+                    [&_textarea]:z-10
+
+                    [&_textarea]:h-full
+                    [&_textarea]:min-h-[92px]
+                    [&_textarea]:w-full
+
+                    [&_textarea]:resize-none
+
+                    [&_textarea]:rounded-[14px]
+                    [&_textarea]:border-0
+                    [&_textarea]:bg-transparent
+
+                    [&_textarea]:px-3
+                    [&_textarea]:py-2
+
+                    [&_textarea]:font-display
+                    [&_textarea]:text-[13px]
+                    [&_textarea]:font-normal
+                    [&_textarea]:leading-[28px]
+
+                    [&_textarea]:text-[#241b3f]
+
+                    [&_textarea]:outline-none
+                    [&_textarea]:shadow-none
+                    [&_textarea]:ring-0
+
+                    [&_textarea:focus]:border-0
+                    [&_textarea:focus]:outline-none
+                    [&_textarea:focus]:shadow-none
+                    [&_textarea:focus]:ring-0
+                  "
+                >
+                  {/* PAPER LINES */}
+
+                  <div
+                    aria-hidden="true"
+                    className="
+                      pointer-events-none
+
+                      absolute
+                      inset-0
+                      z-0
+
+                      opacity-75
+
+                      [background-image:repeating-linear-gradient(to_bottom,transparent_0,transparent_26px,#d9ccef_27px,#d9ccef_29px)]
+                    "
                   />
+
+                  {/* SAVED TEXTAREA */}
+
+                  <div className="relative z-10 h-full">
+                    <ReflectionTextarea
+                      fieldKey={`screen_31_tiekartta_${i + 1}`}
+                      label=""
+                      rows={4}
+                      onSaveStateChange={onSaveStateChange}
+                    />
+                  </div>
                 </div>
-              </div>
-            </section>
-          );
-        })}
+              </section>
+            );
+          })}
+        </div>
+
+        {/* =====================================================
+            EXTRA SPACE
+        ====================================================== */}
+
+        <div aria-hidden="true" className="h-[80px] w-full" />
       </div>
     </div>
   );
