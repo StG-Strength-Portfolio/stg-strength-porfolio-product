@@ -1890,10 +1890,15 @@
     "en": "Honesty",
     "sv": "Ärlighet"
   },
-  "Väritä\nsydämet": {
-  "en": "Color the hearts",
-  "sv": "Färglägg hjärtana"
-},
+  "Väritä": {
+    "en": "Color",
+    "sv": "Färglägg"
+  },
+  "sydämet": {
+    "en": "the hearts",
+    "sv": "hjärtana"
+  },
+
   "Rehtorilta saadut": {
     "en": "From principal",
     "sv": "Från rektor"
