@@ -4537,15 +4537,17 @@ export function Screen19({ onSaveStateChange }: Props) {
                     >
                       <p
                         className="
-                          mb-4
-                          text-center
-                          text-[12px]
-                          font-semibold
-                          leading-[1.25]
-                          text-[#4b3a66]
-                        "
+    mb-4
+    text-center
+    text-[12px]
+    font-semibold
+    leading-[1.25]
+    text-[#4b3a66]
+  "
                       >
-                        {trLines(tr, "Väritä\nsydämet")}
+                        {tr("Väritä")}
+                        <br />
+                        {tr("sydämet")}
                       </p>
 
                       <div
