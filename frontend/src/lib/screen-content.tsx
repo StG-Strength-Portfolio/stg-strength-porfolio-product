@@ -4960,6 +4960,23 @@ function Screen20({ onSaveStateChange }: Props) {
 // FIX: title và heading câu hỏi 2 (đổi <br/> thành trLines) giờ đều qua tr()
 function Screen21({ onSaveStateChange }: Props) {
   const tr = useTr();
+
+  const pages = [
+    {
+      fieldKey: "screen_18_tunne",
+      question: "Miltä se tuntuisi?",
+    },
+    {
+      fieldKey: "screen_18_vaikutus",
+      question: "Miten tämä vaikuttaisi arkeesi, entä opintoihin?",
+    },
+  ] as const;
+
+  const [rawStep] = useScreenSubPages(pages.length);
+  const step = Number.isFinite(rawStep) && rawStep >= 0 && rawStep < pages.length ? rawStep : 0;
+
+  const page = pages[step];
+
   return (
     <div
       className="
@@ -4977,15 +4994,16 @@ function Screen21({ onSaveStateChange }: Props) {
         className="
           relative
           mx-auto
-          min-h-[760px]
+          min-h-[820px]
           w-full
           max-w-[1500px]
           overflow-hidden
           px-[9%]
-          pb-20
-          pt-16
+          pb-28
+          pt-14
         "
       >
+        {/* ILLUSTRATION */}
         <img
           src="/illustrations/s18-can.png"
           alt=""
@@ -4993,24 +5011,46 @@ function Screen21({ onSaveStateChange }: Props) {
           className="
             pointer-events-none
             absolute
-            right-[2%]
-            top-[28px]
+            right-[3%]
+            top-[52px]
             z-10
-            h-[305px]
+            h-[390px]
             w-auto
-            max-w-[23%]
+            max-w-[29%]
             object-contain
+            select-none
           "
         />
 
-        <div className="relative z-20 max-w-[1100px]">
+        {/* HEADER */}
+        <div className="relative z-20 max-w-[980px] pr-[30%]">
+          <div
+            className="
+              mb-5
+              inline-flex
+              items-center
+              rounded-full
+              border-2
+              border-black
+              bg-[#FFE77A]
+              px-4
+              py-1.5
+              text-[15px]
+              font-semibold
+              text-[#241b3f]
+              shadow-[0_4px_0_rgba(0,0,0,0.14)]
+            "
+          >
+            {`21/${step + 1}`}
+          </div>
+
           <h1
             className="
               font-display
-              text-[clamp(38px,3.4vw,54px)]
+              text-[clamp(42px,3.5vw,58px)]
               font-semibold
-              leading-[1.08]
-              text-yellow
+              leading-[1.06]
+              text-[#FFE77A]
             "
           >
             {tr("Vahvuuksien käyttökielto")}
@@ -5018,168 +5058,81 @@ function Screen21({ onSaveStateChange }: Props) {
 
           <p
             className="
-              mt-12
-              max-w-[1050px]
+              mt-10
+              max-w-[980px]
               font-display
-              text-[clamp(20px,1.65vw,27px)]
+              text-[clamp(22px,1.8vw,30px)]
               font-semibold
               leading-[1.35]
-              text-yellow
+              text-[#FFE77A]
             "
           >
             {tr("Kuvittele tilanne, jossa ydinvahvuutesi on kielletty seuraavaksi kuukaudeksi.")}
           </p>
+
+          <h2
+            className="
+              mt-10
+              max-w-[760px]
+              font-display
+              text-[clamp(28px,2.2vw,40px)]
+              font-semibold
+              leading-[1.22]
+              text-white
+            "
+          >
+            {tr(page.question)}
+          </h2>
         </div>
 
-        <div
-          className="
-            relative
-            z-20
-            mt-7
-            grid
-            grid-cols-1
-            gap-x-12
-            gap-y-12
-            pr-[6%]
-            md:grid-cols-2
-          "
-        >
-          <div className="flex min-h-[450px] min-w-0 flex-col">
-            <h2
-              className="
-                min-h-[52px]
-                font-display
-                text-[clamp(21px,1.8vw,28px)]
-                font-semibold
-                leading-[1.3]
-                text-white
-              "
-            >
-              {tr("Miltä se tuntuisi? Miten se vaikuttaisi arkeesi – ja opiskeluusi?")}
-            </h2>
+        {/* SINGLE TEXTBOX */}
+        <div className="relative z-20 mt-7 max-w-[760px] pr-[8%]">
+          <div
+            className="
+              min-h-[420px]
+              overflow-hidden
+              rounded-[22px]
+              border-2
+              border-black
+              bg-[#fcfbfe]
+              shadow-[0_7px_0_rgba(0,0,0,0.16)]
 
-            <div
-              className="
-                relative
-                mt-5
-                min-h-[350px]
-                flex-1
-                overflow-hidden
-                border-2
-                border-black
-                rounded-[18px]
-                bg-[#fcfbfe]
-                shadow-[0_5px_0_#e2d8ed]
+              [&_label]:hidden
+              [&>div]:h-full
+              [&>div]:min-h-0
 
-                focus-within:bg-white
+              [&_div]:border-0
+              [&_div]:bg-transparent
+              [&_div]:p-0
+              [&_div]:shadow-none
 
-                [&_label]:hidden
+              [&_textarea]:h-full
+              [&_textarea]:min-h-[420px]
+              [&_textarea]:w-full
+              [&_textarea]:resize-none
+              [&_textarea]:rounded-[22px]
+              [&_textarea]:border-0
+              [&_textarea]:bg-transparent
+              [&_textarea]:px-6
+              [&_textarea]:py-5
+              [&_textarea]:text-[18px]
+              [&_textarea]:leading-[1.65]
+              [&_textarea]:text-[#241b3f]
+              [&_textarea]:outline-none
+              [&_textarea]:shadow-none
+              [&_textarea]:ring-0
+              [&_textarea]:placeholder:text-[#a7a0b5]
 
-                [&>div]:h-full
-                [&>div]:min-h-0
-
-                [&_div]:border-0
-                [&_div]:bg-transparent
-                [&_div]:p-0
-                [&_div]:shadow-none
-
-                [&_textarea]:h-full
-                [&_textarea]:min-h-[350px]
-                [&_textarea]:w-full
-                [&_textarea]:resize-none
-                [&_textarea]:rounded-[18px]
-                [&_textarea]:border-0
-                [&_textarea]:bg-transparent
-                [&_textarea]:px-5
-                [&_textarea]:py-4
-                [&_textarea]:text-[17px]
-                [&_textarea]:leading-[1.55]
-                [&_textarea]:text-[#241b3f]
-                [&_textarea]:outline-none
-                [&_textarea]:shadow-none
-                [&_textarea]:ring-0
-                [&_textarea]:placeholder:text-[#aaa1b5]
-
-                [&_textarea:focus]:outline-none
-                [&_textarea:focus]:ring-0
-              "
-            >
-              <ReflectionTextarea
-                fieldKey="screen_18_tunne"
-                label=""
-                rows={12}
-                onSaveStateChange={onSaveStateChange}
-              />
-            </div>
-          </div>
-
-          <div className="flex min-h-[300px] min-w-0 flex-col">
-            <h2
-              className="
-                min-h-[72px]
-                font-display
-                text-[clamp(21px,1.8vw,28px)]
-                font-semibold
-                leading-[1.3]
-                text-white
-              "
-            >
-              {trLines(tr, "Miten tämä vaikuttaisi arkeesi,\nentä opintoihin?")}
-            </h2>
-
-            <div
-              className="
-                relative
-                mt-5
-                min-h-[350px]
-                flex-1
-                overflow-hidden
-                border-2
-                border-black
-                rounded-[18px]
-                bg-[#fcfbfe]
-                shadow-[0_5px_0_#e2d8ed]
-
-                focus-within:bg-white
-
-                [&_label]:hidden
-
-                [&>div]:h-full
-                [&>div]:min-h-0
-
-                [&_div]:border-0
-                [&_div]:bg-transparent
-                [&_div]:p-0
-                [&_div]:shadow-none
-
-                [&_textarea]:h-full
-                [&_textarea]:min-h-[350px]
-                [&_textarea]:w-full
-                [&_textarea]:resize-none
-                [&_textarea]:rounded-[18px]
-                [&_textarea]:border-0
-                [&_textarea]:bg-transparent
-                [&_textarea]:px-5
-                [&_textarea]:py-4
-                [&_textarea]:text-[17px]
-                [&_textarea]:leading-[1.55]
-                [&_textarea]:text-[#241b3f]
-                [&_textarea]:outline-none
-                [&_textarea]:shadow-none
-                [&_textarea]:ring-0
-                [&_textarea]:placeholder:text-[#aaa1b5]
-
-                [&_textarea:focus]:outline-none
-                [&_textarea:focus]:ring-0
-              "
-            >
-              <ReflectionTextarea
-                fieldKey="screen_18_vaikutus"
-                label=""
-                rows={12}
-                onSaveStateChange={onSaveStateChange}
-              />
-            </div>
+              [&_textarea:focus]:outline-none
+              [&_textarea:focus]:ring-0
+            "
+          >
+            <ReflectionTextarea
+              fieldKey={page.fieldKey}
+              label=""
+              rows={14}
+              onSaveStateChange={onSaveStateChange}
+            />
           </div>
         </div>
       </div>
