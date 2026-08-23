@@ -9680,16 +9680,349 @@ function Screen43() {
   );
 }
 // ----- Screen44: Vahvuuskarkkini kotona -----
-function Screen44(p: Props) {
+function Screen44StrengthCandyHome({ onSaveStateChange }: Props) {
+  const tr = useTr();
+  const { language } = useLanguage();
+
+  const [selectedStrengths, setSelectedStrengths] = useState<Record<number, string>>({});
+
+  const selectedValues = Object.values(selectedStrengths).filter(Boolean);
+
+  const updateStrength = useCallback((index: number, value: string) => {
+    setSelectedStrengths((current) => {
+      if (current[index] === value) return current;
+
+      return {
+        ...current,
+        [index]: value,
+      };
+    });
+  }, []);
+
+  // Use the existing language-specific worksheet illustration.
+  const sheetIllustration =
+    language === "fi"
+      ? "/illustrations/s29-lukiossa-sheet-fi.png"
+      : language === "sv"
+        ? "/illustrations/s29-lukiossa-sheet-sv.png"
+        : "/illustrations/s29-lukiossa-sheet-en.png";
+
+  // Screen44 uses the same worksheet artwork structure,
+  // but the context label must represent "At home".
+  const homeLabel = language === "fi" ? "KOTONA" : language === "sv" ? "HEMMA" : "AT HOME";
+
   return (
-    <VahvuuskarkkiSheet
-      title="Vahvuuskarkkini"
-      context="kotona"
-      fieldPrefix="screen_41"
-      onSaveStateChange={p.onSaveStateChange}
-    />
+    <div
+      className="
+        relative
+        h-full
+        min-h-0
+        w-full
+        overflow-x-hidden
+        overflow-y-auto
+        text-white
+        [scrollbar-gutter:stable]
+      "
+    >
+      <div
+        className="
+          relative
+          mx-auto
+          grid
+          min-h-[780px]
+          w-full
+          max-w-[1500px]
+          grid-cols-1
+          gap-12
+          px-[6%]
+          pb-24
+          pt-8
+          lg:grid-cols-[44%_56%]
+        "
+      >
+        {/* =====================================================
+            LEFT SIDE
+        ====================================================== */}
+
+        <div className="relative min-w-0 pt-4">
+          {/* Main title */}
+
+          <h1
+            className="
+              max-w-[520px]
+              font-display
+              text-[clamp(36px,3.2vw,52px)]
+              font-semibold
+              leading-[1.05]
+              text-[#FFE77A]
+            "
+          >
+            {tr("Täytä viikon aikana")}
+          </h1>
+
+          {/* Exercise title */}
+
+          <h2
+            className="
+              mt-6
+              max-w-[520px]
+              font-display
+              text-[clamp(30px,2.7vw,44px)]
+              font-semibold
+              leading-[1.08]
+              text-white
+            "
+          >
+            {tr("Vahvuuskarkkini")}
+          </h2>
+
+          {/* Strength selection instruction */}
+
+          <p
+            className="
+              mt-7
+              max-w-[440px]
+              font-display
+              text-[clamp(19px,1.5vw,25px)]
+              font-semibold
+              leading-[1.3]
+              text-white
+            "
+          >
+            {tr("Valitse 1–2 vahvuuskarkkia ja")} {tr("hyödynnä")} {tr("kotona")}.
+          </p>
+
+          <p
+            className="
+              mt-2
+              max-w-[440px]
+              font-display
+              text-[clamp(18px,1.4vw,23px)]
+              font-semibold
+              leading-[1.3]
+              text-white
+            "
+          >
+            {tr("Kirjoita vahvuudet tähän")}
+          </p>
+
+          {/* Strength selectors */}
+
+          <div
+            className="
+              mt-5
+              grid
+              max-w-[420px]
+              gap-3
+            "
+          >
+            <Screen42StrengthSelect
+              index={0}
+              fieldKey="screen_41_karkki_1"
+              language={language}
+              selectedValues={selectedValues}
+              onValueChange={updateStrength}
+              onSaveStateChange={onSaveStateChange}
+            />
+
+            <Screen42StrengthSelect
+              index={1}
+              fieldKey="screen_41_karkki_2"
+              language={language}
+              selectedValues={selectedValues}
+              onValueChange={updateStrength}
+              onSaveStateChange={onSaveStateChange}
+            />
+          </div>
+
+          {/* Reflection instruction */}
+
+          <p
+            className="
+              mt-12
+              max-w-[440px]
+              font-display
+              text-[clamp(19px,1.55vw,25px)]
+              font-semibold
+              leading-[1.35]
+              text-white
+            "
+          >
+            {tr("Pohdi, mitä teit, koit ja opit.")}
+          </p>
+
+          <div
+            className="
+              mt-6
+              grid
+              max-w-[460px]
+              grid-cols-[10px_minmax(0,1fr)]
+              gap-x-4
+            "
+          >
+            <span
+              aria-hidden="true"
+              className="
+                mt-[10px]
+                h-[8px]
+                w-[8px]
+                rounded-full
+                bg-[#ffc936]
+              "
+            />
+
+            <p
+              className="
+                text-[clamp(18px,1.4vw,23px)]
+                leading-[1.35]
+                text-white
+              "
+            >
+              {tr("Täydennä oheinen tehtävä.")}
+            </p>
+          </div>
+        </div>
+
+        {/* =====================================================
+            RIGHT SIDE
+        ====================================================== */}
+
+        <div
+          className="
+            relative
+            flex
+            min-h-[700px]
+            min-w-0
+            items-start
+            justify-center
+          "
+        >
+          <div
+            className="
+              relative
+              h-[700px]
+              w-[560px]
+              max-w-full
+              shrink-0
+            "
+          >
+            {/* Existing worksheet illustration */}
+
+            <img
+              src={sheetIllustration}
+              alt=""
+              aria-hidden="true"
+              className="
+                pointer-events-none
+                absolute
+                inset-0
+                z-0
+                h-full
+                w-full
+                object-fill
+                select-none
+              "
+            />
+
+            {/* =================================================
+                HOME LABEL OVERLAY
+
+                The existing illustration contains the original
+                school-context tab. This overlay changes only the
+                context label without recreating the worksheet.
+            ================================================== */}
+
+            {/* =================================================
+                TOP BOX — 3. WHAT DID YOU LEARN?
+            ================================================== */}
+
+            <div
+              className="
+                absolute
+                left-[25.39%]
+                top-[13.09%]
+                z-20
+                h-[18.95%]
+                w-[50%]
+              "
+            >
+              <VahvuuskarkkiOverlayInput
+                fieldKey="screen_41_opit"
+                onSaveStateChange={onSaveStateChange}
+              />
+            </div>
+
+            {/* =================================================
+                MIDDLE LEFT — 2. WHAT HAPPENED NEXT?
+            ================================================== */}
+
+            <div
+              className="
+                absolute
+                left-[14.75%]
+                top-[39.65%]
+                z-20
+                h-[18.65%]
+                w-[33.59%]
+              "
+            >
+              <VahvuuskarkkiOverlayInput
+                fieldKey="screen_41_seuraavaksi"
+                onSaveStateChange={onSaveStateChange}
+              />
+            </div>
+
+            {/* =================================================
+                MIDDLE RIGHT — 4. HOW WILL YOU USE IT?
+            ================================================== */}
+
+            <div
+              className="
+                absolute
+                left-[51.86%]
+                top-[39.65%]
+                z-20
+                h-[18.65%]
+                w-[33.40%]
+              "
+            >
+              <VahvuuskarkkiOverlayInput
+                fieldKey="screen_41_hyodynnat"
+                onSaveStateChange={onSaveStateChange}
+              />
+            </div>
+
+            {/* =================================================
+                BOTTOM BOX — 1. WHAT DID YOU DO?
+            ================================================== */}
+
+            <div
+              className="
+                absolute
+                left-[24.71%]
+                top-[69.73%]
+                z-20
+                h-[16.02%]
+                w-[50.49%]
+              "
+            >
+              <VahvuuskarkkiOverlayInput
+                fieldKey="screen_41_teit"
+                onSaveStateChange={onSaveStateChange}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
+
+
+function Screen44(p: Props) {
+  return <Screen44StrengthCandyHome {...p} />;
+}
+
 
 // ----- Screen45: Vahvuudet perheessä -----
 function Screen45({ onSaveStateChange }: Props) {
