@@ -10910,14 +10910,861 @@ function Screen49() {
 }
 
 // ----- Screen50 (PDF p53): Vahvuuskarkkini vapaa-ajalla -----
-function Screen50(p: Props) {
+// ============================================================
+// Screen50 — Strength Candy in Free Time
+// ============================================================
+
+function Screen50({ onSaveStateChange }: Props) {
+  const tr = useTr();
+  const { language } = useLanguage();
+
+  const [selectedStrengths, setSelectedStrengths] = useState<Record<number, string>>({});
+
+  const [images, setImages] = useState<Array<string | null>>([null, null, null, null]);
+
+  const imageInputRefs = useRef<Array<HTMLInputElement | null>>([]);
+
+  const selectedValues = Object.values(selectedStrengths).filter(Boolean);
+
+  // Keep both strength selectors synchronized.
+  const updateStrength = useCallback((index: number, value: string) => {
+    setSelectedStrengths((current) => {
+      if (current[index] === value) return current;
+
+      return {
+        ...current,
+        [index]: value,
+      };
+    });
+  }, []);
+
+  // Read a selected image from the user's device.
+  function loadImage(index: number, file?: File) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return;
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (typeof reader.result !== "string") return;
+
+      setImages((current) => {
+        const next = [...current];
+        next[index] = reader.result as string;
+        return next;
+      });
+    };
+
+    reader.readAsDataURL(file);
+  }
+
+  // Remove an image from one slot.
+  function removeImage(index: number) {
+    setImages((current) => {
+      const next = [...current];
+      next[index] = null;
+      return next;
+    });
+
+    const input = imageInputRefs.current[index];
+
+    if (input) {
+      input.value = "";
+    }
+  }
+
+  const selectedImageCount = images.filter(Boolean).length;
+
+  // Use the existing language-specific worksheet illustration.
+  const sheetIllustration =
+    language === "fi"
+      ? "/illustrations/s29-lukiossa-sheet-fi.png"
+      : language === "sv"
+        ? "/illustrations/s29-lukiossa-sheet-sv.png"
+        : "/illustrations/s29-lukiossa-sheet-en.png";
+
   return (
-    <VahvuuskarkkiSheet
-      title="Vahvuuskarkkini"
-      context="vapaa-ajalla"
-      fieldPrefix="screen_48"
-      onSaveStateChange={p.onSaveStateChange}
-    />
+    <div
+      className="
+        relative
+        h-full
+        min-h-0
+        w-full
+        overflow-x-hidden
+        overflow-y-auto
+        text-white
+        [scrollbar-gutter:stable]
+      "
+    >
+      {/* =====================================================
+          MAIN WORKSHEET
+      ====================================================== */}
+
+      <section
+        className="
+          relative
+          mx-auto
+          grid
+          min-h-[780px]
+          w-full
+          max-w-[1500px]
+          grid-cols-1
+          gap-12
+          px-[6%]
+          pb-20
+          pt-8
+          lg:grid-cols-[44%_56%]
+        "
+      >
+        {/* ===================================================
+            LEFT SIDE
+        ==================================================== */}
+
+        <div className="relative min-w-0 pt-6">
+          <h1
+            className="
+              max-w-[520px]
+              font-display
+              text-[clamp(36px,3.2vw,54px)]
+              font-semibold
+              leading-[1.05]
+              text-[#FFE77A]
+            "
+          >
+            {tr("Vahvuuskarkkini")}
+          </h1>
+
+          <p
+            className="
+              mt-8
+              max-w-[430px]
+              font-display
+              text-[clamp(20px,1.55vw,27px)]
+              font-semibold
+              leading-[1.25]
+              text-white
+            "
+          >
+            {tr("Valitse 1–2 vahvuuskarkkia ja")} {tr("hyödynnä")} {tr("vapaa-ajalla")}.
+          </p>
+
+          <p
+            className="
+              mt-2
+              max-w-[430px]
+              font-display
+              text-[clamp(18px,1.4vw,24px)]
+              font-semibold
+              text-white
+            "
+          >
+            {tr("Kirjoita vahvuudet tähän")}
+          </p>
+
+          {/* =================================================
+              TWO STRENGTH SELECTORS
+          ================================================== */}
+
+          <div
+            className="
+              mt-5
+              grid
+              max-w-[420px]
+              gap-3
+            "
+          >
+            <Screen42StrengthSelect
+              index={0}
+              fieldKey="screen_48_karkki_1"
+              language={language}
+              selectedValues={selectedValues}
+              onValueChange={updateStrength}
+              onSaveStateChange={onSaveStateChange}
+            />
+
+            <Screen42StrengthSelect
+              index={1}
+              fieldKey="screen_48_karkki_2"
+              language={language}
+              selectedValues={selectedValues}
+              onValueChange={updateStrength}
+              onSaveStateChange={onSaveStateChange}
+            />
+          </div>
+
+          {/* =================================================
+              SCROLL NOTICE
+          ================================================== */}
+
+          <div
+            className="
+              mt-7
+              flex
+              max-w-[460px]
+              items-center
+              gap-4
+              rounded-[18px]
+              border-2
+              border-black
+              bg-[#FFE77A]
+              px-5
+              py-4
+              text-[#241b3f]
+              shadow-[0_5px_0_rgba(0,0,0,0.15)]
+            "
+          >
+            <span
+              aria-hidden="true"
+              className="
+                inline-flex
+                shrink-0
+                animate-bounce
+                font-display
+                text-[32px]
+                font-bold
+                leading-none
+              "
+            >
+              ↓
+            </span>
+
+            <p
+              className="
+                font-display
+                text-[15px]
+                font-semibold
+                leading-[1.3]
+              "
+            >
+              {tr("Vieritä alaspäin – lisää 4 kuvaa ja tee niistä yksi kuvakollaasi.")}
+            </p>
+          </div>
+
+          <p
+            className="
+              mt-9
+              max-w-[440px]
+              font-display
+              text-[clamp(19px,1.6vw,26px)]
+              font-semibold
+              leading-[1.35]
+              text-white
+            "
+          >
+            {tr("Pohdi, mitä teit, koit ja opit.")}
+          </p>
+
+          <div
+            className="
+              mt-6
+              grid
+              max-w-[460px]
+              grid-cols-[10px_minmax(0,1fr)]
+              gap-x-4
+            "
+          >
+            <span
+              aria-hidden="true"
+              className="
+                mt-[10px]
+                h-[8px]
+                w-[8px]
+                rounded-full
+                bg-[#ffc936]
+              "
+            />
+
+            <p
+              className="
+                text-[clamp(18px,1.45vw,24px)]
+                leading-[1.35]
+                text-white
+              "
+            >
+              {tr("Täydennä oheinen tehtävä.")}
+            </p>
+          </div>
+        </div>
+
+        {/* ===================================================
+            RIGHT SIDE
+        ==================================================== */}
+
+        <div
+          className="
+            relative
+            flex
+            min-h-[700px]
+            min-w-0
+            items-start
+            justify-center
+          "
+        >
+          <div
+            className="
+              relative
+              h-[700px]
+              w-[560px]
+              max-w-full
+              shrink-0
+            "
+          >
+            {/* Existing worksheet illustration */}
+
+            <img
+              src={sheetIllustration}
+              alt=""
+              aria-hidden="true"
+              className="
+                pointer-events-none
+                absolute
+                inset-0
+                z-0
+                h-full
+                w-full
+                object-fill
+                select-none
+              "
+            />
+
+            {/* Top box — What did you learn? */}
+
+            <div
+              className="
+                absolute
+                left-[25.39%]
+                top-[13.09%]
+                z-20
+                h-[18.95%]
+                w-[50%]
+              "
+            >
+              <VahvuuskarkkiOverlayInput
+                fieldKey="screen_48_opit"
+                onSaveStateChange={onSaveStateChange}
+              />
+            </div>
+
+            {/* Middle left box — What happened next? */}
+
+            <div
+              className="
+                absolute
+                left-[14.75%]
+                top-[39.65%]
+                z-20
+                h-[18.65%]
+                w-[33.59%]
+              "
+            >
+              <VahvuuskarkkiOverlayInput
+                fieldKey="screen_48_seuraavaksi"
+                onSaveStateChange={onSaveStateChange}
+              />
+            </div>
+
+            {/* Middle right box — How will you use it? */}
+
+            <div
+              className="
+                absolute
+                left-[51.86%]
+                top-[39.65%]
+                z-20
+                h-[18.65%]
+                w-[33.40%]
+              "
+            >
+              <VahvuuskarkkiOverlayInput
+                fieldKey="screen_48_hyodynnat"
+                onSaveStateChange={onSaveStateChange}
+              />
+            </div>
+
+            {/* Bottom box — What did you do? */}
+
+            <div
+              className="
+                absolute
+                left-[24.71%]
+                top-[69.73%]
+                z-20
+                h-[16.02%]
+                w-[50.49%]
+              "
+            >
+              <VahvuuskarkkiOverlayInput
+                fieldKey="screen_48_teit"
+                onSaveStateChange={onSaveStateChange}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =====================================================
+          SCROLL TRANSITION
+      ====================================================== */}
+
+      <div
+        className="
+          mx-auto
+          flex
+          w-full
+          max-w-[1380px]
+          items-center
+          gap-5
+          px-[6%]
+          py-6
+        "
+      >
+        <div className="h-px flex-1 bg-white/30" />
+
+        <div
+          className="
+            flex
+            items-center
+            gap-3
+            rounded-full
+            bg-[#FFE77A]
+            px-6
+            py-3
+            font-display
+            text-[15px]
+            font-semibold
+            text-[#241b3f]
+          "
+        >
+          <span aria-hidden="true">↓</span>
+
+          {tr("Lisää kuvasi alle")}
+
+          <span aria-hidden="true">↓</span>
+        </div>
+
+        <div className="h-px flex-1 bg-white/30" />
+      </div>
+
+      {/* =====================================================
+          FOUR-PHOTO ACTIVITY
+      ====================================================== */}
+
+      <section
+        className="
+          mx-auto
+          w-full
+          max-w-[1380px]
+          px-[6%]
+          pb-32
+          pt-8
+        "
+      >
+        <div className="max-w-[900px]">
+          <h2
+            className="
+              font-display
+              text-[clamp(32px,2.8vw,46px)]
+              font-semibold
+              leading-[1.08]
+              text-[#FFE77A]
+            "
+          >
+            {tr("Lisää 4 kuvaa vapaa-ajastasi")}
+          </h2>
+
+          <p
+            className="
+              mt-3
+              max-w-[760px]
+              font-display
+              text-[clamp(17px,1.35vw,22px)]
+              leading-[1.4]
+              text-white
+            "
+          >
+            {tr("Vedä kuvat paikoilleen tai valitse ne omista tiedostoistasi.")}
+          </p>
+        </div>
+
+        <div
+          className="
+            mt-8
+            grid
+            grid-cols-1
+            gap-12
+            lg:grid-cols-[1fr_1fr]
+          "
+        >
+          {/* =================================================
+              FOUR IMAGE SLOTS
+          ================================================== */}
+
+          <div
+            className="
+              grid
+              grid-cols-1
+              gap-5
+              sm:grid-cols-2
+            "
+          >
+            {images.map((image, index) => (
+              <div
+                key={index}
+                className="
+                  relative
+                  aspect-[4/3]
+                  min-w-0
+                "
+              >
+                <input
+                  ref={(element) => {
+                    imageInputRefs.current[index] = element;
+                  }}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(event) => {
+                    loadImage(index, event.target.files?.[0]);
+                  }}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => imageInputRefs.current[index]?.click()}
+                  onDragOver={(event) => {
+                    event.preventDefault();
+                  }}
+                  onDrop={(event) => {
+                    event.preventDefault();
+
+                    loadImage(index, event.dataTransfer.files?.[0]);
+                  }}
+                  className="
+                    group
+                    relative
+                    flex
+                    h-full
+                    w-full
+                    overflow-hidden
+                    rounded-[24px]
+                    border-[3px]
+                    border-dashed
+                    border-white
+                    bg-white/10
+                    text-white
+                    transition
+                    duration-200
+
+                    hover:-translate-y-1
+                    hover:bg-white/15
+
+                    focus-visible:outline-none
+                    focus-visible:ring-4
+                    focus-visible:ring-[#FFE77A]/60
+                  "
+                >
+                  {image ? (
+                    <img
+                      src={image}
+                      alt=""
+                      className="
+                        h-full
+                        w-full
+                        object-cover
+                      "
+                    />
+                  ) : (
+                    <div
+                      className="
+                        flex
+                        h-full
+                        w-full
+                        flex-col
+                        items-center
+                        justify-center
+                        px-5
+                        text-center
+                      "
+                    >
+                      <div
+                        className="
+                          flex
+                          h-12
+                          w-12
+                          items-center
+                          justify-center
+                          rounded-full
+                          bg-[#FFE77A]
+                          font-display
+                          text-[27px]
+                          font-semibold
+                          text-[#241b3f]
+                          shadow-[0_4px_0_rgba(0,0,0,0.15)]
+                        "
+                      >
+                        +
+                      </div>
+
+                      <div
+                        className="
+                          mt-4
+                          font-display
+                          text-[17px]
+                          font-semibold
+                          text-white
+                        "
+                      >
+                        {tr("Lisää kuva")} {index + 1}
+                      </div>
+
+                      <div
+                        className="
+                          mt-2
+                          max-w-[190px]
+                          text-[13px]
+                          leading-[1.35]
+                          text-white/75
+                        "
+                      >
+                        {tr("Vedä kuva tähän tai valitse tiedosto")}
+                      </div>
+                    </div>
+                  )}
+
+                  <div
+                    className="
+                      absolute
+                      left-3
+                      top-3
+                      flex
+                      h-8
+                      w-8
+                      items-center
+                      justify-center
+                      rounded-full
+                      border-2
+                      border-black
+                      bg-[#FFE77A]
+                      font-display
+                      text-[14px]
+                      font-semibold
+                      text-[#241b3f]
+                    "
+                  >
+                    {index + 1}
+                  </div>
+
+                  {image && (
+                    <div
+                      className="
+                        absolute
+                        inset-x-0
+                        bottom-0
+                        bg-black/55
+                        px-3
+                        py-2.5
+                        text-center
+                        font-display
+                        text-[13px]
+                        font-semibold
+                        text-white
+                        opacity-0
+                        transition
+                        group-hover:opacity-100
+                      "
+                    >
+                      {tr("Vaihda kuva")}
+                    </div>
+                  )}
+                </button>
+
+                {image && (
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    aria-label={tr("Poista kuva")}
+                    className="
+                      absolute
+                      right-3
+                      top-3
+                      z-30
+                      flex
+                      h-8
+                      w-8
+                      items-center
+                      justify-center
+                      rounded-full
+                      border-2
+                      border-black
+                      bg-[#ef706e]
+                      font-display
+                      text-[18px]
+                      font-semibold
+                      leading-none
+                      text-white
+                      shadow-md
+                      transition
+
+                      hover:scale-110
+                    "
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* =================================================
+              COLLAGE / MASH-UP PREVIEW
+          ================================================== */}
+
+          <div
+            className="
+              flex
+              min-w-0
+              flex-col
+            "
+          >
+            <div
+              className="
+                flex
+                items-end
+                justify-between
+                gap-4
+              "
+            >
+              <h3
+                className="
+                  font-display
+                  text-[clamp(26px,2.2vw,36px)]
+                  font-semibold
+                  text-white
+                "
+              >
+                {tr("Kuvakollaasi")}
+              </h3>
+
+              <span
+                className="
+                  font-display
+                  text-[15px]
+                  font-semibold
+                  text-[#FFE77A]
+                "
+              >
+                {selectedImageCount} / 4
+              </span>
+            </div>
+
+            <p
+              className="
+                mt-2
+                max-w-[560px]
+                text-[14px]
+                leading-[1.4]
+                text-white/75
+              "
+            >
+              {tr("Kuvasi yhdistyvät tähän yhdeksi kollaasiksi.")}
+            </p>
+
+            <div
+              className="
+                mt-5
+                aspect-square
+                w-full
+                max-w-[560px]
+                overflow-hidden
+                rounded-[30px]
+                border-[4px]
+                border-black
+                bg-[#fffdf8]
+                p-3
+                shadow-[0_9px_0_rgba(36,27,63,0.28)]
+              "
+            >
+              <div
+                className="
+                  grid
+                  h-full
+                  w-full
+                  grid-cols-2
+                  grid-rows-2
+                  gap-2
+                  overflow-hidden
+                  rounded-[20px]
+                "
+              >
+                {images.map((image, index) => (
+                  <div
+                    key={index}
+                    className="
+                      relative
+                      flex
+                      min-h-0
+                      min-w-0
+                      items-center
+                      justify-center
+                      overflow-hidden
+                      bg-[#eee8f5]
+                    "
+                  >
+                    {image ? (
+                      <img
+                        src={image}
+                        alt=""
+                        className="
+                          h-full
+                          w-full
+                          object-cover
+                        "
+                      />
+                    ) : (
+                      <div
+                        className="
+                          flex
+                          h-full
+                          w-full
+                          items-center
+                          justify-center
+                          font-display
+                          text-[42px]
+                          font-semibold
+                          text-[#7654ad]/25
+                        "
+                      >
+                        {index + 1}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {selectedImageCount === 4 && (
+              <div
+                className="
+                  mt-5
+                  max-w-[560px]
+                  rounded-[16px]
+                  bg-[#acd8b1]
+                  px-5
+                  py-3
+                  text-center
+                  font-display
+                  text-[15px]
+                  font-semibold
+                  text-[#241b3f]
+                "
+              >
+                {tr("Kuvakollaasi on valmis!")}
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }
 
@@ -11785,12 +12632,7 @@ export function ScreenContent({
 }: {
   n: number;
 } & Props): ReactNode {
-  /*
-   * REGISTRY phải được kiểm tra trước.
-   *
-   * Điều này bảo đảm screen 71–73 vẫn hiển thị nội dung portfolio
-   * nếu cấu hình Strength Meter cũ chưa được cập nhật.
-   */
+ 
   const screenComponent = REGISTRY[n];
 
   if (screenComponent) {
