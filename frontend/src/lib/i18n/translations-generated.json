@@ -11,9 +11,53 @@
     "en": "\"I believe that life has a deeper purpose.\"",
     "sv": "\"Jag tänker att livet har ett djupare syfte.\""
   },
-   "Täytä viikon aikana": {
+  "Täytä viikon aikana": {
     "en": "Fill in during the week",
     "sv": "Fyll i under veckan"
+  },
+  "Vieritä alaspäin – lisää 4 kuvaa ja tee niistä yksi kuvakollaasi.": {
+    "en": "Scroll down – add 4 photos and combine them into one collage.",
+    "sv": "Skrolla ned – lägg till 4 bilder och kombinera dem till ett kollage."
+  },
+  "Lisää kuvasi alle": {
+    "en": "Add your photos below",
+    "sv": "Lägg till dina bilder nedan"
+  },
+  "Lisää 4 kuvaa vapaa-ajastasi": {
+    "en": "Add 4 photos from your free time",
+    "sv": "Lägg till 4 bilder från din fritid"
+  },
+  "Vedä kuvat paikoilleen tai valitse ne omista tiedostoistasi.": {
+    "en": "Drop the photos into the spaces or choose them from your files.",
+    "sv": "Dra bilderna till platserna eller välj dem från dina filer."
+  },
+  "Lisää kuva": {
+    "en": "Add photo",
+    "sv": "Lägg till bild"
+  },
+  "Vedä kuva tähän tai valitse tiedosto": {
+    "en": "Drop a photo here or choose a file",
+    "sv": "Dra en bild hit eller välj en fil"
+  },
+  "Vaihda kuva": {
+    "en": "Change photo",
+    "sv": "Byt bild"
+  },
+  "Poista kuva": {
+    "en": "Remove photo",
+    "sv": "Ta bort bild"
+  },
+  "Kuvakollaasi": {
+    "en": "Photo collage",
+    "sv": "Bildkollage"
+  },
+  "Kuvasi yhdistyvät tähän yhdeksi kollaasiksi.": {
+    "en": "Your photos are combined here into one collage.",
+    "sv": "Dina bilder kombineras här till ett kollage."
+  },
+  "Kuvakollaasi on valmis!": {
+    "en": "Your photo collage is ready!",
+    "sv": "Ditt bildkollage är klart!"
   },
   "\"En kaivele menneitä vaan minun on helppo irrottautua niistä ja mennä elämässä eteenpäin.\"": {
     "en": "\"I do not dwell on the past – it is easy for me to let go and move forward in life.\"",
