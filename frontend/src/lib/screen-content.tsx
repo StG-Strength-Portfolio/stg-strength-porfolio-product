@@ -5091,9 +5091,7 @@ function Screen21({ onSaveStateChange }: Props) {
               text-[#FFE77A]
             "
           >
-            {tr(
-              "Kuvittele tilanne, jossa ydinvahvuutesi on kielletty seuraavaksi kuukaudeksi.",
-            )}
+            {tr("Kuvittele tilanne, jossa ydinvahvuutesi on kielletty seuraavaksi kuukaudeksi.")}
           </p>
 
           {/* QUESTION */}
@@ -6802,12 +6800,15 @@ function Screen26({ onSaveStateChange }: Props) {
 }
 
 // ============================================================
-// Screen27 — PDF page 30: Anna palautetta ja kehuja
+// Screen27 — Give feedback and compliments
 // ============================================================
-// FIX: title (đổi <br/> thành trLines) giờ qua tr()
+
 function Screen27() {
   const tr = useTr();
   const { language } = useLanguage();
+
+  // Use the current language-specific illustration.
+  // Replace these files later when the approved artwork is available.
   const illustrationSrc =
     language === "en"
       ? "/illustrations/s27-feedback-bubbles-en.png"
@@ -6819,70 +6820,85 @@ function Screen27() {
     <div
       className="
         relative
-	        h-full
-	        min-h-0
-	        w-full
-	        overflow-x-hidden
-	        overflow-y-hidden
-	       
-	        text-white
-	      "
+        h-full
+        min-h-0
+        w-full
+        overflow-x-hidden
+        overflow-y-auto
+        text-white
+        [scrollbar-gutter:stable]
+      "
     >
       <div
         className="
-	          relative
-	          mx-auto
-	          flex
-	          h-full
-	          min-h-0
-	          w-full
-	          max-w-[1500px]
-	          flex-col
-	          overflow-visible
-	          px-[7%]
-	          pb-6
-	          pt-10
-	        "
+          relative
+          mx-auto
+          flex
+          min-h-[680px]
+          w-full
+          max-w-[1500px]
+          flex-col
+          px-[7%]
+          pb-20
+          pt-10
+        "
       >
+        {/* =====================================================
+            TITLE
+        ====================================================== */}
+
         <h1
           className="
-	            relative
-	            z-20
-	            max-w-[1120px]
-	            shrink-0
-	            font-display
-	            text-[clamp(30px,2.6vw,46px)]
-	            font-semibold
-	            leading-[1.12]
-	            text-white
-	          "
+            relative
+            z-20
+            max-w-[1120px]
+            shrink-0
+            font-display
+            text-[clamp(30px,2.6vw,46px)]
+            font-semibold
+            leading-[1.12]
+            text-white
+          "
         >
           {trLines(tr, "Anna palautetta ja kehuja täydentämällä\nseuraavia lauseenalkuja:")}
         </h1>
 
-        <img
-          src={illustrationSrc}
-          alt={tr("Anna palautetta ja kehuja täydentämällä seuraavia lauseenalkuja:")}
+        {/* =====================================================
+            LANGUAGE-SPECIFIC ILLUSTRATION
+        ====================================================== */}
+
+        <div
           className="
-	            pointer-events-none
-	            relative
-	            z-20
-	            mx-auto
-	            mt-2
-	            block
-	            min-h-0
-	            w-full
-	            max-w-[px]
-	            flex-1
-	            select-none
-	            object-contain
-	          "
-        />
+            relative
+            z-10
+            mt-4
+            flex
+            min-h-0
+            flex-1
+            items-start
+            justify-center
+          "
+        >
+          <img
+            src={illustrationSrc}
+            alt={tr("Anna palautetta ja kehuja täydentämällä seuraavia lauseenalkuja:")}
+            className="
+              pointer-events-none
+              block
+              h-auto
+              max-h-[600px]
+              w-full
+              max-w-[1180px]
+              select-none
+              object-contain
+              object-top
+            "
+          />
+        </div>
       </div>
     </div>
   );
 }
-
 // ============================================================
 // Screen28 — PDF page 32: Tässä olen minä
 // ============================================================
@@ -9680,6 +9696,17 @@ function Screen43() {
   );
 }
 // ----- Screen44: Vahvuuskarkkini kotona -----
+// ============================================================
+// Screen44 implementation
+// ============================================================
+// ============================================================
+// Screen44 — Strength Candy at Home
+// ============================================================
+
+// ============================================================
+// Screen44 — Strength Candy at Home
+// ============================================================
+
 function Screen44StrengthCandyHome({ onSaveStateChange }: Props) {
   const tr = useTr();
   const { language } = useLanguage();
@@ -10018,11 +10045,9 @@ function Screen44StrengthCandyHome({ onSaveStateChange }: Props) {
   );
 }
 
-
 function Screen44(p: Props) {
   return <Screen44StrengthCandyHome {...p} />;
 }
-
 
 // ----- Screen45: Vahvuudet perheessä -----
 function Screen45({ onSaveStateChange }: Props) {
@@ -11624,196 +11649,6 @@ function Screen73() {
 // ============================================================
 // Screen44 implementation
 // ============================================================
-function Screen44StrengthCandyHome({ onSaveStateChange }: Props) {
-  const tr = useTr();
-
-  return (
-    <div
-      className="
-        relative
-        h-full
-        min-h-0
-        w-full
-        overflow-x-hidden
-        overflow-y-auto
-        text-white
-        [scrollbar-gutter:stable]
-      "
-    >
-      <div
-        className="
-          relative
-          mx-auto
-          grid
-          min-h-[760px]
-          w-full
-          max-w-[1500px]
-          grid-cols-1
-          gap-8
-          overflow-hidden
-          px-[5%]
-          pb-24
-          pt-8
-          lg:grid-cols-[44%_56%]
-        "
-      >
-        <div className="relative z-10 min-w-0 pt-3">
-          <div className="ml-[10%] mt-24 flex max-w-[480px] flex-col">
-            <h1
-              className="
-                font-display
-                text-[clamp(36px,3.7vw,52px)]
-                font-semibold
-                leading-[1.12]
-                tracking-[0]
-                text-[#FFE77A]
-              "
-            >
-              {tr("Vahvuuskarkkini")}
-            </h1>
-
-            <p
-              className="
-                mt-10
-                max-w-[420px]
-                font-display
-                text-[clamp(21px,1.75vw,28px)]
-                font-semibold
-                leading-[1.28]
-                text-white
-              "
-            >
-              {tr("Valitse 1–2 vahvuuskarkkia ja")} {tr("hyödynnä")} {tr("kotona")}.{" "}
-              {tr("Kirjoita vahvuudet tähän")}
-            </p>
-
-            <div
-              className="
-                mt-24
-                font-display
-                text-[clamp(20px,1.55vw,26px)]
-                font-semibold
-                leading-[1.3]
-                text-white
-              "
-            >
-              {tr("Pohdi, mitä teit, koit ja opit.")}
-            </div>
-
-            <div className="mt-10 grid grid-cols-[10px_minmax(0,1fr)] gap-x-5">
-              <span aria-hidden="true" className="mt-[12px] h-2 w-2 rounded-full bg-[#ffd13b]" />
-              <p className="text-[clamp(18px,1.35vw,23px)] leading-[1.35] text-white">
-                {tr("Täydennä oheinen tehtävä.")}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="relative z-10 flex min-h-[680px] min-w-0 items-center justify-center">
-          <div
-            className="
-              relative
-              h-[670px]
-              w-[560px]
-              max-w-full
-              rounded-[32px]
-              bg-[#ffd643]
-              shadow-[0_8px_20px_rgba(36,27,63,0.28)]
-            "
-          >
-            <div
-              className="
-                absolute
-                left-1/2
-                top-[-40px]
-                z-0
-                h-[78px]
-                w-[244px]
-                -translate-x-1/2
-                rounded-t-[12px]
-                bg-[#ef6f6d]
-                pt-3
-                text-center
-                font-display
-                text-[17px]
-                font-semibold
-                uppercase
-                text-white
-              "
-            >
-              {tr("KOTONA")}
-            </div>
-
-            <div className="absolute left-[17%] top-[4.5%] z-10 h-[22.5%] w-[66%] rounded-[18px] bg-white">
-              <VahvuuskarkkiOverlayInput
-                fieldKey="screen_41_opit"
-                onSaveStateChange={onSaveStateChange}
-              />
-            </div>
-            <div className="absolute left-[39%] top-[28%] z-20 font-display text-[23px] font-semibold text-white">
-              {tr("3. Mitä opit?")}
-            </div>
-
-            <div className="absolute left-[4.5%] top-[35%] z-10 h-[22%] w-[44%] rounded-[18px] bg-white">
-              <VahvuuskarkkiOverlayInput
-                fieldKey="screen_41_seuraavaksi"
-                onSaveStateChange={onSaveStateChange}
-              />
-            </div>
-            <div className="absolute left-[9%] top-[59%] z-20 text-center font-display text-[22px] font-semibold leading-[1.05] text-white">
-              {tr("2. Mitä tapahtui seuraavaksi?")}
-            </div>
-
-            <div className="absolute right-[4.5%] top-[35%] z-10 h-[22%] w-[44%] rounded-[18px] bg-white">
-              <VahvuuskarkkiOverlayInput
-                fieldKey="screen_41_hyodynnat"
-                onSaveStateChange={onSaveStateChange}
-              />
-            </div>
-            <div className="absolute right-[8%] top-[59%] z-20 max-w-[210px] text-center font-display text-[22px] font-semibold leading-[1.05] text-white">
-              {tr("4. Miten hyödynnät oppimaasi?")}
-            </div>
-
-            <div className="absolute bottom-[8.5%] left-[17%] z-10 h-[22%] w-[66%] rounded-[18px] bg-white">
-              <VahvuuskarkkiOverlayInput
-                fieldKey="screen_41_teit"
-                onSaveStateChange={onSaveStateChange}
-              />
-            </div>
-            <div className="absolute bottom-[1.5%] left-[34%] z-20 font-display text-[28px] font-semibold text-white">
-              {tr("1. Mitä teit?")}
-            </div>
-
-            <div
-              aria-hidden="true"
-              className="absolute left-[4%] top-[21%] z-20 text-[78px] font-light leading-none text-white"
-            >
-              ↗
-            </div>
-            <div
-              aria-hidden="true"
-              className="absolute right-[5%] top-[21%] z-20 text-[78px] font-light leading-none text-white"
-            >
-              ↘
-            </div>
-            <div
-              aria-hidden="true"
-              className="absolute right-[6%] bottom-[25%] z-20 text-[78px] font-light leading-none text-white"
-            >
-              ↙
-            </div>
-            <div
-              aria-hidden="true"
-              className="absolute left-[5%] bottom-[25%] z-20 text-[78px] font-light leading-none text-white"
-            >
-              ↖
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 const REGISTRY: Record<number, (p: Props) => ReactNode> = {
   // =========================================================
