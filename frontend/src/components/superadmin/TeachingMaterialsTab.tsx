@@ -19,6 +19,7 @@ import {
   createTeachingCategory,
   deleteTeachingArticle,
   deleteTeachingCategory,
+  reorderTeachingArticles,
   saveTeachingArticle,
   saveTeachingCategoryThumbnails,
   setTeachingCategoryPublished,
@@ -89,6 +90,7 @@ export function TeachingMaterialsTab() {
   const delCategory = useServerFn(deleteTeachingCategory);
   const saveArticle = useServerFn(saveTeachingArticle);
   const delArticle = useServerFn(deleteTeachingArticle);
+  const reorderArticles = useServerFn(reorderTeachingArticles);
   const publishCategory = useServerFn(setTeachingCategoryPublished);
   const saveCategoryThumbnails = useServerFn(saveTeachingCategoryThumbnails);
 
@@ -100,6 +102,7 @@ export function TeachingMaterialsTab() {
   const [thumbnailEditing, setThumbnailEditing] = useState<TeachingCategory | null>(null);
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState<TeachingArticle | null>(null);
+  const [draggingArticleId, setDraggingArticleId] = useState<string | null>(null);
 
   const usedStrengths = useMemo(() => new Set(categories.map((c) => c.strength_id)), [categories]);
 
@@ -114,6 +117,20 @@ export function TeachingMaterialsTab() {
     } finally {
       setBusy(false);
     }
+  }
+
+  async function moveArticle(categoryId: string, draggedId: string, targetId: string) {
+    if (draggedId === targetId) return;
+
+    const ordered = articles.filter((a) => catOfArticle(a) === categoryId);
+    const from = ordered.findIndex((a) => a.id === draggedId);
+    const to = ordered.findIndex((a) => a.id === targetId);
+    if (from < 0 || to < 0) return;
+
+    const next = [...ordered];
+    const [moved] = next.splice(from, 1);
+    next.splice(to, 0, moved);
+    await run(() => reorderArticles({ data: { articleIds: next.map((a) => a.id) } }));
   }
 
   return (
@@ -224,13 +241,43 @@ export function TeachingMaterialsTab() {
                       .map((a) => (
                         <li
                           key={a.id}
-                          className="flex flex-wrap items-center justify-between gap-2 text-sm"
+                          className={`flex flex-wrap items-center justify-between gap-2 rounded-lg px-1 py-0.5 text-sm ${
+                            draggingArticleId === a.id ? "opacity-50" : ""
+                          }`}
+                          onDragOver={(e) => {
+                            if (draggingArticleId && draggingArticleId !== a.id) {
+                              e.preventDefault();
+                              e.dataTransfer.dropEffect = "move";
+                            }
+                          }}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            const draggedId =
+                              draggingArticleId || e.dataTransfer.getData("text/plain");
+                            setDraggingArticleId(null);
+                            if (draggedId) void moveArticle(c.id, draggedId, a.id);
+                          }}
                         >
-                          <span className="min-w-0 break-words">
-                            {pickLang(a as never, "title", lang)}
-                            {!a.is_published && (
-                              <span className="ml-2 opacity-60">({tr("Ei julkaistu")})</span>
-                            )}
+                          <span className="flex min-w-0 items-center gap-2">
+                            <span
+                              draggable={!busy}
+                              onDragStart={(e) => {
+                                setDraggingArticleId(a.id);
+                                e.dataTransfer.effectAllowed = "move";
+                                e.dataTransfer.setData("text/plain", a.id);
+                              }}
+                              onDragEnd={() => setDraggingArticleId(null)}
+                              className="cursor-grab select-none text-base leading-none opacity-50 active:cursor-grabbing"
+                              aria-hidden
+                            >
+                              ⋮⋮
+                            </span>
+                            <span className="min-w-0 break-words">
+                              {pickLang(a as never, "title", lang)}
+                              {!a.is_published && (
+                                <span className="ml-2 opacity-60">({tr("Ei julkaistu")})</span>
+                              )}
+                            </span>
                           </span>
                           <span className="flex gap-2">
                             <button
@@ -431,6 +478,7 @@ function ArticleForm({
     slidesSv?: string;
     thumbnailUrl?: string;
     isPublished: boolean;
+    sortOrder?: number;
     slideCount?: number;
   }) => void;
 }) {
@@ -512,6 +560,7 @@ function ArticleForm({
               slidesSv,
               thumbnailUrl: thumb,
               isPublished: published,
+              sortOrder: article?.sort_order,
               slideCount: Number(slideCount) || 10,
             })
           }
