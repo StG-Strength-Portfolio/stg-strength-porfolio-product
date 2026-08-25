@@ -24,6 +24,7 @@ import systemUiRefreshCss from "../styles/system-ui-refresh.css?url";
 import typographyScaleCss from "../styles/typography-scale.css?url";
 import contrastGuardrailsCss from "../styles/contrast-guardrails.css?url";
 import designerPolishCss from "../styles/designer-polish.css?url";
+import buttonPaletteCss from "../styles/button-palette.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 const DOCUMENT_TITLE = {
@@ -185,6 +186,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "stylesheet",
         href: designerPolishCss,
+      },
+      {
+        rel: "stylesheet",
+        href: buttonPaletteCss,
       },
     ],
   }),
