@@ -21,6 +21,7 @@ import appCss from "../styles.css?url";
 import schoolAdminMetricsCss from "../styles/school-admin-metrics.css?url";
 import systemUiRefreshCss from "../styles/system-ui-refresh.css?url";
 import typographyScaleCss from "../styles/typography-scale.css?url";
+import contrastGuardrailsCss from "../styles/contrast-guardrails.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 const DOCUMENT_TITLE = {
@@ -174,6 +175,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "stylesheet",
         href: typographyScaleCss,
+      },
+      {
+        rel: "stylesheet",
+        href: contrastGuardrailsCss,
       },
     ],
   }),
