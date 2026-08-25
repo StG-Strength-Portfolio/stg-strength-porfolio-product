@@ -1,110 +1,200 @@
-/* Final contrast/readability polish for the light 2026 UI refresh. */
+/* Final designer palette and contrast rules for the 2026 light UI refresh. */
+
+:root {
+  --designer-text-primary: #1f2937;
+  --designer-text-heading: #111827;
+  --designer-text-secondary: #6b7280;
+  --designer-border: #e5e7eb;
+  --designer-surface: #ffffff;
+  --designer-surface-soft: #f9fafb;
+  --designer-purple: #7c3aed;
+  --designer-purple-hover: #6d28d9;
+  --designer-purple-light: #f3eeff;
+}
 
 /* --------------------------------------------------------------------------
-   DARK CTA BUTTONS: purple/coral/red/dark buttons always use white text.
-   These selectors intentionally outrank the light-surface legacy guardrails.
+   TYPOGRAPHY COLORS
    -------------------------------------------------------------------------- */
-button[class*="bg-[color:var(--purple)]"][class*="text-white"],
-button[class*="bg-[color:var(--purple-dark)]"][class*="text-white"],
-button[class*="bg-[color:var(--coral)]"][class*="text-white"],
-button[class*="bg-purple-"][class*="text-white"],
-button[class*="bg-violet-"][class*="text-white"],
-button[class*="bg-indigo-"][class*="text-white"],
-button[class*="bg-red-"][class*="text-white"],
-a[class*="bg-[color:var(--purple)]"][class*="text-white"],
-a[class*="bg-[color:var(--purple-dark)]"][class*="text-white"],
-a[class*="bg-[color:var(--coral)]"][class*="text-white"],
-a[class*="bg-purple-"][class*="text-white"],
-a[class*="bg-violet-"][class*="text-white"],
-a[class*="bg-indigo-"][class*="text-white"],
-a[class*="bg-red-"][class*="text-white"] {
+body {
+  color: var(--designer-text-primary);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--designer-text-heading);
+}
+
+p,
+li,
+dd,
+dt,
+td,
+th,
+label,
+legend,
+summary {
+  color: inherit;
+}
+
+.text-foreground {
+  color: var(--designer-text-primary) !important;
+}
+
+.text-muted-foreground,
+.text-slate-500,
+.text-gray-500,
+.text-slate-600,
+.text-gray-600 {
+  color: var(--designer-text-secondary) !important;
+}
+
+/* Legacy white copy on the new light student canvas becomes dark charcoal. */
+.journey-bg [class*="text-white"],
+.sticky-note [class*="text-white"],
+.workbook-paper [class*="text-white"],
+.workbook-line [class*="text-white"],
+.workbook-pill [class*="text-white"] {
+  color: var(--designer-text-primary) !important;
+}
+
+.journey-bg [class*="text-[#f1f1ef]"],
+.sticky-note [class*="text-[#f1f1ef]"],
+.workbook-paper [class*="text-[#f1f1ef]"],
+.workbook-line [class*="text-[#f1f1ef]"],
+.workbook-pill [class*="text-[#f1f1ef]"] {
+  color: var(--designer-text-secondary) !important;
+}
+
+.journey-bg h1,
+.journey-bg h2,
+.journey-bg h3,
+.sticky-note h1,
+.sticky-note h2,
+.sticky-note h3 {
+  color: var(--designer-text-heading) !important;
+}
+
+/* --------------------------------------------------------------------------
+   BUTTON SYSTEM
+   -------------------------------------------------------------------------- */
+button,
+a[role="button"] {
+  text-shadow: none !important;
+  box-shadow: none;
+}
+
+/* Primary purple CTA. */
+:is(button, a, [role="button"]).bg-primary,
+:is(button, a, [role="button"])[class*="bg-primary"],
+:is(button, a, [role="button"])[class*="bg-[color:var(--purple)]"],
+:is(button, a, [role="button"])[class*="bg-[color:var(--purple-dark)]"],
+:is(button, a, [role="button"])[class*="bg-[#7755c9]"],
+:is(button, a, [role="button"])[class*="bg-[#7c3aed]"],
+:is(button, a, [role="button"])[class*="bg-[#6d28d9]"],
+:is(button, a, [role="button"])[class*="bg-purple-"],
+:is(button, a, [role="button"])[class*="bg-violet-"],
+:is(button, a, [role="button"])[class*="bg-indigo-"] {
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+:is(button, a, [role="button"]).bg-primary *,
+:is(button, a, [role="button"])[class*="bg-primary"] *,
+:is(button, a, [role="button"])[class*="bg-[color:var(--purple)]"] *,
+:is(button, a, [role="button"])[class*="bg-[color:var(--purple-dark)]"] *,
+:is(button, a, [role="button"])[class*="bg-[#7755c9]"] *,
+:is(button, a, [role="button"])[class*="bg-[#7c3aed]"] *,
+:is(button, a, [role="button"])[class*="bg-[#6d28d9]"] *,
+:is(button, a, [role="button"])[class*="bg-purple-"] *,
+:is(button, a, [role="button"])[class*="bg-violet-"] *,
+:is(button, a, [role="button"])[class*="bg-indigo-"] * {
   color: #ffffff !important;
 }
 
-.sticky-note button[class*="bg-[color:var(--purple)]"],
-.sticky-note button[class*="bg-[color:var(--purple-dark)]"],
-.sticky-note button[class*="bg-[color:var(--coral)]"],
-.sticky-note button[class*="bg-purple-"],
-.sticky-note button[class*="bg-violet-"],
-.sticky-note button[class*="bg-indigo-"],
-.sticky-note button[class*="bg-red-"],
-.journey-bg button[class*="bg-[color:var(--purple)]"],
-.journey-bg button[class*="bg-[color:var(--purple-dark)]"],
-.journey-bg button[class*="bg-[color:var(--coral)]"],
-.journey-bg button[class*="bg-purple-"],
-.journey-bg button[class*="bg-violet-"],
-.journey-bg button[class*="bg-indigo-"],
-.journey-bg button[class*="bg-red-"],
-.no-print button[class*="bg-[color:var(--purple)]"],
-.no-print button[class*="bg-[color:var(--purple-dark)]"],
-.no-print button[class*="bg-[color:var(--coral)]"],
-.no-print button[class*="bg-purple-"],
-.no-print button[class*="bg-violet-"],
-.no-print button[class*="bg-indigo-"],
-.no-print button[class*="bg-red-"] {
-  color: #ffffff !important;
-}
-
-.sticky-note button[class*="bg-[color:var(--purple)]"] *,
-.sticky-note button[class*="bg-[color:var(--purple-dark)]"] *,
-.sticky-note button[class*="bg-[color:var(--coral)]"] *,
-.sticky-note button[class*="bg-red-"] *,
-.journey-bg button[class*="bg-[color:var(--purple)]"] *,
-.journey-bg button[class*="bg-[color:var(--purple-dark)]"] *,
-.journey-bg button[class*="bg-[color:var(--coral)]"] *,
-.journey-bg button[class*="bg-red-"] *,
-.no-print button[class*="bg-[color:var(--purple)]"] *,
-.no-print button[class*="bg-[color:var(--purple-dark)]"] *,
-.no-print button[class*="bg-[color:var(--coral)]"] *,
-.no-print button[class*="bg-red-"] * {
-  color: #ffffff !important;
-}
-
-/* Destructive semantic buttons are dark/red by definition. */
+/* Coral / red / destructive actions also need white labels. */
+:is(button, a, [role="button"])[class*="bg-[color:var(--coral)]"],
+:is(button, a, [role="button"])[class*="bg-red-"],
 button.bg-destructive,
 button[class*="bg-destructive"] {
   color: #ffffff !important;
+  box-shadow: none !important;
 }
+
+:is(button, a, [role="button"])[class*="bg-[color:var(--coral)]"] *,
+:is(button, a, [role="button"])[class*="bg-red-"] *,
 button.bg-destructive *,
 button[class*="bg-destructive"] * {
   color: #ffffff !important;
 }
 
+/* Neutral buttons remain white/light with charcoal text. */
+:is(button, a, [role="button"])[class*="bg-white"],
+:is(button, a, [role="button"])[class*="bg-background"],
+:is(button, a, [role="button"])[class*="bg-secondary"],
+:is(button, a, [role="button"])[class*="bg-[#f9fafb]"] {
+  color: #374151;
+  box-shadow: none !important;
+}
+
+/* Links and lightweight text actions use brand purple. */
+a:not([class*="bg-"]):hover,
+button[class*="underline"]:hover,
+.text-primary {
+  color: var(--designer-purple-hover);
+}
+
 /* --------------------------------------------------------------------------
-   WORLD MAP: remove the old playful purple offset shadow from level cards.
+   SURFACES / FORMS
    -------------------------------------------------------------------------- */
-button[class*="shadow-[6px_8px_0_0_var(--purple-dark)]"] {
+input,
+textarea,
+select {
+  color: var(--designer-text-primary) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--designer-text-secondary) !important;
+  opacity: 1;
+}
+
+/* Remove old playful shadows from application cards and world cards. */
+button[class*="shadow-[6px_8px_0_0_var(--purple-dark)]"],
+.sticky-note,
+.workbook-paper,
+.workbook-line,
+.workbook-pill {
   box-shadow: none !important;
 }
 
 /* --------------------------------------------------------------------------
-   SCREEN 15 / CORE-STRENGTH CANDY SHOP.
-   The original screen was authored for a dark purple canvas and therefore
-   hard-coded white copy and translucent white jars. On the new light canvas,
-   use the designer's charcoal/slate text and clearly defined light surfaces.
+   SCREEN 15 / CORE-STRENGTH CANDY SHOP
    -------------------------------------------------------------------------- */
 .shopscroll .hd .h1 {
-  color: #1f2937 !important;
+  color: var(--designer-text-heading) !important;
 }
 
 .shopscroll .hd .h1 small {
-  color: #6b7280 !important;
+  color: var(--designer-text-secondary) !important;
   opacity: 1 !important;
 }
 
 .shopscroll .txt {
-  color: #1f2937 !important;
+  color: var(--designer-text-primary) !important;
   text-shadow: none !important;
 }
 
 .shopscroll .rev,
-.shopscroll .rev .nm,
-.shopscroll .rev .vt {
-  color: #1f2937;
+.shopscroll .rev .nm {
+  color: var(--designer-text-primary) !important;
 }
 
 .shopscroll .rev .vt {
-  color: #6b7280;
+  color: var(--designer-text-secondary) !important;
 }
 
 .shopscroll .lid {
@@ -114,7 +204,7 @@ button[class*="shadow-[6px_8px_0_0_var(--purple-dark)]"] {
 }
 
 .shopscroll .tub {
-  background: #f9fafb !important;
+  background: var(--designer-surface-soft) !important;
   border: 1px solid #d1d5db !important;
   border-top: 0 !important;
   box-shadow: none !important;
@@ -124,8 +214,6 @@ button[class*="shadow-[6px_8px_0_0_var(--purple-dark)]"] {
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.18) !important;
 }
 
-/* Keep selected/revealed jars visually distinct without returning to heavy
-   offset shadows. */
 .shopscroll .reveal .bin.won .tub {
   border-color: var(--yellow) !important;
   box-shadow: 0 0 0 2px rgba(244, 200, 74, 0.65) !important;
