@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CornerBlobs } from "@/components/CornerBlobs";
 import { StickyNote } from "@/components/StickyNote";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
 import { ForgotPasswordDialog } from "@/components/ForgotPasswordDialog";
@@ -125,18 +124,17 @@ function LoginPage() {
   }
 
   return (
-    <div className="relative min-h-screen bg-background text-foreground overflow-hidden flex items-center justify-center px-4 py-10">
-      <CornerBlobs />
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-10 text-foreground">
       <AuthLanguageSwitcher />
       <div className="relative z-10 w-full max-w-md space-y-6">
         <div className="text-center">
-          <h1 className="text-4xl font-bold">{t("auth.login.title")}</h1>
+          <h1 className="text-3xl font-semibold tracking-tight text-slate-900">{t("auth.login.title")}</h1>
         </div>
 
         <StickyNote seed="login-card">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="email">{t("common.email")}</Label>
+              <Label htmlFor="email" className="text-slate-700">{t("common.email")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -148,7 +146,7 @@ function LoginPage() {
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="password">{t("common.password")}</Label>
+              <Label htmlFor="password" className="text-slate-700">{t("common.password")}</Label>
               <Input
                 id="password"
                 type="password"
@@ -161,7 +159,7 @@ function LoginPage() {
             <Button
               type="submit"
               disabled={busy}
-              className="w-full rounded-full bg-[color:var(--purple)] hover:bg-[color:var(--purple)]/90 text-white font-bold py-6 text-base h-auto"
+              className="h-11 w-full rounded-lg bg-[color:var(--purple)] text-sm font-semibold text-white shadow-none hover:bg-[color:var(--purple)]/90"
             >
               {busy ? t("auth.login.busy") : t("auth.login.submit")}
             </Button>
@@ -170,14 +168,14 @@ function LoginPage() {
           <div className="mt-4 flex items-center justify-between gap-3">
             <a
               href="/auth"
-              className="text-xs text-muted-foreground underline underline-offset-2 hover:text-[color:var(--purple)]"
+              className="text-xs font-medium text-slate-500 underline-offset-2 hover:text-[color:var(--purple)] hover:underline"
             >
               {tr("Takaisin")}
             </a>
             <button
               type="button"
               onClick={() => setForgotOpen(true)}
-              className="text-xs text-muted-foreground underline underline-offset-2 hover:text-[color:var(--purple)]"
+              className="text-xs font-medium text-slate-500 underline-offset-2 hover:text-[color:var(--purple)] hover:underline"
             >
               {tr("Unohditko salasanan?")}
             </button>
