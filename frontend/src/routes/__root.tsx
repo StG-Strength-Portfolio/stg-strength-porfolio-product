@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
+import { LegacyTranslationGuard } from "@/components/LegacyTranslationGuard";
 import { LanguageProvider, useLanguage } from "@/lib/i18n";
 import {
   domainDefaultLanguage,
@@ -43,10 +44,10 @@ function applyHostnameLanguageDefault() {
 
   if (window.localStorage.getItem(LANGUAGE_STORAGE_KEY)) return;
 
-  const defaultLanguage = domainDefaultLanguage(window.location.hostname);
-  if (defaultLanguage) {
-    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, defaultLanguage);
-  }
+  // Product default is English. The three public domains can override this
+  // initial value, but preview/temporary hosts should not flash Finnish.
+  const defaultLanguage = domainDefaultLanguage(window.location.hostname) ?? "en";
+  window.localStorage.setItem(LANGUAGE_STORAGE_KEY, defaultLanguage);
 }
 
 function DomainLanguagePreferenceSync() {
@@ -215,6 +216,7 @@ function RootComponent() {
       <LanguageProvider>
         <DomainLanguagePreferenceSync />
         <LocalizedDocumentTitle />
+        <LegacyTranslationGuard />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <Toaster position="top-center" />
