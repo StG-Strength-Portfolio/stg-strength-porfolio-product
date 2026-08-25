@@ -1,19 +1,28 @@
 /*
  * Contrast guardrails for the 2026 light-surface UI refresh.
- * Legacy screens sometimes hard-code text-white because the original canvas
- * was purple. On the new white / #f9fafb surfaces those classes must resolve
- * to the designer's dark text palette, while genuine dark brand controls keep
- * white foreground text.
+ *
+ * Rule of thumb from the design review:
+ * - white / light surfaces -> dark charcoal text (#1F2937)
+ * - secondary copy on light surfaces -> slate (#6B7280)
+ * - genuinely dark controls / shapes -> white text
+ *
+ * A number of legacy student screens hard-code white or near-white foreground
+ * colors because the old canvas was purple. The refreshed canvas is light, so
+ * those foregrounds need to be normalized without breaking real dark buttons.
  */
 
 :root {
   --ui-text-primary: #1f2937;
   --ui-text-secondary: #6b7280;
+  --ui-text-on-dark: #ffffff;
 }
 
-/* Student learning screens are now light, so legacy white copy on the open
-   canvas must become readable dark text. This covers text-white and opacity
-   variants such as text-white/90. */
+/* ---------------------------------------------------------------------
+   LIGHT SURFACES
+   --------------------------------------------------------------------- */
+
+/* Student learning canvas: legacy white copy must become readable. This
+   catches text-white and opacity variants such as text-white/90. */
 .journey-bg [class*="text-white"],
 .sticky-note [class*="text-white"],
 .workbook-paper [class*="text-white"],
@@ -22,25 +31,155 @@
   color: var(--ui-text-primary) !important;
 }
 
-/* Muted/secondary copy on light surfaces follows the designer's slate token. */
+/* Several workbook screens use this exact near-white legacy ink rather than
+   Tailwind text-white. On the new light canvas it is effectively invisible. */
+.journey-bg [class*="text-[#f1f1ef]"],
+.sticky-note [class*="text-[#f1f1ef]"],
+.workbook-paper [class*="text-[#f1f1ef]"],
+.workbook-line [class*="text-[#f1f1ef]"],
+.workbook-pill [class*="text-[#f1f1ef]"] {
+  color: var(--ui-text-secondary) !important;
+}
+
+/* Headings remain primary/darker even when the legacy class was near-white. */
+.journey-bg h1[class*="text-[#f1f1ef]"],
+.journey-bg h2[class*="text-[#f1f1ef]"],
+.journey-bg h3[class*="text-[#f1f1ef]"],
+.sticky-note h1[class*="text-[#f1f1ef]"],
+.sticky-note h2[class*="text-[#f1f1ef]"],
+.sticky-note h3[class*="text-[#f1f1ef]"] {
+  color: var(--ui-text-primary) !important;
+}
+
+/* Muted/secondary legacy copy on light surfaces follows the designer's slate
+   token instead of becoming faint white-on-white. */
 .journey-bg [class*="text-white"][class*="opacity-"],
 .sticky-note [class*="text-white"][class*="opacity-"] {
   color: var(--ui-text-secondary) !important;
 }
 
-/* The application canvas/card tokens are light in the refreshed theme. */
+/* Explicitly light cards / panels. These selectors are intentionally scoped
+   to descendants of a known light surface. */
 [class*="bg-background"] > [class*="text-white"],
 [class*="bg-card"] > [class*="text-white"],
 [class*="bg-white"] > [class*="text-white"],
 [class*="bg-slate-50"] > [class*="text-white"],
-[class*="bg-gray-50"] > [class*="text-white"] {
+[class*="bg-gray-50"] > [class*="text-white"],
+[class*="bg-background"] > [class*="text-[#f1f1ef]"],
+[class*="bg-card"] > [class*="text-[#f1f1ef]"],
+[class*="bg-white"] > [class*="text-[#f1f1ef]"],
+[class*="bg-slate-50"] > [class*="text-[#f1f1ef]"],
+[class*="bg-gray-50"] > [class*="text-[#f1f1ef]"] {
   color: var(--ui-text-primary) !important;
 }
 
-/* Keep white text where the actual surface is deliberately dark/brand colored. */
+/* Forms placed on light surfaces always use dark input text and slate
+   placeholders. */
+.journey-bg input,
+.journey-bg textarea,
+.journey-bg select,
+.sticky-note input,
+.sticky-note textarea,
+.sticky-note select,
+.workbook-paper input,
+.workbook-paper textarea,
+.workbook-line input,
+.workbook-line textarea,
+.workbook-pill input,
+.workbook-pill textarea {
+  color: var(--ui-text-primary) !important;
+}
+
+.journey-bg input::placeholder,
+.journey-bg textarea::placeholder,
+.sticky-note input::placeholder,
+.sticky-note textarea::placeholder,
+.workbook-paper input::placeholder,
+.workbook-paper textarea::placeholder,
+.workbook-line input::placeholder,
+.workbook-line textarea::placeholder,
+.workbook-pill input::placeholder,
+.workbook-pill textarea::placeholder {
+  color: var(--ui-text-secondary) !important;
+  opacity: 1;
+}
+
+/* ---------------------------------------------------------------------
+   DARK CONTROLS / SHAPES
+   --------------------------------------------------------------------- */
+
+/* Known dark brand surfaces. Put these AFTER the light-surface corrections so
+   a dark button nested inside a white page still receives white foreground. */
+button.bg-primary,
+a.bg-primary,
+[role="button"].bg-primary,
+button[class*="bg-[color:var(--purple)]"],
+a[class*="bg-[color:var(--purple)]"],
+[role="button"][class*="bg-[color:var(--purple)]"],
+button[class*="bg-[color:var(--purple-dark)]"],
+a[class*="bg-[color:var(--purple-dark)]"],
+[role="button"][class*="bg-[color:var(--purple-dark)]"],
+button[class*="bg-[#7755c9]"],
+a[class*="bg-[#7755c9]"],
+[role="button"][class*="bg-[#7755c9]"],
+button[class*="bg-[#7654ad]"],
+a[class*="bg-[#7654ad]"],
+[role="button"][class*="bg-[#7654ad]"],
+button[class*="bg-[#6d28d9]"],
+a[class*="bg-[#6d28d9]"],
+[role="button"][class*="bg-[#6d28d9]"],
+button[class*="bg-[#7c3aed]"],
+a[class*="bg-[#7c3aed]"],
+[role="button"][class*="bg-[#7c3aed]"],
+button[class*="bg-purple-"],
+a[class*="bg-purple-"],
+[role="button"][class*="bg-purple-"],
+button[class*="bg-violet-"],
+a[class*="bg-violet-"],
+[role="button"][class*="bg-violet-"],
+button[class*="bg-indigo-"],
+a[class*="bg-indigo-"],
+[role="button"][class*="bg-indigo-"],
+button[class*="bg-black"],
+a[class*="bg-black"],
+[role="button"][class*="bg-black"],
+button[class*="bg-slate-7"],
+button[class*="bg-slate-8"],
+button[class*="bg-slate-9"],
+button[class*="bg-gray-7"],
+button[class*="bg-gray-8"],
+button[class*="bg-gray-9"],
+button[class*="bg-red-6"],
+button[class*="bg-red-7"],
+button[class*="bg-red-8"],
+button[class*="bg-red-9"] {
+  color: var(--ui-text-on-dark) !important;
+}
+
+/* Dark form controls, where used, also require white foreground. */
+input.bg-primary,
+textarea.bg-primary,
+select.bg-primary,
+input[class*="bg-[color:var(--purple)]"],
+textarea[class*="bg-[color:var(--purple)]"],
+select[class*="bg-[color:var(--purple)]"],
+input[class*="bg-[#7755c9]"],
+textarea[class*="bg-[#7755c9]"],
+select[class*="bg-[#7755c9]"],
+input[class*="bg-black"],
+textarea[class*="bg-black"],
+select[class*="bg-black"] {
+  color: var(--ui-text-on-dark) !important;
+}
+
+/* Preserve white copy explicitly authored inside a known dark surface. */
 [class*="bg-[color:var(--purple)]"][class*="text-white"],
 [class*="bg-[color:var(--purple-dark)]"][class*="text-white"],
 [class*="bg-[color:var(--coral)]"][class*="text-white"],
+[class*="bg-[#7755c9]"][class*="text-white"],
+[class*="bg-[#7654ad]"][class*="text-white"],
+[class*="bg-[#6d28d9]"][class*="text-white"],
+[class*="bg-[#7c3aed]"][class*="text-white"],
 [class*="bg-purple-"][class*="text-white"],
 [class*="bg-violet-"][class*="text-white"],
 [class*="bg-indigo-"][class*="text-white"],
@@ -51,23 +190,41 @@
 [class*="bg-slate-9"][class*="text-white"],
 [class*="bg-gray-7"][class*="text-white"],
 [class*="bg-gray-8"][class*="text-white"],
-[class*="bg-gray-9"][class*="text-white"],
-[class*="bg-[color:var(--purple)]"] [class*="text-white"],
-[class*="bg-[color:var(--purple-dark)]"] [class*="text-white"],
-[class*="bg-[color:var(--coral)]"] [class*="text-white"],
-[class*="bg-purple-"] [class*="text-white"],
-[class*="bg-violet-"] [class*="text-white"],
-[class*="bg-indigo-"] [class*="text-white"],
-[class*="bg-red-"] [class*="text-white"],
-[class*="bg-black"] [class*="text-white"] {
-  color: #ffffff !important;
+[class*="bg-gray-9"][class*="text-white"] {
+  color: var(--ui-text-on-dark) !important;
 }
 
-/* Explicit semantic text tokens should win on every light surface. */
-.text-foreground {
-  color: #1f2937 !important;
+/* Text descendants of dark buttons/actions should not inherit a legacy dark
+   foreground class from the old light button styling. */
+button.bg-primary :where(span, strong, em, svg),
+a.bg-primary :where(span, strong, em, svg),
+button[class*="bg-[color:var(--purple)]"] :where(span, strong, em, svg),
+a[class*="bg-[color:var(--purple)]"] :where(span, strong, em, svg),
+button[class*="bg-[#7755c9]"] :where(span, strong, em, svg),
+a[class*="bg-[#7755c9]"] :where(span, strong, em, svg),
+button[class*="bg-purple-"] :where(span, strong, em, svg),
+a[class*="bg-purple-"] :where(span, strong, em, svg),
+button[class*="bg-violet-"] :where(span, strong, em, svg),
+a[class*="bg-violet-"] :where(span, strong, em, svg),
+button[class*="bg-indigo-"] :where(span, strong, em, svg),
+a[class*="bg-indigo-"] :where(span, strong, em, svg),
+button[class*="bg-black"] :where(span, strong, em, svg),
+a[class*="bg-black"] :where(span, strong, em, svg) {
+  color: var(--ui-text-on-dark) !important;
 }
 
-.text-muted-foreground {
-  color: #6b7280 !important;
+/* Semantic tokens are scoped to light surfaces rather than overridden
+   globally. This avoids turning text dark inside primary/dark buttons. */
+body > [class*="bg-background"] .text-foreground,
+.journey-bg .text-foreground,
+.sticky-note .text-foreground,
+.workbook-paper .text-foreground {
+  color: var(--ui-text-primary) !important;
+}
+
+body > [class*="bg-background"] .text-muted-foreground,
+.journey-bg .text-muted-foreground,
+.sticky-note .text-muted-foreground,
+.workbook-paper .text-muted-foreground {
+  color: var(--ui-text-secondary) !important;
 }
