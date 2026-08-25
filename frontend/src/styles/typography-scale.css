@@ -1,0 +1,66 @@
+/*
+ * Typography adjustment from the 2026 design review.
+ * Keep layout spacing unchanged while making the type system 25% larger.
+ * Tailwind v4 text utilities consume these --text-* theme variables, so this
+ * also covers responsive text-* classes without scaling paddings or gaps.
+ */
+
+:root {
+  --text-xs: 0.9375rem;       /* 12px -> 15px */
+  --text-sm: 1.09375rem;      /* 14px -> 17.5px */
+  --text-base: 1.25rem;       /* 16px -> 20px */
+  --text-lg: 1.40625rem;      /* 18px -> 22.5px */
+  --text-xl: 1.5625rem;       /* 20px -> 25px */
+  --text-2xl: 1.875rem;       /* 24px -> 30px */
+  --text-3xl: 2.34375rem;     /* 30px -> 37.5px */
+  --text-4xl: 2.8125rem;      /* 36px -> 45px */
+  --text-5xl: 3.75rem;        /* 48px -> 60px */
+  --text-6xl: 4.6875rem;      /* 60px -> 75px */
+  --text-7xl: 5.625rem;       /* 72px -> 90px */
+  --text-8xl: 7.5rem;         /* 96px -> 120px */
+  --text-9xl: 10rem;          /* 128px -> 160px */
+}
+
+body {
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+
+/* H1 is the primary page title and must read clearly as bold. */
+h1 {
+  font-weight: 700 !important;
+}
+
+/* Preserve the hierarchy used by the refreshed system. */
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+}
+
+/* Legacy/custom text sizes that do not use Tailwind text-* utilities. */
+.pencil-badge {
+  font-size: 0.9375rem;
+}
+
+.cover-title {
+  font-size: 102.5px;
+}
+
+.cover-description {
+  font-size: 22.5px;
+}
+
+.celebrate-check {
+  font-size: 3.125rem;
+}
+
+/* Native controls may not inherit body sizing consistently across browsers. */
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
