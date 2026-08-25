@@ -3,6 +3,14 @@
     "en": "\"I feel that another's happiness comes at my expense, and I cannot rejoice in others' success\"",
     "sv": "\"Jag tycker att den andres lycka är något bort från mig och kan inte glädjas åt andras framgångar\""
   },
+  "Vahvuudet eivät ole vain asioita, joissa olet hyvä, eivätkä heikkoudet asioita, joissa olet huono.": {
+  "en": "Strengths are not just things you are good at, and weaknesses are not simply things you are bad at.",
+  "sv": "Styrkor är inte bara saker som du är bra på, och svagheter är inte bara saker som du är dålig på."
+},
+"Vahvuudet ovat ominaisuuksia, jotka tukevat sinua, antavat energiaa ja auttavat sinua toimimaan parhaalla mahdollisella tavalla. Heikkoudet puolestaan voivat kuormittaa, viedä energiaa tai tehdä joistakin tilanteista haastavampia.": {
+  "en": "Strengths are qualities that support you, give you energy, and help you function at your best. Weaknesses, on the other hand, can drain your energy or make some situations more challenging.",
+  "sv": "Styrkor är egenskaper som stödjer dig, ger dig energi och hjälper dig att fungera på bästa möjliga sätt. Svagheter kan däremot belasta dig, ta energi eller göra vissa situationer mer utmanande."
+},
   "\"Ajattelen, että elämällä on jokin syvempi tarkoitus\"": {
     "en": "\"I believe that life has a deeper purpose\"",
     "sv": "\"Jag tänker att livet har en djupare mening\""
