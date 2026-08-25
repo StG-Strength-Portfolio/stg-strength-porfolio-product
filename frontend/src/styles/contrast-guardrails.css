@@ -1,0 +1,73 @@
+/*
+ * Contrast guardrails for the 2026 light-surface UI refresh.
+ * Legacy screens sometimes hard-code text-white because the original canvas
+ * was purple. On the new white / #f9fafb surfaces those classes must resolve
+ * to the designer's dark text palette, while genuine dark brand controls keep
+ * white foreground text.
+ */
+
+:root {
+  --ui-text-primary: #1f2937;
+  --ui-text-secondary: #6b7280;
+}
+
+/* Student learning screens are now light, so legacy white copy on the open
+   canvas must become readable dark text. This covers text-white and opacity
+   variants such as text-white/90. */
+.journey-bg [class*="text-white"],
+.sticky-note [class*="text-white"],
+.workbook-paper [class*="text-white"],
+.workbook-line [class*="text-white"],
+.workbook-pill [class*="text-white"] {
+  color: var(--ui-text-primary) !important;
+}
+
+/* Muted/secondary copy on light surfaces follows the designer's slate token. */
+.journey-bg [class*="text-white"][class*="opacity-"],
+.sticky-note [class*="text-white"][class*="opacity-"] {
+  color: var(--ui-text-secondary) !important;
+}
+
+/* The application canvas/card tokens are light in the refreshed theme. */
+[class*="bg-background"] > [class*="text-white"],
+[class*="bg-card"] > [class*="text-white"],
+[class*="bg-white"] > [class*="text-white"],
+[class*="bg-slate-50"] > [class*="text-white"],
+[class*="bg-gray-50"] > [class*="text-white"] {
+  color: var(--ui-text-primary) !important;
+}
+
+/* Keep white text where the actual surface is deliberately dark/brand colored. */
+[class*="bg-[color:var(--purple)]"][class*="text-white"],
+[class*="bg-[color:var(--purple-dark)]"][class*="text-white"],
+[class*="bg-[color:var(--coral)]"][class*="text-white"],
+[class*="bg-purple-"][class*="text-white"],
+[class*="bg-violet-"][class*="text-white"],
+[class*="bg-indigo-"][class*="text-white"],
+[class*="bg-red-"][class*="text-white"],
+[class*="bg-black"][class*="text-white"],
+[class*="bg-slate-7"][class*="text-white"],
+[class*="bg-slate-8"][class*="text-white"],
+[class*="bg-slate-9"][class*="text-white"],
+[class*="bg-gray-7"][class*="text-white"],
+[class*="bg-gray-8"][class*="text-white"],
+[class*="bg-gray-9"][class*="text-white"],
+[class*="bg-[color:var(--purple)]"] [class*="text-white"],
+[class*="bg-[color:var(--purple-dark)]"] [class*="text-white"],
+[class*="bg-[color:var(--coral)]"] [class*="text-white"],
+[class*="bg-purple-"] [class*="text-white"],
+[class*="bg-violet-"] [class*="text-white"],
+[class*="bg-indigo-"] [class*="text-white"],
+[class*="bg-red-"] [class*="text-white"],
+[class*="bg-black"] [class*="text-white"] {
+  color: #ffffff !important;
+}
+
+/* Explicit semantic text tokens should win on every light surface. */
+.text-foreground {
+  color: #1f2937 !important;
+}
+
+.text-muted-foreground {
+  color: #6b7280 !important;
+}
