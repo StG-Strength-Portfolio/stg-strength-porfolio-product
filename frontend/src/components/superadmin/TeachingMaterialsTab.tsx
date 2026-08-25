@@ -1,7 +1,7 @@
 /**
  * Super admin "Teaching Materials" tab — manage strength categories and articles.
  */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ import {
   type TeachingArticle,
   type TeachingCategory,
 } from "@/lib/teaching.functions";
+import "./TeachingMaterialsTab.css";
 
 function HiddenBadge({ label }: { label: string }) {
   return (
@@ -47,7 +48,7 @@ function PublishToggle({
   onChange: (next: boolean) => void;
 }) {
   return (
-    <label className="flex items-center gap-1.5 text-xs font-semibold">
+    <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-600">
       <input
         type="checkbox"
         className="h-4 w-4"
@@ -79,6 +80,11 @@ export function TeachingMaterialsTab() {
   const { language } = useLanguage();
   const lang = language === "sv" ? "sv" : language === "en" ? "en" : "fi";
   const { categories, subcategories, articles, refresh } = useTeachingMaterials();
+
+  useEffect(() => {
+    document.body.classList.add("admin-materials-theme");
+    return () => document.body.classList.remove("admin-materials-theme");
+  }, []);
 
   const catOfArticle = useMemo(() => {
     const parent = new Map(subcategories.map((s) => [s.id, s.category_id]));
@@ -134,15 +140,15 @@ export function TeachingMaterialsTab() {
   }
 
   return (
-    <div className="space-y-4">
-      <StickyNote seed="tm-add-cat" className="space-y-3">
-        <h3 className="text-xl font-bold">{tr("Lisää kategoria")}</h3>
+    <div className="teaching-materials-admin space-y-3">
+      <StickyNote seed="tm-add-cat" className="tm-panel tm-add-category space-y-3">
+        <h3 className="text-lg font-semibold">{tr("Lisää kategoria")}</h3>
         <div className="flex flex-wrap items-end gap-2">
           <div className="space-y-1">
             <Label htmlFor="tm-strength">{tr("Vahvuus")}</Label>
             <select
               id="tm-strength"
-              className="rounded-2xl border bg-white px-3 py-2 text-slate-900"
+              className="tm-select px-3 py-2"
               value={newStrength}
               onChange={(e) => setNewStrength(e.target.value)}
             >
@@ -157,6 +163,7 @@ export function TeachingMaterialsTab() {
             </select>
           </div>
           <Button
+            className="tm-primary-action"
             disabled={!newStrength || busy}
             onClick={() =>
               void run(async () => {
@@ -175,8 +182,8 @@ export function TeachingMaterialsTab() {
         const thumbnail = visibleCategoryThumbnail(c, lang);
         const color = getStrengthColor(Number(c.strength_id));
         return (
-          <StickyNote key={c.id} seed={`tm-${c.id}`} className="space-y-3">
-            <div className="flex items-center justify-between gap-4">
+          <StickyNote key={c.id} seed={`tm-${c.id}`} className="tm-panel tm-category-card">
+            <div className="tm-category-header flex items-center justify-between gap-4">
               <button
                 type="button"
                 onClick={() => setOpenCat(open ? null : c.id)}
@@ -186,18 +193,18 @@ export function TeachingMaterialsTab() {
                   <img
                     src={thumbnail}
                     alt={getStrengthName(Number(c.strength_id), lang)}
-                    className="aspect-video w-36 shrink-0 rounded-xl object-cover"
+                    className="tm-category-thumbnail aspect-video shrink-0 object-cover"
                   />
                 ) : (
                   <div
-                    className="aspect-video w-36 shrink-0 rounded-xl"
+                    className="tm-category-thumbnail aspect-video shrink-0"
                     style={{ background: color }}
                     aria-hidden
                   />
                 )}
-                <span className="flex min-w-0 items-center gap-2 text-xl font-bold">
+                <span className="tm-category-title flex min-w-0 items-center gap-2">
                   <span
-                    className="h-5 w-5 shrink-0 rounded-full"
+                    className="h-4 w-4 shrink-0 rounded-full"
                     style={{ background: color }}
                     aria-hidden
                   />
@@ -209,7 +216,7 @@ export function TeachingMaterialsTab() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="rounded-full"
+                  className="tm-secondary-action"
                   onClick={() => setThumbnailEditing(c)}
                 >
                   {language === "en" ? "Thumbnail" : language === "sv" ? "Miniatyrbild" : "Pikkukuva"}
@@ -224,6 +231,7 @@ export function TeachingMaterialsTab() {
                 />
                 <Button
                   variant="ghost"
+                  className="tm-secondary-action"
                   disabled={busy}
                   onClick={() => void run(() => delCategory({ data: { id: c.id } }))}
                 >
@@ -233,87 +241,78 @@ export function TeachingMaterialsTab() {
             </div>
 
             {open && (
-              <div className="space-y-3">
-                <div className="rounded-2xl bg-white/70 p-3">
-                  <ul className="space-y-1">
-                    {articles
-                      .filter((a) => catOfArticle(a) === c.id)
-                      .map((a) => (
-                        <li
-                          key={a.id}
-                          className={`flex flex-wrap items-center justify-between gap-2 rounded-lg px-1 py-0.5 text-sm ${
-                            draggingArticleId === a.id ? "opacity-50" : ""
-                          }`}
-                          onDragOver={(e) => {
-                            if (draggingArticleId && draggingArticleId !== a.id) {
-                              e.preventDefault();
-                              e.dataTransfer.dropEffect = "move";
-                            }
-                          }}
-                          onDrop={(e) => {
+              <div className="tm-article-section">
+                <ul className="tm-article-list">
+                  {articles
+                    .filter((a) => catOfArticle(a) === c.id)
+                    .map((a) => (
+                      <li
+                        key={a.id}
+                        className={`tm-article-row flex flex-wrap items-center justify-between gap-2 text-sm ${
+                          draggingArticleId === a.id ? "opacity-50" : ""
+                        }`}
+                        onDragOver={(e) => {
+                          if (draggingArticleId && draggingArticleId !== a.id) {
                             e.preventDefault();
-                            const draggedId =
-                              draggingArticleId || e.dataTransfer.getData("text/plain");
-                            setDraggingArticleId(null);
-                            if (draggedId) void moveArticle(c.id, draggedId, a.id);
-                          }}
-                        >
-                          <span className="flex min-w-0 items-center gap-2">
-                            <span
-                              draggable={!busy}
-                              onDragStart={(e) => {
-                                setDraggingArticleId(a.id);
-                                e.dataTransfer.effectAllowed = "move";
-                                e.dataTransfer.setData("text/plain", a.id);
-                              }}
-                              onDragEnd={() => setDraggingArticleId(null)}
-                              className="cursor-grab select-none text-base leading-none opacity-50 active:cursor-grabbing"
-                              aria-hidden
-                            >
-                              ⋮⋮
-                            </span>
-                            <span className="min-w-0 break-words">
-                              {pickLang(a as never, "title", lang)}
-                              {!a.is_published && (
-                                <span className="ml-2 opacity-60">({tr("Ei julkaistu")})</span>
-                              )}
-                            </span>
+                            e.dataTransfer.dropEffect = "move";
+                          }
+                        }}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          const draggedId = draggingArticleId || e.dataTransfer.getData("text/plain");
+                          setDraggingArticleId(null);
+                          if (draggedId) void moveArticle(c.id, draggedId, a.id);
+                        }}
+                      >
+                        <span className="flex min-w-0 items-center gap-2">
+                          <span
+                            draggable={!busy}
+                            onDragStart={(e) => {
+                              setDraggingArticleId(a.id);
+                              e.dataTransfer.effectAllowed = "move";
+                              e.dataTransfer.setData("text/plain", a.id);
+                            }}
+                            onDragEnd={() => setDraggingArticleId(null)}
+                            className="tm-drag-handle cursor-grab select-none text-base leading-none active:cursor-grabbing"
+                            aria-hidden
+                          >
+                            ⋮⋮
                           </span>
-                          <span className="flex gap-2">
-                            <button
-                              type="button"
-                              className="underline"
-                              onClick={() => setPreview(a)}
-                            >
-                              {tr("Esikatsele")}
-                            </button>
-                            <button
-                              type="button"
-                              className="underline"
-                              onClick={() => setEditing({ catId: c.id, article: a })}
-                            >
-                              {tr("Muokkaa")}
-                            </button>
-                            <button
-                              type="button"
-                              className="underline"
-                              onClick={() => void run(() => delArticle({ data: { id: a.id } }))}
-                            >
-                              {tr("Poista")}
-                            </button>
+                          <span className="min-w-0 break-words font-medium text-slate-700">
+                            {pickLang(a as never, "title", lang)}
+                            {!a.is_published && (
+                              <span className="ml-2 text-slate-400">({tr("Ei julkaistu")})</span>
+                            )}
                           </span>
-                        </li>
-                      ))}
-                  </ul>
-                  <Button
-                    size="sm"
-                    className="mt-3"
-                    disabled={busy}
-                    onClick={() => setEditing({ catId: c.id, article: null })}
-                  >
-                    {tr("Lisää artikkeli")}
-                  </Button>
-                </div>
+                        </span>
+                        <span className="tm-article-actions flex gap-3">
+                          <button type="button" onClick={() => setPreview(a)}>
+                            {tr("Esikatsele")}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setEditing({ catId: c.id, article: a })}
+                          >
+                            {tr("Muokkaa")}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => void run(() => delArticle({ data: { id: a.id } }))}
+                          >
+                            {tr("Poista")}
+                          </button>
+                        </span>
+                      </li>
+                    ))}
+                </ul>
+                <Button
+                  size="sm"
+                  className="tm-primary-action mt-3"
+                  disabled={busy}
+                  onClick={() => setEditing({ catId: c.id, article: null })}
+                >
+                  {tr("Lisää artikkeli")}
+                </Button>
               </div>
             )}
           </StickyNote>
@@ -342,9 +341,9 @@ export function TeachingMaterialsTab() {
       )}
 
       {preview && (
-        <StickyNote seed="tm-preview" className="space-y-3">
+        <StickyNote seed="tm-preview" className="tm-panel space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 className="text-xl font-bold">{tr("Esikatsele")}</h3>
+            <h3 className="text-xl font-semibold">{tr("Esikatsele")}</h3>
             <Button variant="ghost" onClick={() => setPreview(null)}>
               {tr("Sulje")}
             </Button>
@@ -394,16 +393,16 @@ function CategoryThumbnailEditor({
   ];
 
   return (
-    <StickyNote seed={`tm-thumb-${category.id}`} className="space-y-4">
-      <h3 className="text-xl font-bold">{tr("Kuva")} — {getStrengthName(Number(category.strength_id), "en")}</h3>
-      <p className="text-sm opacity-70">
+    <StickyNote seed={`tm-thumb-${category.id}`} className="tm-panel space-y-4">
+      <h3 className="text-xl font-semibold">{tr("Kuva")} — {getStrengthName(Number(category.strength_id), "en")}</h3>
+      <p className="text-sm text-slate-500">
         Paste a separate image URL for Finnish, English and Swedish. Normal Google Drive share links are supported automatically. Leave a field empty to remove that language's thumbnail.
       </p>
       <div className="grid grid-cols-3 gap-4">
         {items.map((item) => {
           const previewUrl = normalizeTeachingThumbnailUrl(item.value);
           return (
-            <div key={item.code} className="space-y-2 rounded-2xl bg-white/70 p-3">
+            <div key={item.code} className="tm-thumbnail-item space-y-2 p-3">
               <Label>{item.code} thumbnail URL</Label>
               <Input
                 type="url"
@@ -415,18 +414,17 @@ function CategoryThumbnailEditor({
                 <img
                   src={previewUrl}
                   alt={`${item.code} thumbnail preview`}
-                  className="aspect-video w-full rounded-xl object-cover"
+                  className="aspect-video w-full rounded-lg object-cover"
                 />
               ) : (
                 <div
-                  className="aspect-video w-full rounded-xl"
+                  className="aspect-video w-full rounded-lg"
                   style={{ background: getStrengthColor(Number(category.strength_id)) }}
                 />
               )}
               <Button
                 type="button"
                 variant="ghost"
-                className="rounded-full"
                 disabled={!item.value || busy}
                 onClick={() => item.setValue("")}
               >
@@ -440,12 +438,12 @@ function CategoryThumbnailEditor({
         <Button
           type="button"
           disabled={busy}
-          className="rounded-full bg-[color:var(--purple)] font-bold text-white"
+          className="tm-primary-action font-semibold"
           onClick={() => onSave({ fi, en, sv })}
         >
           {tr("Tallenna")}
         </Button>
-        <Button type="button" variant="ghost" className="rounded-full" onClick={onCancel}>
+        <Button type="button" variant="ghost" onClick={onCancel}>
           {tr("Peruuta")}
         </Button>
       </div>
@@ -499,8 +497,8 @@ function ArticleForm({
   const badLink = [slidesFi, slidesEn, slidesSv].some((u) => u.trim() && !slidesId(u));
 
   return (
-    <StickyNote seed="tm-article-form" className="space-y-3">
-      <h3 className="text-xl font-bold">{article ? tr("Muokkaa") : tr("Lisää artikkeli")}</h3>
+    <StickyNote seed="tm-article-form" className="tm-panel space-y-3">
+      <h3 className="text-xl font-semibold">{article ? tr("Muokkaa") : tr("Lisää artikkeli")}</h3>
       <div className="grid gap-3 md:grid-cols-3">
         <Field label={`${tr("Otsikko")} (FI)`} value={titleFi} onChange={setTitleFi} />
         <Field label={`${tr("Otsikko")} (EN)`} value={titleEn} onChange={setTitleEn} />
@@ -544,6 +542,7 @@ function ArticleForm({
       </label>
       <div className="flex gap-2">
         <Button
+          className="tm-primary-action"
           disabled={busy || !titleFi.trim() || badLink}
           onClick={() =>
             onSave({
