@@ -3,8 +3,7 @@
  * Google Slides deck rendering for the Teach section.
  *
  * Browse mode = every slide stacked in a scrollable list (quick scanning).
- * @lovable-new 2026-08-05 Double-clicking a slide opens THAT slide fullscreen;
- * the old "Present to class" button is gone.
+ * Double-clicking a slide opens that slide fullscreen.
  */
 import { useState } from "react";
 import { SlideFullscreen } from "@/components/teach/SlideFullscreen";
@@ -30,22 +29,21 @@ export function SlideDeck({
   const total = slideCount && slideCount > 0 ? slideCount : DEFAULT_SLIDES;
   const id = slidesId(url);
 
-  if (!id) return <p className="opacity-70">{tr("Ei materiaaleja vielä.")}</p>;
+  if (!id) return <p className="text-[#6B7280]">{tr("Ei materiaaleja vielä.")}</p>;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4 text-[#1F2937]">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-xl font-bold">{title}</h3>
-        <span className="text-xs opacity-70">
+        <h3 className="text-xl font-bold text-[#111827]">{title}</h3>
+        <span className="text-xs text-[#6B7280]">
           {tr("Avaa dia koko näytölle kaksoisklikkaamalla")}
         </span>
       </div>
 
-      {/* Browse mode — every slide, scrollable */}
       <div className="space-y-4">
         {Array.from({ length: total }).map((_, i) => (
-          <div key={i} className="space-y-1">
-            <span className="font-mono text-xs opacity-70">
+          <div key={i} className="space-y-1.5">
+            <span className="font-mono text-xs text-[#6B7280]">
               {tr("Dia")} {i + 1}
             </span>
             <div
@@ -56,7 +54,7 @@ export function SlideDeck({
               onKeyDown={(e) => {
                 if (e.key === "Enter") setFullscreen(i);
               }}
-              className="relative aspect-video w-full cursor-zoom-in overflow-hidden rounded-2xl bg-white shadow"
+              className="designer-composite-button relative aspect-video w-full cursor-zoom-in overflow-hidden rounded-xl border border-[#E5E7EB] bg-white shadow-none transition-colors hover:border-[#C4B5FD]"
             >
               <iframe
                 src={slidesEmbedUrl(url, { lang, slide: i + 1 }) ?? undefined}
