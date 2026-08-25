@@ -543,23 +543,27 @@ function Screen6({ onSaveStateChange }: Props) {
 
   useEffect(() => {
     onSaveStateChange?.(state);
-    if (state === "saved") setPendingSave(false);
+
+    if (state === "saved") {
+      setPendingSave(false);
+    }
   }, [state, onSaveStateChange]);
 
   useEffect(() => {
     if (!loaded) return;
 
-    // Do not unlock navigation until a changed selection is safely persisted.
-    // Existing saved selections loaded from the database remain complete.
+    // Keep navigation locked until the current selection is saved.
     report(fieldKey, selectedIds.length >= 1 && !pendingSave);
   }, [loaded, pendingSave, report, selectedIds.length]);
 
   function toggleStrength(id: number) {
-    // Clicking a fourth strength does not change the value, so it must not
-    // create a pending-save state that can never resolve.
-    if (!selectedIds.includes(id) && selectedIds.length >= maxSelections) return;
+    // Prevent selecting more than three strengths.
+    if (!selectedIds.includes(id) && selectedIds.length >= maxSelections) {
+      return;
+    }
 
     setPendingSave(true);
+
     setSelectedIds((currentIds) => {
       if (currentIds.includes(id)) {
         return currentIds.filter((selectedId) => selectedId !== id);
@@ -576,10 +580,12 @@ function Screen6({ onSaveStateChange }: Props) {
   return (
     <div className="relative min-h-[560px] overflow-hidden p-8 text-white">
       <div className="relative z-10 grid h-full grid-cols-[220px_minmax(0,1fr)] gap-8">
-        {/* JAR */}
+        {/* LEFT — STRENGTH JAR */}
+
         <aside className="flex flex-col items-center justify-center pt-4 text-center">
           <div className="relative h-[245px] w-[185px]">
             {/* Jar lid */}
+
             <div
               className="
                 absolute
@@ -597,6 +603,7 @@ function Screen6({ onSaveStateChange }: Props) {
             />
 
             {/* Jar body */}
+
             <div
               className="
                 absolute
@@ -731,11 +738,25 @@ function Screen6({ onSaveStateChange }: Props) {
             </div>
           </div>
 
-          <div className="relative mt-5 max-w-[205px] text-center font-display text-[13px] font-semibold leading-[1.25] text-[#FFE65A]">
+          {/* Updated instruction */}
+
+          <div
+            className="
+              relative
+              mt-5
+              max-w-[205px]
+              text-center
+              font-display
+              text-[13px]
+              font-semibold
+              leading-[1.25]
+              text-[#FFE65A]
+            "
+          >
             <span className="absolute -left-7 top-2 -rotate-[25deg] text-[34px]">↗</span>
 
             {tr(
-              "Valitse ne vahvuudet, jotka tunnistat itsessäsi tai läheisissäsi. Voit palata muokkaamaan valintaasi myöhemmin.",
+              "Valitse ne vahvuudet, jotka tunnistat itsessäsi. Voit palata muokkaamaan valintaasi myöhemmin.",
             )}
           </div>
 
@@ -744,10 +765,13 @@ function Screen6({ onSaveStateChange }: Props) {
           </div>
         </aside>
 
-        {/* STRENGTH CANDIES */}
+        {/* RIGHT — STRENGTH CANDIES */}
+
         <section className="min-w-0 pt-1">
+          {/* Updated title */}
+
           <h1 className="mb-1 max-w-[850px] font-display text-[30px] font-bold leading-tight">
-            {tr("Luonteenvahvuudet, joita voit tunnistaa itsessäsi ja toisissa")}
+            {tr("Luonteenvahvuudet, joita voit tunnistaa itsessäsi")}
           </h1>
 
           <p className="mb-4 font-display text-[18px] font-medium">{tr("Keksitkö lisää?")}</p>
@@ -756,7 +780,6 @@ function Screen6({ onSaveStateChange }: Props) {
             {Array.from({ length: 26 }, (_, index) => index + 1).map((id) => {
               const name = getStrengthName(id, language);
               const color = getStrengthColor(id);
-
               const isSelected = selectedIds.includes(id);
 
               const selectionDisabled = selectedIds.length >= maxSelections && !isSelected;
@@ -12632,7 +12655,7 @@ export function ScreenContent({
 }: {
   n: number;
 } & Props): ReactNode {
- 
+  
   const screenComponent = REGISTRY[n];
 
   if (screenComponent) {
