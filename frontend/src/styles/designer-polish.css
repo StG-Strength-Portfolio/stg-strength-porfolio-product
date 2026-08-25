@@ -1,0 +1,132 @@
+/* Final contrast/readability polish for the light 2026 UI refresh. */
+
+/* --------------------------------------------------------------------------
+   DARK CTA BUTTONS: purple/coral/red/dark buttons always use white text.
+   These selectors intentionally outrank the light-surface legacy guardrails.
+   -------------------------------------------------------------------------- */
+button[class*="bg-[color:var(--purple)]"][class*="text-white"],
+button[class*="bg-[color:var(--purple-dark)]"][class*="text-white"],
+button[class*="bg-[color:var(--coral)]"][class*="text-white"],
+button[class*="bg-purple-"][class*="text-white"],
+button[class*="bg-violet-"][class*="text-white"],
+button[class*="bg-indigo-"][class*="text-white"],
+button[class*="bg-red-"][class*="text-white"],
+a[class*="bg-[color:var(--purple)]"][class*="text-white"],
+a[class*="bg-[color:var(--purple-dark)]"][class*="text-white"],
+a[class*="bg-[color:var(--coral)]"][class*="text-white"],
+a[class*="bg-purple-"][class*="text-white"],
+a[class*="bg-violet-"][class*="text-white"],
+a[class*="bg-indigo-"][class*="text-white"],
+a[class*="bg-red-"][class*="text-white"] {
+  color: #ffffff !important;
+}
+
+.sticky-note button[class*="bg-[color:var(--purple)]"],
+.sticky-note button[class*="bg-[color:var(--purple-dark)]"],
+.sticky-note button[class*="bg-[color:var(--coral)]"],
+.sticky-note button[class*="bg-purple-"],
+.sticky-note button[class*="bg-violet-"],
+.sticky-note button[class*="bg-indigo-"],
+.sticky-note button[class*="bg-red-"],
+.journey-bg button[class*="bg-[color:var(--purple)]"],
+.journey-bg button[class*="bg-[color:var(--purple-dark)]"],
+.journey-bg button[class*="bg-[color:var(--coral)]"],
+.journey-bg button[class*="bg-purple-"],
+.journey-bg button[class*="bg-violet-"],
+.journey-bg button[class*="bg-indigo-"],
+.journey-bg button[class*="bg-red-"],
+.no-print button[class*="bg-[color:var(--purple)]"],
+.no-print button[class*="bg-[color:var(--purple-dark)]"],
+.no-print button[class*="bg-[color:var(--coral)]"],
+.no-print button[class*="bg-purple-"],
+.no-print button[class*="bg-violet-"],
+.no-print button[class*="bg-indigo-"],
+.no-print button[class*="bg-red-"] {
+  color: #ffffff !important;
+}
+
+.sticky-note button[class*="bg-[color:var(--purple)]"] *,
+.sticky-note button[class*="bg-[color:var(--purple-dark)]"] *,
+.sticky-note button[class*="bg-[color:var(--coral)]"] *,
+.sticky-note button[class*="bg-red-"] *,
+.journey-bg button[class*="bg-[color:var(--purple)]"] *,
+.journey-bg button[class*="bg-[color:var(--purple-dark)]"] *,
+.journey-bg button[class*="bg-[color:var(--coral)]"] *,
+.journey-bg button[class*="bg-red-"] *,
+.no-print button[class*="bg-[color:var(--purple)]"] *,
+.no-print button[class*="bg-[color:var(--purple-dark)]"] *,
+.no-print button[class*="bg-[color:var(--coral)]"] *,
+.no-print button[class*="bg-red-"] * {
+  color: #ffffff !important;
+}
+
+/* Destructive semantic buttons are dark/red by definition. */
+button.bg-destructive,
+button[class*="bg-destructive"] {
+  color: #ffffff !important;
+}
+button.bg-destructive *,
+button[class*="bg-destructive"] * {
+  color: #ffffff !important;
+}
+
+/* --------------------------------------------------------------------------
+   WORLD MAP: remove the old playful purple offset shadow from level cards.
+   -------------------------------------------------------------------------- */
+button[class*="shadow-[6px_8px_0_0_var(--purple-dark)]"] {
+  box-shadow: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   SCREEN 15 / CORE-STRENGTH CANDY SHOP.
+   The original screen was authored for a dark purple canvas and therefore
+   hard-coded white copy and translucent white jars. On the new light canvas,
+   use the designer's charcoal/slate text and clearly defined light surfaces.
+   -------------------------------------------------------------------------- */
+.shopscroll .hd .h1 {
+  color: #1f2937 !important;
+}
+
+.shopscroll .hd .h1 small {
+  color: #6b7280 !important;
+  opacity: 1 !important;
+}
+
+.shopscroll .txt {
+  color: #1f2937 !important;
+  text-shadow: none !important;
+}
+
+.shopscroll .rev,
+.shopscroll .rev .nm,
+.shopscroll .rev .vt {
+  color: #1f2937;
+}
+
+.shopscroll .rev .vt {
+  color: #6b7280;
+}
+
+.shopscroll .lid {
+  background: #f3f4f6 !important;
+  border-color: #d1d5db !important;
+  box-shadow: none !important;
+}
+
+.shopscroll .tub {
+  background: #f9fafb !important;
+  border: 1px solid #d1d5db !important;
+  border-top: 0 !important;
+  box-shadow: none !important;
+}
+
+.shopscroll .bin:focus-visible .tub {
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.18) !important;
+}
+
+/* Keep selected/revealed jars visually distinct without returning to heavy
+   offset shadows. */
+.shopscroll .reveal .bin.won .tub {
+  border-color: var(--yellow) !important;
+  box-shadow: 0 0 0 2px rgba(244, 200, 74, 0.65) !important;
+}
