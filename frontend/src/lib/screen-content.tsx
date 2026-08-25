@@ -19,7 +19,7 @@ import { getStrengthColor, getStrengthName } from "@/lib/strengths-i18n";
 import { Heart } from "lucide-react";
 
 // Screens 1–22: content sourced verbatim from the workbook PDF
-// "Vahvuusportfolio lukiolaiselle" (Huomaa hyvä!®).
+// "Vahvuusportfolio lukiolaiselle" (Huomaa hyvä!®) workbook.
 
 export const STRENGTHS_24 = [
   "Rohkeus",
@@ -308,7 +308,7 @@ function Screen4() {
           "
         >
           {tr(
-            "Vahvuudet eivät ole ominaisuuksia, joissa olet hyvä, eivätkä heikkoudet niitä, joissa tunnet itsesi huonoksi.",
+            "Vahvuudet eivät ole vain asioita, joissa olet hyvä, eivätkä heikkoudet asioita, joissa olet huono.",
           )}
         </span>
 
@@ -324,7 +324,7 @@ function Screen4() {
           "
         >
           {tr(
-            "Sen sijaan vahvuudet tekevät kantajastaan vahvan ja heikkoudet toimivat päinvastoin.",
+            "Vahvuudet ovat ominaisuuksia, jotka tukevat sinua, antavat energiaa ja auttavat sinua toimimaan parhaalla mahdollisella tavalla. Heikkoudet puolestaan voivat kuormittaa, viedä energiaa tai tehdä joistakin tilanteista haastavampia.",
           )}
         </span>
       </h1>
@@ -360,11 +360,11 @@ function Screen5({ onSaveStateChange: _onSaveStateChange }: Props) {
         "
       >
         {/* =========================
-            BÊN TRÁI: TEXT
+            LEFT: TEXT
         ========================== */}
 
         <div className="min-w-0">
-          {/* PHẦN CHỮ LỚN */}
+          {/* LARGE TEXT SECTION */}
 
           <div>
             <h1 className="font-display text-white">{tr("Tietoa vahvuuksista")}</h1>
@@ -385,7 +385,7 @@ function Screen5({ onSaveStateChange: _onSaveStateChange }: Props) {
             </p>
           </div>
 
-          {/* PHẦN CHỮ NHỎ */}
+          {/* SMALL TEXT SECTION */}
 
           <div
             className="
@@ -416,7 +416,7 @@ function Screen5({ onSaveStateChange: _onSaveStateChange }: Props) {
         </div>
 
         {/* =========================
-            BÊN PHẢI: ILLUSTRATION
+            RIGHT: ILLUSTRATION
         ========================== */}
 
         <div
@@ -1320,7 +1320,7 @@ function Screen10({ onSaveStateChange }: Props) {
       "
     >
       <div className="grid min-h-[760px] grid-cols-[0.25fr_0.75fr] gap-7">
-        {/* CỘT TRÁI */}
+        {/* LEFT COLUMN */}
         <div className="relative min-w-0">
           <h1
             className="
@@ -1359,7 +1359,7 @@ function Screen10({ onSaveStateChange }: Props) {
             {tr('"Olet sinnikäs" → "Minä olen sinnikäs."')}
           </div>
 
-          {/* ILLUSTRATION TO HƠN */}
+          {/* LARGER ILLUSTRATION */}
           <img
             src="/illustrations/mina-olen-character.png"
             alt={tr("Minä olen –övning")}
@@ -1377,7 +1377,7 @@ function Screen10({ onSaveStateChange }: Props) {
           />
         </div>
 
-        {/* CỘT PHẢI */}
+        {/* RIGHT COLUMN */}
         <div className="relative min-h-[760px] min-w-0">
           {notes.map((note) => (
             <div
@@ -1406,7 +1406,7 @@ function Screen10({ onSaveStateChange }: Props) {
                 ${note.position}
               `}
             >
-              {/* TIÊU ĐỀ BOX */}
+              {/* BOX TITLE */}
               <p
                 className="
                   mb-3
@@ -1424,7 +1424,7 @@ function Screen10({ onSaveStateChange }: Props) {
                 {tr("Minä olen ...")}
               </p>
 
-              {/* VÙNG NHẬP */}
+              {/* INPUT AREA */}
               <div
                 className="
                   relative
@@ -1465,7 +1465,7 @@ function Screen10({ onSaveStateChange }: Props) {
                   [&_textarea:focus]:ring-0
                 "
               >
-                {/* DÒNG KẺ GIẤY */}
+                {/* PAPER LINES */}
                 <div
                   aria-hidden="true"
                   className="
@@ -1497,8 +1497,8 @@ function Screen10({ onSaveStateChange }: Props) {
   );
 }
 //s11
-// FIX: description trước đây là JSX hard-code tiếng Phần Lan, không qua tr().
-// Nay chuyển description sang string (dùng "\n" thay cho <br/>) và render bằng trLines().
+// FIX: the description was previously hardcoded Finnish JSX and did not go through tr().
+// The description is now stored as a string (using "\n" instead of <br/>) and rendered with trLines().
 function Screen11() {
   const tr = useTr();
   const items = [
@@ -1606,7 +1606,7 @@ function Screen11() {
   );
 }
 
-// FIX: alt text giờ bọc tr()
+// FIX: alt text now goes through tr().
 function Screen12() {
   const tr = useTr();
 
@@ -1957,7 +1957,7 @@ function Screen14() {
   );
 }
 
-// ----- S12: Ydinvahvuuksien karkkikauppa (PDF p16–17) -----
+// ----- Screen15: Core-strength candy shop (PDF p16–17) -----
 
 const PICK = 5;
 
@@ -2131,7 +2131,7 @@ const PROMPTS = [
   "Miten omien ydinvahvuuksien hyödyntäminen vaikutti itseesi tai toisiin?",
 ];
 
-/* ── karkit ────────────────────────────────────────────────── */
+/* ── candies ──────────────────────────────────────────────── */
 function Candy({ kind, hue, size = 30 }) {
   const [a, b] = HUES[((hue % 9) + 9) % 9];
   const p = { fill: a, stroke: b, strokeWidth: 1.6, strokeLinejoin: "round" };
@@ -2608,7 +2608,7 @@ function Screen15({ onSaveStateChange }: Props) {
   border-left:21px solid var(--ye);
 }
 
-/* ── hylly ────────────────────────────────── */
+/* ── shelf ────────────────────────────────── */
 
 .wall{
   position:relative;
@@ -2649,7 +2649,7 @@ function Screen15({ onSaveStateChange }: Props) {
   flex:0 0 auto;
 }
 
-/* ── purkki ───────────────────────────────── */
+/* ── jar ──────────────────────────────────── */
 
 .bin{
   position:relative;
@@ -2829,7 +2829,7 @@ function Screen15({ onSaveStateChange }: Props) {
   }
 }
 
-/* takapuoli: vahvuus + sitä vastaava karkki */
+/* Back side: strength + its matching candy */
 
 .rev{
   flex:1 1 auto;
@@ -2863,7 +2863,7 @@ function Screen15({ onSaveStateChange }: Props) {
   filter:drop-shadow(0 3px 3px rgba(0,0,0,.35));
 }
 
-/* voittajapurkit vs. muut */
+/* Selected jars vs. the others */
 
 .reveal .bin{
   opacity:.34;
@@ -2923,7 +2923,7 @@ function Screen15({ onSaveStateChange }: Props) {
     opacity .62s ease-in;
 }
 
-/* ── pussi + palkki ───────────────────────── */
+/* ── bag + bar ────────────────────────────── */
 
 .bar{
   position:relative;
@@ -2937,17 +2937,17 @@ function Screen15({ onSaveStateChange }: Props) {
   gap:24px;
   flex-wrap:nowrap;
 
-  /* kéo bar tràn hết 2 bên */
+  /* Extend the bar to both sides */
   width:calc(100% + 40px);
   left:-20px;
 
   margin:0;
   padding:0 22px;
 
-  /* đẩy bar lên */
+  /* Move the bar upward */
   transform:translateY(-20px);
 
-  /* màu mới */
+  /* New color */
   background:#FFE77A;
 
   box-shadow:
@@ -3134,7 +3134,7 @@ function Screen15({ onSaveStateChange }: Props) {
   box-shadow:0 7px 0 #C39C22;
 }
 
-/* button về vị trí cũ */
+/* Keep the button in its original position */
 .middle-btn{
   position:relative;
   top:0;
@@ -3163,7 +3163,7 @@ function Screen15({ onSaveStateChange }: Props) {
   padding:6px;
 }
 
-/* ── kuitti ───────────────────────────────── */
+/* ── receipt ──────────────────────────────── */
 
 .receipt{
   position:relative;
@@ -3561,8 +3561,8 @@ function Screen15({ onSaveStateChange }: Props) {
   );
 }
 
-// ----- Screen16: Vahvuuskarkkini ----- (FIX: heading, subtitle, placeholder, và 3 label giờ đều qua tr())
-// ----- Screen16 (PDF p18): Vahvuuskarkkini -----
+// ----- Screen16: Vahvuuskarkkini ----- (FIX: heading, subtitle, placeholder, and all three labels now go through tr())
+// ----- Screen16 (PDF p18): My strength candies -----
 function Screen16({ onSaveStateChange }: Props) {
   const tr = useTr();
   const { language: lang } = useLanguage();
@@ -3610,7 +3610,7 @@ function Screen16({ onSaveStateChange }: Props) {
         "
       >
         {/* =========================
-            BÊN TRÁI
+            LEFT SIDE
         ========================== */}
 
         <div className="min-w-0">
@@ -3665,7 +3665,7 @@ function Screen16({ onSaveStateChange }: Props) {
         </div>
 
         {/* =========================
-            BÊN PHẢI
+            RIGHT SIDE
         ========================== */}
 
         <StickyNote tone="coral" seed="s13-candies" className="self-start">
@@ -3698,7 +3698,7 @@ function Screen16({ onSaveStateChange }: Props) {
         </StickyNote>
 
         {/* =========================
-            ILLUSTRATION GÓC PHẢI DƯỚI
+            BOTTOM-RIGHT ILLUSTRATION
         ========================== */}
 
         <img
@@ -4040,7 +4040,7 @@ function Screen17({ onSaveStateChange }: Props) {
           "
         >
           {/* Road shadow */}
-          {/* FIX: tăng bề rộng road theo tỉ lệ box to hơn, cho đồng bộ */}
+          {/* FIX: increase the road width proportionally to match the larger boxes */}
           <path
             d={SCREEN_14_ROAD_PATH}
             fill="none"
@@ -4210,11 +4210,11 @@ function Screen17({ onSaveStateChange }: Props) {
 
               {/* =========================
                   WRITING AREA
-                  FIX: siết chặt hơn để chắc chắn KHÔNG còn viền/outline/
-                  shadow/ring nào còn sót lại bên trong (kể cả trên chính
-                  div gốc do ReflectionTextarea trả về) — trước đây chỉ
-                  reset [&_div] (descendant) mà chưa ép luôn chính nó qua
-                  [&>div] nên có thể còn sót viền mặc định.
+                  FIX: tighten the reset rules to ensure NO border/outline/
+                  shadow/ring remains inside, including on the root div
+                  returned by ReflectionTextarea. Previously only descendants
+                  were reset with [&_div]; the direct child also needs
+                  [&>div] rules to remove any remaining default border.
               ========================== */}
 
               <div
@@ -4316,7 +4316,7 @@ function Screen17({ onSaveStateChange }: Props) {
 }
 
 // ----- Screen18 (PDF p20): Voimavarani opiskelijana 1/2 — informational -----
-// FIX: bulletItems giờ là string thuần (không còn JSX fragment), qua tr(); heading cũng qua tr()
+// FIX: bulletItems are now plain strings (no JSX fragments), and both items and heading go through tr().
 function Screen18() {
   const tr = useTr();
   const bulletItems = [
@@ -4370,7 +4370,7 @@ function Screen18() {
 }
 
 // ----- Screen19 (PDF p21): Voimavarani opiskelijana 2/2 -----
-// FIX: heading "Voimavarani opiskelijana 2/2" và "Merkitse vahvuutesi" giờ qua tr()
+// FIX: the "Voimavarani opiskelijana 2/2" and "Merkitse vahvuutesi" headings now go through tr().
 export function Screen19({ onSaveStateChange }: Props) {
   const tr = useTr();
   const [scores, setScores] = useState<Record<string, number[]>>({});
@@ -4979,9 +4979,9 @@ function Screen20({ onSaveStateChange }: Props) {
   );
 }
 
-// ----- Screen21 (PDF p23): Vahvuuksien käyttökielto -----
-// FIX: title và heading câu hỏi 2 (đổi <br/> thành trLines) giờ đều qua tr()
-// ----- Screen21 (PDF p23): Vahvuuksien käyttökielto -----
+// ----- Screen21 (PDF p23): Strength-use ban -----
+// FIX: the title and question 2 heading now go through tr(); <br/> was replaced with trLines().
+// ----- Screen21 (PDF p23): Strength-use ban -----
 function Screen21({ onSaveStateChange }: Props) {
   const tr = useTr();
 
@@ -4998,7 +4998,7 @@ function Screen21({ onSaveStateChange }: Props) {
     },
   ] as const;
 
-  // Không dùng useScreenSubPages nữa
+  // useScreenSubPages is no longer used here.
   const [step, setStep] = useState<0 | 1>(0);
 
   const page = pages[step];
@@ -5274,7 +5274,7 @@ function Screen21({ onSaveStateChange }: Props) {
   );
 }
 // ----- Screen22 (PDF p24): Idea: Vahvuusjulisteet — informational, no required input -----
-// FIX: 3 đoạn <p> giờ qua tr()
+// FIX: all three <p> elements now go through tr().
 function Screen22() {
   const tr = useTr();
   const { language } = useLanguage();
@@ -5418,7 +5418,7 @@ function Screen22() {
 }
 
 // ----- Screen23 (PDF p25): Muistele onnistumista -----
-// FIX: title + 4 câu hỏi (kể cả phần có <strong>) giờ đều qua tr(), tách phần in đậm thành tr() riêng
+// FIX: the title and all four questions now go through tr(), including separate tr() calls for <strong> text.
 function Screen23({ onSaveStateChange }: Props) {
   const tr = useTr();
   return (
@@ -5796,7 +5796,7 @@ function Screen23({ onSaveStateChange }: Props) {
   );
 }
 
-// ----- Screen24 (PDF p26): Pohdi onnistumisia ja täydennä! -----
+// ----- Screen24 (PDF p26): Reflect on successes and complete the prompts -----
 const PAGE_PURPLE = "#7654ad";
 const PAGE_CORAL = "#ef6f70";
 const PAGE_YELLOW = "#ffd85d";
@@ -5940,7 +5940,7 @@ function IrregularPaper({
 }
 
 // ============================================================
-// Screen24 — PDF page 27: Pohdi onnistumisia ja täydennä!
+// Screen24 — PDF page 27: Reflect on successes and complete the prompts
 // ============================================================
 function Screen24({ onSaveStateChange }: Props) {
   const tr = useTr();
@@ -6250,7 +6250,7 @@ function Screen24({ onSaveStateChange }: Props) {
 // ============================================================
 // Screen25 — PDF page 28: Tulevaisuuden muistelu
 // ============================================================
-// FIX: tách 2 đoạn <p> có <strong> thành các tr() riêng
+// FIX: split the two <p> sections containing <strong> into separate tr() calls.
 function Screen25({ onSaveStateChange }: Props) {
   const tr = useTr();
   return (
@@ -6561,7 +6561,7 @@ function Screen25({ onSaveStateChange }: Props) {
 // ============================================================
 // Screen26 — PDF page 29: Ydinvahvuudet parin kanssa
 // ============================================================
-// FIX: đoạn intro giờ qua tr()
+// FIX: the intro text now goes through tr().
 function Screen26({ onSaveStateChange }: Props) {
   const tr = useTr();
 
@@ -6923,7 +6923,7 @@ function Screen27() {
   );
 }
 // ============================================================
-// Screen28 — PDF page 32: Tässä olen minä
+// Screen28 — PDF page 32: This is me
 // ============================================================
 function Screen28({ onSaveStateChange }: Props) {
   const tr = useTr();
@@ -6988,7 +6988,7 @@ function Screen28({ onSaveStateChange }: Props) {
   ];
 
   /*
-   * Illustration theo ngôn ngữ.
+   * Language-specific illustration.
    *
    * FI = Finnish
    * EN = English
@@ -7055,10 +7055,10 @@ function Screen28({ onSaveStateChange }: Props) {
         {/* =========================
             GRID
 
-            4 cột:
-            hàng 1 = 4 box
-            hàng 2 = 4 box
-            hàng 3 = 3 box + illustration
+            4 columns:
+            row 1 = 4 boxes
+            row 2 = 4 boxes
+            row 3 = 3 boxes + illustration
         ========================== */}
 
         <div
@@ -7215,10 +7215,10 @@ function Screen28({ onSaveStateChange }: Props) {
 
           {/* =========================
               ILLUSTRATION
-              HÀNG CUỐI - GÓC PHẢI
+              LAST ROW - RIGHT CORNER
 
-              Đây chính là vị trí thứ 12
-              sau 11 box.
+              This is the 12th position
+              after the 11 boxes.
           ========================== */}
 
           <div
@@ -7413,7 +7413,7 @@ function LikertRow({
 }
 
 // ============================================================
-// Screen29 — PDF page 33: Omien vahvuuksien käyttö
+// Screen29 — PDF page 33: Using my strengths
 // ============================================================
 
 function Screen29({ onSaveStateChange }: Props) {
@@ -7643,7 +7643,7 @@ function Screen29({ onSaveStateChange }: Props) {
 // ============================================================
 // Screen30 — Module 2 title card
 // ============================================================
-// FIX: "Tasot  2" và h1 (đổi <br/> thành trLines) giờ qua tr()
+// FIX: "Tasot 2" and the h1 now go through tr(); <br/> was replaced with trLines().
 function Screen30() {
   const tr = useTr();
   return (
@@ -7662,7 +7662,7 @@ function Screen30() {
 // ============================================================
 // Screen31 — Omat vahvuuteni lukiossa
 // ============================================================
-// FIX: 3 đoạn <p> giờ qua tr()
+// FIX: all three <p> elements now go through tr().
 function Screen31() {
   const tr = useTr();
   return (
@@ -7701,8 +7701,8 @@ function Screen31() {
 // ============================================================
 // Reusable Vahvuuskarkkini worksheet — design used by Screen32
 // ============================================================
-// FIX: "Valitse 1–2 vahvuuskarkkia ja" / "Kirjoita vahvuudet tähän" / "Pohdi, mitä teit, koit ja opit."
-// / "Täydennä oheinen tehtävä." giờ đều qua tr()
+// FIX: the following Finnish source strings now go through tr(): "Valitse 1–2 vahvuuskarkkia ja", "Kirjoita vahvuudet tähän", and "Pohdi, mitä teit, koit ja opit."
+// / "Täydennä oheinen tehtävä." now all go through tr().
 function VahvuuskarkkiOverlayInput({
   fieldKey,
   onSaveStateChange,
@@ -7951,7 +7951,7 @@ function Screen32(p: Props) {
 // ============================================================
 // Screen33 — Osaamisen osa-alueiden palapeli
 // ============================================================
-// FIX: đoạn <p> phụ (trùng h1) giờ qua tr()
+// FIX: the secondary <p> (duplicating the h1) now goes through tr().
 function Screen33({ onSaveStateChange }: Props) {
   const tr = useTr();
   const { language } = useLanguage();
@@ -8621,7 +8621,7 @@ function Screen34({ onSaveStateChange }: Props) {
   );
 }
 
-// ----- Screen35 (PDF p38): Minä opiskelijana -----
+// ----- Screen35 (PDF p38): Me as a student -----
 function Screen35({ onSaveStateChange }: Props) {
   const tr = useTr();
   const qs = [
@@ -8742,7 +8742,7 @@ function Screen35({ onSaveStateChange }: Props) {
 }
 
 // ----- Screen36 (PDF p39): Listaa erityistaidot — 5 slots -----
-// FIX: placeholder giờ qua tr()
+// FIX: the placeholder now goes through tr().
 function Screen36({ onSaveStateChange }: Props) {
   const tr = useTr();
   return (
@@ -9387,7 +9387,7 @@ function Screen41({ onSaveStateChange }: Props) {
   );
 }
 
-// ----- Screen42 (PDF p45): Minä olen (M2) -----
+// ----- Screen42 (PDF p45): I am (M2) -----
 function Screen42({ onSaveStateChange }: Props) {
   const tr = useTr();
   const { language } = useLanguage();
@@ -9703,7 +9703,7 @@ function Screen42StrengthSelect({
 }
 
 // ----- S40 (PDF p46): Moduuli 3 title card -----
-// FIX: trước đây component này KHÔNG có tr() nào. Nay bọc "Moduuli 3" và h1.
+// FIX: this component previously had no tr() calls. "Moduuli 3" and the h1 are now wrapped with tr().
 function Screen43() {
   const tr = useTr();
   return (
@@ -10072,7 +10072,7 @@ function Screen44(p: Props) {
   return <Screen44StrengthCandyHome {...p} />;
 }
 
-// ----- Screen45: Vahvuudet perheessä -----
+// ----- Screen45: Strengths in the family -----
 function Screen45({ onSaveStateChange }: Props) {
   const tr = useTr();
   const notes = [
@@ -10298,7 +10298,7 @@ function Screen45({ onSaveStateChange }: Props) {
   );
 }
 
-// ----- Screen46: Minä perheenjäsenenä -----
+// ----- Screen46: Me as a family member -----
 function Screen46({ onSaveStateChange }: Props) {
   const tr = useTr();
 
@@ -10442,7 +10442,7 @@ function Screen47({ onSaveStateChange }: Props) {
       "
     >
       <div className="grid min-h-[760px] grid-cols-[0.25fr_0.75fr] gap-7">
-        {/* CỘT TRÁI */}
+        {/* LEFT COLUMN */}
         <div className="relative min-w-0">
           <h1
             className="
@@ -10475,7 +10475,7 @@ function Screen47({ onSaveStateChange }: Props) {
           />
         </div>
 
-        {/* CỘT PHẢI */}
+        {/* RIGHT COLUMN */}
         <div className="relative min-h-[760px] min-w-0">
           {notes.map((note) => (
             <div
@@ -10508,7 +10508,7 @@ function Screen47({ onSaveStateChange }: Props) {
                 ${note.position}
               `}
             >
-              {/* CÂU HỎI */}
+              {/* QUESTION */}
               <p
                 className="
                   mb-3
@@ -10792,7 +10792,7 @@ function Screen48({ onSaveStateChange }: Props) {
             </div>
           </div>
 
-          {/* KÄYTÄT NIITÄ */}
+          {/* USE THEM */}
           <div>
             <p className={labelClass}>{tr("Olen huomannut, että käytät niitä, kun")}</p>
 
@@ -11889,7 +11889,7 @@ function WorkbookInfoPanel({ children }: { children: ReactNode }) {
   );
 }
 
-// ----- S48 (PDF p54): Minä vapaa-ajalla -----
+// ----- S48 (PDF p54): Me in my free time -----
 function Screen51({ onSaveStateChange }: Props) {
   const tr = useTr();
   const cols = [
@@ -11925,7 +11925,7 @@ function Screen51({ onSaveStateChange }: Props) {
 }
 
 // ----- S49 (PDF p55): Love to-do -lista 1/3 — informational -----
-// FIX: h1 "Love to-do -lista 1/3" giờ qua tr()
+// FIX: the h1 "Love to-do -lista 1/3" now goes through tr().
 function Screen52() {
   const tr = useTr();
   return (
@@ -11953,7 +11953,7 @@ function Screen52() {
 }
 
 // ----- S50 (PDF p56): Love to-do -lista 2/3 — 5 inputs -----
-// FIX: h1 "Love to-do -lista" giờ qua tr()
+// FIX: the h1 "Love to-do -lista" now goes through tr().
 function Screen53({ onSaveStateChange }: Props) {
   const tr = useTr();
   return (
@@ -11997,7 +11997,7 @@ function Screen53({ onSaveStateChange }: Props) {
 }
 
 // ----- S51 (PDF p57): Love to-do -lista 3/3 -----
-// FIX: h1 "Love to-do -lista" giờ qua tr()
+// FIX: the h1 "Love to-do -lista" now goes through tr().
 function Screen54({ onSaveStateChange }: Props) {
   const tr = useTr();
   return (
@@ -12025,7 +12025,7 @@ function Screen54({ onSaveStateChange }: Props) {
 }
 
 // ----- S52 (PDF p58): Kuvakollaasi 1/2 — informational -----
-// FIX: h1 "Kuvakollaasi 1/2" giờ qua tr()
+// FIX: the h1 "Kuvakollaasi 1/2" now goes through tr().
 function Screen55() {
   const tr = useTr();
   const bullets = [
@@ -12058,7 +12058,7 @@ function Screen55() {
 }
 
 // ----- S53 (PDF p59): Kuvakollaasi 2/2 -----
-// FIX: h1 "Kuvakollaasi 2/2" giờ qua tr()
+// FIX: the h1 "Kuvakollaasi 2/2" now goes through tr().
 function Screen56({ onSaveStateChange }: Props) {
   const tr = useTr();
   return (
@@ -12105,7 +12105,7 @@ function Screen57() {
   );
 }
 
-// ----- Screen58 (PDF p61): Vahvuuskarkkini ystävyyssuhteissa -----
+// ----- Screen58 (PDF p61): My strength candies in friendships -----
 function Screen58(p: Props) {
   return (
     <VahvuuskarkkiSheet
@@ -12117,8 +12117,8 @@ function Screen58(p: Props) {
   );
 }
 
-// ----- S56 (PDF p62): Minä ystävänä -----
-// FIX: h1 "Minä ystävänä" giờ qua tr()
+// ----- S56 (PDF p62): Me as a friend -----
+// FIX: the h1 "Minä ystävänä" now goes through tr().
 function Screen59({ onSaveStateChange }: Props) {
   const tr = useTr();
   return (
@@ -12147,8 +12147,8 @@ function Screen59({ onSaveStateChange }: Props) {
   );
 }
 
-// ----- S57 (PDF p63): Vahvuuspalaute ystäviltä -----
-// FIX: h1 "Vahvuuspalaute ystäviltä" giờ qua tr()
+// ----- S57 (PDF p63): Strength feedback from friends -----
+// FIX: the h1 "Vahvuuspalaute ystäviltä" now goes through tr().
 function Screen60({ onSaveStateChange }: Props) {
   const tr = useTr();
   return (
@@ -12204,7 +12204,7 @@ function Screen61() {
 }
 
 // ----- S59 (PDF p65): Vahvuuksien yhteenveto -----
-// FIX: h1 "Vahvuuksien yhteenveto" giờ qua tr()
+// FIX: the h1 "Vahvuuksien yhteenveto" now goes through tr().
 function Screen62({ onSaveStateChange }: Props) {
   const tr = useTr();
   const cols = [
@@ -12236,8 +12236,8 @@ function Screen62({ onSaveStateChange }: Props) {
   );
 }
 
-// ----- S60 (PDF p66): Pohdi ja hyödynnä saamaasi palautetta -----
-// FIX: h1 giờ qua tr()
+// ----- S60 (PDF p66): Reflect on and use the feedback you received -----
+// FIX: the h1 now goes through tr().
 function Screen63({ onSaveStateChange }: Props) {
   const tr = useTr();
   const qs = [
@@ -12270,7 +12270,7 @@ function Screen63({ onSaveStateChange }: Props) {
 }
 
 // ----- S61 (PDF p67): Visioni ja tavoitteeni -----
-// FIX: h1 "Visioni ja tavoitteeni" giờ qua tr()
+// FIX: the h1 "Visioni ja tavoitteeni" now goes through tr().
 function Screen64({ onSaveStateChange }: Props) {
   const tr = useTr();
   const qs = [
@@ -12333,7 +12333,7 @@ function Screen65({ onSaveStateChange }: Props) {
 }
 
 // ----- S63 (PDF p69): Muistiinpanoja — stems -----
-// FIX: h1 "Muistiinpanoja" giờ qua tr()
+// FIX: the h1 "Muistiinpanoja" now goes through tr().
 function Screen66({ onSaveStateChange }: Props) {
   const tr = useTr();
   const stems = [
@@ -12359,7 +12359,7 @@ function Screen66({ onSaveStateChange }: Props) {
 }
 
 // ----- S64 (PDF p70): Muistiinpanoja — free notes -----
-// FIX: h1 "Muistiinpanoja" giờ qua tr()
+// FIX: the h1 "Muistiinpanoja" now goes through tr().
 function Screen67({ onSaveStateChange }: Props) {
   const tr = useTr();
   return (
@@ -12375,7 +12375,7 @@ function Screen67({ onSaveStateChange }: Props) {
 }
 
 // ----- S65 (PDF p71): Muistiinpanoja — free notes -----
-// FIX: h1 "Muistiinpanoja" giờ qua tr()
+// FIX: the h1 "Muistiinpanoja" now goes through tr().
 function Screen68({ onSaveStateChange }: Props) {
   const tr = useTr();
   return (
@@ -12405,8 +12405,8 @@ function Screen69() {
   );
 }
 
-// ----- S67 (PDF p73): 5 vinkkiä sinulle — informational -----
-// FIX: h1 "5 vinkkiä sinulle" giờ qua tr()
+// ----- S67 (PDF p73): 5 tips for you — informational -----
+// FIX: the h1 "5 vinkkiä sinulle" now goes through tr().
 function Screen70() {
   const tr = useTr();
   const tips = [
@@ -12435,7 +12435,7 @@ function Screen70() {
 }
 
 // ----- S68 (PDF p74): Reflektoi tuloksia -----
-// FIX: h1 "Reflektoi tuloksia" giờ qua tr()
+// FIX: the h1 "Reflektoi tuloksia" now goes through tr().
 function Screen71({ onSaveStateChange }: Props) {
   const tr = useTr();
   return (
@@ -12474,7 +12474,7 @@ function Screen71({ onSaveStateChange }: Props) {
   );
 }
 
-// ----- S69 (PDF p75): Täydennä vahvuusmittari — finale -----
+// ----- S69 (PDF p75): Complete the strength meter — finale -----
 function Screen72() {
   const tr = useTr();
   return (
@@ -12655,7 +12655,12 @@ export function ScreenContent({
 }: {
   n: number;
 } & Props): ReactNode {
-  
+  /*
+   * REGISTRY must be checked first.
+   *
+   * This ensures screens 71–73 still display portfolio content
+   * if the old Strength Meter configuration has not yet been updated.
+   */
   const screenComponent = REGISTRY[n];
 
   if (screenComponent) {
