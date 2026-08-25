@@ -232,6 +232,28 @@ export const saveTeachingArticle = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const reorderTeachingArticles = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { articleIds: string[] }) => d)
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.supabase, context.userId);
+    if (new Set(data.articleIds).size !== data.articleIds.length) {
+      throw new Error("Invalid article order");
+    }
+
+    const db = await admin();
+    for (const [sortOrder, id] of data.articleIds.entries()) {
+      const { error } = await db
+        .from("teaching_articles")
+        .update({ sort_order: sortOrder })
+        .eq("id", id)
+        .select("id")
+        .single();
+      if (error) throw new Error(error.message);
+    }
+    return { ok: true };
+  });
+
 export const deleteTeachingArticle = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { id: string }) => d)
