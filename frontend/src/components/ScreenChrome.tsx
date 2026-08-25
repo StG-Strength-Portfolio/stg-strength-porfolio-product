@@ -22,15 +22,15 @@ export function ScreenChrome({
       : n;
 
   return (
-    <div className="no-print sticky top-14 z-10 flex items-center justify-end gap-3 border-b border-white/10 bg-[color:var(--purple-dark)]/60 px-4 py-2 text-xs backdrop-blur">
-      <span className="whitespace-nowrap font-mono opacity-90">
+    <div className="no-print sticky top-14 z-10 flex items-center justify-end gap-3 border-b border-slate-200 bg-white px-4 py-2 text-xs text-slate-500">
+      <span className="whitespace-nowrap font-mono">
         {t("app.screenOfTotal", {
           n: displayedScreen,
           total: TOTAL_SCREENS,
         })}
       </span>
 
-      <span className="opacity-30">•</span>
+      <span className="text-slate-300">•</span>
 
       <SaveIndicator state={saveState} />
     </div>
