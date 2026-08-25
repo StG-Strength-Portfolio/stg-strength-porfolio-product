@@ -45,6 +45,8 @@ function applyHostnameLanguageDefault() {
 
   if (window.localStorage.getItem(LANGUAGE_STORAGE_KEY)) return;
 
+  // Product default is English. The three public domains can override this
+  // initial value, but preview/temporary hosts should not flash Finnish.
   const defaultLanguage = domainDefaultLanguage(window.location.hostname) ?? "en";
   window.localStorage.setItem(LANGUAGE_STORAGE_KEY, defaultLanguage);
 }
@@ -160,12 +162,30 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
     ],
     links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "stylesheet", href: schoolAdminMetricsCss },
-      { rel: "stylesheet", href: systemUiRefreshCss },
-      { rel: "stylesheet", href: typographyScaleCss },
-      { rel: "stylesheet", href: contrastGuardrailsCss },
-      { rel: "stylesheet", href: designerPolishCss },
+      {
+        rel: "stylesheet",
+        href: appCss,
+      },
+      {
+        rel: "stylesheet",
+        href: schoolAdminMetricsCss,
+      },
+      {
+        rel: "stylesheet",
+        href: systemUiRefreshCss,
+      },
+      {
+        rel: "stylesheet",
+        href: typographyScaleCss,
+      },
+      {
+        rel: "stylesheet",
+        href: contrastGuardrailsCss,
+      },
+      {
+        rel: "stylesheet",
+        href: designerPolishCss,
+      },
     ],
   }),
   shellComponent: RootShell,
@@ -202,6 +222,7 @@ function RootComponent() {
         <DomainLanguagePreferenceSync />
         <LocalizedDocumentTitle />
         <LegacyTranslationGuard />
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <Toaster position="top-center" />
       </LanguageProvider>
