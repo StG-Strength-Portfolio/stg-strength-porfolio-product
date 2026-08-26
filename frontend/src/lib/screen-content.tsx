@@ -6567,11 +6567,11 @@ function Screen26({ onSaveStateChange }: Props) {
   const questions = [
     {
       fieldKey: "screen_23_innostus",
-      text: "Mistä innostut?",
+      text: "Mistä tekemisestä innostut arjessa?",
     },
     {
       fieldKey: "screen_23_kevyelta",
-      text: "Minkä tekeminen tuntuu kevyeltä?",
+      text: "Minkä asioiden tekeminen tuntuu sinulle kevyeltä ja jopa helpolta?",
     },
     {
       fieldKey: "screen_23_palaute",
@@ -6583,7 +6583,7 @@ function Screen26({ onSaveStateChange }: Props) {
     },
     {
       fieldKey: "screen_23_love_to_do",
-      text: "Mitkä asiat päätyvät love-to-do -listalle?",
+      text: "Mitkä asiat päätyvät sinulla ”rakasta tehdä tätä!” -listalle?",
     },
     {
       fieldKey: "screen_23_flow",
@@ -6624,13 +6624,13 @@ function Screen26({ onSaveStateChange }: Props) {
         className="
           relative
           mx-auto
-	          min-h-[1840px]
+          min-h-[1840px]
           w-full
           max-w-[1500px]
           overflow-hidden
           px-[8%]
-	          pb-16
-	          pt-12
+          pb-16
+          pt-12
         "
       >
         <div className="relative z-20">
@@ -6645,9 +6645,7 @@ function Screen26({ onSaveStateChange }: Props) {
                 text-[#ffd95d]
               "
             >
-              {tr(
-                "Ydinvahvuudet pareittain – Keskustele parin kanssa. Vastatkaa kysymyksiin. Käyttäkää vahvuuskarkkejanne tukena.",
-              )}
+              {tr("Ydinvahvuudet pareittain")}
             </h1>
 
             <p
@@ -6661,7 +6659,7 @@ function Screen26({ onSaveStateChange }: Props) {
               "
             >
               {tr(
-                "Keskustele parin kanssa. Vastaa kysymyksiin. Käyttäkää omia vahvuuskarkkeja apuna keskustelussa.",
+                "Keskustele parin kanssa. Vastatkaa kysymyksiin. Käyttäkää vahvuuskarkkejanne apuna.",
               )}
             </p>
           </div>
@@ -6688,11 +6686,11 @@ function Screen26({ onSaveStateChange }: Props) {
           {/* QUESTIONS */}
           <div
             className="
-	              mt-10
+              mt-10
               grid
               grid-cols-1
               gap-x-12
-	              gap-y-5
+              gap-y-5
               lg:grid-cols-2
             "
           >
@@ -6740,8 +6738,8 @@ function Screen26({ onSaveStateChange }: Props) {
                 <div
                   className="
                     relative
-	                    mt-1.5
-	                    min-h-[165px]
+                    mt-1.5
+                    min-h-[165px]
                     w-full
                     overflow-hidden
                     rounded-[18px]
@@ -6771,7 +6769,7 @@ function Screen26({ onSaveStateChange }: Props) {
                       relative
                       z-10
                       h-full
-	                      min-h-[165px]
+                      min-h-[165px]
 
                       [&_label]:hidden
 
@@ -6784,7 +6782,7 @@ function Screen26({ onSaveStateChange }: Props) {
                       [&_div]:shadow-none
 
                       [&_textarea]:h-full
-	                      [&_textarea]:min-h-[165px]
+                      [&_textarea]:min-h-[165px]
                       [&_textarea]:w-full
                       [&_textarea]:resize-none
                       [&_textarea]:rounded-[16px]
@@ -6820,7 +6818,6 @@ function Screen26({ onSaveStateChange }: Props) {
     </div>
   );
 }
-
 // ============================================================
 // Screen27 — Give feedback and compliments
 // ============================================================
