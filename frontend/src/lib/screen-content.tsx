@@ -5315,7 +5315,7 @@ function Screen22() {
               text-white
             "
           >
-            {tr("Idea: Vahvuusjulisteet")}
+            {tr("Vahvuusjulisteet")}
           </h1>
 
           <p
@@ -5442,7 +5442,7 @@ function Screen23({ onSaveStateChange }: Props) {
             text-black
           "
         >
-          {tr("Muistele onnistumista")}
+          {tr("Muistele omia onnistumisia")}
         </h1>
 
         <div className="mt-10 space-y-8">
