@@ -1705,6 +1705,7 @@ function Screen12() {
 
 function Screen13({ onSaveStateChange }: Props) {
   const tr = useTr();
+
   const questions = [
     {
       fieldKey: "screen_13_hyva_tanaan",
@@ -1745,7 +1746,6 @@ function Screen13({ onSaveStateChange }: Props) {
         w-full
         overflow-x-hidden
         overflow-y-auto
-      
         text-white
         [scrollbar-gutter:stable]
       "
@@ -1813,7 +1813,7 @@ function Screen13({ onSaveStateChange }: Props) {
                 leading-[1.4]
               "
             >
-              {tr("Kysy itseltäsi päivän aikana ja päätteeksi:")}
+              {tr("Pohdi hetki ja vastaa kysymyksiin.")}
             </p>
 
             <div className="mt-8 space-y-8">
