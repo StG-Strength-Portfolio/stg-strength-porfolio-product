@@ -6001,29 +6001,25 @@ function Screen24({ onSaveStateChange }: Props) {
           pt-8
         "
       >
-        {/* =========================
-            BOTTOM LEFT ILLUSTRATION
-        ========================== */}
+        {/* BOTTOM LEFT ILLUSTRATION */}
         <img
           src="/illustrations/s24-bottom-left.png"
           alt=""
           aria-hidden="true"
           className="
-    pointer-events-none
-    absolute
-    bottom-[230px]
-    left-[-10px]
-    z-10
-    h-auto
-    w-[240px]
-    object-contain
-    lg:w-[300px]
-  "
+            pointer-events-none
+            absolute
+            bottom-[230px]
+            left-[-10px]
+            z-10
+            h-auto
+            w-[240px]
+            object-contain
+            lg:w-[300px]
+          "
         />
 
-        {/* =========================
-            BOTTOM RIGHT ILLUSTRATION
-        ========================== */}
+        {/* BOTTOM RIGHT ILLUSTRATION */}
         <img
           src="/illustrations/s24-bottom-right.png"
           alt=""
@@ -6056,10 +6052,7 @@ function Screen24({ onSaveStateChange }: Props) {
             lg:gap-y-20
           "
         >
-          {/* =========================
-              TITLE
-          ========================== */}
-
+          {/* TITLE */}
           <div
             className="
               relative
@@ -6079,7 +6072,7 @@ function Screen24({ onSaveStateChange }: Props) {
               className="
                 max-w-[340px]
                 font-display
-                text-[clamp(40px,4vw,64px)]
+                text-[clamp(48px,4.8vw,72px)]
                 font-extrabold
                 leading-[1.02]
                 tracking-[-0.025em]
@@ -6091,10 +6084,7 @@ function Screen24({ onSaveStateChange }: Props) {
             </h1>
           </div>
 
-          {/* =========================
-              NOTES
-          ========================== */}
-
+          {/* NOTES */}
           {notes.map((note) => (
             <IrregularPaper
               key={note.fieldKey}
@@ -6108,6 +6098,8 @@ function Screen24({ onSaveStateChange }: Props) {
                   min-w-0
                   flex-col
                   overflow-hidden
+                  border-[4px]
+                  border-black
                   px-4
                   pb-4
                   pt-3
@@ -6122,28 +6114,30 @@ function Screen24({ onSaveStateChange }: Props) {
                 note.gridClass,
               )}
             >
+              {/* NOTE TITLE */}
               <p
                 className="
                   relative
                   z-20
                   mx-auto
                   flex
-                  min-h-[44px]
+                  min-h-[52px]
                   max-w-[95%]
                   shrink-0
                   items-start
                   justify-center
                   text-center
                   font-display
-                  text-[14px]
+                  text-[17px]
                   font-semibold
-                  leading-[1.25]
+                  leading-[1.22]
                   text-black
                 "
               >
                 {tr(note.label)}
               </p>
 
+              {/* WRITING AREA */}
               <div
                 className="
                   relative
@@ -6153,11 +6147,16 @@ function Screen24({ onSaveStateChange }: Props) {
                   flex-1
                   overflow-hidden
                   rounded-[16px]
+                  border-[4px]
+                  border-black
+                  bg-[#fffefa]
 
                   [&_label]:hidden
 
                   [&>div]:h-full
                   [&>div]:min-h-0
+                  [&>div]:border-0
+                  [&>div]:shadow-none
 
                   [&_div]:border-0
                   [&_div]:bg-transparent
@@ -6168,12 +6167,12 @@ function Screen24({ onSaveStateChange }: Props) {
                   [&_textarea]:min-h-0
                   [&_textarea]:w-full
                   [&_textarea]:resize-none
-                  [&_textarea]:rounded-[16px]
+                  [&_textarea]:rounded-[12px]
                   [&_textarea]:border-0
                   [&_textarea]:bg-transparent
                   [&_textarea]:px-3
                   [&_textarea]:py-2
-                  [&_textarea]:text-[15px]
+                  [&_textarea]:text-[17px]
                   [&_textarea]:leading-[30px]
                   [&_textarea]:text-[#241b3f]
                   [&_textarea]:outline-none
@@ -6185,6 +6184,7 @@ function Screen24({ onSaveStateChange }: Props) {
                   [&_textarea:focus]:ring-0
                 "
               >
+                {/* PAPER LINES */}
                 <div
                   aria-hidden="true"
                   className="
@@ -6197,12 +6197,13 @@ function Screen24({ onSaveStateChange }: Props) {
                   "
                 />
 
+                {/* SAVED TEXTAREA */}
                 <div className="relative z-10 h-full">
                   <FlatReflectionTextarea
                     fieldKey={note.fieldKey}
                     rows={6}
                     minHeight={155}
-                    textClass="text-[15px]"
+                    textClass="text-[17px]"
                     onSaveStateChange={onSaveStateChange}
                   />
                 </div>
