@@ -7044,7 +7044,7 @@ function Screen28({ onSaveStateChange }: Props) {
               drop-shadow-[0_5px_0_rgba(59,35,82,0.35)]
             "
           >
-            {tr("Täällä olen minä:")}
+            {tr("Tällainen minä olen: ")}
           </h1>
         </div>
 
