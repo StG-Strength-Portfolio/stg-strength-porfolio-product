@@ -28,23 +28,19 @@ export function BottomNav({
 
   const subpages = useScreenSubPageNav();
 
-  async function goNext(
-    e: React.MouseEvent<HTMLButtonElement>,
-  ) {
-   
+  async function goNext(e: React.MouseEvent<HTMLButtonElement>) {
     if (subpages.hasNext) {
       subpages.goNext();
       return;
     }
 
-  
     const btn = e.currentTarget;
 
     if (onBeforeNext) {
       try {
         await onBeforeNext();
       } catch {
-     
+        // Navigation remains available if a best-effort pre-navigation save fails.
       }
     }
 
@@ -59,12 +55,10 @@ export function BottomNav({
   }
 
   function goPrevious() {
-
     if (subpages.hasPrevious) {
       subpages.goPrevious();
       return;
     }
-
 
     navigate({
       to: "/seikkailu/$screen",
@@ -74,8 +68,7 @@ export function BottomNav({
     });
   }
 
-  const previousDisabled =
-    n <= 1 && !subpages.hasPrevious;
+  const previousDisabled = n <= 1 && !subpages.hasPrevious;
 
   const finalNextDisabled =
     !subpages.hasNext &&
@@ -87,17 +80,17 @@ export function BottomNav({
       : n;
 
   return (
-    <nav className="no-print sticky bottom-0 z-20 flex items-center justify-between gap-3 border-t border-white/10 bg-[color:var(--purple-dark)]/80 px-4 py-3 backdrop-blur">
+    <nav className="no-print sticky bottom-0 z-20 flex items-center justify-between gap-3 border-t border-slate-200 bg-white px-4 py-3">
       <Button
-        variant="secondary"
+        variant="outline"
         disabled={previousDisabled}
         onClick={goPrevious}
-        className="game-btn rounded-full font-display font-semibold"
+        className="rounded-lg border-slate-200 bg-white font-display font-semibold text-slate-700 shadow-none hover:bg-slate-50 hover:text-slate-900"
       >
         ← {t("common.previous")}
       </Button>
 
-      <div className="flex min-h-[1.5rem] flex-col items-center justify-center text-center text-xs opacity-90">
+      <div className="flex min-h-[1.5rem] flex-col items-center justify-center text-center text-xs text-slate-500">
         {showProgress && (
           <span>
             {t("app.screenOfTotal", {
@@ -110,22 +103,16 @@ export function BottomNav({
         {showProgress ? (
           <SaveIndicator state={saveState} />
         ) : finalNextDisabled && nextHint ? (
-          <span className="text-[color:var(--yellow)]">
-            {nextHint}
-          </span>
+          <span className="text-slate-500">{nextHint}</span>
         ) : null}
       </div>
 
       <Button
         disabled={finalNextDisabled}
         onClick={goNext}
-        className="game-btn rounded-full bg-[color:var(--coral)] px-5 font-display font-semibold text-white hover:bg-[color:var(--coral)]/90"
+        className="rounded-lg bg-[color:var(--purple)] px-5 font-display font-semibold text-white shadow-none hover:bg-[color:var(--purple)]/90"
       >
-        <SparkleIcon
-          size={16}
-          className="sparkle mr-1"
-        />
-
+        <SparkleIcon size={16} className="mr-1" />
         {t("common.next")} →
       </Button>
     </nav>

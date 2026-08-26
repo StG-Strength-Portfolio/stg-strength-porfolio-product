@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CornerBlobs } from "@/components/CornerBlobs";
 import { StickyNote } from "@/components/StickyNote";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
 import { toast } from "sonner";
@@ -138,15 +137,11 @@ function StudentSignup() {
         return;
       }
 
-      // If email confirmation is disabled in a non-production environment,
-      // preserve the same end result and enter the platform immediately.
       if (signUpData.session) {
         await finishStudentSetup(code, name);
         return;
       }
 
-      // Production requires email confirmation. Do not attempt a password sign-in
-      // here: that only produces the confusing Supabase "Email not confirmed" error.
       setSentTo(normalizedEmail);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Error");
@@ -177,25 +172,24 @@ function StudentSignup() {
   if (sentTo) {
     return (
       <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-10 text-foreground">
-        <CornerBlobs />
         <AuthLanguageSwitcher />
         <div className="relative z-10 w-full max-w-md">
           <StickyNote seed="student-confirmation-sent" className="space-y-4 text-center">
-            <h1 className="text-3xl font-bold">{confirmation.title}</h1>
-            <p>
+            <h1 className="text-3xl font-semibold text-slate-900">{confirmation.title}</h1>
+            <p className="text-slate-700">
               {confirmation.sentBody} <strong>{sentTo}</strong>.
             </p>
-            <p className="text-sm opacity-75">{confirmation.sentHint}</p>
+            <p className="text-sm text-slate-500">{confirmation.sentHint}</p>
             <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
               <Button
                 type="button"
                 disabled={resending}
                 onClick={() => void resendConfirmation()}
-                className="rounded-full bg-[color:var(--purple)] font-bold text-white hover:bg-[color:var(--purple)]/90"
+                className="rounded-lg bg-[color:var(--purple)] font-semibold text-white shadow-none hover:bg-[color:var(--purple)]/90"
               >
                 {resending ? confirmation.resending : confirmation.resend}
               </Button>
-              <Button asChild variant="outline" className="rounded-full">
+              <Button asChild variant="outline" className="rounded-lg border-slate-200 shadow-none">
                 <Link to="/auth/login">{confirmation.login}</Link>
               </Button>
             </div>
@@ -206,81 +200,46 @@ function StudentSignup() {
   }
 
   return (
-    <div className="relative min-h-screen bg-background text-foreground overflow-hidden flex items-center justify-center px-4 py-10">
-      <CornerBlobs />
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-10 text-foreground">
       <AuthLanguageSwitcher />
       <div className="relative z-10 w-full max-w-md space-y-6">
         <div className="text-center">
-          <h1 className="text-4xl font-bold">{t("auth.student.title")}</h1>
-          <p className="mt-2 opacity-90">{t("auth.student.subtitle")}</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-slate-900">{t("auth.student.title")}</h1>
+          <p className="mt-2 text-sm text-slate-500">{t("auth.student.subtitle")}</p>
         </div>
 
         <StickyNote seed="student-signup-card">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="email">{t("common.email")}</Label>
-              <Input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={t("auth.student.emailPh")}
-                autoComplete="email"
-              />
+              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t("auth.student.emailPh")} autoComplete="email" />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="password">{t("common.password")}</Label>
-              <Input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder={t("auth.student.passwordPh")}
-                autoComplete="new-password"
-              />
+              <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t("auth.student.passwordPh")} autoComplete="new-password" />
               <p className="text-sm text-muted-foreground">{t("auth.student.passwordHint")}</p>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="displayName">{t("auth.student.nameLabel")}</Label>
-              <Input
-                id="displayName"
-                type="text"
-                required
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                placeholder={t("auth.student.namePh")}
-                autoComplete="name"
-              />
+              <Input id="displayName" type="text" required value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder={t("auth.student.namePh")} autoComplete="name" />
               <p className="text-sm text-muted-foreground">{t("auth.student.nameHint")}</p>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="code">{t("auth.student.codeLabel")}</Label>
-              <Input
-                id="code"
-                required
-                value={joinCode}
-                onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                placeholder={t("auth.student.codePh")}
-              />
+              <Input id="code" required value={joinCode} onChange={(e) => setJoinCode(e.target.value.toUpperCase())} placeholder={t("auth.student.codePh")} />
             </div>
             <Button
               type="submit"
               disabled={busy}
-              className="w-full rounded-full bg-[color:var(--coral)] hover:bg-[color:var(--coral)]/90 text-white font-bold py-6 text-base"
+              className="h-11 w-full rounded-lg bg-[color:var(--purple)] text-sm font-semibold text-white shadow-none hover:bg-[color:var(--purple)]/90"
             >
               {busy ? t("auth.login.busy") : t("auth.student.submit")}
             </Button>
           </form>
 
           <div className="mt-5 flex justify-between text-xs text-muted-foreground">
-            <Link to="/auth" className="font-semibold text-[color:var(--purple)] underline">
-              {t("common.back")}
-            </Link>
-            <Link to="/auth/login" className="font-semibold text-[color:var(--purple)] underline">
-              {t("common.login")}
-            </Link>
+            <Link to="/auth" className="font-medium text-[color:var(--purple)] hover:underline">{t("common.back")}</Link>
+            <Link to="/auth/login" className="font-medium text-[color:var(--purple)] hover:underline">{t("common.login")}</Link>
           </div>
         </StickyNote>
       </div>

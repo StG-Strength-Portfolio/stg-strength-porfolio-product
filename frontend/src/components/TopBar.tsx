@@ -60,12 +60,12 @@ export function TopBar({ subtitle }: { subtitle?: string }) {
   }
 
   return (
-    <header className="no-print sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-white/10 bg-[color:var(--purple-dark)]/70 px-3 backdrop-blur">
-      <SidebarTrigger className="text-foreground" />
-      <div className="font-display text-lg leading-none">{t("app.title")}</div>
-      {subtitle && <div className="hidden md:block text-sm opacity-80 truncate">— {subtitle}</div>}
+    <header className="no-print sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-slate-200 bg-white px-3">
+      <SidebarTrigger className="text-slate-600 hover:bg-slate-100 hover:text-slate-900" />
+      <div className="font-display text-lg leading-none text-slate-900">{t("app.title")}</div>
+      {subtitle && <div className="hidden truncate text-sm text-slate-500 md:block">— {subtitle}</div>}
       <div className="ml-auto flex items-center gap-2">
-        <span className="inline-flex max-w-[40vw] items-center rounded-full px-3 py-1 font-display text-base sm:text-lg leading-none truncate text-foreground">
+        <span className="inline-flex max-w-[40vw] items-center truncate px-2 py-1 font-display text-base leading-none text-slate-600 sm:text-lg">
           {name}
         </span>
         <Button
@@ -74,7 +74,7 @@ export function TopBar({ subtitle }: { subtitle?: string }) {
           onClick={signOut}
           aria-label={t("common.logout")}
           title={t("common.logout")}
-          className="text-foreground hover:bg-white/10 rounded-full"
+          className="rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900"
         >
           <LogOut className="h-5 w-5" />
         </Button>

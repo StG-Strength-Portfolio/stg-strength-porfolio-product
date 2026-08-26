@@ -1,9 +1,12 @@
 /**
  * Teaching Materials browser used by teachers and school admins.
  * Flat structure: strength categories → articles → Google Slides.
+ *
+ * Demo and production intentionally share this exact component. Keep data,
+ * publishing and navigation behavior unchanged; presentation follows the
+ * designer UI system used by the current Strength Portfolio refresh.
  */
 import { useMemo, useState } from "react";
-import { StickyNote } from "@/components/StickyNote";
 import { ArrowLeftIcon, BookIcon } from "@/components/icons/AppIcons";
 import { useLanguage, useTr } from "@/lib/i18n";
 import { getStrengthColor, getStrengthName } from "@/lib/strengths-i18n";
@@ -97,29 +100,33 @@ export function MaterialsBrowser({
   if (category) crumbs.push({ label: strengthName, onClick: () => setArticleId(null) });
   if (article) crumbs.push({ label: pickLang(article as never, "title", lang) });
 
-  if (loading) return <p className="opacity-70">…</p>;
+  if (loading) return <p className="text-[#6B7280]">…</p>;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5 text-[#1F2937]">
       {crumbs.length > 1 && (
-        <nav className="flex flex-wrap items-center gap-2 text-sm">
+        <nav className="flex flex-wrap items-center gap-2 text-sm text-[#6B7280]">
           <button
             type="button"
             onClick={crumbs[crumbs.length - 2].onClick}
-            className="flex items-center gap-1 rounded-full bg-white/80 px-3 py-1 font-bold text-slate-900"
+            className="flex items-center gap-1.5 rounded-lg border border-[#D1D5DB] bg-white px-3 py-1.5 font-semibold text-[#374151] shadow-none transition-colors hover:border-[#C4B5FD] hover:bg-[#F9FAFB] hover:text-[#6D28D9]"
           >
             <ArrowLeftIcon size={16} />
             {tr("Takaisin")}
           </button>
           {crumbs.map((c, i) => (
-            <span key={i} className="flex items-center gap-2 opacity-80">
-              {i > 0 && <span aria-hidden>›</span>}
+            <span key={i} className="flex items-center gap-2">
+              {i > 0 && <span className="text-[#9CA3AF]" aria-hidden>›</span>}
               {c.onClick && i < crumbs.length - 1 ? (
-                <button type="button" onClick={c.onClick} className="underline">
+                <button
+                  type="button"
+                  onClick={c.onClick}
+                  className="bg-transparent font-medium text-[#6D28D9] underline-offset-4 shadow-none hover:underline"
+                >
                   {c.label}
                 </button>
               ) : (
-                <span className="font-bold">{c.label}</span>
+                <span className="font-semibold text-[#374151]">{c.label}</span>
               )}
             </span>
           ))}
@@ -127,14 +134,17 @@ export function MaterialsBrowser({
       )}
 
       {!category && (
-        <StickyNote seed="materials-cats" className="space-y-3">
-          <h3 className="flex items-center gap-2 text-xl font-bold">
-            <BookIcon size={20} /> {tr("Opetusmateriaalit")}
-          </h3>
+        <section className="space-y-4 rounded-xl border border-[#E5E7EB] bg-white p-5 shadow-none">
+          <div>
+            <h3 className="flex items-center gap-2 text-xl font-bold text-[#111827]">
+              <BookIcon size={20} /> {tr("Opetusmateriaalit")}
+            </h3>
+          </div>
+
           {visibleCategories.length === 0 ? (
-            <p className="opacity-70">{tr("Ei materiaaleja vielä.")}</p>
+            <p className="text-[#6B7280]">{tr("Ei materiaaleja vielä.")}</p>
           ) : (
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
               {visibleCategories.map(({ c, count }) => {
                 const color = getStrengthColor(Number(c.strength_id));
                 const thumbnail = categoryThumbnail(c, lang);
@@ -143,7 +153,7 @@ export function MaterialsBrowser({
                     key={c.id}
                     type="button"
                     onClick={() => setCatId(c.id)}
-                    className="overflow-hidden rounded-2xl bg-white text-left shadow transition-transform hover:-translate-y-0.5"
+                    className="designer-composite-button overflow-hidden rounded-xl border border-[#E5E7EB] bg-white text-left shadow-none transition-colors hover:border-[#C4B5FD] hover:bg-white"
                   >
                     {thumbnail ? (
                       <img
@@ -159,55 +169,66 @@ export function MaterialsBrowser({
                         aria-hidden
                       />
                     )}
-                    <div className="p-4 text-white" style={{ background: color }}>
-                      <span className="block text-lg font-bold">
-                        {getStrengthName(Number(c.strength_id), lang)}
-                      </span>
-                      {showCounts && (
-                        <span className="block text-sm opacity-90">
-                          {count} {tr("Artikkeleita")}
+                    <div className="border-t border-[#E5E7EB] bg-white p-4">
+                      <div className="flex items-start gap-3">
+                        <span
+                          className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full"
+                          style={{ background: color }}
+                          aria-hidden
+                        />
+                        <span className="min-w-0">
+                          <span className="block text-lg font-semibold text-[#1F2937]">
+                            {getStrengthName(Number(c.strength_id), lang)}
+                          </span>
+                          {showCounts && (
+                            <span className="mt-0.5 block text-sm font-normal text-[#6B7280]">
+                              {count} {tr("Artikkeleita")}
+                            </span>
+                          )}
                         </span>
-                      )}
+                      </div>
                     </div>
                   </button>
                 );
               })}
             </div>
           )}
-        </StickyNote>
+        </section>
       )}
 
       {category && !article && (
-        <StickyNote seed="materials-articles" className="space-y-3">
-          <h3 className="text-xl font-bold">{strengthName}</h3>
+        <section className="space-y-4 rounded-xl border border-[#E5E7EB] bg-white p-5 shadow-none">
+          <h3 className="text-xl font-bold text-[#111827]">{strengthName}</h3>
           {articlesOf.length === 0 ? (
-            <p className="opacity-70">{tr("Ei materiaaleja vielä.")}</p>
+            <p className="text-[#6B7280]">{tr("Ei materiaaleja vielä.")}</p>
           ) : (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {articlesOf.map((a) => (
                 <button
                   key={a.id}
                   type="button"
                   onClick={() => setArticleId(a.id)}
-                  className="space-y-2 rounded-2xl bg-white/85 p-3 text-left text-slate-900 shadow transition-transform hover:-translate-y-0.5"
+                  className="designer-composite-button space-y-3 rounded-xl border border-[#E5E7EB] bg-white p-3 text-left shadow-none transition-colors hover:border-[#C4B5FD] hover:bg-[#F9FAFB]"
                 >
                   {a.thumbnail_url && (
                     <img
                       src={normalizeTeachingThumbnailUrl(a.thumbnail_url)}
                       alt={pickLang(a as never, "title", lang)}
                       loading="lazy"
-                      className="h-28 w-full rounded-xl object-cover"
+                      className="h-28 w-full rounded-lg object-cover"
                     />
                   )}
-                  <span className="block font-bold">{pickLang(a as never, "title", lang)}</span>
-                  <span className="block text-sm opacity-70">
+                  <span className="block font-semibold text-[#1F2937]">
+                    {pickLang(a as never, "title", lang)}
+                  </span>
+                  <span className="block text-sm font-normal text-[#6B7280]">
                     {pickLang(a as never, "description", lang)}
                   </span>
                 </button>
               ))}
             </div>
           )}
-        </StickyNote>
+        </section>
       )}
 
       {article && <ArticleView article={article} lang={lang} />}

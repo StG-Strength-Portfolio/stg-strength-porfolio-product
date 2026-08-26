@@ -5,7 +5,6 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CornerBlobs } from "@/components/CornerBlobs";
 import { StickyNote } from "@/components/StickyNote";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
 import { supabase } from "@/integrations/supabase/client";
@@ -142,7 +141,6 @@ function RegisterStaff() {
         return;
       }
 
-      // Access is intentionally withheld until the confirmation link is used.
       await supabase.auth.signOut();
       setSentTo(normalizedEmail);
     } catch (error) {
@@ -155,14 +153,13 @@ function RegisterStaff() {
   if (sentTo) {
     return (
       <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-10 text-foreground">
-        <CornerBlobs />
         <AuthLanguageSwitcher />
         <div className="relative z-10 w-full max-w-md">
           <StickyNote seed="staff-confirmation-sent" className="space-y-4 text-center">
-            <h1 className="text-3xl font-bold">{text.sentTitle}</h1>
-            <p>{text.sentBody} <strong>{sentTo}</strong>.</p>
-            <p className="text-sm opacity-75">{text.sentHint}</p>
-            <Link to="/auth/login" className="inline-block font-semibold text-[color:var(--purple)] underline">
+            <h1 className="text-3xl font-semibold text-slate-900">{text.sentTitle}</h1>
+            <p className="text-slate-700">{text.sentBody} <strong>{sentTo}</strong>.</p>
+            <p className="text-sm text-slate-500">{text.sentHint}</p>
+            <Link to="/auth/login" className="inline-block font-medium text-[color:var(--purple)] hover:underline">
               {text.login}
             </Link>
           </StickyNote>
@@ -173,12 +170,11 @@ function RegisterStaff() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-10 text-foreground">
-      <CornerBlobs />
       <AuthLanguageSwitcher />
       <div className="relative z-10 w-full max-w-md space-y-6">
         <div className="text-center">
-          <h1 className="text-4xl font-bold">{text.title}</h1>
-          <p className="mt-2 opacity-90">{text.subtitle}</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-slate-900">{text.title}</h1>
+          <p className="mt-2 text-sm text-slate-500">{text.subtitle}</p>
         </div>
 
         <StickyNote seed="staff-register-card">
@@ -201,14 +197,14 @@ function RegisterStaff() {
               <Input id="staff-code" required maxLength={8} value={code} onChange={(e) => setCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8))} placeholder="K7PM4Q2X" className="font-mono uppercase tracking-[0.18em]" autoComplete="off" />
               <p className="text-sm text-muted-foreground">{text.codeHint}</p>
             </div>
-            <Button type="submit" disabled={busy} className="h-auto w-full rounded-full bg-[color:var(--coral)] py-6 text-base font-bold text-white hover:bg-[color:var(--coral)]/90">
+            <Button type="submit" disabled={busy} className="h-11 w-full rounded-lg bg-[color:var(--purple)] text-sm font-semibold text-white shadow-none hover:bg-[color:var(--purple)]/90">
               {busy ? text.busy : text.submit}
             </Button>
           </form>
 
           <div className="mt-5 flex justify-between text-xs text-muted-foreground">
-            <Link to="/auth" className="font-semibold text-[color:var(--purple)] underline">{text.back}</Link>
-            <Link to="/auth/login" className="font-semibold text-[color:var(--purple)] underline">{text.login}</Link>
+            <Link to="/auth" className="font-medium text-[color:var(--purple)] hover:underline">{text.back}</Link>
+            <Link to="/auth/login" className="font-medium text-[color:var(--purple)] hover:underline">{text.login}</Link>
           </div>
         </StickyNote>
       </div>

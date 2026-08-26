@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
+import { LegacyTranslationGuard } from "@/components/LegacyTranslationGuard";
 import { LanguageProvider, useLanguage } from "@/lib/i18n";
 import {
   domainDefaultLanguage,
@@ -19,6 +20,11 @@ import { ensureAgeoFont } from "@/lib/ageo-font";
 
 import appCss from "../styles.css?url";
 import schoolAdminMetricsCss from "../styles/school-admin-metrics.css?url";
+import systemUiRefreshCss from "../styles/system-ui-refresh.css?url";
+import typographyScaleCss from "../styles/typography-scale.css?url";
+import contrastGuardrailsCss from "../styles/contrast-guardrails.css?url";
+import designerPolishCss from "../styles/designer-polish.css?url";
+import buttonPaletteCss from "../styles/button-palette.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 const DOCUMENT_TITLE = {
@@ -40,10 +46,10 @@ function applyHostnameLanguageDefault() {
 
   if (window.localStorage.getItem(LANGUAGE_STORAGE_KEY)) return;
 
-  const defaultLanguage = domainDefaultLanguage(window.location.hostname);
-  if (defaultLanguage) {
-    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, defaultLanguage);
-  }
+  // Product default is English. The three public domains can override this
+  // initial value, but preview/temporary hosts should not flash Finnish.
+  const defaultLanguage = domainDefaultLanguage(window.location.hostname) ?? "en";
+  window.localStorage.setItem(LANGUAGE_STORAGE_KEY, defaultLanguage);
 }
 
 function DomainLanguagePreferenceSync() {
@@ -165,6 +171,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: schoolAdminMetricsCss,
       },
+      {
+        rel: "stylesheet",
+        href: systemUiRefreshCss,
+      },
+      {
+        rel: "stylesheet",
+        href: typographyScaleCss,
+      },
+      {
+        rel: "stylesheet",
+        href: contrastGuardrailsCss,
+      },
+      {
+        rel: "stylesheet",
+        href: designerPolishCss,
+      },
+      {
+        rel: "stylesheet",
+        href: buttonPaletteCss,
+      },
     ],
   }),
   shellComponent: RootShell,
@@ -200,6 +226,7 @@ function RootComponent() {
       <LanguageProvider>
         <DomainLanguagePreferenceSync />
         <LocalizedDocumentTitle />
+        <LegacyTranslationGuard />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <Toaster position="top-center" />

@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { CornerBlobs } from "@/components/CornerBlobs";
 import { StickyNote } from "@/components/StickyNote";
 import { Button } from "@/components/ui/button";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
@@ -88,15 +87,14 @@ function AuthLanding() {
   }
 
   return (
-    <div className="relative min-h-screen bg-background text-foreground overflow-hidden flex items-center justify-center px-4 py-10">
-      <CornerBlobs />
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-10 text-foreground">
       <AuthLanguageSwitcher />
-      <div className="relative z-10 w-full max-w-md space-y-6">
+      <div className="relative z-10 w-full max-w-md space-y-7">
         <div className="text-center">
-          <h1 className="text-5xl font-bold">
+          <h1 className="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
             {language === "fi" ? "Vahvuusportfolio" : t("app.title")}
           </h1>
-          <p className="mt-2 opacity-90">{t("app.tagline")}</p>
+          <p className="mt-2 text-sm text-slate-500">{t("app.tagline")}</p>
         </div>
 
         {search.idle && (
@@ -105,22 +103,24 @@ function AuthLanding() {
           </StickyNote>
         )}
 
-        <StickyNote seed="landing-card" className="space-y-4 text-center">
+        <StickyNote seed="landing-card" className="space-y-3 text-center">
           <Button
             onClick={() => navigate({ to: "/auth/login" })}
-            className="w-full rounded-full bg-[color:var(--purple)] hover:bg-[color:var(--purple)]/90 text-white font-bold py-6 text-base h-auto"
+            className="h-11 w-full rounded-lg bg-[color:var(--purple)] text-sm font-semibold text-white hover:bg-[color:var(--purple)]/90"
           >
             {t("auth.landing.loginBtn")}
           </Button>
           <Button
+            variant="outline"
             onClick={() => navigate({ to: "/auth/student" })}
-            className="w-full rounded-full bg-[color:var(--coral)] hover:bg-[color:var(--coral)]/90 text-white font-bold py-6 text-base h-auto"
+            className="h-11 w-full rounded-lg border-slate-200 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900"
           >
             {t("auth.landing.signupBtn")}
           </Button>
           <Button
+            variant="ghost"
             onClick={() => navigate({ to: "/register-staff" })}
-            className="w-full rounded-full bg-yellow hover:bg-yellow/90 text-ink font-bold py-6 text-base h-auto"
+            className="h-11 w-full rounded-lg text-sm font-semibold text-[color:var(--purple)] hover:bg-purple-50 hover:text-[color:var(--purple)]"
           >
             {staffLabel}
           </Button>
