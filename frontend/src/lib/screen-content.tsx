@@ -6233,6 +6233,7 @@ function Screen24({ onSaveStateChange }: Props) {
 // FIX: split the two <p> sections containing <strong> into separate tr() calls.
 function Screen25({ onSaveStateChange }: Props) {
   const tr = useTr();
+
   return (
     <div
       className="
@@ -6242,7 +6243,6 @@ function Screen25({ onSaveStateChange }: Props) {
         w-full
         overflow-x-hidden
         overflow-y-auto
-     
         [scrollbar-gutter:stable]
       "
     >
@@ -6250,44 +6250,61 @@ function Screen25({ onSaveStateChange }: Props) {
         className="
           relative
           mx-auto
-	          min-h-[840px]
+          min-h-[840px]
           w-full
           max-w-[1500px]
           overflow-hidden
           px-[5.5%]
-	          pb-14
-	          pt-12
+          pb-14
+          pt-12
         "
       >
         <div
           className="
             relative
             z-10
-	            min-h-[720px]
+            min-h-[720px]
             rounded-[62px]
-            
             px-[5.5%]
-	            pb-12
+            pb-12
             pt-12
             text-white
           "
         >
-          <h1
-            className="
-              max-w-[800px]
-              font-display
-              text-[clamp(34px,2.6vw,48px)]
-              font-semibold
-              leading-[1.05]
-              text-[#ffd95d]
-            "
-          >
-            {tr(
-              "Tulevaisuusmuisto – Mieti opiskelussasi tai vapaa-ajalla tilannetta, jossa voit lähitulevaisuudessa käyttää vahvuuksiasi.",
-            )}
-          </h1>
+          {/* HEADER */}
+          <div className="max-w-[1050px] pr-[24%]">
+            <h1
+              className="
+                max-w-[900px]
+                font-display
+                text-[clamp(34px,2.8vw,50px)]
+                font-semibold
+                leading-[1.08]
+                text-[#ffd95d]
+              "
+            >
+              {tr("Hyvän ja toivotun tulevaisuuden visiointi")}
+            </h1>
+
+            <p
+              className="
+                mt-5
+                max-w-[900px]
+                font-display
+                text-[clamp(20px,1.55vw,26px)]
+                font-semibold
+                leading-[1.35]
+                text-white
+              "
+            >
+              {tr(
+                "Mieti opiskelussasi tai vapaa-ajalla tilannetta, jossa voit lähitulevaisuudessa käyttää vahvuuksiasi.",
+              )}
+            </p>
+          </div>
 
           <div className="mt-10 space-y-12">
+            {/* QUESTION 1 */}
             <section
               className="
                 grid
@@ -6311,7 +6328,7 @@ function Screen25({ onSaveStateChange }: Props) {
                 <div className="pr-[18%]">
                   <p
                     className="
-	                      max-w-[1040px]
+                      max-w-[1040px]
                       text-[clamp(17px,1.25vw,22px)]
                       leading-[1.42]
                       text-white
@@ -6332,12 +6349,12 @@ function Screen25({ onSaveStateChange }: Props) {
                   className="
                     relative
                     mt-6
-	                    min-h-[175px]
+                    min-h-[175px]
                     w-full
                     overflow-hidden
+                    rounded-[18px]
                     border-2
                     border-black
-                    rounded-[18px]
                     bg-[#fffefa]
                     shadow-[0_6px_0_#4f267d]
 
@@ -6362,7 +6379,7 @@ function Screen25({ onSaveStateChange }: Props) {
                       relative
                       z-10
                       h-full
-	                      min-h-[175px]
+                      min-h-[175px]
 
                       [&_label]:hidden
 
@@ -6374,7 +6391,7 @@ function Screen25({ onSaveStateChange }: Props) {
                       [&>div]:shadow-none
 
                       [&_textarea]:h-full
-	                      [&_textarea]:min-h-[175px]
+                      [&_textarea]:min-h-[175px]
                       [&_textarea]:w-full
                       [&_textarea]:resize-none
                       [&_textarea]:rounded-[16px]
@@ -6405,6 +6422,7 @@ function Screen25({ onSaveStateChange }: Props) {
               </div>
             </section>
 
+            {/* QUESTION 2 */}
             <section
               className="
                 grid
@@ -6443,12 +6461,12 @@ function Screen25({ onSaveStateChange }: Props) {
                   className="
                     relative
                     mt-6
-	                    min-h-[155px]
+                    min-h-[155px]
                     w-full
                     overflow-hidden
+                    rounded-[18px]
                     border-2
                     border-black
-                    rounded-[18px]
                     bg-[#fffefa]
                     shadow-[0_6px_0_#4f267d]
 
@@ -6473,7 +6491,7 @@ function Screen25({ onSaveStateChange }: Props) {
                       relative
                       z-10
                       h-full
-	                      min-h-[155px]
+                      min-h-[155px]
 
                       [&_label]:hidden
 
@@ -6485,7 +6503,7 @@ function Screen25({ onSaveStateChange }: Props) {
                       [&>div]:shadow-none
 
                       [&_textarea]:h-full
-	                      [&_textarea]:min-h-[155px]
+                      [&_textarea]:min-h-[155px]
                       [&_textarea]:w-full
                       [&_textarea]:resize-none
                       [&_textarea]:rounded-[16px]
@@ -6518,18 +6536,19 @@ function Screen25({ onSaveStateChange }: Props) {
           </div>
         </div>
 
+        {/* ILLUSTRATION */}
         <img
           src="/illustrations/s22-future-book.png"
           alt={tr("Back to the Future -kirja")}
           className="
             pointer-events-none
             absolute
-	            right-[0.75%]
-	            top-[4px]
-	            z-20
-	            h-[350px]
-	            w-auto
-	            max-w-[24%]
+            right-[1.5%]
+            top-[22px]
+            z-20
+            h-[315px]
+            w-auto
+            max-w-[22%]
             object-contain
           "
         />
