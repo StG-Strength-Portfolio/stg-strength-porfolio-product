@@ -1647,25 +1647,24 @@ function Screen12() {
             mx-auto
             w-full
             max-w-[1240px]
-            
             shrink-0
           "
         >
           <h1
             className="
-    mx-auto
-    max-w-[1240px]
-    text-center
-    font-display
-    text-[clamp(24px,2.15vw,36px)]
-    font-semibold
-    leading-[1.08]
-    tracking-[-0.01em]
-    text-white
-  "
+              mx-auto
+              max-w-[1240px]
+              text-center
+              font-display
+              text-[clamp(24px,2.15vw,36px)]
+              font-semibold
+              leading-[1.08]
+              tracking-[-0.01em]
+              text-white
+            "
           >
             {tr(
-              "Meissä kaikissa on paljon enemmän vahvuuksia kuin päällepäin näkyy. Omien vahvuuksien pohtiminen ja hyödyntäminen tukee itsetuntoa, antaa itsevarmuutta ja auttaa tekemään valintoja – esimerkiksi opiskeluun tai työpaikkaan liittyen.",
+              "Meissä kaikissa on enemmän vahvuuksia kuin mitä ulospäin näkyy. Kun opit tunnistamaan omia vahvuuksiasi ja käyttämään sekä kehittämään niitä tietoisesti, voit saada lisää luottamusta itseesi ja tukea tärkeiden valintojen tekemiseen, esimerkiksi opintoihin, tulevaisuuteen ja työelämään liittyen.",
             )}
           </h1>
         </div>
