@@ -3,82 +3,138 @@
     "en": "\"I feel that another's happiness comes at my expense, and I cannot rejoice in others' success\"",
     "sv": "\"Jag tycker att den andres lycka är något bort från mig och kan inte glädjas åt andras framgångar\""
   },
-  "Tässä kokonaisuudessa pääset tutustumaan ja kehittämään omia vahvuuksiasi lukiolaisena.": {
-  "en": "In this section, you will explore and develop your own strengths as an upper secondary student.",
-  "sv": "I den här helheten får du lära känna och utveckla dina egna styrkor som gymnasiestuderande."
-},
-"Koulukulttuurissa ja opinnoissa virheiden ja puutteiden tunnistaminen tapahtuu kuin itsestään, mutta sen vastavoima, eli vahvuudet ja onnistumiset, eivät aina nouse esiin tai tule arvioiduksi. Opiskelussa huomio saattaa kiinnittyä kaikkeen siihen, mitä ei vielä osaa, missä ei ole onnistunut ja mitä kaikkea pitäisi vielä kehittää ja oppia.": {
-  "en": "In school culture and studies, mistakes and shortcomings are often noticed almost automatically, while their counterpart, strengths and successes, do not always become visible or receive recognition. In studies, attention may focus on what you cannot yet do, where you have not succeeded, and what you still need to develop and learn.",
-  "sv": "I skolkulturen och studierna uppmärksammas misstag och brister ofta nästan automatiskt, medan deras motvikt, styrkor och framgångar, inte alltid blir synliga eller uppmärksammas. I studierna kan fokus lätt hamna på det du ännu inte kan, det du inte har lyckats med och det du fortfarande behöver utveckla och lära dig."
-},
-"Kasvamme ja kehitymme ihmisenä läpi opintojen ja koko elämän. On hyvä muistaa, että luonteenvahvuudet eivät ole syntymässä fiksattuja ominaisuuksia, vaan niitä voi tavoitteellisesti kehittää. Lähtökohta on, että opit tunnistamaan omat vahvuutesi opiskelijana, jotta voit hyödyntää ja kehittää niitä osana lukio-opintoja.": {
-  "en": "We grow and develop as people throughout our studies and our entire lives. It is important to remember that character strengths are not fixed at birth; they can be intentionally developed. The starting point is learning to recognize your own strengths as a student so that you can use and develop them as part of your upper secondary studies.",
-  "sv": "Vi växer och utvecklas som människor genom studierna och hela livet. Det är bra att komma ihåg att karaktärsstyrkor inte är fasta egenskaper från födseln, utan att de kan utvecklas målmedvetet. Utgångspunkten är att du lär dig känna igen dina egna styrkor som studerande så att du kan använda och utveckla dem som en del av gymnasiestudierna."
-},
-  "Tällainen minä olen": {
-  "en": "This is what I am like",
-  "sv": "Sådan är jag"
-},
+  "Koulumuistoja": {
+    "en": "School Memories",
+    "sv": "Skolminnen"
+  },
+  "Pohdi elämääsi taaksepäin. Mieti omia aiempia opiskelukokemuksiasi ja huomaa, mitä vahvuuksia sinulla jo on.": {
+    "en": "Look back on your life. Think about your previous experiences as a student and notice the strengths you already have.",
+    "sv": "Se tillbaka på ditt liv. Fundera över dina tidigare erfarenheter som studerande och lägg märke till vilka styrkor du redan har."
+  },
+  "Vahvuuspalaute opiskelukavereilta": {
+    "en": "Strength Feedback from Classmates",
+    "sv": "Styrkeåterkoppling från studiekamrater"
+  },
+  "Keskustelkaa, antakaa toisillenne positiivista palautetta ja sanoittakaa vahvuuksia.": {
+    "en": "Discuss together, give each other positive feedback, and put strengths into words.",
+    "sv": "Diskutera tillsammans, ge varandra positiv respons och sätt ord på styrkor."
+  },
+  "Kirjoittakaa toisillenne palautetta pienryhmässä. Sanallistakaa niitä taitoja ja vahvuuksia, joita arvostatte ja ihailette toisissanne. Kun saat toisilta positiivista palautetta, kiitä!": {
+    "en": "Write feedback to each other in a small group. Put into words the skills and strengths that you value and admire in one another. When you receive positive feedback from others, say thank you!",
+    "sv": "Skriv respons till varandra i en liten grupp. Sätt ord på de färdigheter och styrkor som ni uppskattar och beundrar hos varandra. När du får positiv respons från andra, tacka!"
+  },
+  "Erityistaitosi ja osaamisesi": {
+    "en": "Your special skills and competencies",
+    "sv": "Dina särskilda färdigheter och kunskaper"
+  },
+  "Erityistaito tai osaaminen…": {
+    "en": "Special skill or competency…",
+    "sv": "Särskild färdighet eller kunskap…"
+  },
+  "Minä opiskelijana": {
+    "en": "Me as a Student",
+    "sv": "Jag som studerande"
+  },
+  "Pohdi seuraavia kysymyksiä ja selvitä, mitä oikeasti rakastat tehdä ja missä olet erityisen hyvä opiskelijana. Mieti, millä uudella tavalla voit hyödyntää vahvuuksiasi lukiossa.": {
+    "en": "Reflect on the following questions and discover what you truly love doing and what you are especially good at as a student. Think of a new way you can use your strengths in upper secondary school.",
+    "sv": "Fundera över följande frågor och ta reda på vad du verkligen älskar att göra och vad du är särskilt bra på som studerande. Fundera på hur du kan använda dina styrkor på ett nytt sätt i gymnasiet."
+  },
+  "Listaa seuraavaksi kaikki vahvuutesi ja taitosi opiskelijana, myös sellaiset, jotka voivat tuntua sinusta itsestäänselvyyksiltä.": {
+    "en": "Next, list all your strengths and skills as a student, including those that may feel obvious to you.",
+    "sv": "Lista sedan alla dina styrkor och färdigheter som studerande, även sådana som kan kännas självklara för dig."
+  },
+  "Vahvuus tai taito…": {
+    "en": "Strength or skill…",
+    "sv": "Styrka eller färdighet…"
+  },
   "Ydinvahvuudet pareittain": {
-  "en": "Core Strengths in Pairs",
-  "sv": "Kärnstyrkor i par"
-},
-"Keskustele parin kanssa. Vastatkaa kysymyksiin. Käyttäkää vahvuuskarkkejanne apuna.": {
-  "en": "Discuss with a partner. Answer the questions together. Use your strength candies to help you.",
-  "sv": "Diskutera med ett par. Svara på frågorna tillsammans. Använd era styrkegodisar som hjälp."
-},
-"Mistä tekemisestä innostut arjessa?": {
-  "en": "What activities make you feel enthusiastic in everyday life?",
-  "sv": "Vilka aktiviteter blir du entusiastisk av i vardagen?"
-},
-"Minkä asioiden tekeminen tuntuu sinulle kevyeltä ja jopa helpolta?": {
-  "en": "What things feel natural and even easy for you to do?",
-  "sv": "Vilka saker känns lätta och till och med enkla för dig att göra?"
-},
-"Mitkä asiat päätyvät sinulla ”rakasta tehdä tätä!” -listalle?": {
-  "en": "What things would be on your “I love doing this!” list?",
-  "sv": "Vilka saker skulle hamna på din lista över ”det här älskar jag att göra!”?"
-},
+    "en": "Core Strengths in Pairs",
+    "sv": "Kärnstyrkor i par"
+  },
+  "Valitse vahvuudet": {
+    "en": "Choose strengths",
+    "sv": "Välj styrkor"
+  },
+  "Valitse 1–2 vahvuutta, joita haluat hyödyntää opinnoissasi.": {
+    "en": "Choose 1–2 strengths that you want to use in your studies.",
+    "sv": "Välj 1–2 styrkor som du vill använda i dina studier."
+  },
+  "Hyödynnä vahvuuksiasi": {
+    "en": "Use your strengths",
+    "sv": "Använd dina styrkor"
+  },
+  "Kokeile käyttää valitsemiasi vahvuuksia tietoisesti opiskelussa tai opiskelupäivän aikana.": {
+    "en": "Try to consciously use the strengths you selected in your studies or during your school day.",
+    "sv": "Försök att medvetet använda de styrkor du valt i dina studier eller under skoldagen."
+  },
+  "Pohdi vahvuuksien käyttöä": {
+    "en": "Reflect on using your strengths",
+    "sv": "Reflektera över hur du använder dina styrkor"
+  },
+  "Täydennä oikealla oleva tehtävä kokemuksesi pohjalta.": {
+    "en": "Complete the activity on the right based on your experience.",
+    "sv": "Fyll i uppgiften till höger utifrån din erfarenhet."
+  },
+  "Keskustele parin kanssa. Vastatkaa kysymyksiin. Käyttäkää vahvuuskarkkejanne apuna.": {
+    "en": "Discuss with a partner. Answer the questions together. Use your strength candies to help you.",
+    "sv": "Diskutera med ett par. Svara på frågorna tillsammans. Använd era styrkegodisar som hjälp."
+  },
+  "Mistä tekemisestä innostut arjessa?": {
+    "en": "What activities make you feel enthusiastic in everyday life?",
+    "sv": "Vilka aktiviteter blir du entusiastisk av i vardagen?"
+  },
+  "Tällainen minä olen": {
+    "en": "This is what I am like",
+    "sv": "Sådan är jag"
+  },
+  "Minkä asioiden tekeminen tuntuu sinulle kevyeltä ja jopa helpolta?": {
+    "en": "What things feel natural and even easy for you to do?",
+    "sv": "Vilka saker känns lätta och till och med enkla för dig att göra?"
+  },
+  "Mitkä asiat päätyvät sinulla ”rakasta tehdä tätä!” -listalle?": {
+    "en": "What things would be on your “I love doing this!” list?",
+    "sv": "Vilka saker skulle hamna på din lista över ”det här älskar jag att göra!”?"
+  },
   "Hyvän ja toivotun tulevaisuuden visiointi": {
-  "en": "Visualizing a Positive and Desired Future",
-  "sv": "Visualisering av en god och önskad framtid"
-},
-"Mieti opiskelussasi tai vapaa-ajalla tilannetta, jossa voit lähitulevaisuudessa käyttää vahvuuksiasi.": {
-  "en": "Think of a situation in your studies or free time where you can use your strengths in the near future.",
-  "sv": "Tänk på en situation i dina studier eller på fritiden där du kan använda dina styrkor inom den närmaste framtiden."
-},
-  "Miltä se tuntuisi? Miten tämä muutos vaikuttaisi opiskeluusi?": {
-  "en": "How would it feel? How would this change affect your studies?",
-  "sv": "Hur skulle det kännas? Hur skulle den här förändringen påverka dina studier?"
-},
-"Miten tämä muutos vaikuttaisi arkeesi kotona tai ystävyyssuhteissa?": {
-  "en": "How would this change affect your everyday life at home or in your friendships?",
-  "sv": "Hur skulle den här förändringen påverka din vardag hemma eller i dina vänskapsrelationer?"
-},
+    "en": "Visualizing a Positive and Desired Future",
+    "sv": "Visualisering av en god och önskad framtid"
+  },
+  "Mieti opiskelussasi tai vapaa-ajalla tilannetta, jossa voit lähitulevaisuudessa käyttää vahvuuksiasi.": {
+    "en": "Think of a situation in your studies or free time where you can use your strengths in the near future.",
+    "sv": "Tänk på en situation i dina studier eller på fritiden där du kan använda dina styrkor inom den närmaste framtiden."
+  },
   "Pohdi ja kirjoita vastaukset": {
-  "en": "Reflect and write your answers",
-  "sv": "Fundera och skriv dina svar"
-},
+    "en": "Reflect and write your answers",
+    "sv": "Fundera och skriv dina svar"
+  },
+  "Miltä se tuntuisi? Miten tämä muutos vaikuttaisi opiskeluusi?": {
+    "en": "How would it feel? How would this change affect your studies?",
+    "sv": "Hur skulle det kännas? Hur skulle den här förändringen påverka dina studier?"
+  },
+  "Miten tämä muutos vaikuttaisi arkeesi kotona tai ystävyyssuhteissa?": {
+    "en": "How would this change affect your everyday life at home or in your friendships?",
+    "sv": "Hur skulle den här förändringen påverka din vardag hemma eller i dina vänskapsrelationer?"
+  },
   "Pohdi omia vahvuuksiasi ja vastaa seuraaviin kysymyksiin:": {
-  "en": "Reflect on your own strengths and answer the following questions:",
-  "sv": "Fundera över dina egna styrkor och svara på följande frågor:"
-},
-  "Pohdi hetki ja vastaa kysymyksiin.": {
-  "en": "Take a moment to reflect and answer the questions.",
-  "sv": "Fundera en stund och svara på frågorna."
-},
+    "en": "Reflect on your own strengths and answer the following questions:",
+    "sv": "Fundera över dina egna styrkor och svara på följande frågor:"
+  },
   "Meissä kaikissa on enemmän vahvuuksia kuin mitä ulospäin näkyy. Kun opit tunnistamaan omia vahvuuksiasi ja käyttämään sekä kehittämään niitä tietoisesti, voit saada lisää luottamusta itseesi ja tukea tärkeiden valintojen tekemiseen, esimerkiksi opintoihin, tulevaisuuteen ja työelämään liittyen.": {
-  "en": "We all have more strengths than are visible on the outside. When you learn to recognize your own strengths and use and develop them intentionally, you can build greater confidence in yourself and gain support for making important choices, for example related to your studies, future, and working life.",
-  "sv": "Vi har alla fler styrkor än vad som syns utåt. När du lär dig att känna igen dina egna styrkor och använda samt utveckla dem medvetet kan du få större tillit till dig själv och stöd i att göra viktiga val, till exempel när det gäller studier, framtid och arbetsliv."
-},
+    "en": "We all have more strengths than are visible on the outside. When you learn to recognize your own strengths and use and develop them intentionally, you can build greater confidence in yourself and gain support for making important choices, for example related to your studies, future, and working life.",
+    "sv": "Vi har alla fler styrkor än vad som syns utåt. När du lär dig att känna igen dina egna styrkor och använda samt utveckla dem medvetet kan du få större tillit till dig själv och stöd i att göra viktiga val, till exempel när det gäller studier, framtid och arbetsliv."
+  },
+  "Pohdi hetki ja vastaa kysymyksiin.": {
+    "en": "Take a moment to reflect and answer the questions.",
+    "sv": "Fundera en stund och svara på frågorna."
+  },
   "Vahvuudet eivät ole vain asioita, joissa olet hyvä, eivätkä heikkoudet asioita, joissa olet huono.": {
-  "en": "Strengths are not just things you are good at, and weaknesses are not simply things you are bad at.",
-  "sv": "Styrkor är inte bara saker som du är bra på, och svagheter är inte bara saker som du är dålig på."
-},
-"Vahvuudet ovat ominaisuuksia, jotka tukevat sinua, antavat energiaa ja auttavat sinua toimimaan parhaalla mahdollisella tavalla. Heikkoudet puolestaan voivat kuormittaa, viedä energiaa tai tehdä joistakin tilanteista haastavampia.": {
-  "en": "Strengths are qualities that support you, give you energy, and help you function at your best. Weaknesses, on the other hand, can drain your energy or make some situations more challenging.",
-  "sv": "Styrkor är egenskaper som stödjer dig, ger dig energi och hjälper dig att fungera på bästa möjliga sätt. Svagheter kan däremot belasta dig, ta energi eller göra vissa situationer mer utmanande."
-},
+    "en": "Strengths are not just things you are good at, and weaknesses are not simply things you are bad at.",
+    "sv": "Styrkor är inte bara saker som du är bra på, och svagheter är inte bara saker som du är dålig på."
+  },
+  "Vahvuudet ovat ominaisuuksia, jotka tukevat sinua, antavat energiaa ja auttavat sinua toimimaan parhaalla mahdollisella tavalla. Heikkoudet puolestaan voivat kuormittaa, viedä energiaa tai tehdä joistakin tilanteista haastavampia.": {
+    "en": "Strengths are qualities that support you, give you energy, and help you function at your best. Weaknesses, on the other hand, can drain your energy or make some situations more challenging.",
+    "sv": "Styrkor är egenskaper som stödjer dig, ger dig energi och hjälper dig att fungera på bästa möjliga sätt. Svagheter kan däremot belasta dig, ta energi eller göra vissa situationer mer utmanande."
+  },
   "\"Ajattelen, että elämällä on jokin syvempi tarkoitus\"": {
     "en": "\"I believe that life has a deeper purpose\"",
     "sv": "\"Jag tänker att livet har en djupare mening\""
