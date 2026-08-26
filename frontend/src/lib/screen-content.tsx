@@ -4670,9 +4670,7 @@ function Screen20({ onSaveStateChange }: Props) {
           pt-16
         "
       >
-        {/* =========================
-            ILLUSTRATION
-        ========================== */}
+        {/* ILLUSTRATION */}
 
         <img
           src="/illustrations/s17-chain.png"
@@ -4691,9 +4689,7 @@ function Screen20({ onSaveStateChange }: Props) {
           "
         />
 
-        {/* =========================
-            TITLE
-        ========================== */}
+        {/* TITLE */}
 
         <div
           className="
@@ -4727,13 +4723,11 @@ function Screen20({ onSaveStateChange }: Props) {
               text-[#FFE77A]
             "
           >
-            {tr("– Pohdi ja kirjoita vastaukset.")}
+            {tr("Pohdi ja kirjoita vastaukset")}
           </h3>
         </div>
 
-        {/* =========================
-            TOP QUESTIONS
-        ========================== */}
+        {/* TOP QUESTIONS */}
 
         <div
           className="
@@ -4748,9 +4742,7 @@ function Screen20({ onSaveStateChange }: Props) {
             md:grid-cols-2
           "
         >
-          {/* =========================
-              QUESTION 1
-          ========================== */}
+          {/* QUESTION 1 */}
 
           <div className="flex min-h-[245px] min-w-0 flex-col">
             <h2
@@ -4821,9 +4813,7 @@ function Screen20({ onSaveStateChange }: Props) {
             </div>
           </div>
 
-          {/* =========================
-              QUESTION 2
-          ========================== */}
+          {/* QUESTION 2 */}
 
           <div className="flex min-h-[245px] min-w-0 flex-col">
             <h2
@@ -4895,9 +4885,7 @@ function Screen20({ onSaveStateChange }: Props) {
           </div>
         </div>
 
-        {/* =========================
-            BOTTOM QUESTION
-        ========================== */}
+        {/* BOTTOM QUESTION */}
 
         <div
           className="
