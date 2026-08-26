@@ -4978,12 +4978,12 @@ function Screen21({ onSaveStateChange }: Props) {
     {
       label: "21/1",
       fieldKey: "screen_18_tunne",
-      question: "Miltä se tuntuisi?",
+      question: "Miltä se tuntuisi? Miten tämä muutos vaikuttaisi opiskeluusi?",
     },
     {
       label: "21/2",
       fieldKey: "screen_18_vaikutus",
-      question: "Miten tämä vaikuttaisi arkeesi, entä opintoihin?",
+      question: "Miten tämä muutos vaikuttaisi arkeesi kotona tai ystävyyssuhteissa?",
     },
   ] as const;
 
@@ -5018,9 +5018,7 @@ function Screen21({ onSaveStateChange }: Props) {
           pt-12
         "
       >
-        {/* =====================================================
-            LARGE ILLUSTRATION
-        ====================================================== */}
+        {/* LARGE ILLUSTRATION */}
 
         <img
           src="/illustrations/s18-can.png"
@@ -5040,9 +5038,7 @@ function Screen21({ onSaveStateChange }: Props) {
           "
         />
 
-        {/* =====================================================
-            CONTENT
-        ====================================================== */}
+        {/* CONTENT */}
 
         <div
           className="
@@ -5122,9 +5118,7 @@ function Screen21({ onSaveStateChange }: Props) {
             {tr(page.question)}
           </h2>
 
-          {/* =====================================================
-              ONE TEXTBOX ONLY
-          ====================================================== */}
+          {/* ONE TEXTBOX ONLY */}
 
           <div
             className="
@@ -5181,9 +5175,7 @@ function Screen21({ onSaveStateChange }: Props) {
             />
           </div>
 
-          {/* =====================================================
-              SUBPAGE NAVIGATION
-          ====================================================== */}
+          {/* SUBPAGE NAVIGATION */}
 
           <div
             className="
@@ -5219,8 +5211,6 @@ function Screen21({ onSaveStateChange }: Props) {
             >
               ← {tr("Takaisin")}
             </button>
-
-            {/* SUBPAGE DOT / NUMBER */}
 
             <div
               className="
