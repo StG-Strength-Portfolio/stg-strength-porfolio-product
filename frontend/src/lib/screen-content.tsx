@@ -17,6 +17,8 @@ import { cn } from "@/lib/utils";
 import { useTr, useLanguage } from "@/lib/i18n";
 import { getStrengthColor, getStrengthName } from "@/lib/strengths-i18n";
 import { Heart } from "lucide-react";
+import { meterContentFor } from "./meter-content";
+import { METER_FIRST_SCREEN, METER_TOP } from "./meter-data";
 
 // Screens 1–22: content sourced verbatim from the workbook PDF
 // "Vahvuusportfolio lukiolaiselle" (Huomaa hyvä!®) workbook.
@@ -282,7 +284,7 @@ function Screen3() {
     </div>
   );
 }
-//s4
+// Screen 4
 function Screen4() {
   const tr = useTr();
 
@@ -331,7 +333,7 @@ function Screen4() {
     </div>
   );
 }
-//s5
+// Screen 5
 function Screen5({ onSaveStateChange: _onSaveStateChange }: Props) {
   const tr = useTr();
 
@@ -448,7 +450,7 @@ function Screen5({ onSaveStateChange: _onSaveStateChange }: Props) {
   );
 }
 
-// S6
+// Screen 6
 function Screen6({ onSaveStateChange }: Props) {
   const tr = useTr();
   const { language } = useLanguage();
@@ -980,7 +982,7 @@ function Screen7() {
     </div>
   );
 }
-//s8
+// Screen 8
 function Screen8({ onSaveStateChange }: Props) {
   const tr = useTr();
 
@@ -1141,7 +1143,7 @@ function Screen8({ onSaveStateChange }: Props) {
     </div>
   );
 }
-//s9
+// Screen 9
 function Screen9({ onSaveStateChange }: Props) {
   const tr = useTr();
 
@@ -1268,7 +1270,7 @@ function Screen9({ onSaveStateChange }: Props) {
     </div>
   );
 }
-//s10
+// Screen 10
 function Screen10({ onSaveStateChange }: Props) {
   const tr = useTr();
 
@@ -1496,7 +1498,7 @@ function Screen10({ onSaveStateChange }: Props) {
     </div>
   );
 }
-//s11
+// Screen 11
 // FIX: the description was previously hardcoded Finnish JSX and did not go through tr().
 // The description is now stored as a string (using "\n" instead of <br/>) and rendered with trLines().
 function Screen11() {
@@ -2315,7 +2317,7 @@ function Fly({ x0, y0, x1, y1, kind, hue }) {
 /* ════════════════════════════════════════════════════════════ */
 function Screen15({ onSaveStateChange }: Props) {
   const tr = useTr();
-  const [phase, setPhase] = useState("kauppa"); // kauppa | kaanto | kuitti
+  const [phase, setPhase] = useState("kauppa"); // shop | reveal | receipt
   const [picked, setPicked] = useState([]);
   const [turned, setTurned] = useState(false);
   const [settled, setSettled] = useState(false);
