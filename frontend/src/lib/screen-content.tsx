@@ -6818,6 +6818,7 @@ function Screen26({ onSaveStateChange }: Props) {
     </div>
   );
 }
+
 // ============================================================
 // Screen27 — Give feedback and compliments
 // ============================================================
@@ -7021,22 +7022,21 @@ function Screen28({ onSaveStateChange }: Props) {
           pt-8
         "
       >
-        {/* =========================
-            TITLE
-        ========================== */}
+        {/* TITLE */}
 
         <div
           className="
             relative
             z-20
             mb-10
-            max-w-[360px]
+            w-full
           "
         >
           <h1
             className="
+              whitespace-nowrap
               font-display
-              text-[clamp(40px,4vw,60px)]
+              text-[clamp(34px,4vw,60px)]
               font-extrabold
               leading-[1.03]
               tracking-[-0.025em]
@@ -7044,18 +7044,11 @@ function Screen28({ onSaveStateChange }: Props) {
               drop-shadow-[0_5px_0_rgba(59,35,82,0.35)]
             "
           >
-            {tr("Tällainen minä olen: ")}
+            {tr("Tällainen minä olen")}
           </h1>
         </div>
 
-        {/* =========================
-            GRID
-
-            4 columns:
-            row 1 = 4 boxes
-            row 2 = 4 boxes
-            row 3 = 3 boxes + illustration
-        ========================== */}
+        {/* GRID */}
 
         <div
           className="
@@ -7091,9 +7084,7 @@ function Screen28({ onSaveStateChange }: Props) {
                 `,
               )}
             >
-              {/* =========================
-                  LABEL
-              ========================== */}
+              {/* LABEL */}
 
               <p
                 className="
@@ -7116,9 +7107,7 @@ function Screen28({ onSaveStateChange }: Props) {
                 {tr(note.label)}
               </p>
 
-              {/* =========================
-                  TEXT BOX
-              ========================== */}
+              {/* TEXT BOX */}
 
               <div
                 className="
@@ -7126,13 +7115,10 @@ function Screen28({ onSaveStateChange }: Props) {
                   min-h-0
                   flex-1
                   overflow-hidden
-
                   rounded-[30px]
                   border-[5px]
                   border-black
-
                   bg-[#f7f4ee]
-
                   shadow-[2px_2px_0_rgba(0,0,0,0.08)_inset]
                 "
               >
@@ -7144,9 +7130,7 @@ function Screen28({ onSaveStateChange }: Props) {
                     pointer-events-none
                     absolute
                     inset-0
-
                     rounded-[24px]
-
                     [background-image:repeating-linear-gradient(to_bottom,transparent_0,transparent_29px,#ddd4ea_30px,#ddd4ea_31px)]
                     [background-position:0_18px]
                   "
@@ -7209,13 +7193,7 @@ function Screen28({ onSaveStateChange }: Props) {
             </IrregularPaper>
           ))}
 
-          {/* =========================
-              ILLUSTRATION
-              LAST ROW - RIGHT CORNER
-
-              This is the 12th position
-              after the 11 boxes.
-          ========================== */}
+          {/* ILLUSTRATION */}
 
           <div
             className="
@@ -7733,7 +7711,6 @@ function Screen31() {
   );
 }
 
-
 // ============================================================
 // Reusable Vahvuuskarkkini worksheet — design used by Screen32
 // ============================================================
@@ -7973,14 +7950,563 @@ function VahvuuskarkkiSheet({
 // Screen32
 // ============================================================
 
-function Screen32(p: Props) {
+function Screen32({ onSaveStateChange }: Props) {
+  const tr = useTr();
+  const { language } = useLanguage();
+
+  const [selectedStrengths, setSelectedStrengths] = useState<string[]>([]);
+
+  const updateStrength = useCallback((index: number, value: string) => {
+    setSelectedStrengths((current) => {
+      const next = [...current];
+      next[index] = value;
+      return next;
+    });
+  }, []);
+
+  const illustrationSrc =
+    language === "en"
+      ? "/illustrations/s29-lukiossa-sheet-en.png"
+      : language === "sv"
+        ? "/illustrations/s29-lukiossa-sheet-sv.png"
+        : "/illustrations/s29-lukiossa-sheet.png";
+
   return (
-    <VahvuuskarkkiSheet
-      title="Vahvuuskarkkini"
-      context="opinnoissa"
-      fieldPrefix="screen_29"
-      {...p}
-    />
+    <div
+      className="
+        relative
+        h-full
+        min-h-0
+        w-full
+        overflow-x-hidden
+        overflow-y-auto
+        text-white
+        [scrollbar-gutter:stable]
+      "
+    >
+      <div
+        className="
+          relative
+          mx-auto
+          grid
+          min-h-[760px]
+          w-full
+          max-w-[1450px]
+          grid-cols-1
+          gap-8
+          px-[4%]
+          pb-24
+          pt-8
+          lg:grid-cols-[38%_62%]
+        "
+      >
+        {/* LEFT SIDE */}
+
+        <div
+          className="
+            relative
+            z-20
+            min-w-0
+            pt-4
+          "
+        >
+          <h1
+            className="
+              font-display
+              text-[clamp(38px,3.5vw,56px)]
+              font-semibold
+              leading-[1.05]
+              text-[#FFE77A]
+            "
+          >
+            {tr("Vahvuuskarkkini")}
+          </h1>
+
+          <p
+            className="
+              mt-8
+              max-w-[470px]
+              font-display
+              text-[clamp(19px,1.55vw,25px)]
+              font-semibold
+              leading-[1.4]
+              text-white
+            "
+          >
+            {tr("Valitse 1–2 vahvuuskarkkia ja hyödynnä niitä opinnoissa.")}
+          </p>
+
+          {/* STRENGTH SELECTS */}
+
+          <div
+            className="
+              mt-7
+              grid
+              max-w-[520px]
+              gap-4
+            "
+          >
+            <Screen42StrengthSelect
+              index={0}
+              fieldKey="screen_29_karkki_1"
+              language={language}
+              selectedValues={selectedStrengths}
+              onValueChange={updateStrength}
+              onSaveStateChange={onSaveStateChange}
+            />
+
+            <Screen42StrengthSelect
+              index={1}
+              fieldKey="screen_29_karkki_2"
+              language={language}
+              selectedValues={selectedStrengths}
+              onValueChange={updateStrength}
+              onSaveStateChange={onSaveStateChange}
+            />
+          </div>
+
+          {/* STEP FLOW */}
+
+          <div
+            className="
+              mt-14
+              max-w-[500px]
+              space-y-6
+            "
+          >
+            <div className="flex items-start gap-4">
+              <div
+                className="
+                  flex
+                  h-9
+                  w-9
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-full
+                  border-2
+                  border-black
+                  bg-[#FFE77A]
+                  font-display
+                  text-[17px]
+                  font-bold
+                  text-[#241b3f]
+                "
+              >
+                1
+              </div>
+
+              <div>
+                <h2
+                  className="
+                    font-display
+                    text-[21px]
+                    font-semibold
+                    leading-[1.25]
+                    text-white
+                  "
+                >
+                  {tr("Valitse vahvuudet")}
+                </h2>
+
+                <p
+                  className="
+                    mt-1
+                    text-[17px]
+                    leading-[1.4]
+                    text-white
+                  "
+                >
+                  {tr("Valitse 1–2 vahvuutta, joita haluat hyödyntää opinnoissasi.")}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <div
+                className="
+                  flex
+                  h-9
+                  w-9
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-full
+                  border-2
+                  border-black
+                  bg-[#ef706e]
+                  font-display
+                  text-[17px]
+                  font-bold
+                  text-white
+                "
+              >
+                2
+              </div>
+
+              <div>
+                <h2
+                  className="
+                    font-display
+                    text-[21px]
+                    font-semibold
+                    leading-[1.25]
+                    text-white
+                  "
+                >
+                  {tr("Hyödynnä vahvuuksiasi")}
+                </h2>
+
+                <p
+                  className="
+                    mt-1
+                    text-[17px]
+                    leading-[1.4]
+                    text-white
+                  "
+                >
+                  {tr(
+                    "Kokeile käyttää valitsemiasi vahvuuksia tietoisesti opiskelussa tai opiskelupäivän aikana.",
+                  )}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <div
+                className="
+                  flex
+                  h-9
+                  w-9
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-full
+                  border-2
+                  border-black
+                  bg-[#acd9dc]
+                  font-display
+                  text-[17px]
+                  font-bold
+                  text-[#241b3f]
+                "
+              >
+                3
+              </div>
+
+              <div>
+                <h2
+                  className="
+                    font-display
+                    text-[21px]
+                    font-semibold
+                    leading-[1.25]
+                    text-white
+                  "
+                >
+                  {tr("Pohdi vahvuuksien käyttöä")}
+                </h2>
+
+                <p
+                  className="
+                    mt-1
+                    text-[17px]
+                    leading-[1.4]
+                    text-white
+                  "
+                >
+                  {tr("Täydennä oikealla oleva tehtävä kokemuksesi pohjalta.")}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT SIDE */}
+
+        <div
+          className="
+            relative
+            z-10
+            flex
+            min-w-0
+            items-start
+            justify-center
+          "
+        >
+          <div
+            className="
+              relative
+              aspect-square
+              w-full
+              max-w-[760px]
+            "
+          >
+            {/* ILLUSTRATION */}
+
+            <img
+              src={illustrationSrc}
+              alt=""
+              aria-hidden="true"
+              className="
+                pointer-events-none
+                absolute
+                inset-0
+                z-0
+                h-full
+                w-full
+                object-fill
+                select-none
+              "
+            />
+
+            {/* TOP BOX — 3. MITÄ OPIT? */}
+
+            <div
+              className="
+                absolute
+                left-[25.39%]
+                top-[13.09%]
+                z-20
+                h-[18.95%]
+                w-[50%]
+              "
+            >
+              <div
+                className="
+                  h-full
+                  w-full
+                  overflow-hidden
+                  rounded-[24px]
+                  border-[4px]
+                  border-black
+                  bg-[#fffefa]
+
+                  [&_label]:hidden
+
+                  [&>div]:h-full
+                  [&>div]:min-h-0
+
+                  [&_div]:border-0
+                  [&_div]:bg-transparent
+                  [&_div]:p-0
+                  [&_div]:shadow-none
+
+                  [&_textarea]:h-full
+                  [&_textarea]:min-h-0
+                  [&_textarea]:w-full
+                  [&_textarea]:resize-none
+                  [&_textarea]:rounded-[19px]
+                  [&_textarea]:border-0
+                  [&_textarea]:bg-transparent
+                  [&_textarea]:px-4
+                  [&_textarea]:py-3
+                  [&_textarea]:text-[16px]
+                  [&_textarea]:leading-[28px]
+                  [&_textarea]:text-[#241b3f]
+                  [&_textarea]:outline-none
+                  [&_textarea]:shadow-none
+                  [&_textarea]:ring-0
+
+                  [&_textarea:focus]:outline-none
+                  [&_textarea:focus]:ring-0
+                "
+              >
+                <ReflectionTextarea
+                  fieldKey="screen_29_opit"
+                  label=""
+                  rows={5}
+                  onSaveStateChange={onSaveStateChange}
+                />
+              </div>
+            </div>
+
+            {/* MIDDLE LEFT — 2. MITÄ TAPAHTUI SEURAAVAKSI? */}
+
+            <div
+              className="
+                absolute
+                left-[14.75%]
+                top-[39.65%]
+                z-20
+                h-[18.65%]
+                w-[33.59%]
+              "
+            >
+              <div
+                className="
+                  h-full
+                  w-full
+                  overflow-hidden
+                  rounded-[22px]
+                  border-[4px]
+                  border-black
+                  bg-[#fffefa]
+
+                  [&_label]:hidden
+
+                  [&>div]:h-full
+                  [&>div]:min-h-0
+
+                  [&_div]:border-0
+                  [&_div]:bg-transparent
+                  [&_div]:p-0
+                  [&_div]:shadow-none
+
+                  [&_textarea]:h-full
+                  [&_textarea]:min-h-0
+                  [&_textarea]:w-full
+                  [&_textarea]:resize-none
+                  [&_textarea]:rounded-[17px]
+                  [&_textarea]:border-0
+                  [&_textarea]:bg-transparent
+                  [&_textarea]:px-4
+                  [&_textarea]:py-3
+                  [&_textarea]:text-[16px]
+                  [&_textarea]:leading-[28px]
+                  [&_textarea]:text-[#241b3f]
+                  [&_textarea]:outline-none
+                  [&_textarea]:shadow-none
+                  [&_textarea]:ring-0
+
+                  [&_textarea:focus]:outline-none
+                  [&_textarea:focus]:ring-0
+                "
+              >
+                <ReflectionTextarea
+                  fieldKey="screen_29_seuraavaksi"
+                  label=""
+                  rows={5}
+                  onSaveStateChange={onSaveStateChange}
+                />
+              </div>
+            </div>
+
+            {/* MIDDLE RIGHT — 4. MITEN HYÖDYNNÄT OPPIMAASI? */}
+
+            <div
+              className="
+                absolute
+                left-[51.86%]
+                top-[39.65%]
+                z-20
+                h-[18.65%]
+                w-[33.40%]
+              "
+            >
+              <div
+                className="
+                  h-full
+                  w-full
+                  overflow-hidden
+                  rounded-[22px]
+                  border-[4px]
+                  border-black
+                  bg-[#fffefa]
+
+                  [&_label]:hidden
+
+                  [&>div]:h-full
+                  [&>div]:min-h-0
+
+                  [&_div]:border-0
+                  [&_div]:bg-transparent
+                  [&_div]:p-0
+                  [&_div]:shadow-none
+
+                  [&_textarea]:h-full
+                  [&_textarea]:min-h-0
+                  [&_textarea]:w-full
+                  [&_textarea]:resize-none
+                  [&_textarea]:rounded-[17px]
+                  [&_textarea]:border-0
+                  [&_textarea]:bg-transparent
+                  [&_textarea]:px-4
+                  [&_textarea]:py-3
+                  [&_textarea]:text-[16px]
+                  [&_textarea]:leading-[28px]
+                  [&_textarea]:text-[#241b3f]
+                  [&_textarea]:outline-none
+                  [&_textarea]:shadow-none
+                  [&_textarea]:ring-0
+
+                  [&_textarea:focus]:outline-none
+                  [&_textarea:focus]:ring-0
+                "
+              >
+                <ReflectionTextarea
+                  fieldKey="screen_29_hyodynnat"
+                  label=""
+                  rows={5}
+                  onSaveStateChange={onSaveStateChange}
+                />
+              </div>
+            </div>
+
+            {/* BOTTOM BOX — 1. MITÄ TEIT? */}
+
+            <div
+              className="
+                absolute
+                left-[24.71%]
+                top-[69.73%]
+                z-20
+                h-[16.02%]
+                w-[50.49%]
+              "
+            >
+              <div
+                className="
+                  h-full
+                  w-full
+                  overflow-hidden
+                  rounded-[22px]
+                  border-[4px]
+                  border-black
+                  bg-[#fffefa]
+
+                  [&_label]:hidden
+
+                  [&>div]:h-full
+                  [&>div]:min-h-0
+
+                  [&_div]:border-0
+                  [&_div]:bg-transparent
+                  [&_div]:p-0
+                  [&_div]:shadow-none
+
+                  [&_textarea]:h-full
+                  [&_textarea]:min-h-0
+                  [&_textarea]:w-full
+                  [&_textarea]:resize-none
+                  [&_textarea]:rounded-[17px]
+                  [&_textarea]:border-0
+                  [&_textarea]:bg-transparent
+                  [&_textarea]:px-4
+                  [&_textarea]:py-3
+                  [&_textarea]:text-[16px]
+                  [&_textarea]:leading-[28px]
+                  [&_textarea]:text-[#241b3f]
+                  [&_textarea]:outline-none
+                  [&_textarea]:shadow-none
+                  [&_textarea]:ring-0
+
+                  [&_textarea:focus]:outline-none
+                  [&_textarea:focus]:ring-0
+                "
+              >
+                <ReflectionTextarea
+                  fieldKey="screen_29_teit"
+                  label=""
+                  rows={5}
+                  onSaveStateChange={onSaveStateChange}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -8660,6 +9186,7 @@ function Screen34({ onSaveStateChange }: Props) {
 // ----- Screen35 (PDF p38): Me as a student -----
 function Screen35({ onSaveStateChange }: Props) {
   const tr = useTr();
+
   const qs = [
     "Mikä saa sinut innostumaan opinnoissa?",
     "Minkä tekemiseen uppoudut?",
@@ -8668,28 +9195,77 @@ function Screen35({ onSaveStateChange }: Props) {
     "Mistä olet erityisen kiinnostunut opinnoissa?",
     "Mitä vahvuuksia tavallisesti hyödynnät opintojen aikana?",
   ];
+
   return (
-    <div className="relative h-full min-h-0 w-full overflow-x-hidden overflow-y-auto px-[7%] pb-10 pt-9 text-black">
-      <div className="mx-auto w-full max-w-[1150px] rounded-[30px] px-10 py-8 pb-12">
-        <h1 className="font-display text-[clamp(30px,2.8vw,42px)] font-medium leading-[1.12] text-[#f1f1ef]">
-          {tr(
-            "Minä opiskelijana – Listaa seuraavalle sivulle kaikki vahvuutesi opiskelijana – myös sellaiset, jotka voivat tuntua sinusta itsestäänselvyyksiltä.",
-          )}
+    <div
+      className="
+        relative
+        h-full
+        min-h-0
+        w-full
+        overflow-x-hidden
+        overflow-y-auto
+        px-[7%]
+        pb-10
+        pt-9
+        text-black
+      "
+    >
+      <div
+        className="
+          mx-auto
+          w-full
+          max-w-[1150px]
+          rounded-[30px]
+          px-10
+          pb-12
+          pt-8
+        "
+      >
+        {/* TITLE */}
+
+        <h1
+          className="
+            font-display
+            text-[clamp(34px,3vw,48px)]
+            font-semibold
+            leading-[1.1]
+            text-[#f1f1ef]
+          "
+        >
+          {tr("Minä opiskelijana")}
         </h1>
 
-        <p className="mt-6 max-w-[980px] text-[19px] font-normal leading-[1.45] text-[#f1f1ef]">
+        {/* SUBTITLE */}
+
+        <p
+          className="
+            mt-5
+            max-w-[1000px]
+            font-display
+            text-[clamp(18px,1.45vw,23px)]
+            font-medium
+            leading-[1.45]
+            text-[#f1f1ef]
+          "
+        >
           {tr(
-            "Listaa seuraavalle sivulle aivan kaikki vahvuutesi opiskelijana, myös sellaiset, jotka saattavat tuntua sinulle itsestään selvyydeltä. Oletko hyvä kielissä, keksitkö luovia ratkaisuja ongelmiin, autatko mielelläsi toisia, keksitkö parhaat vitsit, kiitätkö toisia, oletko ryhmähengen luoja?",
+            "Pohdi seuraavia kysymyksiä ja selvitä, mitä oikeasti rakastat tehdä ja missä olet erityisen hyvä opiskelijana. Mieti, millä uudella tavalla voit hyödyntää vahvuuksiasi lukiossa.",
           )}
         </p>
 
-        <p className="mt-4 max-w-[980px] text-[19px] font-normal leading-[1.45] text-[#f1f1ef]">
-          {tr(
-            "Pohdi ensin seuraavia kysymyksiä ja selvitä, mitä oikeasti rakastat tehdä ja missä olet erityisen hyvä. Mieti, millä uudella tavalla voit hyödyntää vahvuuksiasi lukiossa.",
-          )}
-        </p>
+        {/* QUESTIONS */}
 
-        <div className="mt-7 grid grid-cols-1 gap-x-6 gap-y-6 md:grid-cols-2">
+        <div
+          className="
+            mt-8
+            grid
+            grid-cols-1
+            gap-x-6
+            gap-y-6
+            md:grid-cols-2
+          "
+        >
           {qs.map((q, i) => (
             <section
               key={q}
@@ -8709,6 +9285,8 @@ function Screen35({ onSaveStateChange }: Props) {
                 shadow-[0_6px_0_rgba(0,0,0,0.18)]
               "
             >
+              {/* QUESTION */}
+
               <h2
                 className="
                   min-h-[56px]
@@ -8723,6 +9301,8 @@ function Screen35({ onSaveStateChange }: Props) {
                 {tr(q)}
               </h2>
 
+              {/* ANSWER BOX */}
+
               <div
                 className="
                   mt-4
@@ -8735,12 +9315,15 @@ function Screen35({ onSaveStateChange }: Props) {
                   bg-white
 
                   [&_label]:hidden
+
                   [&>div]:h-full
                   [&>div]:min-h-0
+
                   [&_div]:border-0
                   [&_div]:bg-transparent
                   [&_div]:p-0
                   [&_div]:shadow-none
+
                   [&_textarea]:h-full
                   [&_textarea]:min-h-[120px]
                   [&_textarea]:w-full
@@ -8758,6 +9341,7 @@ function Screen35({ onSaveStateChange }: Props) {
                   [&_textarea]:shadow-none
                   [&_textarea]:ring-0
                   [&_textarea]:placeholder:text-[#9a93a6]
+
                   [&_textarea:focus]:outline-none
                   [&_textarea:focus]:ring-0
                 "
@@ -8781,27 +9365,107 @@ function Screen35({ onSaveStateChange }: Props) {
 // FIX: the placeholder now goes through tr().
 function Screen36({ onSaveStateChange }: Props) {
   const tr = useTr();
+
   return (
-    <div className="relative h-full min-h-0 w-full overflow-x-hidden overflow-y-auto px-[7%] pb-12 pt-9 text-black">
-      <div className="mx-auto grid w-full max-w-[1180px] grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+    <div
+      className="
+        relative
+        h-full
+        min-h-0
+        w-full
+        overflow-x-hidden
+        overflow-y-auto
+        px-[7%]
+        pb-12
+        pt-9
+        text-white
+        [scrollbar-gutter:stable]
+      "
+    >
+      <div
+        className="
+          mx-auto
+          grid
+          w-full
+          max-w-[1180px]
+          grid-cols-1
+          items-start
+          gap-10
+          lg:grid-cols-[minmax(0,1fr)_360px]
+        "
+      >
+        {/* LEFT CONTENT */}
+
         <div className="min-w-0">
-          <h1 className="max-w-[820px] font-display text-[clamp(34px,3vw,48px)] font-medium leading-[1.08] text-[#f1f1ef]">
-            <span className="block">{tr("Täytä kaikki erityisosaamisesi tähän listaan.")}</span>
-            <span className="block">{tr("(Täytettävät kohdat 1–5)")}</span>
+          {/* TITLE */}
+
+          <h1
+            className="
+              font-display
+              text-[clamp(36px,3vw,50px)]
+              font-semibold
+              leading-[1.08]
+              text-[#ffd95d]
+            "
+          >
+            {tr("Minä opiskelijana")}
           </h1>
 
-          <div className="mt-8 grid gap-5">
+          {/* INSTRUCTION */}
+
+          <p
+            className="
+              mt-6
+              max-w-[850px]
+              font-display
+              text-[clamp(19px,1.5vw,24px)]
+              font-medium
+              leading-[1.45]
+              text-white
+            "
+          >
+            {tr(
+              "Listaa seuraavaksi kaikki vahvuutesi ja taitosi opiskelijana, myös sellaiset, jotka voivat tuntua sinusta itsestäänselvyyksiltä.",
+            )}
+          </p>
+
+          {/* LIST HEADING */}
+
+          <h2
+            className="
+              mt-9
+              font-display
+              text-[clamp(22px,1.8vw,29px)]
+              font-semibold
+              leading-[1.25]
+              text-white
+            "
+          >
+            {tr("Erityistaitosi ja osaamisesi")}
+          </h2>
+
+          {/* INPUTS */}
+
+          <div
+            className="
+              mt-6
+              grid
+              gap-5
+            "
+          >
             {Array.from({ length: 5 }).map((_, i) => (
               <ReflectionInput
                 key={i}
                 fieldKey={`screen_33_erityistaito_${i + 1}`}
                 prefix={`${i + 1}.`}
-                placeholder={tr("Erityistaito…")}
+                placeholder={tr("Erityistaito tai osaaminen…")}
                 onSaveStateChange={onSaveStateChange}
               />
             ))}
           </div>
         </div>
+
+        {/* RIGHT ILLUSTRATION */}
 
         <img
           src="/illustrations/s23-candy-banana-shoe.png"
@@ -8810,7 +9474,7 @@ function Screen36({ onSaveStateChange }: Props) {
           className="
             pointer-events-none
             mx-auto
-            mt-2
+            mt-6
             h-auto
             w-full
             max-w-[360px]
@@ -8823,45 +9487,100 @@ function Screen36({ onSaveStateChange }: Props) {
     </div>
   );
 }
-
 // ----- Screen37 (PDF p40): Koulu-kokemuksia -----
 function Screen37({ onSaveStateChange }: Props) {
   const tr = useTr();
-  const qs: Array<{ k: string; q: string }> = [
-    { k: "screen_34_oppi", q: "Minkälaisia asioita opit nopeasti ja helposti?" },
+
+  const questions = [
     {
-      k: "screen_34_palaute",
-      q: "Mistä sait rohkaisevaa palautetta peruskoulussa opettajilta entä luokkakavereilta?",
+      fieldKey: "screen_34_oppi",
+      text: "Minkälaisia asioita opit nopeasti ja helposti?",
     },
-    { k: "screen_34_aiheet", q: "Mistä tykkäsit koulussa ala-asteella, entä yläasteella?" },
     {
-      k: "screen_34_onnistuminen",
-      q: "Mikä onnistuminen sinulle on jäänyt mieleen peruskoulusta?",
+      fieldKey: "screen_34_palaute",
+      text: "Mistä sait rohkaisevaa palautetta peruskoulussa opettajilta entä luokkakavereilta?",
+    },
+    {
+      fieldKey: "screen_34_aiheet",
+      text: "Mistä tykkäsit koulussa ala-asteella, entä yläasteella?",
+    },
+    {
+      fieldKey: "screen_34_onnistuminen",
+      text: "Mikä onnistuminen sinulle on jäänyt mieleen peruskoulusta?",
     },
   ];
+
   return (
-    <div className="relative h-full min-h-0 w-full overflow-x-hidden overflow-y-auto px-[7%] pb-10 pt-9 text-black">
-      <div className="mx-auto w-full max-w-[1150px] rounded-[30px] px-10 py-8 pb-12">
-        <h1 className="font-display text-[clamp(32px,3vw,46px)] font-medium leading-[1.1] text-[#f1f1ef]">
-          {tr("Koulumuistot")}
-          <br />
-          <span className="text-[clamp(24px,2.1vw,34px)]">
-            {tr(
-              "Katso taaksepäin omia aiempia opiskelukokemuksiasi ja huomaa, mitä vahvuuksia sinulla on.",
-            )}
-          </span>
+    <div
+      className="
+        relative
+        h-full
+        min-h-0
+        w-full
+        overflow-x-hidden
+        overflow-y-auto
+        px-[7%]
+        pb-12
+        pt-10
+        text-white
+        [scrollbar-gutter:stable]
+      "
+    >
+      <div
+        className="
+          mx-auto
+          w-full
+          max-w-[1150px]
+          pb-12
+        "
+      >
+        {/* TITLE */}
+
+        <h1
+          className="
+            font-display
+            text-[clamp(38px,3.2vw,52px)]
+            font-semibold
+            leading-[1.08]
+            text-[#ffd95d]
+          "
+        >
+          {tr("Koulumuistoja")}
         </h1>
 
-        <p className="mt-6 max-w-[980px] text-[19px] font-normal leading-[1.45] text-[#f1f1ef]">
+        {/* INTRODUCTION */}
+
+        <p
+          className="
+            mt-5
+            max-w-[1020px]
+            font-display
+            text-[clamp(18px,1.45vw,24px)]
+            font-medium
+            leading-[1.45]
+            text-white
+          "
+        >
           {tr(
-            "Tarkastele omia aiempia kokemuksiasi opinnoissa ja huomaa, millaisia vahvuuksia sinulla on.",
+            "Pohdi elämääsi taaksepäin. Mieti omia aiempia opiskelukokemuksiasi ja huomaa, mitä vahvuuksia sinulla jo on.",
           )}
         </p>
 
-        <div className="mt-7 grid grid-cols-1 gap-x-6 gap-y-6 md:grid-cols-2">
-          {qs.map((x) => (
+        {/* QUESTIONS */}
+
+        <div
+          className="
+            mt-9
+            grid
+            grid-cols-1
+            gap-x-7
+            gap-y-7
+            md:grid-cols-2
+          "
+        >
+          {questions.map((question) => (
             <section
-              key={x.k}
+              key={question.fieldKey}
               className="
                 relative
                 flex
@@ -8875,57 +9594,102 @@ function Screen37({ onSaveStateChange }: Props) {
                 px-5
                 pb-5
                 pt-5
+                text-black
                 shadow-[0_6px_0_rgba(0,0,0,0.18)]
               "
             >
-              <h2 className="min-h-[70px] text-left font-display text-[clamp(23px,1.9vw,31px)] font-semibold leading-[1.12] text-[black] [paint-order:stroke_fill] [-webkit-text-stroke:0.8px_#241b3f]">
-                {tr(x.q)}
+              {/* QUESTION */}
+
+              <h2
+                className="
+                  min-h-[64px]
+                  text-left
+                  font-display
+                  text-[clamp(18px,1.45vw,23px)]
+                  font-semibold
+                  leading-[1.3]
+                  text-[#241b3f]
+                "
+              >
+                {tr(question.text)}
               </h2>
+
+              {/* ANSWER BOX */}
 
               <div
                 className="
+                  relative
                   mt-4
-                  min-h-0
+                  min-h-[140px]
                   flex-1
                   overflow-hidden
                   rounded-[16px]
-                  border-2
+                  border-[3px]
                   border-black
-                  bg-white
+                  bg-[#fffefa]
+
+                  focus-within:bg-white
 
                   [&_label]:hidden
+
                   [&>div]:h-full
                   [&>div]:min-h-0
+                  [&>div]:border-0
+                  [&>div]:bg-transparent
+                  [&>div]:p-0
+                  [&>div]:shadow-none
+
                   [&_div]:border-0
                   [&_div]:bg-transparent
                   [&_div]:p-0
                   [&_div]:shadow-none
+
                   [&_textarea]:h-full
-                  [&_textarea]:min-h-[120px]
+                  [&_textarea]:min-h-[140px]
                   [&_textarea]:w-full
                   [&_textarea]:resize-none
-                  [&_textarea]:rounded-[14px]
+                  [&_textarea]:rounded-[13px]
                   [&_textarea]:border-0
                   [&_textarea]:bg-transparent
                   [&_textarea]:px-4
                   [&_textarea]:py-3
+                  [&_textarea]:font-display
                   [&_textarea]:text-[16px]
                   [&_textarea]:font-normal
-                  [&_textarea]:leading-[1.5]
+                  [&_textarea]:leading-[29px]
                   [&_textarea]:text-[#241b3f]
                   [&_textarea]:outline-none
                   [&_textarea]:shadow-none
                   [&_textarea]:ring-0
+                  [&_textarea]:placeholder:text-[#aaa1b5]
+
                   [&_textarea:focus]:outline-none
                   [&_textarea:focus]:ring-0
                 "
               >
-                <ReflectionTextarea
-                  fieldKey={x.k}
-                  label=""
-                  rows={3}
-                  onSaveStateChange={onSaveStateChange}
+                {/* PAPER LINES */}
+
+                <div
+                  aria-hidden="true"
+                  className="
+                    pointer-events-none
+                    absolute
+                    inset-x-4
+                    inset-y-3
+                    z-0
+                    opacity-60
+                    [background-image:repeating-linear-gradient(to_bottom,transparent_0,transparent_28px,#ddd4ea_29px,#ddd4ea_30px)]
+                  "
                 />
+
+                <div className="relative z-10 h-full">
+                  <ReflectionTextarea
+                    fieldKey={question.fieldKey}
+                    label=""
+                    rows={5}
+                    onSaveStateChange={onSaveStateChange}
+                  />
+                </div>
               </div>
             </section>
           ))}
@@ -9024,26 +9788,22 @@ function Screen39({ onSaveStateChange }: Props) {
     {
       k: "screen_36_tavoite",
       label: "1. Tavoitteeni ja miksi se on minulle tärkeä",
-      position: "left-[5%] top-[20%] w-[22%]",
-      height: 190,
+      position: "left-[4%] top-[20%]",
     },
     {
       k: "screen_36_vahvuudet",
       label: "2. Vaaditut vahvuudet",
-      position: "left-[5%] top-[57%] w-[22%]",
-      height: 180,
+      position: "left-[4%] top-[61%]",
     },
     {
       k: "screen_36_hyodynnan",
       label: "3. Miten hyödynnän vahvuuksia",
-      position: "right-[5%] top-[20%] w-[22%]",
-      height: 190,
+      position: "right-[4%] top-[61%]",
     },
     {
       k: "screen_36_taidot",
       label: "4. Mitä muita taitoja tarvitsen",
-      position: "right-[5%] top-[57%] w-[22%]",
-      height: 180,
+      position: "left-1/2 top-[79%] -translate-x-1/2",
     },
   ];
 
@@ -9064,16 +9824,17 @@ function Screen39({ onSaveStateChange }: Props) {
         className="
           relative
           mx-auto
-          min-h-[760px]
+          min-h-[1040px]
           w-full
           max-w-[1500px]
           overflow-hidden
           px-[5%]
-          pb-10
+          pb-24
           pt-6
         "
       >
         {/* TITLE */}
+
         <h1
           className="
             relative
@@ -9090,22 +9851,24 @@ function Screen39({ onSaveStateChange }: Props) {
         </h1>
 
         {/* WATER LINE */}
+
         <div
           aria-hidden="true"
           className="
             pointer-events-none
             absolute
-            left-[5%]
-            right-[5%]
-            top-[54%]
-            z-[1]
-            border-t-[2px]
+            left-[30%]
+            right-[30%]
+            top-[53%]
+            z-[5]
+            border-t-[3px]
             border-dashed
-            border-[#b7dfe0]
+            border-[#d7f1f1]
           "
         />
 
         {/* ICEBERG */}
+
         <svg
           className="
             pointer-events-none
@@ -9129,6 +9892,7 @@ function Screen39({ onSaveStateChange }: Props) {
           </defs>
 
           {/* ICEBERG ABOVE WATER */}
+
           <path
             d="
               M70 290
@@ -9150,6 +9914,7 @@ function Screen39({ onSaveStateChange }: Props) {
           />
 
           {/* ICEBERG BELOW WATER */}
+
           <path
             d="
               M64 315
@@ -9177,6 +9942,7 @@ function Screen39({ onSaveStateChange }: Props) {
           />
 
           {/* ARROW */}
+
           <path
             d="
               M8 68
@@ -9193,117 +9959,128 @@ function Screen39({ onSaveStateChange }: Props) {
         </svg>
 
         {/* QUESTIONS + TEXTBOXES */}
-        {boxes.map((box) => {
-          const isRight = box.position.includes("right-");
 
-          return (
-            <section
-              key={box.k}
-              className={`
-                absolute
-                z-20
-                flex
-                flex-col
-                ${isRight ? "items-end" : "items-start"}
-                ${box.position}
-              `}
+        {boxes.map((box) => (
+          <section
+            key={box.k}
+            className={`
+              absolute
+              z-20
+              flex
+              w-[290px]
+              flex-col
+              ${box.position}
+            `}
+          >
+            {/* QUESTION */}
+
+            <h2
+              className="
+                min-h-[48px]
+                w-full
+                font-display
+                text-[clamp(16px,1.2vw,20px)]
+                font-semibold
+                leading-[1.15]
+                text-white
+              "
             >
-              {/* QUESTION */}
-              <h2
-                className="
-                  w-full
-                  max-w-[290px]
-                  font-display
-                  text-[clamp(16px,1.2vw,21px)]
-                  font-semibold
-                  leading-[1.12]
-                  text-white
-                "
-              >
-                {tr(box.label)}
-              </h2>
+              {tr(box.label)}
+            </h2>
 
-              {/* TEXTBOX */}
+            {/* TEXTBOX */}
+
+            <div
+              className="
+                relative
+                mt-2
+                h-[180px]
+                w-[290px]
+                overflow-hidden
+                rounded-[20px]
+                border-[4px]
+                border-black
+                bg-[#fffefa]
+                shadow-[0_5px_0_rgba(55,34,90,0.18)]
+
+                [&_label]:hidden
+
+                [&>div]:h-full
+                [&>div]:min-h-0
+                [&>div]:w-full
+                [&>div]:border-0
+                [&>div]:bg-transparent
+                [&>div]:p-0
+                [&>div]:shadow-none
+                [&>div]:outline-none
+                [&>div]:ring-0
+
+                [&_div]:border-0
+                [&_div]:bg-transparent
+                [&_div]:p-0
+                [&_div]:shadow-none
+                [&_div]:outline-none
+                [&_div]:ring-0
+
+                [&_textarea]:block
+                [&_textarea]:h-full
+                [&_textarea]:min-h-0
+                [&_textarea]:w-full
+                [&_textarea]:resize-none
+                [&_textarea]:rounded-[16px]
+                [&_textarea]:border-0
+                [&_textarea]:bg-transparent
+                [&_textarea]:px-4
+                [&_textarea]:py-3
+                [&_textarea]:font-display
+                [&_textarea]:text-[16px]
+                [&_textarea]:font-normal
+                [&_textarea]:leading-[29px]
+                [&_textarea]:text-[#241b3f]
+                [&_textarea]:outline-none
+                [&_textarea]:shadow-none
+                [&_textarea]:ring-0
+
+                [&_textarea::placeholder]:text-[#aaa1b5]
+
+                [&_textarea:focus]:border-0
+                [&_textarea:focus]:outline-none
+                [&_textarea:focus]:shadow-none
+                [&_textarea:focus]:ring-0
+              "
+            >
+              {/* PAPER LINES */}
+
               <div
+                aria-hidden="true"
                 className="
-                  relative
-                  mt-1
-                  w-full
-                  max-w-[290px]
-                  overflow-hidden
-                  rounded-[20px]
-                  border-[4px]
-                  border-solid
-                  border-black
-                  bg-transparent
+                  pointer-events-none
+                  absolute
+                  inset-x-4
+                  inset-y-3
+                  z-0
+                  opacity-65
+                  [background-image:repeating-linear-gradient(to_bottom,transparent_0,transparent_28px,#ddd4ea_29px,#ddd4ea_30px)]
                 "
-                style={{
-                  height: `${box.height}px`,
-                }}
-              >
-                <div
-                  className="
-                    h-full
-                    w-full
+              />
 
-                    [&_label]:hidden
+              {/* TEXTAREA */}
 
-                    [&>div]:h-full
-                    [&>div]:w-full
-                    [&>div]:border-0
-                    [&>div]:bg-transparent
-                    [&>div]:p-0
-                    [&>div]:shadow-none
-                    [&>div]:outline-none
-                    [&>div]:ring-0
-
-                    [&_div]:border-0
-                    [&_div]:bg-transparent
-                    [&_div]:shadow-none
-
-                    [&_textarea]:block
-                    [&_textarea]:h-full
-                    [&_textarea]:min-h-0
-                    [&_textarea]:w-full
-                    [&_textarea]:resize-none
-                    [&_textarea]:rounded-[16px]
-                    [&_textarea]:border-0
-                    [&_textarea]:bg-transparent
-                    [&_textarea]:px-4
-                    [&_textarea]:py-3
-                    [&_textarea]:font-display
-                    [&_textarea]:text-[15px]
-                    [&_textarea]:font-normal
-                    [&_textarea]:leading-[27px]
-                    [&_textarea]:text-white
-                    [&_textarea]:outline-none
-                    [&_textarea]:shadow-none
-                    [&_textarea]:ring-0
-
-                    [&_textarea::placeholder]:text-white/50
-
-                    [&_textarea:focus]:border-0
-                    [&_textarea:focus]:outline-none
-                    [&_textarea:focus]:shadow-none
-                    [&_textarea:focus]:ring-0
-                  "
-                >
-                  <ReflectionTextarea
-                    fieldKey={box.k}
-                    label=""
-                    rows={6}
-                    onSaveStateChange={onSaveStateChange}
-                  />
-                </div>
+              <div className="relative z-10 h-full">
+                <ReflectionTextarea
+                  fieldKey={box.k}
+                  label=""
+                  rows={6}
+                  onSaveStateChange={onSaveStateChange}
+                />
               </div>
-            </section>
-          );
-        })}
+            </div>
+          </section>
+        ))}
       </div>
     </div>
   );
 }
-
 // ----- Screen40 (PDF p43): Vahvuuteni opiskelijana — 3 columns -----
 function Screen40({ onSaveStateChange }: Props) {
   const tr = useTr();
@@ -9371,49 +10148,208 @@ function Screen40({ onSaveStateChange }: Props) {
 // ----- Screen41 (PDF p44): Vahvuuspalaute opiskelukavereilta -----
 function Screen41({ onSaveStateChange }: Props) {
   const tr = useTr();
+
   const questions = [
-    { key: "screen_38_uutta", text: "Mitä uutta opin palautteista?" },
-    { key: "screen_38_tarkeaa", text: "Mikä palautteessa on minulle tärkeää?" },
+    {
+      key: "screen_38_uutta",
+      text: "Mitä uutta opin palautteista?",
+    },
+    {
+      key: "screen_38_tarkeaa",
+      text: "Mikä palautteessa on minulle tärkeää?",
+    },
     {
       key: "screen_38_muistetaan",
       text: "Millaisista asioista minut muistetaan / tunnistetaan parhaiten?",
     },
-    { key: "screen_38_yhteisoon", text: "Mitä hyvää vahvuuteni tuovat yhteisööni?" },
+    {
+      key: "screen_38_yhteisoon",
+      text: "Mitä hyvää vahvuuteni tuovat yhteisööni?",
+    },
   ];
-  return (
-    <div className="h-full min-h-0 w-full overflow-x-hidden overflow-y-auto px-[8%] pb-12 pt-12 text-white">
-      <div className="mx-auto max-w-[1180px]">
-        <h1 className="font-display text-[clamp(38px,4vw,64px)] font-semibold leading-[1.08] text-[#ffd33f]">
-          {tr(
-            "Vahvuuspalaute opiskelukavereilla – Kirjoita palautetta ja kehuja ryhmässä 2–4 opiskelukaverin kanssa. Nimeä vahvuuksia, joita arvostat toisissanne.",
-          )}
-        </h1>
-        <p className="mt-8 max-w-[1080px] text-[clamp(20px,1.6vw,28px)] font-normal leading-[1.42] text-white">
-          {tr(
-            "Kirjoita palautetta ja kehuja ryhmässä 2–4 opiskelukaverin kanssa. Käytä sivua 10 pohjana. Nimetkää ne vahvuudet, joita toisissanne arvostatte. Kertokaa myös, missä vahvuudet näkyvät ja miten ne vaikuttavat kanssaihmisiin.",
-          )}
-        </p>
 
-        <div className="mt-9 grid gap-x-8 gap-y-8 md:grid-cols-2">
+  return (
+    <div
+      className="
+        h-full
+        min-h-0
+        w-full
+        overflow-x-hidden
+        overflow-y-auto
+        px-[8%]
+        pb-12
+        pt-12
+        text-white
+        [scrollbar-gutter:stable]
+      "
+    >
+      <div className="mx-auto max-w-[1180px]">
+        {/* TITLE */}
+
+        <h1
+          className="
+            max-w-[1050px]
+            font-display
+            text-[clamp(38px,4vw,64px)]
+            font-semibold
+            leading-[1.08]
+            text-[#ffd33f]
+          "
+        >
+          {tr("Vahvuuspalaute opiskelukavereilta")}
+        </h1>
+
+        {/* INSTRUCTION */}
+
+        <div
+          className="
+            mt-6
+            max-w-[1080px]
+            space-y-4
+            font-display
+            text-[clamp(18px,1.45vw,24px)]
+            font-normal
+            leading-[1.45]
+            text-white
+          "
+        >
+          <p>
+            {tr(
+              "Keskustelkaa, antakaa toisillenne positiivista palautetta ja sanoittakaa vahvuuksia.",
+            )}
+          </p>
+
+          <p>
+            {tr(
+              "Kirjoittakaa toisillenne palautetta pienryhmässä. Sanallistakaa niitä taitoja ja vahvuuksia, joita arvostatte ja ihailette toisissanne. Kun saat toisilta positiivista palautetta, kiitä!",
+            )}
+          </p>
+        </div>
+
+        {/* QUESTIONS */}
+
+        <div
+          className="
+            mt-9
+            grid
+            gap-x-8
+            gap-y-8
+            md:grid-cols-2
+          "
+        >
           {questions.map((question, index) => (
-            <section key={question.key} className="min-w-0">
-              <h2 className="grid grid-cols-[22px_minmax(0,1fr)] gap-3 font-display text-[clamp(20px,1.65vw,29px)] font-semibold leading-[1.18] text-white">
+            <section
+              key={question.key}
+              className="
+                min-w-0
+              "
+            >
+              {/* QUESTION */}
+
+              <h2
+                className="
+                  grid
+                  grid-cols-[22px_minmax(0,1fr)]
+                  gap-3
+                  font-display
+                  text-[clamp(20px,1.65vw,29px)]
+                  font-semibold
+                  leading-[1.18]
+                  text-white
+                "
+              >
                 <span
-                  className="mt-[0.45em] h-3 w-3 rounded-full bg-[#ffd33f]"
                   aria-hidden="true"
+                  className="
+                    mt-[0.45em]
+                    h-3
+                    w-3
+                    rounded-full
+                    bg-[#ffd33f]
+                  "
                 />
+
                 <span>
                   {index + 1}. {tr(question.text)}
                 </span>
               </h2>
-              <div className="mt-4 overflow-hidden rounded-[24px] border-[5px] border-black bg-[#fffdf8] shadow-[inset_0_6px_0_0_#000,0_8px_0_rgba(0,0,0,0.16)]">
-                <FlatReflectionTextarea
-                  fieldKey={question.key}
-                  rows={6}
-                  minHeight={172}
-                  textClass="text-[16px] bg-[repeating-linear-gradient(to_bottom,transparent_0,transparent_27px,#e7d8ff_28px,#e7d8ff_29px)]"
-                  onSaveStateChange={onSaveStateChange}
+
+              {/* ANSWER BOX */}
+
+              <div
+                className="
+                  relative
+                  mt-4
+                  min-h-[180px]
+                  w-full
+                  overflow-hidden
+                  rounded-[18px]
+                  border-[3px]
+                  border-black
+                  bg-[#fffefa]
+                  shadow-[0_6px_0_rgba(55,34,90,0.2)]
+
+                  focus-within:bg-white
+
+                  [&_label]:hidden
+
+                  [&>div]:h-full
+                  [&>div]:min-h-0
+                  [&>div]:border-0
+                  [&>div]:bg-transparent
+                  [&>div]:p-0
+                  [&>div]:shadow-none
+
+                  [&_div]:border-0
+                  [&_div]:bg-transparent
+                  [&_div]:p-0
+                  [&_div]:shadow-none
+
+                  [&_textarea]:h-full
+                  [&_textarea]:min-h-[180px]
+                  [&_textarea]:w-full
+                  [&_textarea]:resize-none
+                  [&_textarea]:rounded-[15px]
+                  [&_textarea]:border-0
+                  [&_textarea]:bg-transparent
+                  [&_textarea]:px-5
+                  [&_textarea]:py-4
+                  [&_textarea]:font-display
+                  [&_textarea]:text-[17px]
+                  [&_textarea]:leading-[30px]
+                  [&_textarea]:text-[#241b3f]
+                  [&_textarea]:outline-none
+                  [&_textarea]:shadow-none
+                  [&_textarea]:ring-0
+                  [&_textarea]:placeholder:text-[#aaa1b5]
+
+                  [&_textarea:focus]:outline-none
+                  [&_textarea:focus]:ring-0
+                "
+              >
+                {/* PAPER LINES */}
+
+                <div
+                  aria-hidden="true"
+                  className="
+                    pointer-events-none
+                    absolute
+                    inset-x-5
+                    inset-y-4
+                    z-0
+                    opacity-65
+                    [background-image:repeating-linear-gradient(to_bottom,transparent_0,transparent_29px,#ddd4ea_30px,#ddd4ea_31px)]
+                  "
                 />
+
+                <div className="relative z-10 h-full">
+                  <ReflectionTextarea
+                    fieldKey={question.key}
+                    label=""
+                    rows={6}
+                    onSaveStateChange={onSaveStateChange}
+                  />
+                </div>
               </div>
             </section>
           ))}
