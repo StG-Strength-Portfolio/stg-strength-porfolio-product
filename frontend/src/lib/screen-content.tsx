@@ -3636,7 +3636,7 @@ function Screen16({ onSaveStateChange }: Props) {
               text-white
             "
           >
-            {tr("Pohdi omia vahvuuksia ja vastaa:")}
+            {tr("Pohdi omia vahvuuksiasi ja vastaa seuraaviin kysymyksiin:")}
           </p>
 
           <div className="mt-7 grid gap-6">
