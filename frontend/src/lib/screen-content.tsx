@@ -9700,32 +9700,47 @@ function Screen37({ onSaveStateChange }: Props) {
 }
 
 // ----- Screen38 (PDF p41): Tavoitteeni opiskelijana 1/2 — informational -----
-function Screen38(_props: Props) {
+function Screen38({ onSaveStateChange }: Props) {
   const tr = useTr();
 
-  const questions = [
-    "Mikä on sinulle se iso tavoite, jonka haluat elämässäsi saavuttaa?",
-    "Kirjoita tavoitteesi jäävuoren pinnan päällä näkyvään osaan.",
-    "Pohdi ja kirjaa jäävuoren pinnan alapuolelle kaikki vahvuudet, joiden käyttäminen ja kehittäminen tukee tavoitteen saavuttamista.",
-    "Pohdi ja konkretisoi, miten voit hyödyntää kyseisiä vahvuuksia tavoitteen saavuttamisessa.",
-    "Kirjoita myös, mitä muita taitoja tulet tarvitsemaan ja kehittämään tavoitteen saavuttamisessa.",
+  const steps = [
+    {
+      key: "screen_35_jaavuori_1",
+      text: "Kirjoita tavoitteesi jäävuoren pinnan päällä näkyvään osaan.",
+    },
+    {
+      key: "screen_35_jaavuori_2",
+      text: "Pohdi ja kirjaa jäävuoren pinnan alapuolelle kaikki vahvuudet, joiden käyttäminen ja kehittäminen tukee tavoitteen saavuttamista.",
+    },
+    {
+      key: "screen_35_jaavuori_3",
+      text: "Pohdi ja konkretisoi, miten voit hyödyntää kyseisiä vahvuuksia tavoitteen saavuttamisessa.",
+    },
+    {
+      key: "screen_35_jaavuori_4",
+      text: "Kirjoita myös, mitä muita taitoja tulet tarvitsemaan ja kehittämään tavoitteen saavuttamisessa.",
+    },
   ];
 
   return (
     <div
       className="
+        relative
         h-full
         min-h-0
         w-full
         overflow-x-hidden
         overflow-y-auto
         px-[8%]
-        pb-12
+        pb-16
         pt-12
         text-white
+        [scrollbar-gutter:stable]
       "
     >
-      <div className="mx-auto max-w-[1180px]">
+      <div className="mx-auto w-full max-w-[1180px]">
+        {/* TITLE */}
+
         <h1
           className="
             font-display
@@ -9738,43 +9753,253 @@ function Screen38(_props: Props) {
           {tr("Tavoitteeni opiskelijana 1/2")}
         </h1>
 
-        <div className="mt-12 max-w-[1080px] space-y-9">
-          {questions.map((question, index) => (
-            <div
-              key={question}
-              className="
-                grid
-                grid-cols-[34px_minmax(0,1fr)]
-                items-start
-                gap-4
-              "
-            >
-              <span
-                className="
-                  font-display
-                  text-[clamp(22px,1.8vw,30px)]
-                  font-semibold
-                  leading-[1.35]
-                  text-[#ffd33f]
-                "
-              >
-                {index + 1}.
-              </span>
+        {/* INTRODUCTION */}
 
-              <p
+        <p
+          className="
+            mt-7
+            max-w-[1080px]
+            font-display
+            text-[clamp(18px,1.45vw,24px)]
+            font-medium
+            leading-[1.45]
+            text-white
+          "
+        >
+          {tr(
+            "Tässä tehtävässä pääset kirkastamaan tavoitteesi opiskelijana ja pohtimaan, mitä niiden saavuttaminen vaatii. Pohdi myös, mitä vahvuuksia sinulla jo on ja miten voit hyödyntää niitä tavoitteen saavuttamisessa.",
+          )}
+        </p>
+
+        {/* BIG GOAL */}
+
+        <section className="mt-9">
+          <h2
+            className="
+              font-display
+              text-[clamp(23px,2vw,34px)]
+              font-semibold
+              leading-[1.25]
+              text-white
+            "
+          >
+            {tr("Mikä on sinulle se iso tavoite, jonka haluat elämässäsi saavuttaa?")}
+          </h2>
+
+          <div
+            className="
+              relative
+              mt-5
+              min-h-[190px]
+              w-full
+              overflow-hidden
+              rounded-[24px]
+              border-[4px]
+              border-black
+              bg-[#fffdf8]
+              shadow-[0_7px_0_rgba(0,0,0,0.18)]
+
+              [&_label]:hidden
+
+              [&>div]:h-full
+              [&>div]:min-h-0
+              [&>div]:border-0
+              [&>div]:bg-transparent
+              [&>div]:p-0
+              [&>div]:shadow-none
+
+              [&_div]:border-0
+              [&_div]:bg-transparent
+              [&_div]:p-0
+              [&_div]:shadow-none
+
+              [&_textarea]:h-full
+              [&_textarea]:min-h-[190px]
+              [&_textarea]:w-full
+              [&_textarea]:resize-none
+              [&_textarea]:rounded-[20px]
+              [&_textarea]:border-0
+              [&_textarea]:bg-transparent
+              [&_textarea]:px-5
+              [&_textarea]:py-4
+              [&_textarea]:font-display
+              [&_textarea]:text-[17px]
+              [&_textarea]:leading-[31px]
+              [&_textarea]:text-[#241b3f]
+              [&_textarea]:outline-none
+              [&_textarea]:shadow-none
+              [&_textarea]:ring-0
+
+              [&_textarea:focus]:outline-none
+              [&_textarea:focus]:ring-0
+            "
+          >
+            <div
+              aria-hidden="true"
+              className="
+                pointer-events-none
+                absolute
+                inset-x-5
+                inset-y-4
+                z-0
+                opacity-65
+                [background-image:repeating-linear-gradient(to_bottom,transparent_0,transparent_30px,#e7d8ff_31px,#e7d8ff_32px)]
+              "
+            />
+
+            <div className="relative z-10 h-full">
+              <FlatReflectionTextarea
+                fieldKey="screen_35_iso_tavoite"
+                rows={6}
+                minHeight={190}
+                textClass="text-[17px]"
+                onSaveStateChange={onSaveStateChange}
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* STEPS */}
+
+        <div className="mt-10 space-y-9">
+          {steps.map((step, index) => (
+            <section key={step.key}>
+              <div
                 className="
-                  font-display
-                  text-[clamp(22px,1.8vw,30px)]
-                  font-medium
-                  leading-[1.4]
-                  text-white
+                  grid
+                  grid-cols-[36px_minmax(0,1fr)]
+                  items-start
+                  gap-4
                 "
               >
-                {tr(question)}
-              </p>
-            </div>
+                <span
+                  className="
+                    font-display
+                    text-[clamp(22px,1.8vw,30px)]
+                    font-semibold
+                    leading-[1.35]
+                    text-[#ffd33f]
+                  "
+                >
+                  {index + 2}.
+                </span>
+
+                <div className="min-w-0">
+                  <h2
+                    className="
+                      font-display
+                      text-[clamp(20px,1.65vw,27px)]
+                      font-medium
+                      leading-[1.4]
+                      text-white
+                    "
+                  >
+                    {tr(step.text)}
+                  </h2>
+
+                  <div
+                    className="
+                      relative
+                      mt-4
+                      min-h-[165px]
+                      w-full
+                      overflow-hidden
+                      rounded-[22px]
+                      border-[4px]
+                      border-black
+                      bg-[#fffdf8]
+                      shadow-[0_7px_0_rgba(0,0,0,0.16)]
+
+                      [&_label]:hidden
+
+                      [&>div]:h-full
+                      [&>div]:min-h-0
+                      [&>div]:border-0
+                      [&>div]:bg-transparent
+                      [&>div]:p-0
+                      [&>div]:shadow-none
+
+                      [&_div]:border-0
+                      [&_div]:bg-transparent
+                      [&_div]:p-0
+                      [&_div]:shadow-none
+
+                      [&_textarea]:h-full
+                      [&_textarea]:min-h-[165px]
+                      [&_textarea]:w-full
+                      [&_textarea]:resize-none
+                      [&_textarea]:rounded-[18px]
+                      [&_textarea]:border-0
+                      [&_textarea]:bg-transparent
+                      [&_textarea]:px-5
+                      [&_textarea]:py-4
+                      [&_textarea]:font-display
+                      [&_textarea]:text-[16px]
+                      [&_textarea]:leading-[29px]
+                      [&_textarea]:text-[#241b3f]
+                      [&_textarea]:outline-none
+                      [&_textarea]:shadow-none
+                      [&_textarea]:ring-0
+
+                      [&_textarea:focus]:outline-none
+                      [&_textarea:focus]:ring-0
+                    "
+                  >
+                    <div
+                      aria-hidden="true"
+                      className="
+                        pointer-events-none
+                        absolute
+                        inset-x-5
+                        inset-y-4
+                        z-0
+                        opacity-65
+                        [background-image:repeating-linear-gradient(to_bottom,transparent_0,transparent_28px,#e7d8ff_29px,#e7d8ff_30px)]
+                      "
+                    />
+
+                    <div className="relative z-10 h-full">
+                      <FlatReflectionTextarea
+                        fieldKey={step.key}
+                        rows={5}
+                        minHeight={165}
+                        textClass="text-[16px]"
+                        onSaveStateChange={onSaveStateChange}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
           ))}
         </div>
+
+        {/* NEXT PAGE NOTE */}
+
+        <p
+          className="
+            mt-10
+            flex
+            items-center
+            gap-4
+            font-display
+            text-[clamp(20px,1.8vw,29px)]
+            font-semibold
+            text-[#ffd33f]
+          "
+        >
+          <span
+            aria-hidden="true"
+            className="
+              text-[1.7em]
+              leading-none
+            "
+          >
+            ›
+          </span>
+
+          <span>{tr("Jäävuori seuraavalla sivulla.")}</span>
+        </p>
       </div>
     </div>
   );
