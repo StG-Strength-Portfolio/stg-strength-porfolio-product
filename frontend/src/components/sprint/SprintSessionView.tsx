@@ -3,8 +3,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { StickyNote } from "@/components/StickyNote";
 import { StrengthPickerGrid } from "@/components/strengths/StrengthPickerGrid";
 import { useLanguage } from "@/lib/i18n";
@@ -32,8 +30,7 @@ const COPY = {
     cancel: "Peruuta sprintti",
     active: "Vahvuuksia annetaan!",
     question: "Mitä vahvuutta näet henkilössä",
-    feedback: "Palaute (valinnainen)",
-    progress: "Annettu palaute",
+    progress: "Annetut vahvuudet",
     done: "Olet antanut vahvuuden kaikille tässä sprintissä. Odotetaan muita osallistujia.",
     end: "Lopeta sprintti",
     results: "Saamasi vahvuudet",
@@ -56,8 +53,7 @@ const COPY = {
     cancel: "Cancel Sprint",
     active: "Strengths are being shared!",
     question: "What strength do you see in",
-    feedback: "Feedback (optional)",
-    progress: "Feedback given",
+    progress: "Strengths given",
     done: "You have given a strength to everyone in this Sprint. Waiting for the other participants.",
     end: "End Sprint",
     results: "Strengths you received",
@@ -80,8 +76,7 @@ const COPY = {
     cancel: "Avbryt sprinten",
     active: "Styrkor delas!",
     question: "Vilken styrka ser du hos",
-    feedback: "Feedback (valfritt)",
-    progress: "Given återkoppling",
+    progress: "Givna styrkor",
     done: "Du har gett en styrka till alla i sprinten. Väntar på de andra deltagarna.",
     end: "Avsluta sprinten",
     results: "Styrkor du fick",
@@ -131,7 +126,6 @@ export function SprintSessionView({
 
   const [snapshot, setSnapshot] = useState<SprintSnapshot | null>(null);
   const [results, setResults] = useState<SprintReceived[] | null>(null);
-  const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
 
   const refresh = useCallback(async () => {
@@ -177,9 +171,7 @@ export function SprintSessionView({
       snapshot.myCompleted ||
       !snapshot.players.length ||
       remaining.length > 0
-    ) {
-      return;
-    }
+    ) return;
     void complete({ data: { sprintId } })
       .then(() => refresh())
       .catch((error) => console.error("[sprint-complete]", error));
@@ -214,18 +206,8 @@ export function SprintSessionView({
     if (!target) return;
     setBusy(true);
     try {
-      await give({
-        data: {
-          sprintId,
-          toUserId: target.userId,
-          strengthId,
-          message: message.trim() || null,
-        },
-      });
-      setMessage("");
-      if (remaining.length === 1) {
-        await complete({ data: { sprintId } });
-      }
+      await give({ data: { sprintId, toUserId: target.userId, strengthId } });
+      if (remaining.length === 1) await complete({ data: { sprintId } });
       await refresh();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Error");
@@ -247,11 +229,8 @@ export function SprintSessionView({
       <StickyNote seed="sprint-waiting" className="space-y-5 text-center">
         <div>
           <h2 className="font-display text-2xl">{text.waiting}</h2>
-          <p className="mt-1 text-sm opacity-70">
-            {snapshot.players.length} {text.participants}
-          </p>
+          <p className="mt-1 text-sm opacity-70">{snapshot.players.length} {text.participants}</p>
         </div>
-
         <button
           type="button"
           className="mx-auto space-y-1"
@@ -262,47 +241,26 @@ export function SprintSessionView({
         >
           <span className="block text-xs font-bold uppercase tracking-wider opacity-60">{text.joinCode}</span>
           <span className="flex items-center gap-3 font-mono text-4xl font-bold tracking-[0.3em] md:text-6xl">
-            {snapshot.joinCode}
-            <Copy className="h-5 w-5 opacity-60" />
+            {snapshot.joinCode}<Copy className="h-5 w-5 opacity-60" />
           </span>
         </button>
-
         <div className="flex flex-wrap justify-center gap-2">
           {snapshot.players.map((player) => (
-            <span
-              key={player.userId}
-              className="flex items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 text-sm font-bold text-slate-900 shadow"
-            >
+            <span key={player.userId} className="flex items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 text-sm font-bold text-slate-900 shadow">
               {player.name}
               <RoleBadge role={player.role} label={text[player.role]} />
-              {player.userId === snapshot.creatorId && (
-                <span className="text-[10px] opacity-55">{text.creator}</span>
-              )}
+              {player.userId === snapshot.creatorId && <span className="text-[10px] opacity-55">{text.creator}</span>}
             </span>
           ))}
         </div>
-
         {isCreator ? (
           <div className="flex flex-wrap justify-center gap-3">
-            <Button
-              disabled={busy || snapshot.players.length < 2}
-              onClick={() => void run(() => startSprint({ data: { sprintId } }))}
-              className="rounded-full bg-[color:var(--yellow)] font-bold text-[color:var(--ink)] hover:brightness-95"
-            >
+            <Button disabled={busy || snapshot.players.length < 2} onClick={() => void run(() => startSprint({ data: { sprintId } }))} className="rounded-full bg-[color:var(--yellow)] font-bold text-[color:var(--ink)] hover:brightness-95">
               {text.start}
             </Button>
-            <Button
-              variant="outline"
-              disabled={busy}
-              onClick={() => void cancelAndExit()}
-              className="rounded-full"
-            >
-              {text.cancel}
-            </Button>
+            <Button variant="outline" disabled={busy} onClick={() => void cancelAndExit()} className="rounded-full">{text.cancel}</Button>
           </div>
-        ) : (
-          <p className="text-sm opacity-70">{text.waiting}…</p>
-        )}
+        ) : <p className="text-sm opacity-70">{text.waiting}…</p>}
       </StickyNote>
     );
   }
@@ -315,29 +273,14 @@ export function SprintSessionView({
       <div className="space-y-6">
         {target ? (
           <StickyNote seed="sprint-give" className="space-y-4">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <h2 className="font-display text-2xl">
-                  {text.question} {target.name}?
-                </h2>
-                <div className="mt-1 flex items-center gap-2 text-xs opacity-70">
-                  <RoleBadge role={target.role} label={text[target.role]} />
-                  <span>{snapshot.givenToIds.length + 1} / {others.length}</span>
-                </div>
+            <div>
+              <h2 className="font-display text-2xl">{text.question} {target.name}?</h2>
+              <div className="mt-1 flex items-center gap-2 text-xs opacity-70">
+                <RoleBadge role={target.role} label={text[target.role]} />
+                <span>{snapshot.givenToIds.length + 1} / {others.length}</span>
               </div>
             </div>
             <StrengthPickerGrid lang={lang} disabled={busy} onSelect={(id) => void pick(id)} />
-            <div className="space-y-2">
-              <Label htmlFor="sprint-feedback">{text.feedback}</Label>
-              <Textarea
-                id="sprint-feedback"
-                value={message}
-                onChange={(event) => setMessage(event.target.value)}
-                rows={3}
-                maxLength={500}
-                className="bg-white text-[color:var(--ink)]"
-              />
-            </div>
           </StickyNote>
         ) : (
           <StickyNote seed="sprint-person-done" className="space-y-2 text-center">
@@ -349,34 +292,18 @@ export function SprintSessionView({
         {isCreator && (
           <StickyNote seed="sprint-host-progress" className="space-y-4 text-center">
             <h3 className="text-lg font-bold">{text.progress}</h3>
-            <p className="font-mono text-3xl font-bold tabular-nums">
-              {snapshot.sentCount} / {snapshot.expectedCount}
-            </p>
+            <p className="font-mono text-3xl font-bold tabular-nums">{snapshot.sentCount} / {snapshot.expectedCount}</p>
             <div className="mx-auto h-2 w-full max-w-xl overflow-hidden rounded-full bg-white">
-              <div
-                className="h-full rounded-full bg-[color:var(--yellow)] transition-all"
-                style={{ width: `${pct}%` }}
-              />
+              <div className="h-full rounded-full bg-[color:var(--yellow)] transition-all" style={{ width: `${pct}%` }} />
             </div>
             <div className="flex flex-wrap justify-center gap-2">
               {snapshot.players.map((player) => (
-                <span
-                  key={player.userId}
-                  className={
-                    player.isCompleted
-                      ? "rounded-full bg-[color:var(--yellow)] px-3 py-1.5 text-sm font-bold text-slate-900"
-                      : "rounded-full bg-white/90 px-3 py-1.5 text-sm font-bold text-slate-900"
-                  }
-                >
+                <span key={player.userId} className={player.isCompleted ? "rounded-full bg-[color:var(--yellow)] px-3 py-1.5 text-sm font-bold text-slate-900" : "rounded-full bg-white/90 px-3 py-1.5 text-sm font-bold text-slate-900"}>
                   {player.name}
                 </span>
               ))}
             </div>
-            <Button
-              disabled={busy}
-              onClick={() => void run(() => endSprint({ data: { sprintId } }), text.saved)}
-              className="rounded-full bg-[color:var(--yellow)] font-bold text-[color:var(--ink)] hover:brightness-95"
-            >
+            <Button disabled={busy} onClick={() => void run(() => endSprint({ data: { sprintId } }), text.saved)} className="rounded-full bg-[color:var(--yellow)] font-bold text-[color:var(--ink)] hover:brightness-95">
               {text.end}
             </Button>
           </StickyNote>
@@ -398,25 +325,15 @@ export function SprintSessionView({
                 <span>{getStrengthName(result.strengthId, lang)} ×{result.count}</span>
               </div>
               <div className="h-2.5 w-full overflow-hidden rounded-full bg-white">
-                <div
-                  className="h-full rounded-full"
-                  style={{
-                    width: `${Math.round((result.count / maxCount) * 100)}%`,
-                    background: getStrengthColor(result.strengthId),
-                  }}
-                />
+                <div className="h-full rounded-full" style={{ width: `${Math.round((result.count / maxCount) * 100)}%`, background: getStrengthColor(result.strengthId) }} />
               </div>
               <ul className="space-y-1.5 text-sm">
                 {result.givers.map((giver, index) => (
-                  <li
-                    key={`${result.strengthId}-${giver.name}-${index}`}
-                    className="rounded-xl bg-white/75 px-3 py-2"
-                  >
+                  <li key={`${result.strengthId}-${giver.name}-${index}`} className="rounded-xl bg-white/75 px-3 py-2">
                     <div className="flex flex-wrap items-center gap-2">
                       <strong>{giver.name}</strong>
                       <RoleBadge role={giver.role} label={text[giver.role]} />
                     </div>
-                    {giver.message && <p className="mt-1 opacity-80">{giver.message}</p>}
                   </li>
                 ))}
               </ul>
@@ -431,12 +348,7 @@ export function SprintSessionView({
           <div className="flex flex-wrap justify-center gap-4">
             {snapshot.podium.map((item) => (
               <div key={item.strengthId} className="rounded-2xl bg-white/80 p-3 shadow-sm">
-                <div
-                  className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full font-bold text-white"
-                  style={{ background: getStrengthColor(item.strengthId) }}
-                >
-                  {item.count}
-                </div>
+                <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full font-bold text-white" style={{ background: getStrengthColor(item.strengthId) }}>{item.count}</div>
                 <div className="text-sm font-bold">{getStrengthName(item.strengthId, lang)}</div>
               </div>
             ))}
@@ -445,12 +357,7 @@ export function SprintSessionView({
       )}
 
       <div className="flex justify-center">
-        <Button
-          onClick={onExit}
-          className="rounded-full bg-[color:var(--yellow)] font-bold text-[color:var(--ink)] hover:brightness-95"
-        >
-          {text.back}
-        </Button>
+        <Button onClick={onExit} className="rounded-full bg-[color:var(--yellow)] font-bold text-[color:var(--ink)] hover:brightness-95">{text.back}</Button>
       </div>
     </div>
   );
