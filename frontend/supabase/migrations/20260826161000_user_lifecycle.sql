@@ -42,7 +42,7 @@ BEGIN
   WHERE p.id = v_actor AND ur.role = 'school_admin';
   IF v_actor_school IS NULL THEN RAISE EXCEPTION 'Forbidden'; END IF;
 
-  SELECT p.school_id, ur.role::text
+  SELECT public.user_school_id(p_user_id), ur.role::text
   INTO v_target_school, v_target_role
   FROM public.profiles p
   JOIN public.user_roles ur ON ur.user_id = p.id
@@ -79,7 +79,7 @@ BEGIN
       IF p_replacement_teacher_id IS NULL THEN
         RAISE EXCEPTION 'Replacement teacher is required';
       END IF;
-      SELECT p.school_id, ur.role::text
+      SELECT public.user_school_id(p_replacement_teacher_id), ur.role::text
       INTO v_replacement_school, v_replacement_role
       FROM public.profiles p
       JOIN public.user_roles ur ON ur.user_id = p.id
@@ -112,14 +112,17 @@ BEGIN
     WHERE id = p_user_id AND deleted_at IS NULL;
   ELSIF v_action = 'delete' THEN
     UPDATE public.profiles
-    SET deleted_at = now(), deleted_by = v_actor, deactivated_at = now(), deactivated_by = v_actor, locked = true
+    SET deleted_at = now(), deleted_by = v_actor,
+        deactivated_at = now(), deactivated_by = v_actor, locked = true
     WHERE id = p_user_id AND deleted_at IS NULL;
   ELSIF v_action = 'restore' THEN
     UPDATE public.profiles
-    SET deleted_at = NULL, deleted_by = NULL, deactivated_at = NULL, deactivated_by = NULL, locked = false
+    SET deleted_at = NULL, deleted_by = NULL,
+        deactivated_at = NULL, deactivated_by = NULL, locked = false
     WHERE id = p_user_id
       AND deleted_at IS NOT NULL
       AND deleted_at >= now() - INTERVAL '90 days';
+    IF NOT FOUND THEN RAISE EXCEPTION 'User restore period has expired'; END IF;
   ELSIF v_action = 'demote_to_teacher' THEN
     UPDATE public.user_roles SET role = 'teacher' WHERE user_id = p_user_id;
   END IF;
