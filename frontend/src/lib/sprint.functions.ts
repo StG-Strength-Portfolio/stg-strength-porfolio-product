@@ -47,7 +47,6 @@ export interface SprintSnapshot {
 export interface SprintReceivedGiver {
   name: string;
   role: SprintRole;
-  message: string | null;
 }
 
 export interface SprintReceived {
@@ -111,10 +110,7 @@ export const getSprintSnapshot = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<SprintSnapshot> => {
     const db = await admin();
     const { sprint, rows } = await loadSprint(db, data.sprintId, context.userId);
-    const names = await namesFor(
-      db,
-      rows.map((row) => row.student_id),
-    );
+    const names = await namesFor(db, rows.map((row) => row.student_id));
 
     const { data: strengthRows, error: strengthsError } = await db
       .from("sprint_strengths")
@@ -170,10 +166,7 @@ export const listSprintPlayers = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<SprintPlayer[]> => {
     const db = await admin();
     const { rows } = await loadSprint(db, data.sprintId, context.userId);
-    const names = await namesFor(
-      db,
-      rows.map((row) => row.student_id),
-    );
+    const names = await namesFor(db, rows.map((row) => row.student_id));
     return rows.map((row) => ({
       userId: row.student_id,
       name: names.get(row.student_id) ?? "—",
@@ -187,11 +180,7 @@ export const createSprintSession = createServerFn({ method: "POST" })
   .handler(async ({ context }): Promise<{ sprintId: string; joinCode: string }> => {
     const { data, error } = await context.supabase.rpc("create_sprint_session" as never);
     if (error) throw new Error(error.message);
-    const result = data as unknown as {
-      ok?: boolean;
-      sprint_id?: string;
-      join_code?: string;
-    };
+    const result = data as unknown as { ok?: boolean; sprint_id?: string; join_code?: string };
     if (!result?.ok || !result.sprint_id || !result.join_code) {
       throw new Error("Sprint could not be created");
     }
@@ -235,23 +224,17 @@ async function runSprintRpc(
 export const startSprintSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { sprintId: string }) => data)
-  .handler(async ({ data, context }) =>
-    runSprintRpc(context.supabase, "start_sprint", data.sprintId),
-  );
+  .handler(async ({ data, context }) => runSprintRpc(context.supabase, "start_sprint", data.sprintId));
 
 export const endSprintSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { sprintId: string }) => data)
-  .handler(async ({ data, context }) =>
-    runSprintRpc(context.supabase, "end_sprint", data.sprintId),
-  );
+  .handler(async ({ data, context }) => runSprintRpc(context.supabase, "end_sprint", data.sprintId));
 
 export const cancelSprintSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { sprintId: string }) => data)
-  .handler(async ({ data, context }) =>
-    runSprintRpc(context.supabase, "cancel_sprint", data.sprintId),
-  );
+  .handler(async ({ data, context }) => runSprintRpc(context.supabase, "cancel_sprint", data.sprintId));
 
 export const completeSprintPlayer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -262,9 +245,7 @@ export const completeSprintPlayer = createServerFn({ method: "POST" })
 
 export const giveSprintStrength = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (data: { sprintId: string; toUserId: string; strengthId: number; message?: string | null }) => data,
-  )
+  .inputValidator((data: { sprintId: string; toUserId: string; strengthId: number }) => data)
   .handler(async ({ data, context }) => {
     const { data: result, error } = await context.supabase.rpc(
       "give_sprint_strength" as never,
@@ -272,7 +253,7 @@ export const giveSprintStrength = createServerFn({ method: "POST" })
         p_sprint_id: data.sprintId,
         p_to_user_id: data.toUserId,
         p_strength_id: String(data.strengthId),
-        p_message: data.message?.trim() || null,
+        p_message: null,
       } as never,
     );
     if (error) throw new Error(error.message);
@@ -289,7 +270,7 @@ export const collectSprintResults = createServerFn({ method: "POST" })
 
     const { data: received, error } = await db
       .from("sprint_strengths")
-      .select("from_student_id, from_role, strength_id, message")
+      .select("from_student_id, from_role, strength_id")
       .eq("sprint_id", data.sprintId)
       .eq("to_student_id", context.userId)
       .order("created_at", { ascending: true });
@@ -299,7 +280,6 @@ export const collectSprintResults = createServerFn({ method: "POST" })
       from_student_id: string;
       from_role: SprintRole;
       strength_id: string;
-      message: string | null;
     }>;
     const names = await namesFor(db, [...new Set(rows.map((row) => row.from_student_id))]);
 
@@ -311,7 +291,6 @@ export const collectSprintResults = createServerFn({ method: "POST" })
       entry.givers.push({
         name: names.get(row.from_student_id) ?? "—",
         role: row.from_role,
-        message: row.message,
       });
       grouped.set(strengthId, entry);
     }
