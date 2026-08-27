@@ -103,6 +103,23 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
       throw new Error("Unauthorized: No user ID found in token");
     }
 
+    // A valid Supabase token must not keep a deactivated or soft-deleted
+    // Strength Portfolio account usable. The lifecycle RPCs set profiles.locked
+    // immediately, so every protected server function enforces that state even
+    // if the browser still holds an otherwise-valid access token.
+    const { data: lifecycleProfile, error: lifecycleError } = await supabase
+      .from("profiles")
+      .select("locked")
+      .eq("id", data.claims.sub)
+      .maybeSingle();
+
+    if (lifecycleError) {
+      throw new Error("Unauthorized: Account status could not be verified");
+    }
+    if (lifecycleProfile?.locked) {
+      throw new Error("Unauthorized: Account is inactive");
+    }
+
     return next({
       context: {
         supabase,
