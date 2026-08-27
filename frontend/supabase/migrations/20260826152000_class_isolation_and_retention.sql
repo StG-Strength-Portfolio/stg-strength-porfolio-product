@@ -1,30 +1,104 @@
--- Service-description compliance: one class per student, controlled same-school
--- moves, and a 90-day restore period for normal class deletion.
+-- Service-description compliance: one active class per student, controlled
+-- same-school moves, and a 90-day restore period for normal class deletion.
+-- Deleted-class memberships are intentionally preserved so a class can be
+-- restored during the retention period without losing its historical roster.
 
 BEGIN;
 
--- Legacy duplicates are reduced deterministically to one membership: prefer an
--- active class, then the most recently joined class.
-WITH ranked_memberships AS (
+-- Legacy data may contain more than one active membership. Keep the most recent
+-- active membership and preserve every membership whose class is already
+-- deleted, because those belong to the 90-day restoration model.
+WITH ranked_active_memberships AS (
   SELECT
     cm.ctid,
     row_number() OVER (
       PARTITION BY cm.student_id
-      ORDER BY
-        CASE WHEN COALESCE(c.is_deleted, false) = false THEN 0 ELSE 1 END,
-        cm.joined_at DESC,
-        cm.class_id
+      ORDER BY cm.joined_at DESC, cm.class_id
     ) AS rn
   FROM public.class_members cm
   JOIN public.classes c ON c.id = cm.class_id
+  WHERE COALESCE(c.is_deleted, false) = false
 )
 DELETE FROM public.class_members cm
-USING ranked_memberships ranked
+USING ranked_active_memberships ranked
 WHERE cm.ctid = ranked.ctid
   AND ranked.rn > 1;
 
-CREATE UNIQUE INDEX IF NOT EXISTS class_members_one_class_per_student_uidx
-  ON public.class_members (student_id);
+-- A normal unique index on student_id would also count memberships in deleted
+-- classes and would therefore break class restoration. Enforce the invariant
+-- with a trigger that considers only active classes.
+DROP INDEX IF EXISTS public.class_members_one_class_per_student_uidx;
+
+CREATE OR REPLACE FUNCTION public.enforce_one_active_class_membership()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_target_deleted boolean;
+BEGIN
+  SELECT COALESCE(c.is_deleted, false)
+  INTO v_target_deleted
+  FROM public.classes c
+  WHERE c.id = NEW.class_id;
+
+  IF v_target_deleted IS NULL THEN
+    RAISE EXCEPTION 'Class not found';
+  END IF;
+
+  IF v_target_deleted = false AND EXISTS (
+    SELECT 1
+    FROM public.class_members cm
+    JOIN public.classes c ON c.id = cm.class_id
+    WHERE cm.student_id = NEW.student_id
+      AND cm.class_id <> NEW.class_id
+      AND COALESCE(c.is_deleted, false) = false
+  ) THEN
+    RAISE EXCEPTION 'Student already belongs to an active class';
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS class_members_one_active_class ON public.class_members;
+CREATE TRIGGER class_members_one_active_class
+BEFORE INSERT OR UPDATE OF class_id, student_id ON public.class_members
+FOR EACH ROW EXECUTE FUNCTION public.enforce_one_active_class_membership();
+
+-- Restoring a class must not silently give a student two active classes. The
+-- administrator can resolve the conflicting active membership first and then
+-- retry the restore.
+CREATE OR REPLACE FUNCTION public.prevent_conflicting_class_restore()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF COALESCE(OLD.is_deleted, false) = true AND COALESCE(NEW.is_deleted, false) = false THEN
+    IF EXISTS (
+      SELECT 1
+      FROM public.class_members restoring
+      JOIN public.class_members current_membership
+        ON current_membership.student_id = restoring.student_id
+       AND current_membership.class_id <> restoring.class_id
+      JOIN public.classes current_class ON current_class.id = current_membership.class_id
+      WHERE restoring.class_id = NEW.id
+        AND COALESCE(current_class.is_deleted, false) = false
+    ) THEN
+      RAISE EXCEPTION 'Class cannot be restored while a former student belongs to another active class';
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS classes_prevent_conflicting_restore ON public.classes;
+CREATE TRIGGER classes_prevent_conflicting_restore
+BEFORE UPDATE OF is_deleted ON public.classes
+FOR EACH ROW EXECUTE FUNCTION public.prevent_conflicting_class_restore();
 
 CREATE OR REPLACE FUNCTION public.join_class(p_join_code text)
 RETURNS jsonb
@@ -53,6 +127,8 @@ BEGIN
   FROM public.class_members cm
   JOIN public.classes c ON c.id = cm.class_id
   WHERE cm.student_id = v_uid
+    AND COALESCE(c.is_deleted, false) = false
+  ORDER BY cm.joined_at DESC
   LIMIT 1;
 
   IF FOUND THEN
@@ -70,13 +146,13 @@ BEGIN
       'ok', false,
       'error', 'already_in_class',
       'current_class_id', v_existing.id,
-      'current_class_name', v_existing.name,
-      'current_class_deleted', COALESCE(v_existing.is_deleted, false)
+      'current_class_name', v_existing.name
     );
   END IF;
 
   INSERT INTO public.class_members (class_id, student_id)
-  VALUES (v_class.id, v_uid);
+  VALUES (v_class.id, v_uid)
+  ON CONFLICT (class_id, student_id) DO NOTHING;
 
   UPDATE public.profiles
   SET language = v_class.language
@@ -144,9 +220,11 @@ BEGIN
   JOIN public.classes c ON c.id = cm.class_id
   JOIN public.profiles owner_profile ON owner_profile.id = c.teacher_id
   WHERE cm.student_id = p_student_id
+    AND COALESCE(c.is_deleted, false) = false
+  ORDER BY cm.joined_at DESC
   LIMIT 1;
 
-  IF v_current_class_id IS NULL THEN RAISE EXCEPTION 'Student is not assigned to a class'; END IF;
+  IF v_current_class_id IS NULL THEN RAISE EXCEPTION 'Student is not assigned to an active class'; END IF;
   IF v_current_class_id = p_target_class_id THEN
     RETURN jsonb_build_object('ok', true, 'already_member', true);
   END IF;
@@ -165,11 +243,17 @@ BEGIN
     RAISE EXCEPTION 'Forbidden';
   END IF;
 
-  DELETE FROM public.class_members
-  WHERE student_id = p_student_id;
+  -- Remove only the active membership. Deleted-class memberships are retained
+  -- for the 90-day class-restore window.
+  DELETE FROM public.class_members cm
+  USING public.classes c
+  WHERE cm.class_id = c.id
+    AND cm.student_id = p_student_id
+    AND COALESCE(c.is_deleted, false) = false;
 
   INSERT INTO public.class_members (class_id, student_id)
-  VALUES (p_target_class_id, p_student_id);
+  VALUES (p_target_class_id, p_student_id)
+  ON CONFLICT (class_id, student_id) DO NOTHING;
 
   UPDATE public.profiles
   SET language = v_target_language
@@ -187,6 +271,10 @@ $$;
 
 REVOKE EXECUTE ON FUNCTION public.move_student_to_class(uuid, uuid) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.move_student_to_class(uuid, uuid) TO authenticated;
+
+-- Students cannot detach themselves from the Customer-controlled class through
+-- a crafted client request. Removal/move is controlled by authorized staff.
+DROP POLICY IF EXISTS "student leaves own membership" ON public.class_members;
 
 CREATE OR REPLACE FUNCTION public.cleanup_deleted_classes()
 RETURNS void
