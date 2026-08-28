@@ -6,9 +6,10 @@ import { Label } from "@/components/ui/label";
 import { StickyNote } from "@/components/StickyNote";
 import { ExternalContentPrivacySettings } from "@/components/privacy/ExternalContentPrivacySettings";
 import { supabase } from "@/integrations/supabase/client";
-import { useTr } from "@/lib/i18n";
+import { useLanguage, useTr } from "@/lib/i18n";
 import { getSuperAdminPreview } from "@/lib/superadmin-preview";
 import { updateDemoProfile } from "@/lib/demo-community";
+import { isStrongPassword, passwordPolicyMessage } from "@/lib/password-policy";
 import type { PrivacyRegion } from "@/lib/external-content-preferences";
 
 /** Own-profile settings shared by the School Admin and Teacher dashboards. */
@@ -22,6 +23,7 @@ export function ProfileSettings({
   email: string | null;
 }) {
   const tr = useTr();
+  const { language } = useLanguage();
   const [name, setName] = useState(displayName ?? "");
   const [mail, setMail] = useState(email ?? "");
   const [password, setPassword] = useState("");
@@ -89,6 +91,10 @@ export function ProfileSettings({
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
+    if (password && !isStrongPassword(password)) {
+      toast.error(passwordPolicyMessage(language));
+      return;
+    }
     setBusy(true);
     try {
       const previewMode = getSuperAdminPreview().mode;
@@ -149,10 +155,12 @@ export function ProfileSettings({
             <Input
               id="set-pass"
               type="password"
+              minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="new-password"
             />
+            <p className="text-xs opacity-65">{passwordPolicyMessage(language)}</p>
           </div>
           <div className="md:col-span-3">
             <Button
