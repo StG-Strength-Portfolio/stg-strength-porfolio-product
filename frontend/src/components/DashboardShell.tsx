@@ -96,12 +96,8 @@ function mergeCommunityLinks(
     { to: `${prefix}/give-strength`, label: labels.give },
     { to: `${prefix}/sprint`, label: labels.sprint },
     { to: `${prefix}/profile`, label: labels.profile },
-    ...(area === "school-admin"
-      ? [
-          { to: `${prefix}/management`, label: labels.management },
-          { to: `${prefix}/trash`, label: labels.trash },
-        ]
-      : []),
+    { to: `${prefix}/management`, label: labels.management },
+    ...(area === "school-admin" ? [{ to: `${prefix}/trash`, label: labels.trash }] : []),
     ...otherLinks,
   ];
 }
@@ -145,7 +141,17 @@ export function DashboardShell({
     sprint: language === "en" ? "Strength Sprint" : language === "sv" ? "Styrkesprint" : "Vahvuussprintti",
     profile: language === "en" ? "Profile" : language === "sv" ? "Profil" : "Profiili",
     management:
-      language === "en" ? "School management" : language === "sv" ? "Skoladministration" : "Koulun hallinta",
+      area === "teacher"
+        ? language === "en"
+          ? "Student management"
+          : language === "sv"
+            ? "Elevhantering"
+            : "Opiskelijoiden hallinta"
+        : language === "en"
+          ? "School management"
+          : language === "sv"
+            ? "Skoladministration"
+            : "Koulun hallinta",
     trash: language === "en" ? "Trash" : language === "sv" ? "Papperskorg" : "Roskakori",
   };
   const effectiveLinks = mergeCommunityLinks(links, area, communityLabels);
