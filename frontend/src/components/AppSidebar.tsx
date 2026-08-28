@@ -8,6 +8,7 @@ import {
   WorldIcon,
   PlayIcon,
   StarIcon,
+  PresentIcon,
 } from "@/components/icons/AppIcons";
 import { toast } from "sonner";
 import {
@@ -30,9 +31,9 @@ import { getSuperAdminPreview } from "@/lib/superadmin-preview";
 import { DEMO_SCHOOL_NAME } from "@/lib/demo-store";
 
 const COMMUNITY_COPY = {
-  fi: { sprint: "Vahvuussprintti", give: "Lähetä vahvuus" },
-  en: { sprint: "Strength Sprint", give: "Give a strength" },
-  sv: { sprint: "Styrkesprint", give: "Ge en styrka" },
+  fi: { sprint: "Vahvuussprintti", give: "Lähetä vahvuus", portfolio: "Minun portfolioni" },
+  en: { sprint: "Strength Sprint", give: "Give a strength", portfolio: "My Portfolio" },
+  sv: { sprint: "Styrkesprint", give: "Ge en styrka", portfolio: "Min portfolio" },
 } as const;
 
 export function AppSidebar() {
@@ -101,6 +102,13 @@ export function AppSidebar() {
                   <Link to="/seikkailu" className="flex items-center gap-2">
                     <MapIcon size={18} />
                     <span>{language === "fi" ? "Lukiolaisen vahvuusportfolio" : t("sidebar.worldmap")}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={path === "/student/portfolio"}>
+                  <Link to="/student/portfolio" className="flex items-center gap-2">
+                    <PresentIcon size={18} /> <span>{communityText.portfolio}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
