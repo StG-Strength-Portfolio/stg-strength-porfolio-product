@@ -63,7 +63,7 @@ type Props = {
 export function ExternalContentPrivacySettings({
   userId,
   schoolId,
-  privacyRegion,
+  privacyRegion: _privacyRegion,
   preview = false,
 }: Props) {
   const { language } = useLanguage();
@@ -73,7 +73,10 @@ export function ExternalContentPrivacySettings({
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  const visible = !preview && privacyRegion === "eu_eea" && !!userId && !!schoolId;
+  // The service-description rule applies to every production school. Region is
+  // retained in the component contract for backwards compatibility, but it no
+  // longer changes whether users can review/withdraw their consent.
+  const visible = !preview && !!userId && !!schoolId;
 
   useEffect(() => {
     let cancelled = false;
