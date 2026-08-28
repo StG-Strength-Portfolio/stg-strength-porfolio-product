@@ -60,6 +60,7 @@ export function iconForRoute(to: string): IconCmp {
   if (to.includes("sprint")) return to.includes("student") ? GamepadIcon : MapIcon;
   if (to.includes("give-strength")) return HeartOrGift;
   if (to.includes("received-strengths")) return GiftIcon;
+  if (to.includes("management")) return PeopleIcon;
   if (to.includes("profile")) return UserIcon;
   if (to.includes("strengths")) return CandyIcon;
   if (to.includes("trash")) return GridIcon;
@@ -71,7 +72,7 @@ const HeartOrGift: IconCmp = GiftIcon;
 function mergeCommunityLinks(
   current: ShellLink[] | undefined,
   area: "teacher" | "school-admin" | null,
-  labels: { give: string; sprint: string; profile: string; trash: string },
+  labels: { give: string; sprint: string; profile: string; management: string; trash: string },
 ): ShellLink[] {
   const base = current ?? [];
   if (!area) return base;
@@ -81,6 +82,7 @@ function mergeCommunityLinks(
     `${prefix}/give-strength`,
     `${prefix}/sprint`,
     `${prefix}/profile`,
+    `${prefix}/management`,
     `${prefix}/trash`,
   ]);
   const backPath = `${prefix}/dashboard`;
@@ -94,7 +96,12 @@ function mergeCommunityLinks(
     { to: `${prefix}/give-strength`, label: labels.give },
     { to: `${prefix}/sprint`, label: labels.sprint },
     { to: `${prefix}/profile`, label: labels.profile },
-    ...(area === "school-admin" ? [{ to: `${prefix}/trash`, label: labels.trash }] : []),
+    ...(area === "school-admin"
+      ? [
+          { to: `${prefix}/management`, label: labels.management },
+          { to: `${prefix}/trash`, label: labels.trash },
+        ]
+      : []),
     ...otherLinks,
   ];
 }
@@ -137,6 +144,8 @@ export function DashboardShell({
     give: language === "en" ? "Give a strength" : language === "sv" ? "Ge en styrka" : "Lähetä vahvuus",
     sprint: language === "en" ? "Strength Sprint" : language === "sv" ? "Styrkesprint" : "Vahvuussprintti",
     profile: language === "en" ? "Profile" : language === "sv" ? "Profil" : "Profiili",
+    management:
+      language === "en" ? "School management" : language === "sv" ? "Skoladministration" : "Koulun hallinta",
     trash: language === "en" ? "Trash" : language === "sv" ? "Papperskorg" : "Roskakori",
   };
   const effectiveLinks = mergeCommunityLinks(links, area, communityLabels);
