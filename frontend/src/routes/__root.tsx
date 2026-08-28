@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
+import { TrialExperience } from "@/components/trial/TrialExperience";
 import { LanguageProvider, useLanguage } from "@/lib/i18n";
 import {
   domainDefaultLanguage,
@@ -200,6 +201,7 @@ function RootComponent() {
       <LanguageProvider>
         <DomainLanguagePreferenceSync />
         <LocalizedDocumentTitle />
+        <TrialExperience />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <Toaster position="top-center" />
