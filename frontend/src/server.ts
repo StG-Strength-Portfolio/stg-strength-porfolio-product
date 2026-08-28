@@ -50,15 +50,22 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
   });
 }
 
-async function runScheduledMonthlyReports(
+async function runScheduledMaintenance(
   controller: ScheduledControllerLike,
   env: unknown,
 ): Promise<void> {
   exposeRuntimeEnv(env);
-  const { runMonthlyReports } = await import("./lib/monthly-report.server");
   const runAt = controller.scheduledTime ? new Date(controller.scheduledTime) : new Date();
-  const result = await runMonthlyReports(runAt);
-  console.log("[monthly-reports]", JSON.stringify(result));
+  const [{ runMonthlyReports }, { purgeExpiredLifecycleData }] = await Promise.all([
+    import("./lib/monthly-report.server"),
+    import("./lib/lifecycle-maintenance.server"),
+  ]);
+
+  const maintenance = await purgeExpiredLifecycleData(runAt);
+  console.log("[lifecycle-maintenance]", JSON.stringify(maintenance));
+
+  const reportResult = await runMonthlyReports(runAt);
+  console.log("[monthly-reports]", JSON.stringify(reportResult));
 }
 
 export default {
@@ -78,8 +85,8 @@ export default {
   },
 
   scheduled(controller: ScheduledControllerLike, env: unknown, ctx: ExecutionContextLike) {
-    const task = runScheduledMonthlyReports(controller, env).catch((error) => {
-      console.error("[monthly-reports] scheduled run failed", error);
+    const task = runScheduledMaintenance(controller, env).catch((error) => {
+      console.error("[scheduled-maintenance] run failed", error);
       throw error;
     });
     if (ctx?.waitUntil) {
