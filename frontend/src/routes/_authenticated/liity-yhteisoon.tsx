@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -15,13 +15,19 @@ export const Route = createFileRoute("/_authenticated/liity-yhteisoon")({
   component: JoinCommunityPage,
 });
 
+const PORTFOLIO_COPY = {
+  fi: "Avaa oma portfolio",
+  en: "Open My Portfolio",
+  sv: "Öppna min portfolio",
+} as const;
+
 function JoinCommunityPage() {
   const navigate = useNavigate();
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [checking, setChecking] = useState(true);
   const t = useT();
-  const { setLanguage } = useLanguage();
+  const { language, setLanguage } = useLanguage();
 
   useEffect(() => {
     getStudentClassMembership().then((m) => {
@@ -49,7 +55,17 @@ function JoinCommunityPage() {
         language?: string;
       };
       if (!result?.ok) {
-        toast.error(t("join.err.notFound"));
+        // A student already assigned to another active class must be moved by
+        // authorized school staff; the database does not permit self-transfer.
+        toast.error(
+          result?.error === "already_in_class"
+            ? language === "fi"
+              ? "Olet jo aktiivisessa luokassa. Pyydä opettajaa tai koulun adminia siirtämään sinut."
+              : language === "sv"
+                ? "Du tillhör redan en aktiv klass. Be en lärare eller skoladministratör att flytta dig."
+                : "You already belong to an active class. Ask a teacher or school administrator to move you."
+            : t("join.err.notFound"),
+        );
         return;
       }
       // The student's class language becomes authoritative after joining.
@@ -114,6 +130,14 @@ function JoinCommunityPage() {
             </Button>
           </form>
           <p className="mt-5 text-xs text-muted-foreground">{t("join.hint")}</p>
+          <div className="mt-4 border-t border-black/10 pt-4 text-center">
+            <Link
+              to="/student/portfolio"
+              className="font-semibold text-[color:var(--purple)] underline underline-offset-2"
+            >
+              {PORTFOLIO_COPY[language]}
+            </Link>
+          </div>
         </StickyNote>
       </div>
     </div>
