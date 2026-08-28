@@ -212,6 +212,7 @@ function TrialPage() {
           email: normalizedEmail,
           password: form.password,
           schoolName: form.schoolName,
+          city: "N/A",
           country: form.country,
           role: form.role,
           language,
