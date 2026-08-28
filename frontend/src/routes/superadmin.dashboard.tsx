@@ -48,7 +48,10 @@ const TABS = [
   "settings",
 ] as const;
 type Tab = (typeof TABS)[number];
-type SchoolListRow = SchoolRow & { deleted_at?: string | null };
+type SchoolListRow = SchoolRow & {
+  deleted_at?: string | null;
+  account_kind?: "paid" | "trial" | string | null;
+};
 
 export const Route = createFileRoute("/superadmin/dashboard")({
   validateSearch: z.object({ tab: z.enum(TABS).optional() }).parse,
@@ -100,6 +103,10 @@ function SuperAdminDashboard() {
   const deletedLabel = language === "en" ? "Deleted" : language === "sv" ? "Raderad" : "Poistettu";
   const daysLabel = language === "en" ? "days to restore" : language === "sv" ? "dagar att återställa" : "päivää palautusaikaa";
   const noMatchesLabel = language === "en" ? "No matching schools." : language === "sv" ? "Inga matchande skolor." : "Ei hakua vastaavia kouluja.";
+  const paidSchoolsLabel =
+    language === "en" ? "Paid Schools" : language === "sv" ? "Betalda skolor" : "Maksulliset koulut";
+  const freeTrialsLabel =
+    language === "en" ? "Free Trials" : language === "sv" ? "Gratis provperioder" : "Maksuttomat kokeilut";
   const navigate = useNavigate();
   const ready = useSuperAdminGuard();
   const tab: Tab = Route.useSearch().tab ?? "schools";
@@ -230,14 +237,15 @@ function SuperAdminDashboard() {
     return Math.max(0, Math.ceil((deadline - Date.now()) / 86400000));
   }
 
+  const paidSchools = schools.filter((s) => s.account_kind !== "trial");
   const query = search.trim().toLowerCase();
-  const filteredSchools = schools.filter((s) => {
+  const filteredSchools = paidSchools.filter((s) => {
     const isDeleted = !!s.deleted_at;
     if (isDeleted !== showDeleted) return false;
     if (!query) return true;
     return [s.name, staffCodes[s.id] ?? "", ...s.adminNames].join(" ").toLowerCase().includes(query);
   });
-  const activeSchools = schools.filter((s) => !s.deleted_at);
+  const activeSchools = paidSchools.filter((s) => !s.deleted_at);
   const totalTeachers = activeSchools.reduce((a, s) => a + s.teacherCount, 0);
   const totalStudents = activeSchools.reduce((a, s) => a + s.studentCount, 0);
   const expired = activeSchools.filter((s) => !s.is_active);
@@ -249,7 +257,24 @@ function SuperAdminDashboard() {
         <aside className="hidden w-52 shrink-0 md:block">
           <p className="mb-3 text-sm font-bold opacity-70">{tr("Ylläpito")}</p>
           <nav className="space-y-1">
-            {TABS.map((tb) => (
+            <Link
+              to="/superadmin/dashboard"
+              search={{ tab: "schools" }}
+              className={`block rounded-full px-4 py-2 text-sm font-semibold ${
+                tab === "schools"
+                  ? "bg-[color:var(--purple)] text-white"
+                  : "hover:bg-black/5 text-foreground"
+              }`}
+            >
+              {paidSchoolsLabel}
+            </Link>
+            <Link
+              to="/superadmin/free-trials"
+              className="block rounded-full px-4 py-2 text-sm font-semibold text-foreground hover:bg-black/5"
+            >
+              {freeTrialsLabel}
+            </Link>
+            {TABS.filter((tb) => tb !== "schools").map((tb) => (
               <Link
                 key={tb}
                 to="/superadmin/dashboard"
@@ -261,21 +286,19 @@ function SuperAdminDashboard() {
                 }`}
               >
                 {tr(
-                  tb === "schools"
-                    ? "Koulut"
-                    : tb === "billing"
-                      ? "Laskutus"
-                      : tb === "users"
-                        ? "Käyttäjät"
-                        : tb === "admins"
-                          ? "Ylläpitäjät"
-                          : tb === "emails"
-                            ? "Sähköpostit"
-                            : tb === "materials"
-                              ? "Opetusmateriaalit"
-                              : tb === "reports"
-                                ? "Raportit"
-                                : "Asetukset",
+                  tb === "billing"
+                    ? "Laskutus"
+                    : tb === "users"
+                      ? "Käyttäjät"
+                      : tb === "admins"
+                        ? "Ylläpitäjät"
+                        : tb === "emails"
+                          ? "Sähköpostit"
+                          : tb === "materials"
+                            ? "Opetusmateriaalit"
+                            : tb === "reports"
+                              ? "Raportit"
+                              : "Asetukset",
                 )}
               </Link>
             ))}
@@ -371,7 +394,7 @@ function SuperAdminDashboard() {
                     onClick={() => setShowDeleted((v) => !v)}
                   >
                     <Trash2 className="mr-1 h-4 w-4" />
-                    {trashLabel} ({schools.filter((s) => !!s.deleted_at).length})
+                    {trashLabel} ({paidSchools.filter((s) => !!s.deleted_at).length})
                   </Button>
                 </div>
 
