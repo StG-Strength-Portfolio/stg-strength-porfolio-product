@@ -63,9 +63,9 @@ export function TrialAccessPolicy() {
 
   if (policy.isTrialUser && !policy.authorizationConfirmed) {
     return (
-      <div className="fixed bottom-4 left-1/2 z-[85] w-[min(94vw,42rem)] -translate-x-1/2 rounded-3xl bg-white p-4 shadow-2xl">
-        <h2 className="font-bold">{text.authTitle}</h2>
-        <label className="mt-2 flex items-start gap-2 text-sm"><input className="mt-1" type="checkbox" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} /><span>{text.authBody}</span></label>
+      <div className="fixed bottom-4 left-1/2 z-[85] w-[min(94vw,42rem)] -translate-x-1/2 rounded-3xl bg-white p-4 text-black shadow-2xl">
+        <h2 className="font-bold text-black">{text.authTitle}</h2>
+        <label className="mt-2 flex items-start gap-2 text-sm text-black"><input className="mt-1" type="checkbox" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} /><span className="text-black">{text.authBody}</span></label>
         <Button disabled={!confirmed} className="mt-3 rounded-full bg-[color:var(--purple)] text-white" onClick={() => void confirm({}).then(() => setPolicy((current: any) => ({ ...current, authorizationConfirmed: true })))}>{text.confirm}</Button>
       </div>
     );
