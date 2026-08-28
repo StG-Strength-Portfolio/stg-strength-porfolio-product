@@ -28,15 +28,8 @@ CREATE INDEX IF NOT EXISTS monthly_report_deliveries_school_month_idx
 ALTER TABLE public.monthly_report_deliveries ENABLE ROW LEVEL SECURITY;
 GRANT ALL ON public.monthly_report_deliveries TO service_role;
 
--- Users may read and change only their own monthly-report preference. The
--- delivery ledger itself stays service-role-only and contains no student data.
-DROP POLICY IF EXISTS "users read own monthly report preference" ON public.profiles;
-CREATE POLICY "users read own monthly report preference"
-  ON public.profiles FOR SELECT TO authenticated
-  USING (id = auth.uid() OR public.is_teacher_of(id));
-
--- Existing profile update policies remain authoritative for general profile
--- fields. This RPC changes only the report preference to avoid broadening them.
+-- Existing profile RLS remains unchanged. This narrowly scoped RPC changes only
+-- the signed-in staff member's report preference.
 CREATE OR REPLACE FUNCTION public.set_my_monthly_report_opt_out(p_opt_out boolean)
 RETURNS boolean
 LANGUAGE plpgsql
