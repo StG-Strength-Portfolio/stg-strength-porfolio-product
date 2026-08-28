@@ -1,8 +1,11 @@
-# Monthly Strength Portfolio reports
+# Monthly Strength Portfolio reports and lifecycle maintenance
 
 The application includes a Cloudflare scheduled handler in `src/server.ts`.
-It sends the previous calendar month's aggregate report to active Teachers and
-School Admins who have not opted out.
+It performs two server-side maintenance tasks:
+
+1. permanently purges users/classes whose 90-day restore period has expired;
+2. sends the previous calendar month's aggregate report to active Teachers and
+   School Admins who have not opted out when the monthly send window is reached.
 
 ## Required runtime bindings
 
@@ -33,19 +36,25 @@ student response/reflection text, or portfolio content to Resend.
 Pedagogical guidance/tips should be authored and maintained directly in the
 published Resend template.
 
-## Schedule
+## Cloudflare Cron Triggers
 
-Configure the Cloudflare Worker Cron Trigger to invoke the scheduled handler
-once per hour on the third day of each month:
+Configure two Worker Cron Triggers:
 
 ```text
+15 2 * * *
 0 * 3 * *
 ```
 
-Cloudflare cron expressions use UTC. The scheduled handler performs a second
-check using `Europe/Helsinki` and sends only when local time is 08:00 on day 3.
-This keeps the delivery time at 08:00 Finland time through daylight-saving
-changes while harmlessly skipping the other hourly invocations.
+`15 2 * * *` runs lifecycle cleanup daily. The reporting function sees that it
+is outside its monthly delivery window and returns without sending email.
+
+`0 * 3 * *` invokes the scheduled handler once per hour on the third day of each
+month. Cloudflare cron expressions use UTC; the reporting function performs a
+second check using `Europe/Helsinki` and sends only when local time is 08:00 on
+day 3. This keeps delivery at 08:00 Finland time through daylight-saving changes.
+
+The lifecycle purge is safe to run again during these hourly day-3 invocations;
+already-purged records are absent and therefore no-op.
 
 ## Reporting period and retry behavior
 
@@ -63,3 +72,11 @@ changes while harmlessly skipping the other hourly invocations.
 Teacher and School Admin Profile settings include a monthly-report checkbox.
 The preference is stored in `profiles.monthly_report_opt_out`; opt-out users are
 excluded before any Resend request is made.
+
+## 90-day lifecycle purge
+
+The scheduled maintenance job reads profiles whose `deleted_at` timestamp is
+older than 90 days and permanently removes the corresponding Supabase Auth user
+through the server-side Admin API. Cascading product data is removed with the
+identity. It also calls `cleanup_deleted_classes()` for classes whose restore
+period has expired.
