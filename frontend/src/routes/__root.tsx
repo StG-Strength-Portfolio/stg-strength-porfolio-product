@@ -10,6 +10,8 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
+import { TrialExperience } from "@/components/trial/TrialExperience";
+import { TrialAccessPolicy } from "@/components/trial/TrialAccessPolicy";
 import { LanguageProvider, useLanguage } from "@/lib/i18n";
 import {
   domainDefaultLanguage,
@@ -157,14 +159,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-      {
-        rel: "stylesheet",
-        href: schoolAdminMetricsCss,
-      },
+      { rel: "stylesheet", href: appCss },
+      { rel: "stylesheet", href: schoolAdminMetricsCss },
     ],
   }),
   shellComponent: RootShell,
@@ -176,13 +172,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
+      <head><HeadContent /></head>
+      <body>{children}<Scripts /></body>
     </html>
   );
 }
@@ -190,16 +181,15 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   applyHostnameLanguageDefault();
-
-  useEffect(() => {
-    void ensureAgeoFont();
-  }, []);
+  useEffect(() => { void ensureAgeoFont(); }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
         <DomainLanguagePreferenceSync />
         <LocalizedDocumentTitle />
+        <TrialExperience />
+        <TrialAccessPolicy />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <Toaster position="top-center" />
