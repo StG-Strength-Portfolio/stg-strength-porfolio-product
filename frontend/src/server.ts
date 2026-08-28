@@ -3,6 +3,13 @@ import "./lib/error-capture";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 
+type RuntimeEnv = Record<string, string | undefined>;
+type ExecutionContextLike = {
+  waitUntil?: (promise: Promise<unknown>) => void;
+};
+type ScheduledControllerLike = {
+  scheduledTime?: number;
+};
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
 };
@@ -16,6 +23,12 @@ async function getServerEntry(): Promise<ServerEntry> {
     );
   }
   return serverEntryPromise;
+}
+
+function exposeRuntimeEnv(env: unknown) {
+  if (env && typeof env === "object") {
+    (globalThis as { __env__?: RuntimeEnv }).__env__ = env as RuntimeEnv;
+  }
 }
 
 // h3 swallows in-handler throws into a normal 500 Response with body
@@ -37,8 +50,20 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
   });
 }
 
+async function runScheduledMonthlyReports(
+  controller: ScheduledControllerLike,
+  env: unknown,
+): Promise<void> {
+  exposeRuntimeEnv(env);
+  const { runMonthlyReports } = await import("./lib/monthly-report.server");
+  const runAt = controller.scheduledTime ? new Date(controller.scheduledTime) : new Date();
+  const result = await runMonthlyReports(runAt);
+  console.log("[monthly-reports]", JSON.stringify(result));
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    exposeRuntimeEnv(env);
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
@@ -50,5 +75,17 @@ export default {
         headers: { "content-type": "text/html; charset=utf-8" },
       });
     }
+  },
+
+  scheduled(controller: ScheduledControllerLike, env: unknown, ctx: ExecutionContextLike) {
+    const task = runScheduledMonthlyReports(controller, env).catch((error) => {
+      console.error("[monthly-reports] scheduled run failed", error);
+      throw error;
+    });
+    if (ctx?.waitUntil) {
+      ctx.waitUntil(task);
+      return;
+    }
+    return task;
   },
 };
