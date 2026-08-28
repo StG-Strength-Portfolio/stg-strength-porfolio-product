@@ -9,6 +9,7 @@ import { StickyNote } from "@/components/StickyNote";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
 import { toast } from "sonner";
 import { useT, useLanguage, isLanguage } from "@/lib/i18n";
+import { isStrongPassword, passwordPolicyMessage } from "@/lib/password-policy";
 
 export const Route = createFileRoute("/auth/student")({
   component: StudentSignup,
@@ -105,8 +106,8 @@ function StudentSignup() {
       toast.error(t("auth.student.err.emailInvalid"));
       return;
     }
-    if (password.length < 8) {
-      toast.error(t("auth.student.err.passwordShort"));
+    if (!isStrongPassword(password)) {
+      toast.error(passwordPolicyMessage(language));
       return;
     }
     if (!name) {
@@ -235,12 +236,13 @@ function StudentSignup() {
                 id="password"
                 type="password"
                 required
+                minLength={8}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={t("auth.student.passwordPh")}
                 autoComplete="new-password"
               />
-              <p className="text-sm text-muted-foreground">{t("auth.student.passwordHint")}</p>
+              <p className="text-sm text-muted-foreground">{passwordPolicyMessage(language)}</p>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="displayName">{t("auth.student.nameLabel")}</Label>
