@@ -9,6 +9,7 @@ import { StickyNote } from "@/components/StickyNote";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
 import { toast } from "sonner";
 import { useLanguage } from "@/lib/i18n";
+import { isStrongPassword, passwordPolicyMessage } from "@/lib/password-policy";
 import { z } from "zod";
 
 const RECOVERY_WAIT_MS = 4000;
@@ -25,7 +26,6 @@ const RESET_COPY = {
     confirmPassword: "Vahvista salasana",
     save: "Tallenna",
     saving: "Tallennetaan…",
-    passwordShort: "Salasanan tulee olla vähintään 6 merkkiä.",
     passwordMismatch: "Salasanat eivät täsmää.",
     genericError: "Salasanan vaihtaminen epäonnistui. Yritä uudelleen.",
     browserTitle: "Salasanan palautus — Vahvuusportfolio",
@@ -42,7 +42,6 @@ const RESET_COPY = {
     confirmPassword: "Confirm password",
     save: "Save",
     saving: "Saving…",
-    passwordShort: "Password must be at least 6 characters.",
     passwordMismatch: "Passwords do not match.",
     genericError: "The password could not be changed. Please try again.",
     browserTitle: "Password Reset — Strength Portfolio",
@@ -59,7 +58,6 @@ const RESET_COPY = {
     confirmPassword: "Bekräfta lösenord",
     save: "Spara",
     saving: "Sparar…",
-    passwordShort: "Lösenordet måste innehålla minst 6 tecken.",
     passwordMismatch: "Lösenorden matchar inte.",
     genericError: "Lösenordet kunde inte ändras. Försök igen.",
     browserTitle: "Återställ lösenord — Styrkeportfolio",
@@ -165,8 +163,8 @@ function ResetPasswordPage() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (password.length < 6) {
-      toast.error(copy.passwordShort);
+    if (!isStrongPassword(password)) {
+      toast.error(passwordPolicyMessage(language));
       return;
     }
     if (password !== confirm) {
@@ -182,7 +180,7 @@ function ResetPasswordPage() {
           setSessionState("invalid");
           toast.error(copy.invalid);
         } else if (m.includes("weak") || m.includes("password") || m.includes("short")) {
-          toast.error(copy.passwordShort);
+          toast.error(passwordPolicyMessage(language));
         } else {
           toast.error(copy.genericError);
         }
@@ -235,12 +233,13 @@ function ResetPasswordPage() {
                   id="new-password"
                   type="password"
                   required
-                  minLength={6}
+                  minLength={8}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="new-password"
                   autoFocus
                 />
+                <p className="text-xs opacity-65">{passwordPolicyMessage(language)}</p>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="confirm-password">{copy.confirmPassword}</Label>
@@ -248,7 +247,7 @@ function ResetPasswordPage() {
                   id="confirm-password"
                   type="password"
                   required
-                  minLength={6}
+                  minLength={8}
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                   autoComplete="new-password"
