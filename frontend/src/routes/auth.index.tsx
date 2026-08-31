@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
 import { useLanguage, useT } from "@/lib/i18n";
 import { homeForRole, roleOfCurrentUser } from "@/lib/role-guard";
+import { isSsoAuthorityOrigin } from "@/lib/cross-domain-auth";
+import { checkAuthoritySilently } from "@/lib/central-sso-client";
 import { z } from "zod";
 
 export const Route = createFileRoute("/auth/")({
@@ -51,6 +53,15 @@ function AuthLanding() {
       if (data.session) {
         window.location.replace(homeForRole(await roleOfCurrentUser()));
         return;
+      }
+
+      if (!isSsoAuthorityOrigin(window.location.origin)) {
+        const transferred = await checkAuthoritySilently();
+        if (cancelled) return;
+        if (transferred) {
+          window.location.replace(homeForRole(await roleOfCurrentUser()));
+          return;
+        }
       }
 
       setResolving(false);
