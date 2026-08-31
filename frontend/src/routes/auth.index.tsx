@@ -7,12 +7,8 @@ import { Button } from "@/components/ui/button";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
 import { useLanguage, useT } from "@/lib/i18n";
 import { homeForRole, roleOfCurrentUser } from "@/lib/role-guard";
-import { hasRecentAuthorityMiss, isSsoAuthorityOrigin } from "@/lib/cross-domain-auth";
-import {
-  seedAuthorityAndContinue,
-  startAuthorityCheck,
-  startLegacyAuthorityDiscovery,
-} from "@/lib/central-sso-client";
+import { isSsoAuthorityOrigin } from "@/lib/cross-domain-auth";
+import { checkAuthoritySilently } from "@/lib/central-sso-client";
 import { z } from "zod";
 
 export const Route = createFileRoute("/auth/")({
@@ -55,26 +51,20 @@ function AuthLanding() {
       if (cancelled) return;
 
       if (data.session) {
-        const home = homeForRole(await roleOfCurrentUser());
-        if (!isSsoAuthorityOrigin(window.location.origin)) {
-          const seeding = await seedAuthorityAndContinue(data.session, home);
-          if (seeding || cancelled) return;
+        window.location.replace(homeForRole(await roleOfCurrentUser()));
+        return;
+      }
+
+      if (!isSsoAuthorityOrigin(window.location.origin)) {
+        const transferred = await checkAuthoritySilently();
+        if (cancelled) return;
+        if (transferred) {
+          window.location.replace(homeForRole(await roleOfCurrentUser()));
+          return;
         }
-        window.location.replace(home);
-        return;
       }
 
-      if (hasRecentAuthorityMiss()) {
-        setResolving(false);
-        return;
-      }
-
-      if (isSsoAuthorityOrigin(window.location.origin)) {
-        if (!startLegacyAuthorityDiscovery("auth")) setResolving(false);
-        return;
-      }
-
-      if (!startAuthorityCheck("auth")) setResolving(false);
+      setResolving(false);
     }
 
     void resolveAuth();

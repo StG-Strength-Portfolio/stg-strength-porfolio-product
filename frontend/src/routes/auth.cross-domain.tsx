@@ -19,6 +19,17 @@ import {
 } from "@/lib/cross-domain-auth";
 import { postSsoMessage } from "@/lib/central-sso-client";
 
+const SILENT_SSO_CHANNEL = "strength-portfolio-silent-sso-v1";
+
+type SilentBridgeMessage =
+  | { channel: typeof SILENT_SSO_CHANNEL; action: "check"; targetOrigin: string }
+  | {
+      channel: typeof SILENT_SSO_CHANNEL;
+      action: "seed";
+      tokenHash: string;
+      verificationType: SsoVerificationType;
+    };
+
 function isDomainCode(value: unknown): value is PortfolioDomainCode {
   return value === "en" || value === "fi" || value === "sv";
 }
@@ -29,6 +40,27 @@ function isReturnCode(value: unknown): value is SsoReturnCode {
 
 function isVerificationType(value: unknown): value is SsoVerificationType {
   return value === "email" || value === "magiclink";
+}
+
+function isSilentBridgeMessage(value: unknown): value is SilentBridgeMessage {
+  if (!value || typeof value !== "object") return false;
+  const message = value as Record<string, unknown>;
+  if (message.channel !== SILENT_SSO_CHANNEL || typeof message.action !== "string") return false;
+
+  if (message.action === "check") {
+    return typeof message.targetOrigin === "string";
+  }
+
+  if (message.action === "seed") {
+    return (
+      typeof message.tokenHash === "string" &&
+      message.tokenHash.length > 0 &&
+      message.tokenHash.length < 1000 &&
+      isVerificationType(message.verificationType)
+    );
+  }
+
+  return false;
 }
 
 function parsePostedMessage(raw: string): SsoMessage | null {
@@ -137,7 +169,10 @@ export const Route = createFileRoute("/auth/cross-domain")({
         }
 
         const contentType = request.headers.get("content-type") ?? "";
-        if (!contentType.includes("application/x-www-form-urlencoded") && !contentType.includes("multipart/form-data")) {
+        if (
+          !contentType.includes("application/x-www-form-urlencoded") &&
+          !contentType.includes("multipart/form-data")
+        ) {
           return new Response("Bad Request", { status: 400 });
         }
         const form = await request.formData();
@@ -155,30 +190,97 @@ function CrossDomainAuthBridge() {
   useEffect(() => {
     let cancelled = false;
 
-    async function createHandoff(targetOrigin: string, returnCode: SsoReturnCode) {
+    async function buildHandoff(targetOrigin: string) {
       const { data, error } = await supabase.functions.invoke("cross-domain-session", {
         body: { targetOrigin },
       });
-      if (cancelled) return false;
+      if (cancelled) return null;
 
       const tokenHash = typeof data?.tokenHash === "string" ? data.tokenHash : "";
-      const verificationType =
+      const verificationType: SsoVerificationType =
         data?.verificationType === "magiclink" || data?.verificationType === "email"
           ? data.verificationType
           : "email";
 
       if (error || !tokenHash) {
         console.warn("[central-sso] Could not create handoff", error ?? data);
-        return false;
+        return null;
       }
+
+      return { tokenHash, verificationType };
+    }
+
+    async function createHandoff(targetOrigin: string, returnCode: SsoReturnCode) {
+      const payload = await buildHandoff(targetOrigin);
+      if (!payload || cancelled) return false;
 
       postSsoMessage(targetOrigin, {
         action: "receive",
-        tokenHash,
-        verificationType,
+        tokenHash: payload.tokenHash,
+        verificationType: payload.verificationType,
         returnCode,
       });
       return true;
+    }
+
+    if (window.self !== window.top && isSsoAuthorityOrigin(window.location.origin)) {
+      const onSilentMessage = async (event: MessageEvent) => {
+        if (!isStrengthPortfolioOrigin(event.origin) || !isSilentBridgeMessage(event.data)) return;
+        const source = event.source as WindowProxy | null;
+        if (!source) return;
+
+        if (event.data.action === "check") {
+          if (event.data.targetOrigin !== event.origin) return;
+
+          const { data: current } = await supabase.auth.getSession();
+          if (cancelled) return;
+          if (!current.session) {
+            source.postMessage({ channel: SILENT_SSO_CHANNEL, action: "miss" }, event.origin);
+            return;
+          }
+
+          const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
+          if (cancelled) return;
+          if (refreshError || !refreshed.session) {
+            await supabase.auth.signOut({ scope: "local" }).catch(() => undefined);
+            source.postMessage({ channel: SILENT_SSO_CHANNEL, action: "miss" }, event.origin);
+            return;
+          }
+
+          const payload = await buildHandoff(event.origin);
+          if (!payload || cancelled) {
+            source.postMessage({ channel: SILENT_SSO_CHANNEL, action: "miss" }, event.origin);
+            return;
+          }
+
+          source.postMessage(
+            {
+              channel: SILENT_SSO_CHANNEL,
+              action: "handoff",
+              tokenHash: payload.tokenHash,
+              verificationType: payload.verificationType,
+            },
+            event.origin,
+          );
+          return;
+        }
+
+        const { error } = await supabase.auth.verifyOtp({
+          token_hash: event.data.tokenHash,
+          type: event.data.verificationType,
+        });
+        if (cancelled) return;
+        source.postMessage(
+          { channel: SILENT_SSO_CHANNEL, action: "seed-result", ok: !error },
+          event.origin,
+        );
+      };
+
+      window.addEventListener("message", onSilentMessage);
+      return () => {
+        cancelled = true;
+        window.removeEventListener("message", onSilentMessage);
+      };
     }
 
     async function run() {
