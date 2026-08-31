@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
 import { CornerBlobs } from "@/components/CornerBlobs";
@@ -11,6 +10,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/lib/i18n";
+import {
+  domainDefaultLanguage,
+  readDomainLanguagePreference,
+} from "@/lib/domain-language";
 import { registerFreeTrial } from "@/lib/free-trial.functions";
 
 export const Route = createFileRoute("/trial")({ component: TrialPage });
@@ -46,14 +49,6 @@ const COUNTRY_CODES = [
 
 const copy = {
   en: {
-    eyebrow: "Strength Portfolio for schools",
-    title: "Try Strength Portfolio free for 30 days",
-    subtitle: "Explore the full platform with your school, create classes and invite students using the same classroom flow as a paid school.",
-    promise: "Free for 30 days · No credit card required",
-    start: "Start free trial",
-    benefit1: "Full Strength Portfolio platform",
-    benefit2: "Create classes and invite students",
-    benefit3: "For teachers and school leaders",
     formTitle: "Create your school trial",
     name: "Full name",
     email: "Work email",
@@ -81,14 +76,6 @@ const copy = {
     required: "Complete all required fields.",
   },
   fi: {
-    eyebrow: "Vahvuusportfolio kouluille",
-    title: "Kokeile Vahvuusportfoliota maksutta 30 päivää",
-    subtitle: "Tutustu koko palveluun koulusi kanssa, luo luokkia ja kutsu opiskelijoita samalla tavalla kuin maksullisessa koulutilissä.",
-    promise: "30 päivää maksutta · Ei luottokorttia",
-    start: "Aloita maksuton kokeilu",
-    benefit1: "Koko Vahvuusportfolio käytössä",
-    benefit2: "Luo luokkia ja kutsu opiskelijoita",
-    benefit3: "Opettajille ja koulun johdolle",
     formTitle: "Luo koulusi kokeilujakso",
     name: "Koko nimi",
     email: "Työsähköposti",
@@ -116,14 +103,6 @@ const copy = {
     required: "Täytä kaikki pakolliset kentät.",
   },
   sv: {
-    eyebrow: "Styrkeportfolio för skolor",
-    title: "Prova Styrkeportfolio gratis i 30 dagar",
-    subtitle: "Utforska hela plattformen med din skola, skapa klasser och bjud in elever med samma flöde som i en betald skollicens.",
-    promise: "Gratis i 30 dagar · Inget kreditkort krävs",
-    start: "Starta gratis provperiod",
-    benefit1: "Hela Styrkeportfolio-plattformen",
-    benefit2: "Skapa klasser och bjud in elever",
-    benefit3: "För lärare och skolledare",
     formTitle: "Skapa skolans provperiod",
     name: "Fullständigt namn",
     email: "Arbets-e-post",
@@ -153,10 +132,9 @@ const copy = {
 } as const;
 
 function TrialPage() {
-  const { language } = useLanguage();
+  const { language, setLanguage } = useLanguage();
   const text = copy[language];
   const register = useServerFn(registerFreeTrial);
-  const [showForm, setShowForm] = useState(false);
   const [busy, setBusy] = useState(false);
   const [sentTo, setSentTo] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -178,6 +156,16 @@ function TrialPage() {
     [],
   );
   const referralCode = params.get("ref")?.trim().toUpperCase() || undefined;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (readDomainLanguagePreference()) return;
+
+    const defaultLanguage = domainDefaultLanguage(window.location.hostname);
+    if (defaultLanguage && defaultLanguage !== language) {
+      setLanguage(defaultLanguage);
+    }
+  }, [language, setLanguage]);
 
   const countryOptions = useMemo(() => {
     const displayNames = new Intl.DisplayNames([language], { type: "region" });
@@ -285,154 +273,119 @@ function TrialPage() {
       <CornerBlobs />
       <AuthLanguageSwitcher />
       <main className="relative z-10 mx-auto max-w-6xl">
-        {!showForm ? (
-          <div className="grid min-h-[78vh] items-center gap-10 lg:grid-cols-[1.15fr_.85fr]">
-            <section>
-              <p className="font-bold uppercase tracking-[.18em] text-[color:var(--purple)]">
-                {text.eyebrow}
-              </p>
-              <h1 className="mt-4 max-w-4xl text-5xl font-bold leading-tight md:text-6xl">
-                {text.title}
-              </h1>
-              <p className="mt-5 max-w-2xl text-lg opacity-80">{text.subtitle}</p>
-              <p className="mt-5 font-bold">{text.promise}</p>
-              <Button
-                onClick={() => setShowForm(true)}
-                className="mt-7 h-auto rounded-full bg-[color:var(--coral)] px-8 py-5 text-base font-bold text-white hover:bg-[color:var(--coral)]/90"
-              >
-                {text.start}
-              </Button>
-            </section>
-            <StickyNote seed="trial-benefits" className="space-y-5">
-              {[text.benefit1, text.benefit2, text.benefit3].map((item) => (
-                <div key={item} className="flex items-start gap-3">
-                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[color:var(--purple)]" />
-                  <span className="font-semibold">{item}</span>
-                </div>
-              ))}
+        <div className="mx-auto max-w-2xl py-10">
+          <h1 className="mb-6 text-center text-4xl font-bold">{text.formTitle}</h1>
+          <StickyNote seed="trial-register-form">
+            <form onSubmit={submit} className="grid gap-4 md:grid-cols-2">
+              <Field label={text.name}>
+                <Input
+                  required
+                  autoComplete="name"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                />
+              </Field>
+              <Field label={text.email}>
+                <Input
+                  required
+                  type="email"
+                  autoComplete="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                />
+              </Field>
+              <Field label={text.password}>
+                <Input
+                  required
+                  minLength={8}
+                  type="password"
+                  autoComplete="new-password"
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                />
+                <p className="mt-1 text-xs opacity-65">{text.passwordHint}</p>
+              </Field>
+              <Field label={text.role}>
+                <select
+                  value={form.role}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      role: e.target.value as "teacher" | "school_admin",
+                    })
+                  }
+                  className="h-10 w-full rounded-md border border-[#D7D3E2] bg-white px-3 text-sm text-[#2B2342]"
+                >
+                  <option value="teacher">{text.teacher}</option>
+                  <option value="school_admin">{text.admin}</option>
+                </select>
+              </Field>
+              <Field label={text.school}>
+                <Input
+                  required
+                  value={form.schoolName}
+                  onChange={(e) => setForm({ ...form, schoolName: e.target.value })}
+                />
+              </Field>
+              <Field label={text.country}>
+                <select
+                  required
+                  value={form.country}
+                  onChange={(e) => setForm({ ...form, country: e.target.value })}
+                  className="h-10 w-full rounded-md border border-[#D7D3E2] bg-white px-3 text-sm text-[#2B2342]"
+                >
+                  <option value="" disabled>
+                    {text.chooseCountry}
+                  </option>
+                  <optgroup label={text.priorityCountries}>
+                    {countryOptions.priority.map((country) => (
+                      <option key={country.code} value={country.code}>
+                        {country.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label={text.allCountries}>
+                    {countryOptions.rest.map((country) => (
+                      <option key={country.code} value={country.code}>
+                        {country.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                </select>
+              </Field>
               {referralCode && (
-                <div className="rounded-2xl bg-black/5 p-4 text-sm">
-                  <strong>Referral:</strong> <code>{referralCode}</code> · +30 days after verified
-                  activation.
-                </div>
+                <Field label="Referral code">
+                  <Input readOnly value={referralCode} className="font-mono" />
+                </Field>
               )}
-            </StickyNote>
-          </div>
-        ) : (
-          <div className="mx-auto max-w-2xl py-10">
-            <h1 className="mb-6 text-center text-4xl font-bold">{text.formTitle}</h1>
-            <StickyNote seed="trial-register-form">
-              <form onSubmit={submit} className="grid gap-4 md:grid-cols-2">
-                <Field label={text.name}>
-                  <Input
-                    required
-                    autoComplete="name"
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  />
-                </Field>
-                <Field label={text.email}>
-                  <Input
-                    required
-                    type="email"
-                    autoComplete="email"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  />
-                </Field>
-                <Field label={text.password}>
-                  <Input
-                    required
-                    minLength={8}
-                    type="password"
-                    autoComplete="new-password"
-                    value={form.password}
-                    onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  />
-                  <p className="mt-1 text-xs opacity-65">{text.passwordHint}</p>
-                </Field>
-                <Field label={text.role}>
-                  <select
-                    value={form.role}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        role: e.target.value as "teacher" | "school_admin",
-                      })
-                    }
-                    className="h-10 w-full rounded-md border border-[#D7D3E2] bg-white px-3 text-sm text-[#2B2342]"
-                  >
-                    <option value="teacher">{text.teacher}</option>
-                    <option value="school_admin">{text.admin}</option>
-                  </select>
-                </Field>
-                <Field label={text.school}>
-                  <Input
-                    required
-                    value={form.schoolName}
-                    onChange={(e) => setForm({ ...form, schoolName: e.target.value })}
-                  />
-                </Field>
-                <Field label={text.country}>
-                  <select
-                    required
-                    value={form.country}
-                    onChange={(e) => setForm({ ...form, country: e.target.value })}
-                    className="h-10 w-full rounded-md border border-[#D7D3E2] bg-white px-3 text-sm text-[#2B2342]"
-                  >
-                    <option value="" disabled>
-                      {text.chooseCountry}
-                    </option>
-                    <optgroup label={text.priorityCountries}>
-                      {countryOptions.priority.map((country) => (
-                        <option key={country.code} value={country.code}>
-                          {country.name}
-                        </option>
-                      ))}
-                    </optgroup>
-                    <optgroup label={text.allCountries}>
-                      {countryOptions.rest.map((country) => (
-                        <option key={country.code} value={country.code}>
-                          {country.name}
-                        </option>
-                      ))}
-                    </optgroup>
-                  </select>
-                </Field>
-                {referralCode && (
-                  <Field label="Referral code">
-                    <Input readOnly value={referralCode} className="font-mono" />
-                  </Field>
-                )}
-                <div className="space-y-3 md:col-span-2">
-                  <Check
-                    label={text.terms}
-                    checked={form.terms}
-                    onChange={(checked) => setForm({ ...form, terms: checked })}
-                  />
-                  <Check
-                    label={text.privacy}
-                    checked={form.privacy}
-                    onChange={(checked) => setForm({ ...form, privacy: checked })}
-                  />
-                  <Check
-                    label={text.marketing}
-                    checked={form.marketing}
-                    onChange={(checked) => setForm({ ...form, marketing: checked })}
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <Button
-                    disabled={busy}
-                    className="h-auto w-full rounded-full bg-[color:var(--coral)] py-5 font-bold text-white hover:bg-[color:var(--coral)]/90"
-                  >
-                    {busy ? text.busy : text.submit}
-                  </Button>
-                </div>
-              </form>
-            </StickyNote>
-          </div>
-        )}
+              <div className="space-y-3 md:col-span-2">
+                <Check
+                  label={text.terms}
+                  checked={form.terms}
+                  onChange={(checked) => setForm({ ...form, terms: checked })}
+                />
+                <Check
+                  label={text.privacy}
+                  checked={form.privacy}
+                  onChange={(checked) => setForm({ ...form, privacy: checked })}
+                />
+                <Check
+                  label={text.marketing}
+                  checked={form.marketing}
+                  onChange={(checked) => setForm({ ...form, marketing: checked })}
+                />
+              </div>
+              <div className="md:col-span-2">
+                <Button
+                  disabled={busy}
+                  className="h-auto w-full rounded-full bg-[color:var(--coral)] py-5 font-bold text-white hover:bg-[color:var(--coral)]/90"
+                >
+                  {busy ? text.busy : text.submit}
+                </Button>
+              </div>
+            </form>
+          </StickyNote>
+        </div>
       </main>
     </div>
   );
