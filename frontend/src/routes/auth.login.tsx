@@ -11,12 +11,6 @@ import { ForgotPasswordDialog } from "@/components/ForgotPasswordDialog";
 import { toast } from "sonner";
 import { useLanguage, useT, useTr } from "@/lib/i18n";
 import { homeForRole, roleOfCurrentUser } from "@/lib/role-guard";
-import { hasRecentAuthorityMiss, isSsoAuthorityOrigin } from "@/lib/cross-domain-auth";
-import {
-  seedAuthorityAndContinue,
-  startAuthorityCheck,
-  startLegacyAuthorityDiscovery,
-} from "@/lib/central-sso-client";
 import { z } from "zod";
 
 export const Route = createFileRoute("/auth/login")({
@@ -67,25 +61,11 @@ function LoginPage() {
 
       if (data.session) {
         const returnPath = next || homeForRole(await roleOfCurrentUser());
-        if (!isSsoAuthorityOrigin(window.location.origin)) {
-          const seeding = await seedAuthorityAndContinue(data.session, returnPath);
-          if (seeding || cancelled) return;
-        }
         window.location.replace(returnPath);
         return;
       }
 
-      if (hasRecentAuthorityMiss()) {
-        setResolving(false);
-        return;
-      }
-
-      if (isSsoAuthorityOrigin(window.location.origin)) {
-        if (!startLegacyAuthorityDiscovery("login")) setResolving(false);
-        return;
-      }
-
-      if (!startAuthorityCheck("login")) setResolving(false);
+      setResolving(false);
     }
 
     void resolveAuth();
@@ -98,7 +78,7 @@ function LoginPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         const errorText = `${error.code ?? ""} ${error.message}`.toLowerCase();
         const isUnconfirmed =
@@ -110,10 +90,6 @@ function LoginPage() {
       }
 
       const returnPath = next || homeForRole(await roleOfCurrentUser());
-      if (data.session && !isSsoAuthorityOrigin(window.location.origin)) {
-        const seeding = await seedAuthorityAndContinue(data.session, returnPath, true);
-        if (seeding) return;
-      }
       window.location.replace(returnPath);
     } finally {
       setBusy(false);
