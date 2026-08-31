@@ -11,6 +11,8 @@ import { ForgotPasswordDialog } from "@/components/ForgotPasswordDialog";
 import { toast } from "sonner";
 import { useLanguage, useT, useTr } from "@/lib/i18n";
 import { homeForRole, roleOfCurrentUser } from "@/lib/role-guard";
+import { isSsoAuthorityOrigin } from "@/lib/cross-domain-auth";
+import { checkAuthoritySilently, seedAuthoritySilently } from "@/lib/central-sso-client";
 import { z } from "zod";
 
 export const Route = createFileRoute("/auth/login")({
@@ -65,6 +67,16 @@ function LoginPage() {
         return;
       }
 
+      if (!isSsoAuthorityOrigin(window.location.origin)) {
+        const transferred = await checkAuthoritySilently();
+        if (cancelled) return;
+        if (transferred) {
+          const returnPath = next || homeForRole(await roleOfCurrentUser());
+          window.location.replace(returnPath);
+          return;
+        }
+      }
+
       setResolving(false);
     }
 
@@ -78,7 +90,7 @@ function LoginPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         const errorText = `${error.code ?? ""} ${error.message}`.toLowerCase();
         const isUnconfirmed =
@@ -87,6 +99,10 @@ function LoginPage() {
           errorText.includes("email not verified");
         toast.error(isUnconfirmed ? unconfirmedEmailCopy[language] : t("auth.login.wrong"));
         return;
+      }
+
+      if (data.session && !isSsoAuthorityOrigin(window.location.origin)) {
+        await seedAuthoritySilently(data.session, true);
       }
 
       const returnPath = next || homeForRole(await roleOfCurrentUser());
