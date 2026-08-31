@@ -85,7 +85,7 @@ type Props = {
 export function ExternalTeachingContentGate({
   userId,
   schoolId,
-  privacyRegion,
+  privacyRegion: _privacyRegion,
   preview = false,
   children,
 }: Props) {
@@ -97,9 +97,10 @@ export function ExternalTeachingContentGate({
   const [failed, setFailed] = useState(false);
   const [missingContext, setMissingContext] = useState(false);
 
-  // Only an explicitly configured U.S. school bypasses the European consent gate.
-  // Unknown/missing school context fails closed so Google content never loads by accident.
-  const requiresConsent = !preview && privacyRegion !== "us";
+  // Every production school requires an explicit user choice before Google or
+  // YouTube content is rendered. Only the fictional Super Admin preview bypasses
+  // this gate so sales/demo mode does not write real privacy preferences.
+  const requiresConsent = !preview;
 
   async function load() {
     if (!requiresConsent) {

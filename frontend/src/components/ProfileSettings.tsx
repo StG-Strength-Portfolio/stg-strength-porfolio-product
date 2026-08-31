@@ -6,10 +6,35 @@ import { Label } from "@/components/ui/label";
 import { StickyNote } from "@/components/StickyNote";
 import { ExternalContentPrivacySettings } from "@/components/privacy/ExternalContentPrivacySettings";
 import { supabase } from "@/integrations/supabase/client";
-import { useTr } from "@/lib/i18n";
+import { useLanguage, useTr } from "@/lib/i18n";
 import { getSuperAdminPreview } from "@/lib/superadmin-preview";
 import { updateDemoProfile } from "@/lib/demo-community";
+import { isStrongPassword, passwordPolicyMessage } from "@/lib/password-policy";
 import type { PrivacyRegion } from "@/lib/external-content-preferences";
+
+const REPORT_COPY = {
+  fi: {
+    title: "Kuukausiraportit",
+    description:
+      "Saat kuukausittain sähköpostiin yhteenvedon opetuksesi tai koulusi edistymisestä ja vahvuuksista. Raportti sisältää vain koontitietoja, ei opiskelijoiden vastauksia tai nimiä.",
+    receive: "Lähetä minulle kuukausiraportti",
+    saved: "Kuukausiraporttiasetus tallennettu.",
+  },
+  en: {
+    title: "Monthly reports",
+    description:
+      "Receive a monthly email with aggregate progress and strengths for your classes or school. The email does not include student responses or student names.",
+    receive: "Send me the monthly report",
+    saved: "Monthly report preference saved.",
+  },
+  sv: {
+    title: "Månadsrapporter",
+    description:
+      "Få ett månatligt e-postmeddelande med sammanställda framsteg och styrkor för dina klasser eller din skola. Meddelandet innehåller inte elevsvar eller elevnamn.",
+    receive: "Skicka månadsrapporten till mig",
+    saved: "Inställningen för månadsrapporten har sparats.",
+  },
+} as const;
 
 /** Own-profile settings shared by the School Admin and Teacher dashboards. */
 export function ProfileSettings({
@@ -22,10 +47,14 @@ export function ProfileSettings({
   email: string | null;
 }) {
   const tr = useTr();
+  const { language } = useLanguage();
+  const reportText = REPORT_COPY[language];
   const [name, setName] = useState(displayName ?? "");
   const [mail, setMail] = useState(email ?? "");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [reportOptOut, setReportOptOut] = useState(false);
+  const [reportBusy, setReportBusy] = useState(false);
   const [privacyContext, setPrivacyContext] = useState<{
     userId: string;
     schoolId: string;
@@ -61,10 +90,14 @@ export function ProfileSettings({
 
       const { data: profile } = await supabase
         .from("profiles" as never)
-        .select("school_id")
+        .select("school_id, monthly_report_opt_out")
         .eq("id", user.id)
         .maybeSingle();
-      const schoolId = (profile as { school_id?: string | null } | null)?.school_id;
+      const typedProfile = profile as {
+        school_id?: string | null;
+        monthly_report_opt_out?: boolean | null;
+      } | null;
+      const schoolId = typedProfile?.school_id;
       if (!schoolId) return;
 
       const { data: school } = await supabase
@@ -78,6 +111,7 @@ export function ProfileSettings({
           : "eu_eea";
 
       if (!cancelled) {
+        setReportOptOut(Boolean(typedProfile?.monthly_report_opt_out));
         setPrivacyContext({ userId: user.id, schoolId, privacyRegion });
       }
     })();
@@ -89,6 +123,10 @@ export function ProfileSettings({
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
+    if (password && !isStrongPassword(password)) {
+      toast.error(passwordPolicyMessage(language));
+      return;
+    }
     setBusy(true);
     try {
       const previewMode = getSuperAdminPreview().mode;
@@ -123,6 +161,28 @@ export function ProfileSettings({
     }
   }
 
+  async function setReceiveMonthlyReport(receive: boolean) {
+    if (getSuperAdminPreview().mode) {
+      setReportOptOut(!receive);
+      toast.success(reportText.saved);
+      return;
+    }
+    setReportBusy(true);
+    try {
+      const { data, error } = await supabase.rpc(
+        "set_my_monthly_report_opt_out" as never,
+        { p_opt_out: !receive } as never,
+      );
+      if (error) throw error;
+      setReportOptOut(Boolean(data));
+      toast.success(reportText.saved);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Error");
+    } finally {
+      setReportBusy(false);
+    }
+  }
+
   return (
     <>
       <StickyNote seed="settings-profile" className="space-y-4">
@@ -149,10 +209,12 @@ export function ProfileSettings({
             <Input
               id="set-pass"
               type="password"
+              minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="new-password"
             />
+            <p className="text-xs opacity-65">{passwordPolicyMessage(language)}</p>
           </div>
           <div className="md:col-span-3">
             <Button
@@ -167,13 +229,35 @@ export function ProfileSettings({
       </StickyNote>
 
       {showPrivacy && privacyContext && (
-        <div className="mt-6">
-          <ExternalContentPrivacySettings
-            userId={privacyContext.userId}
-            schoolId={privacyContext.schoolId}
-            privacyRegion={privacyContext.privacyRegion}
-          />
-        </div>
+        <>
+          <div className="mt-6">
+            <StickyNote seed="monthly-report-settings" className="space-y-3">
+              <div>
+                <h3 className="text-xl font-bold">{reportText.title}</h3>
+                <p className="mt-1 max-w-3xl text-sm leading-relaxed opacity-75">
+                  {reportText.description}
+                </p>
+              </div>
+              <label className="flex cursor-pointer items-center gap-3 text-sm font-semibold">
+                <input
+                  type="checkbox"
+                  checked={!reportOptOut}
+                  disabled={reportBusy}
+                  onChange={(event) => void setReceiveMonthlyReport(event.target.checked)}
+                  className="h-4 w-4"
+                />
+                <span>{reportText.receive}</span>
+              </label>
+            </StickyNote>
+          </div>
+          <div className="mt-6">
+            <ExternalContentPrivacySettings
+              userId={privacyContext.userId}
+              schoolId={privacyContext.schoolId}
+              privacyRegion={privacyContext.privacyRegion}
+            />
+          </div>
+        </>
       )}
     </>
   );

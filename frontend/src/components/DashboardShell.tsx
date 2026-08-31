@@ -60,8 +60,10 @@ export function iconForRoute(to: string): IconCmp {
   if (to.includes("sprint")) return to.includes("student") ? GamepadIcon : MapIcon;
   if (to.includes("give-strength")) return HeartOrGift;
   if (to.includes("received-strengths")) return GiftIcon;
+  if (to.includes("management")) return PeopleIcon;
   if (to.includes("profile")) return UserIcon;
   if (to.includes("strengths")) return CandyIcon;
+  if (to.includes("trash")) return GridIcon;
   return SparkleIcon;
 }
 
@@ -70,7 +72,7 @@ const HeartOrGift: IconCmp = GiftIcon;
 function mergeCommunityLinks(
   current: ShellLink[] | undefined,
   area: "teacher" | "school-admin" | null,
-  labels: { give: string; sprint: string; profile: string },
+  labels: { give: string; sprint: string; profile: string; management: string; trash: string },
 ): ShellLink[] {
   const base = current ?? [];
   if (!area) return base;
@@ -80,6 +82,8 @@ function mergeCommunityLinks(
     `${prefix}/give-strength`,
     `${prefix}/sprint`,
     `${prefix}/profile`,
+    `${prefix}/management`,
+    `${prefix}/trash`,
   ]);
   const backPath = `${prefix}/dashboard`;
   const backLinks = base.filter((link) => link.to === backPath);
@@ -92,6 +96,8 @@ function mergeCommunityLinks(
     { to: `${prefix}/give-strength`, label: labels.give },
     { to: `${prefix}/sprint`, label: labels.sprint },
     { to: `${prefix}/profile`, label: labels.profile },
+    { to: `${prefix}/management`, label: labels.management },
+    ...(area === "school-admin" ? [{ to: `${prefix}/trash`, label: labels.trash }] : []),
     ...otherLinks,
   ];
 }
@@ -134,6 +140,19 @@ export function DashboardShell({
     give: language === "en" ? "Give a strength" : language === "sv" ? "Ge en styrka" : "Lähetä vahvuus",
     sprint: language === "en" ? "Strength Sprint" : language === "sv" ? "Styrkesprint" : "Vahvuussprintti",
     profile: language === "en" ? "Profile" : language === "sv" ? "Profil" : "Profiili",
+    management:
+      area === "teacher"
+        ? language === "en"
+          ? "Student management"
+          : language === "sv"
+            ? "Elevhantering"
+            : "Opiskelijoiden hallinta"
+        : language === "en"
+          ? "School management"
+          : language === "sv"
+            ? "Skoladministration"
+            : "Koulun hallinta",
+    trash: language === "en" ? "Trash" : language === "sv" ? "Papperskorg" : "Roskakori",
   };
   const effectiveLinks = mergeCommunityLinks(links, area, communityLabels);
   const isTeacherDashboard = area === "teacher";
@@ -233,18 +252,10 @@ export function DashboardShell({
                 {roleLabels[mode]}
               </button>
             ))}
-            <button
-              type="button"
-              onClick={() => void resetPreview()}
-              className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[color:var(--purple)] shadow-sm"
-            >
+            <button type="button" onClick={() => void resetPreview()} className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[color:var(--purple)] shadow-sm">
               {resetLabel}
             </button>
-            <button
-              type="button"
-              onClick={exitPreview}
-              className="rounded-full border border-[color:var(--purple)] bg-transparent px-3 py-1 text-xs font-bold text-[color:var(--purple)]"
-            >
+            <button type="button" onClick={exitPreview} className="rounded-full border border-[color:var(--purple)] bg-transparent px-3 py-1 text-xs font-bold text-[color:var(--purple)]">
               {exitLabel}
             </button>
           </div>
@@ -299,9 +310,7 @@ export function DashboardShell({
             )}
             {effectiveSections.map((section) => (
               <nav key={section.label} className="mt-3 space-y-1.5 border-t border-white/20 pt-3">
-                <p className="px-4 pb-1 text-xs font-bold uppercase tracking-wider text-white/60">
-                  {section.label}
-                </p>
+                <p className="px-4 pb-1 text-xs font-bold uppercase tracking-wider text-white/60">{section.label}</p>
                 {section.links.map((link) => (
                   <Link
                     key={link.to}
@@ -319,25 +328,11 @@ export function DashboardShell({
               </nav>
             ))}
             {rolePreview ? (
-              <button
-                type="button"
-                className="mt-6 px-4 text-left text-xs text-white/80 underline hover:text-white"
-                onClick={exitPreview}
-              >
-                {exitLabel}
-              </button>
+              <button type="button" className="mt-6 px-4 text-left text-xs text-white/80 underline hover:text-white" onClick={exitPreview}>{exitLabel}</button>
             ) : (
-              <button
-                type="button"
-                className="mt-6 px-4 text-left text-xs text-white/80 underline hover:text-white"
-                onClick={() => void signOut()}
-              >
-                {tr("Kirjaudu ulos")}
-              </button>
+              <button type="button" className="mt-6 px-4 text-left text-xs text-white/80 underline hover:text-white" onClick={() => void signOut()}>{tr("Kirjaudu ulos")}</button>
             )}
-            <div className="mt-auto break-words pt-10 text-xs text-white/70">
-              {schoolName ?? ""}
-            </div>
+            <div className="mt-auto break-words pt-10 text-xs text-white/70">{schoolName ?? ""}</div>
           </div>
         </aside>
 

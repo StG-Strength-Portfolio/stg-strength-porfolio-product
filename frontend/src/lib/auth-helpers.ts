@@ -17,14 +17,13 @@ export async function getCurrentRole(): Promise<AppRole | null> {
 export async function getStudentClassMembership(): Promise<{ classId: string } | null> {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) return null;
-  const { data } = await supabase
-    .from("class_members" as never)
-    .select("class_id")
-    .eq("student_id", userData.user.id)
-    .limit(1)
-    .maybeSingle();
-  if (!data) return null;
-  return { classId: (data as { class_id: string }).class_id };
+
+  // The database helper intentionally ignores memberships whose class is in
+  // the 90-day trash. Those rows remain for restoration but must not unlock
+  // normal student portfolio work.
+  const { data, error } = await supabase.rpc("get_my_active_class_id" as never);
+  if (error || !data) return null;
+  return { classId: String(data) };
 }
 
 export async function getCurrentScreen(): Promise<number> {

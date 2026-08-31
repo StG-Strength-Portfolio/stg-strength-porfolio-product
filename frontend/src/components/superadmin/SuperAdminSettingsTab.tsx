@@ -7,6 +7,7 @@ import { StickyNote } from "@/components/StickyNote";
 import { SchoolPrivacyRegionsSettings } from "@/components/superadmin/SchoolPrivacyRegionsSettings";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/lib/i18n";
+import { isStrongPassword, passwordPolicyMessage } from "@/lib/password-policy";
 
 const COPY = {
   fi: {
@@ -22,7 +23,6 @@ const COPY = {
     saving: "Tallennetaan…",
     loading: "Ladataan tilitietoja…",
     nameRequired: "Nimi ei voi olla tyhjä.",
-    passwordShort: "Salasanan tulee olla vähintään 6 merkkiä.",
     passwordMismatch: "Salasanat eivät täsmää.",
     saved: "Tilitiedot tallennettu.",
     emailConfirmation: "Sähköpostiosoitteen vaihto pyydetty. Vahvista uusi osoite sähköpostissa, jos saat vahvistusviestin.",
@@ -42,7 +42,6 @@ const COPY = {
     saving: "Saving…",
     loading: "Loading account details…",
     nameRequired: "Name cannot be empty.",
-    passwordShort: "Password must be at least 6 characters.",
     passwordMismatch: "Passwords do not match.",
     saved: "Account settings saved.",
     emailConfirmation: "Email change requested. Confirm the new address from your email if a confirmation message is sent.",
@@ -62,7 +61,6 @@ const COPY = {
     saving: "Sparar…",
     loading: "Laddar kontouppgifter…",
     nameRequired: "Namnet får inte vara tomt.",
-    passwordShort: "Lösenordet måste innehålla minst 6 tecken.",
     passwordMismatch: "Lösenorden matchar inte.",
     saved: "Kontoinställningarna har sparats.",
     emailConfirmation: "Ändring av e-postadress har begärts. Bekräfta den nya adressen via e-post om ett bekräftelsemeddelande skickas.",
@@ -129,8 +127,8 @@ export function SuperAdminSettingsTab() {
       toast.error(copy.nameRequired);
       return;
     }
-    if (password && password.length < 6) {
-      toast.error(copy.passwordShort);
+    if (password && !isStrongPassword(password)) {
+      toast.error(passwordPolicyMessage(language));
       return;
     }
     if (password !== confirmPassword) {
@@ -222,7 +220,7 @@ export function SuperAdminSettingsTab() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="new-password"
-                  minLength={6}
+                  minLength={8}
                 />
               </div>
               <div className="space-y-1.5">
@@ -233,11 +231,13 @@ export function SuperAdminSettingsTab() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   autoComplete="new-password"
-                  minLength={6}
+                  minLength={8}
                 />
               </div>
             </div>
-            <p className="text-xs opacity-60">{copy.passwordHint}</p>
+            <p className="text-xs opacity-60">
+              {copy.passwordHint} {passwordPolicyMessage(language)}
+            </p>
 
             <Button
               type="submit"

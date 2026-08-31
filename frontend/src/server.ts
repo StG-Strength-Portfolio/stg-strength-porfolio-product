@@ -3,6 +3,13 @@ import "./lib/error-capture";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 
+type RuntimeEnv = Record<string, string | undefined>;
+type ExecutionContextLike = {
+  waitUntil?: (promise: Promise<unknown>) => void;
+};
+type ScheduledControllerLike = {
+  scheduledTime?: number;
+};
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
 };
@@ -16,6 +23,12 @@ async function getServerEntry(): Promise<ServerEntry> {
     );
   }
   return serverEntryPromise;
+}
+
+function exposeRuntimeEnv(env: unknown) {
+  if (env && typeof env === "object") {
+    (globalThis as { __env__?: RuntimeEnv }).__env__ = env as RuntimeEnv;
+  }
 }
 
 // h3 swallows in-handler throws into a normal 500 Response with body
@@ -37,8 +50,27 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
   });
 }
 
+async function runScheduledMaintenance(
+  controller: ScheduledControllerLike,
+  env: unknown,
+): Promise<void> {
+  exposeRuntimeEnv(env);
+  const runAt = controller.scheduledTime ? new Date(controller.scheduledTime) : new Date();
+  const [{ runMonthlyReports }, { purgeExpiredLifecycleData }] = await Promise.all([
+    import("./lib/monthly-report.server"),
+    import("./lib/lifecycle-maintenance.server"),
+  ]);
+
+  const maintenance = await purgeExpiredLifecycleData(runAt);
+  console.log("[lifecycle-maintenance]", JSON.stringify(maintenance));
+
+  const reportResult = await runMonthlyReports(runAt);
+  console.log("[monthly-reports]", JSON.stringify(reportResult));
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    exposeRuntimeEnv(env);
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
@@ -50,5 +82,17 @@ export default {
         headers: { "content-type": "text/html; charset=utf-8" },
       });
     }
+  },
+
+  scheduled(controller: ScheduledControllerLike, env: unknown, ctx: ExecutionContextLike) {
+    const task = runScheduledMaintenance(controller, env).catch((error) => {
+      console.error("[scheduled-maintenance] run failed", error);
+      throw error;
+    });
+    if (ctx?.waitUntil) {
+      ctx.waitUntil(task);
+      return;
+    }
+    return task;
   },
 };

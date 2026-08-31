@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLanguage, useTr } from "@/lib/i18n";
 import { getSuperAdminPreview } from "@/lib/superadmin-preview";
 import { getDemoProfile, updateDemoProfile } from "@/lib/demo-community";
+import { isStrongPassword, passwordPolicyMessage } from "@/lib/password-policy";
 
 export const Route = createFileRoute("/_authenticated/student/profile")({
   component: StudentProfilePage,
@@ -82,8 +83,8 @@ function StudentProfilePage() {
       return;
     }
     if (password) {
-      if (password.length < 8) {
-        toast.error(tr("Salasanan pitää olla vähintään 8 merkkiä"));
+      if (!isStrongPassword(password)) {
+        toast.error(passwordPolicyMessage(language));
         return;
       }
       if (password !== confirm) {
@@ -170,16 +171,19 @@ function StudentProfilePage() {
             <Input
               id="sp-pass"
               type="password"
+              minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="new-password"
             />
+            <p className="text-xs opacity-65">{passwordPolicyMessage(language)}</p>
           </div>
           <div className="space-y-1">
             <Label htmlFor="sp-pass2">{tr("Vahvista salasana")}</Label>
             <Input
               id="sp-pass2"
               type="password"
+              minLength={8}
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               autoComplete="new-password"
