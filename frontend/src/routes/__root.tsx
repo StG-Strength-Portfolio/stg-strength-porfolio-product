@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
+import { StaffProfileLanguageSync } from "@/components/StaffProfileLanguageSync";
 import { TrialExperience } from "@/components/trial/TrialExperience";
 import { TrialAccessPolicy } from "@/components/trial/TrialAccessPolicy";
 import { LanguageProvider, useLanguage } from "@/lib/i18n";
@@ -210,6 +211,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
         <DomainLanguagePreferenceSync />
+        <StaffProfileLanguageSync />
         <LocalizedDocumentTitle />
         <TrialExperience />
         <TrialAccessPolicy />
