@@ -63,14 +63,21 @@ BEGIN
   END IF;
 END $$;
 
--- Existing users keep their current language. We cannot reliably reconstruct
--- which public domain they originally used, so registration_domain stays NULL.
-UPDATE public.profiles
+-- Existing Teacher/School Admin users keep their current language. We cannot
+-- reliably reconstruct which public domain they originally used, so
+-- registration_domain stays NULL. Student language/class behavior is untouched.
+UPDATE public.profiles p
 SET registration_language = CASE
-  WHEN language IN ('fi', 'en', 'sv') THEN language
+  WHEN p.language IN ('fi', 'en', 'sv') THEN p.language
   ELSE NULL
 END
-WHERE registration_language IS NULL;
+WHERE p.registration_language IS NULL
+  AND EXISTS (
+    SELECT 1
+    FROM public.user_roles r
+    WHERE r.user_id = p.id
+      AND r.role IN ('teacher', 'school_admin')
+  );
 
 CREATE INDEX IF NOT EXISTS profiles_language_idx
   ON public.profiles (language)
