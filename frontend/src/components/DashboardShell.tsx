@@ -1,9 +1,8 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { CornerBlobs } from "@/components/CornerBlobs";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import {
   ArrowLeftIcon,
   BookIcon,
@@ -20,7 +19,12 @@ import {
   SparkleIcon,
   UserIcon,
 } from "@/components/icons/AppIcons";
-import { useLanguage, useTr } from "@/lib/i18n";
+import { useLanguage, useTr, type Language } from "@/lib/i18n";
+import {
+  portfolioOriginForLanguage,
+  registrationDomainForHostname,
+} from "@/lib/domain-language";
+import { seedAuthoritySilently } from "@/lib/central-sso-client";
 import { cn } from "@/lib/utils";
 import {
   clearSuperAdminPreview,
@@ -102,7 +106,7 @@ export function DashboardShell({
   active,
   onSelect,
   schoolName,
-  persistLanguage = true,
+  persistLanguage: _persistLanguage = true,
   links,
   sections,
   children,
@@ -130,6 +134,43 @@ export function DashboardShell({
     : pathname.startsWith("/school-admin")
       ? "school-admin"
       : null;
+
+  useEffect(() => {
+    if (!area || rolePreview || typeof window === "undefined") return;
+    if (!registrationDomainForHostname(window.location.hostname)) return;
+
+    let cancelled = false;
+    void (async () => {
+      const { data: authData } = await supabase.auth.getSession();
+      const session = authData.session;
+      if (!session || cancelled) return;
+
+      const { data: profile } = await supabase
+        .from("profiles" as never)
+        .select("language")
+        .eq("id", session.user.id)
+        .maybeSingle();
+      if (cancelled) return;
+
+      const raw = (profile as { language?: string | null } | null)?.language;
+      const savedLanguage: Language = raw === "sv" ? "sv" : raw === "en" ? "en" : "fi";
+      const targetOrigin = portfolioOriginForLanguage(savedLanguage);
+      if (targetOrigin === window.location.origin) return;
+
+      if (window.location.origin !== "https://strengthportfolio.com") {
+        await seedAuthoritySilently(session, true);
+        if (cancelled) return;
+      }
+
+      const next = `${window.location.pathname}${window.location.search}`;
+      window.location.replace(`${targetOrigin}/auth/login?next=${encodeURIComponent(next)}`);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [area, rolePreview]);
+
   const communityLabels = {
     give: language === "en" ? "Give a strength" : language === "sv" ? "Ge en styrka" : "Lähetä vahvuus",
     sprint: language === "en" ? "Strength Sprint" : language === "sv" ? "Styrkesprint" : "Vahvuussprintti",
@@ -344,7 +385,6 @@ export function DashboardShell({
         <main className="min-w-0 flex-1 space-y-6">
           <header className="flex flex-wrap items-start justify-between gap-3">
             <h1 className="font-display text-3xl md:text-4xl">{title}</h1>
-            <LanguageSwitcher persistToProfile={rolePreview ? false : persistLanguage} />
           </header>
 
           <nav className="flex flex-wrap gap-2 md:hidden">
