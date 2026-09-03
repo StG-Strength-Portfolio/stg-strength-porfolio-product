@@ -1,13 +1,32 @@
 import { LANGUAGES, useLanguage, type Language } from "@/lib/i18n";
-import { rememberDomainLanguagePreference } from "@/lib/domain-language";
+import {
+  domainDefaultLanguage,
+  rememberDomainLanguagePreference,
+} from "@/lib/domain-language";
 import { cn } from "@/lib/utils";
 
 const ORDER: Language[] = ["fi", "sv", "en"];
+const DOMAIN_LOCKED_STAFF_PATHS = new Set([
+  "/register-staff",
+  "/confirm-staff",
+  "/trial",
+  "/confirm-trial",
+]);
 
-/** Small FI | SV | EN switcher for the public auth pages. */
+/** Small FI | SV | EN switcher for public auth pages. */
 export function AuthLanguageSwitcher({ className }: { className?: string }) {
   const { language, setLanguage } = useLanguage();
   const items = ORDER.filter((l) => LANGUAGES.includes(l));
+
+  // Teacher/School Admin registration is language-locked by production domain.
+  // Preview/local hosts keep the switcher so the three languages remain testable.
+  if (
+    typeof window !== "undefined" &&
+    DOMAIN_LOCKED_STAFF_PATHS.has(window.location.pathname) &&
+    domainDefaultLanguage(window.location.hostname)
+  ) {
+    return null;
+  }
 
   function pick(l: Language) {
     rememberDomainLanguagePreference(l);
