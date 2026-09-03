@@ -6,15 +6,19 @@ import { CornerBlobs } from "@/components/CornerBlobs";
 import { StickyNote } from "@/components/StickyNote";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { useLanguage, isLanguage } from "@/lib/i18n";
+import { useLanguage, isLanguage, type Language } from "@/lib/i18n";
+import {
+  domainDefaultLanguage,
+  registrationDomainForHostname,
+} from "@/lib/domain-language";
 import { finalizeFreeTrialRegistration } from "@/lib/free-trial.functions";
 
 export const Route = createFileRoute("/confirm-trial")({ component: ConfirmTrial });
 
 const copy = {
   en: { title: "Activating your free trial…", body: "We are creating your school trial and opening Strength Portfolio.", errorTitle: "We could not activate the trial", retry: "Start again", login: "Sign in" },
-  fi: { title: "Aktivoidaan maksutonta kokeilua…", body: "Luomme koulusi kokeilujakson ja avaamme Vahvuusportfolion.", errorTitle: "Kokeilua ei voitu aktivoida", retry: "Aloita uudelleen", login: "Kirjaudu sisään" },
-  sv: { title: "Aktiverar din gratis provperiod…", body: "Vi skapar skolans provperiod och öppnar Styrkeportfolio.", errorTitle: "Provperioden kunde inte aktiveras", retry: "Börja om", login: "Logga in" },
+  fi: { title: "Aktivoidaan maksutonta kokeilua…", body: "Luomme koulusi kokeilujakson ja avaamme Vahvuus Portfolion.", errorTitle: "Kokeilua ei voitu aktivoida", retry: "Aloita uudelleen", login: "Kirjaudu sisään" },
+  sv: { title: "Aktiverar din gratis provperiod…", body: "Vi skapar skolans provperiod och öppnar Styrke Portfolj.", errorTitle: "Provperioden kunde inte aktiveras", retry: "Börja om", login: "Logga in" },
 } as const;
 
 function ConfirmTrial() {
@@ -38,7 +42,23 @@ function ConfirmTrial() {
     finalizing.current = true;
     try {
       const result = await finalize({});
-      if (isLanguage(result.language)) setLanguage(result.language);
+      const domainLanguage = domainDefaultLanguage(window.location.hostname);
+      const savedLanguage: Language = domainLanguage ?? (isLanguage(result.language) ? result.language : "en");
+      const registrationDomain = registrationDomainForHostname(window.location.hostname);
+
+      if (registrationDomain) {
+        const { error: profileError } = await supabase
+          .from("profiles" as never)
+          .update({
+            language: savedLanguage,
+            registration_language: savedLanguage,
+            registration_domain: registrationDomain,
+          } as never)
+          .eq("id", data.session.user.id);
+        if (profileError) throw profileError;
+      }
+
+      setLanguage(savedLanguage);
       window.location.replace(result.role === "school_admin" ? "/school-admin/dashboard" : "/teacher/dashboard");
     } catch (e) {
       finalizing.current = false;
