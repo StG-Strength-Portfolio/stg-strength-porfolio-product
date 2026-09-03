@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,11 @@ import { StickyNote } from "@/components/StickyNote";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/lib/i18n";
+import {
+  domainBrandName,
+  domainDefaultLanguage,
+  registrationDomainForHostname,
+} from "@/lib/domain-language";
 import { registerStaffAccount } from "@/lib/staff-registration.functions";
 
 export const Route = createFileRoute("/register-staff")({
@@ -92,8 +97,7 @@ const copy = {
 } as const;
 
 function RegisterStaff() {
-  const { language } = useLanguage();
-  const text = copy[language];
+  const { language, setLanguage } = useLanguage();
   const register = useServerFn(registerStaffAccount);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -102,12 +106,33 @@ function RegisterStaff() {
   const [busy, setBusy] = useState(false);
   const [sentTo, setSentTo] = useState<string | null>(null);
 
+  const hostname = typeof window === "undefined" ? "" : window.location.hostname;
+  const domainLanguage = domainDefaultLanguage(hostname);
+  const registrationDomain = registrationDomainForHostname(hostname);
+  const brandName = domainBrandName(hostname);
+  const effectiveLanguage = domainLanguage ?? language;
+  const text = copy[effectiveLanguage];
+  const showDevelopmentLanguageSwitcher = !domainLanguage;
+
+  useEffect(() => {
+    if (domainLanguage && domainLanguage !== language) setLanguage(domainLanguage);
+  }, [domainLanguage, language, setLanguage]);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     try {
       const normalizedEmail = email.trim().toLowerCase();
-      const result = await register({ data: { name, email: normalizedEmail, password, code, language } });
+      const result = await register({
+        data: {
+          name,
+          email: normalizedEmail,
+          password,
+          code,
+          language: effectiveLanguage,
+          registrationDomain,
+        },
+      });
       if (!result.ok) {
         const messages = {
           name: text.nameError,
@@ -132,6 +157,8 @@ function RegisterStaff() {
             name: name.trim(),
             registration_type: "staff",
             pending_staff_token: result.pendingToken,
+            registration_language: result.language,
+            registration_domain: result.registrationDomain,
           },
         },
       });
@@ -142,7 +169,6 @@ function RegisterStaff() {
         return;
       }
 
-      // Access is intentionally withheld until the confirmation link is used.
       await supabase.auth.signOut();
       setSentTo(normalizedEmail);
     } catch (error) {
@@ -156,9 +182,10 @@ function RegisterStaff() {
     return (
       <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-10 text-foreground">
         <CornerBlobs />
-        <AuthLanguageSwitcher />
+        {showDevelopmentLanguageSwitcher && <AuthLanguageSwitcher />}
         <div className="relative z-10 w-full max-w-md">
           <StickyNote seed="staff-confirmation-sent" className="space-y-4 text-center">
+            {brandName && <p className="text-sm font-bold opacity-70">{brandName}</p>}
             <h1 className="text-3xl font-bold">{text.sentTitle}</h1>
             <p>{text.sentBody} <strong>{sentTo}</strong>.</p>
             <p className="text-sm opacity-75">{text.sentHint}</p>
@@ -174,9 +201,10 @@ function RegisterStaff() {
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-10 text-foreground">
       <CornerBlobs />
-      <AuthLanguageSwitcher />
+      {showDevelopmentLanguageSwitcher && <AuthLanguageSwitcher />}
       <div className="relative z-10 w-full max-w-md space-y-6">
         <div className="text-center">
+          {brandName && <p className="mb-2 text-sm font-bold opacity-70">{brandName}</p>}
           <h1 className="text-4xl font-bold">{text.title}</h1>
           <p className="mt-2 opacity-90">{text.subtitle}</p>
         </div>
