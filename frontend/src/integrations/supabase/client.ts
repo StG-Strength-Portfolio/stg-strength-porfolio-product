@@ -10,6 +10,8 @@ import {
   restoreDemoClass,
 } from "@/lib/demo-store";
 
+const COURSE_SCHEMA = "course_test";
+
 function isNewSupabaseApiKey(value: string): boolean {
   return value.startsWith("sb_publishable_") || value.startsWith("sb_secret_");
 }
@@ -32,6 +34,8 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
     }
 
     headers.set("apikey", supabaseKey);
+    headers.set("Accept-Profile", COURSE_SCHEMA);
+    headers.set("Content-Profile", COURSE_SCHEMA);
     return fetch(input, { ...init, headers });
   };
 }
