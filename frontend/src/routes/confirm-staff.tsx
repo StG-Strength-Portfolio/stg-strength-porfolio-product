@@ -7,7 +7,10 @@ import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage, isLanguage } from "@/lib/i18n";
-import { domainDefaultLanguage } from "@/lib/domain-language";
+import {
+  domainDefaultLanguage,
+  rememberDomainLanguagePreference,
+} from "@/lib/domain-language";
 import { finalizeStaffRegistration } from "@/lib/staff-registration.functions";
 
 export const Route = createFileRoute("/confirm-staff")({
@@ -70,7 +73,10 @@ function ConfirmStaff() {
     finalizing.current = true;
     try {
       const result = await finalize({});
-      if (isLanguage(result.language)) setLanguage(result.language);
+      if (isLanguage(result.language)) {
+        rememberDomainLanguagePreference(result.language);
+        setLanguage(result.language);
+      }
       window.location.replace("/teacher/dashboard");
     } catch (e) {
       finalizing.current = false;
