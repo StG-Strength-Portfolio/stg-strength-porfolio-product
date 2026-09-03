@@ -31,9 +31,25 @@ const DOCUMENT_TITLE = {
 } as const;
 
 const LANGUAGE_STORAGE_KEY = "student_language";
+const DOMAIN_LOCKED_STAFF_PATHS = new Set([
+  "/register-staff",
+  "/confirm-staff",
+  "/trial",
+  "/confirm-trial",
+]);
+
+function isDomainLockedStaffPath(pathname: string): boolean {
+  return DOMAIN_LOCKED_STAFF_PATHS.has(pathname);
+}
 
 function applyHostnameLanguageDefault() {
   if (typeof window === "undefined") return;
+
+  const defaultLanguage = domainDefaultLanguage(window.location.hostname);
+  if (defaultLanguage && isDomainLockedStaffPath(window.location.pathname)) {
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, defaultLanguage);
+    return;
+  }
 
   const manualPreference = readDomainLanguagePreference();
   if (manualPreference) {
@@ -43,7 +59,6 @@ function applyHostnameLanguageDefault() {
 
   if (window.localStorage.getItem(LANGUAGE_STORAGE_KEY)) return;
 
-  const defaultLanguage = domainDefaultLanguage(window.location.hostname);
   if (defaultLanguage) {
     window.localStorage.setItem(LANGUAGE_STORAGE_KEY, defaultLanguage);
   }
@@ -51,13 +66,20 @@ function applyHostnameLanguageDefault() {
 
 function DomainLanguagePreferenceSync() {
   const { language, setLanguage } = useLanguage();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
 
   useEffect(() => {
+    const defaultLanguage = domainDefaultLanguage(window.location.hostname);
+    if (defaultLanguage && isDomainLockedStaffPath(pathname)) {
+      if (defaultLanguage !== language) setLanguage(defaultLanguage);
+      return;
+    }
+
     const manualPreference = readDomainLanguagePreference();
     if (manualPreference && manualPreference !== language) {
       setLanguage(manualPreference);
     }
-  }, [language, setLanguage]);
+  }, [language, pathname, setLanguage]);
 
   return null;
 }
