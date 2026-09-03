@@ -61,12 +61,18 @@ BEGIN
   END IF;
 END $$;
 
-UPDATE public.profiles
+UPDATE public.profiles p
 SET registration_language = CASE
-  WHEN language IN ('fi', 'en', 'sv') THEN language
+  WHEN p.language IN ('fi', 'en', 'sv') THEN p.language
   ELSE NULL
 END
-WHERE registration_language IS NULL;
+WHERE p.registration_language IS NULL
+  AND EXISTS (
+    SELECT 1
+    FROM public.user_roles r
+    WHERE r.user_id = p.id
+      AND r.role IN ('teacher', 'school_admin')
+  );
 
 CREATE INDEX IF NOT EXISTS profiles_language_idx
   ON public.profiles (language)
