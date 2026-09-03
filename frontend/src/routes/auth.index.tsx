@@ -6,6 +6,7 @@ import { StickyNote } from "@/components/StickyNote";
 import { Button } from "@/components/ui/button";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
 import { useLanguage, useT } from "@/lib/i18n";
+import { domainBrandName } from "@/lib/domain-language";
 import { homeForRole, roleOfCurrentUser } from "@/lib/role-guard";
 import { isSsoAuthorityOrigin } from "@/lib/cross-domain-auth";
 import { checkAuthoritySilently } from "@/lib/central-sso-client";
@@ -40,6 +41,19 @@ function AuthLanding() {
       : language === "sv"
         ? "Skapa personalkonto"
         : "Luo henkilökunnan tili";
+  const brandName =
+    typeof window === "undefined"
+      ? language === "fi"
+        ? "Vahvuus Portfolio"
+        : language === "sv"
+          ? "Styrke Portfolj"
+          : "Strength Portfolio"
+      : domainBrandName(window.location.hostname) ??
+        (language === "fi"
+          ? "Vahvuus Portfolio"
+          : language === "sv"
+            ? "Styrke Portfolj"
+            : "Strength Portfolio");
 
   useEffect(() => {
     let cancelled = false;
@@ -83,9 +97,7 @@ function AuthLanding() {
       <AuthLanguageSwitcher />
       <div className="relative z-10 w-full max-w-md space-y-6">
         <div className="text-center">
-          <h1 className="text-5xl font-bold">
-            {language === "fi" ? "Vahvuusportfolio" : t("app.title")}
-          </h1>
+          <h1 className="text-5xl font-bold">{brandName}</h1>
           <p className="mt-2 opacity-90">{t("app.tagline")}</p>
         </div>
 

@@ -6,10 +6,22 @@ import { Label } from "@/components/ui/label";
 import { StickyNote } from "@/components/StickyNote";
 import { ExternalContentPrivacySettings } from "@/components/privacy/ExternalContentPrivacySettings";
 import { supabase } from "@/integrations/supabase/client";
-import { useTr } from "@/lib/i18n";
+import { useLanguage, useTr, type Language } from "@/lib/i18n";
+import {
+  portfolioOriginForLanguage,
+  registrationDomainForHostname,
+  rememberDomainLanguagePreference,
+} from "@/lib/domain-language";
+import { seedAuthoritySilently } from "@/lib/central-sso-client";
 import { getSuperAdminPreview } from "@/lib/superadmin-preview";
 import { updateDemoProfile } from "@/lib/demo-community";
 import type { PrivacyRegion } from "@/lib/external-content-preferences";
+
+const LANGUAGE_LABELS: Record<Language, string> = {
+  fi: "Suomi",
+  en: "English",
+  sv: "Svenska",
+};
 
 /** Own-profile settings shared by the School Admin and Teacher dashboards. */
 export function ProfileSettings({
@@ -22,9 +34,11 @@ export function ProfileSettings({
   email: string | null;
 }) {
   const tr = useTr();
+  const { language, setLanguage } = useLanguage();
   const [name, setName] = useState(displayName ?? "");
   const [mail, setMail] = useState(email ?? "");
   const [password, setPassword] = useState("");
+  const [profileLanguage, setProfileLanguage] = useState<Language>(language);
   const [busy, setBusy] = useState(false);
   const [privacyContext, setPrivacyContext] = useState<{
     userId: string;
@@ -32,7 +46,7 @@ export function ProfileSettings({
     privacyRegion: PrivacyRegion;
   } | null>(null);
 
-  const showPrivacy =
+  const showStaffSettings =
     typeof window !== "undefined" &&
     (window.location.pathname === "/teacher/profile" ||
       window.location.pathname === "/school-admin/profile");
@@ -44,7 +58,7 @@ export function ProfileSettings({
 
   useEffect(() => {
     let cancelled = false;
-    if (!showPrivacy || getSuperAdminPreview().mode) return;
+    if (!showStaffSettings || getSuperAdminPreview().mode) return;
 
     void (async () => {
       const { data: userData } = await supabase.auth.getUser();
@@ -61,10 +75,15 @@ export function ProfileSettings({
 
       const { data: profile } = await supabase
         .from("profiles" as never)
-        .select("school_id")
+        .select("school_id, language")
         .eq("id", user.id)
         .maybeSingle();
-      const schoolId = (profile as { school_id?: string | null } | null)?.school_id;
+      const profileRow = profile as { school_id?: string | null; language?: string | null } | null;
+      const schoolId = profileRow?.school_id;
+      const savedLanguage: Language =
+        profileRow?.language === "sv" ? "sv" : profileRow?.language === "en" ? "en" : "fi";
+
+      if (!cancelled) setProfileLanguage(savedLanguage);
       if (!schoolId) return;
 
       const { data: school } = await supabase
@@ -85,17 +104,32 @@ export function ProfileSettings({
     return () => {
       cancelled = true;
     };
-  }, [showPrivacy]);
+  }, [showStaffSettings]);
+
+  async function redirectToSavedLanguageDomain(nextLanguage: Language) {
+    if (typeof window === "undefined") return;
+    if (!registrationDomainForHostname(window.location.hostname)) return;
+
+    const targetOrigin = portfolioOriginForLanguage(nextLanguage);
+    if (targetOrigin === window.location.origin) return;
+
+    const { data } = await supabase.auth.getSession();
+    if (data.session && window.location.origin !== "https://strengthportfolio.com") {
+      await seedAuthoritySilently(data.session, true);
+    }
+
+    const next = `${window.location.pathname}${window.location.search}`;
+    window.location.replace(`${targetOrigin}/auth/login?next=${encodeURIComponent(next)}`);
+  }
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     try {
       const previewMode = getSuperAdminPreview().mode;
-      // Sales demo profile fields are session-only and never update the signed-in
-      // Superadmin account or customer data. Password input is simulated only.
       if (previewMode === "teacher" || previewMode === "principal") {
         updateDemoProfile(previewMode, { name, email: mail });
+        setLanguage(profileLanguage);
         setPassword("");
         toast.success(tr("Tallennettu!"));
         return;
@@ -103,10 +137,12 @@ export function ProfileSettings({
 
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return;
-      await supabase
+      const { error: profileError } = await supabase
         .from("profiles" as never)
-        .update({ display_name: name.trim() } as never)
+        .update({ display_name: name.trim(), language: profileLanguage } as never)
         .eq("id", u.user.id);
+      if (profileError) throw profileError;
+
       const patch: { email?: string; password?: string } = {};
       if (mail && mail !== email) patch.email = mail;
       if (password) patch.password = password;
@@ -114,14 +150,26 @@ export function ProfileSettings({
         const { error } = await supabase.auth.updateUser(patch);
         if (error) throw error;
       }
+
+      rememberDomainLanguagePreference(profileLanguage);
+      setLanguage(profileLanguage);
       setPassword("");
       toast.success(tr("Tallennettu!"));
+      await redirectToSavedLanguageDomain(profileLanguage);
     } catch (err) {
       toast.error((err as Error).message);
     } finally {
       setBusy(false);
     }
   }
+
+  const languageLabel = language === "en" ? "Language" : language === "sv" ? "Språk" : "Kieli";
+  const languageHint =
+    language === "en"
+      ? "This language is also used for staff emails and reports."
+      : language === "sv"
+        ? "Det här språket används också för personalens e-post och rapporter."
+        : "Tätä kieltä käytetään myös henkilökunnan sähköposteissa ja raporteissa.";
 
   return (
     <>
@@ -154,6 +202,22 @@ export function ProfileSettings({
               autoComplete="new-password"
             />
           </div>
+          {showStaffSettings && (
+            <div className="space-y-1 md:col-span-3">
+              <Label htmlFor="set-language">{languageLabel}</Label>
+              <select
+                id="set-language"
+                value={profileLanguage}
+                onChange={(e) => setProfileLanguage(e.target.value as Language)}
+                className="h-10 w-full max-w-sm rounded-md border border-input bg-background px-3 text-sm"
+              >
+                <option value="fi">{LANGUAGE_LABELS.fi}</option>
+                <option value="en">{LANGUAGE_LABELS.en}</option>
+                <option value="sv">{LANGUAGE_LABELS.sv}</option>
+              </select>
+              <p className="text-xs opacity-65">{languageHint}</p>
+            </div>
+          )}
           <div className="md:col-span-3">
             <Button
               type="submit"
@@ -166,7 +230,7 @@ export function ProfileSettings({
         </form>
       </StickyNote>
 
-      {showPrivacy && privacyContext && (
+      {showStaffSettings && privacyContext && (
         <div className="mt-6">
           <ExternalContentPrivacySettings
             userId={privacyContext.userId}

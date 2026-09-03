@@ -10,10 +10,12 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
+import { StaffProfileLanguageSync } from "@/components/StaffProfileLanguageSync";
 import { TrialExperience } from "@/components/trial/TrialExperience";
 import { TrialAccessPolicy } from "@/components/trial/TrialAccessPolicy";
 import { LanguageProvider, useLanguage } from "@/lib/i18n";
 import {
+  domainBrandName,
   domainDefaultLanguage,
   readDomainLanguagePreference,
 } from "@/lib/domain-language";
@@ -24,15 +26,31 @@ import schoolAdminMetricsCss from "../styles/school-admin-metrics.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 const DOCUMENT_TITLE = {
-  fi: "Vahvuusportfolio",
+  fi: "Vahvuus Portfolio",
   en: "Strength Portfolio",
-  sv: "Styrkeportfolio",
+  sv: "Styrke Portfolj",
 } as const;
 
 const LANGUAGE_STORAGE_KEY = "student_language";
+const DOMAIN_LOCKED_STAFF_PATHS = new Set([
+  "/register-staff",
+  "/confirm-staff",
+  "/trial",
+  "/confirm-trial",
+]);
+
+function isDomainLockedStaffPath(pathname: string): boolean {
+  return DOMAIN_LOCKED_STAFF_PATHS.has(pathname);
+}
 
 function applyHostnameLanguageDefault() {
   if (typeof window === "undefined") return;
+
+  const defaultLanguage = domainDefaultLanguage(window.location.hostname);
+  if (defaultLanguage && isDomainLockedStaffPath(window.location.pathname)) {
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, defaultLanguage);
+    return;
+  }
 
   const manualPreference = readDomainLanguagePreference();
   if (manualPreference) {
@@ -42,7 +60,6 @@ function applyHostnameLanguageDefault() {
 
   if (window.localStorage.getItem(LANGUAGE_STORAGE_KEY)) return;
 
-  const defaultLanguage = domainDefaultLanguage(window.location.hostname);
   if (defaultLanguage) {
     window.localStorage.setItem(LANGUAGE_STORAGE_KEY, defaultLanguage);
   }
@@ -50,13 +67,20 @@ function applyHostnameLanguageDefault() {
 
 function DomainLanguagePreferenceSync() {
   const { language, setLanguage } = useLanguage();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
 
   useEffect(() => {
+    const defaultLanguage = domainDefaultLanguage(window.location.hostname);
+    if (defaultLanguage && isDomainLockedStaffPath(pathname)) {
+      if (defaultLanguage !== language) setLanguage(defaultLanguage);
+      return;
+    }
+
     const manualPreference = readDomainLanguagePreference();
     if (manualPreference && manualPreference !== language) {
       setLanguage(manualPreference);
     }
-  }, [language, setLanguage]);
+  }, [language, pathname, setLanguage]);
 
   return null;
 }
@@ -66,7 +90,7 @@ function LocalizedDocumentTitle() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
 
   useEffect(() => {
-    document.title = DOCUMENT_TITLE[language];
+    document.title = domainBrandName(window.location.hostname) ?? DOCUMENT_TITLE[language];
     document.documentElement.lang = language;
   }, [language, pathname]);
 
@@ -187,10 +211,10 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
         <DomainLanguagePreferenceSync />
+        <StaffProfileLanguageSync />
         <LocalizedDocumentTitle />
         <TrialExperience />
         <TrialAccessPolicy />
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <Toaster position="top-center" />
       </LanguageProvider>
