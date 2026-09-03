@@ -14,6 +14,7 @@ import { TrialExperience } from "@/components/trial/TrialExperience";
 import { TrialAccessPolicy } from "@/components/trial/TrialAccessPolicy";
 import { LanguageProvider, useLanguage } from "@/lib/i18n";
 import {
+  domainBrandName,
   domainDefaultLanguage,
   readDomainLanguagePreference,
 } from "@/lib/domain-language";
@@ -24,9 +25,9 @@ import schoolAdminMetricsCss from "../styles/school-admin-metrics.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 const DOCUMENT_TITLE = {
-  fi: "Vahvuusportfolio",
+  fi: "Vahvuus Portfolio",
   en: "Strength Portfolio",
-  sv: "Styrkeportfolio",
+  sv: "Styrke Portfolj",
 } as const;
 
 const LANGUAGE_STORAGE_KEY = "student_language";
@@ -66,7 +67,7 @@ function LocalizedDocumentTitle() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
 
   useEffect(() => {
-    document.title = DOCUMENT_TITLE[language];
+    document.title = domainBrandName(window.location.hostname) ?? DOCUMENT_TITLE[language];
     document.documentElement.lang = language;
   }, [language, pathname]);
 
@@ -190,7 +191,6 @@ function RootComponent() {
         <LocalizedDocumentTitle />
         <TrialExperience />
         <TrialAccessPolicy />
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <Toaster position="top-center" />
       </LanguageProvider>
