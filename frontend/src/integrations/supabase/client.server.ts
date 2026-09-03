@@ -5,6 +5,8 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 
+const COURSE_SCHEMA = "course_test";
+
 function isNewSupabaseApiKey(value: string): boolean {
   return value.startsWith("sb_publishable_") || value.startsWith("sb_secret_");
 }
@@ -28,6 +30,8 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
     }
 
     headers.set("apikey", supabaseKey);
+    headers.set("Accept-Profile", COURSE_SCHEMA);
+    headers.set("Content-Profile", COURSE_SCHEMA);
     return fetch(input, { ...init, headers });
   };
 }
@@ -69,7 +73,7 @@ function createSupabaseAdminClient() {
       ...(!SUPABASE_URL ? ["SUPABASE_URL"] : []),
       ...(!SUPABASE_SERVICE_ROLE_KEY ? ["SUPABASE_SERVICE_ROLE_KEY"] : []),
     ];
-    const message = `Missing Supabase environment variable(s): ${missing.join(", ")}. Connect Supabase in Lovable Cloud.`;
+    const message = `Missing Supabase environment variable(s): ${missing.join(", ")}. Configure them in Cloudflare.`;
     console.error(`[Supabase] ${message}`);
     throw new Error(message);
   }
