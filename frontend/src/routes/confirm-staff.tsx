@@ -7,6 +7,7 @@ import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage, isLanguage } from "@/lib/i18n";
+import { domainDefaultLanguage } from "@/lib/domain-language";
 import { finalizeStaffRegistration } from "@/lib/staff-registration.functions";
 
 export const Route = createFileRoute("/confirm-staff")({
@@ -46,6 +47,8 @@ function ConfirmStaff() {
   const finalize = useServerFn(finalizeStaffRegistration);
   const finalizing = useRef(false);
   const [error, setError] = useState<string | null>(null);
+  const productionLanguage =
+    typeof window === "undefined" ? null : domainDefaultLanguage(window.location.hostname);
 
   const complete = useCallback(async () => {
     if (finalizing.current) return;
@@ -94,7 +97,7 @@ function ConfirmStaff() {
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-10 text-foreground">
       <CornerBlobs />
-      <AuthLanguageSwitcher />
+      {!productionLanguage && <AuthLanguageSwitcher />}
       <div className="relative z-10 w-full max-w-md">
         <StickyNote seed="confirm-staff" className="space-y-4 text-center">
           {error ? (
