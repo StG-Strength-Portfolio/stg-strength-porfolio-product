@@ -10,6 +10,7 @@ import { useLanguage, isLanguage, type Language } from "@/lib/i18n";
 import {
   domainDefaultLanguage,
   registrationDomainForHostname,
+  rememberDomainLanguagePreference,
 } from "@/lib/domain-language";
 import { finalizeFreeTrialRegistration } from "@/lib/free-trial.functions";
 
@@ -58,6 +59,7 @@ function ConfirmTrial() {
         if (profileError) throw profileError;
       }
 
+      rememberDomainLanguagePreference(savedLanguage);
       setLanguage(savedLanguage);
       window.location.replace(result.role === "school_admin" ? "/school-admin/dashboard" : "/teacher/dashboard");
     } catch (e) {
