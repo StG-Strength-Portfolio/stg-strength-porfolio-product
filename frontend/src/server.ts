@@ -7,6 +7,8 @@ type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
 };
 
+type GlobalWithEnv = typeof globalThis & { __env__?: unknown };
+
 let serverEntryPromise: Promise<ServerEntry> | undefined;
 
 async function getServerEntry(): Promise<ServerEntry> {
@@ -39,6 +41,12 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    // TanStack route modules do not receive the Cloudflare env argument directly.
+    // Expose the request-scoped bindings through the runtime holder consumed by
+    // server-only integrations such as STG-LM. Cloudflare isolates concurrent
+    // worker executions; callers still must treat bindings as server-only.
+    (globalThis as GlobalWithEnv).__env__ = env;
+
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
