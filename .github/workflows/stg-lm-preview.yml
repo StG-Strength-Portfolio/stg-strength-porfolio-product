@@ -2,6 +2,11 @@ name: STG-LM Cloudflare Preview
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - stg-lm-1
+    paths:
+      - .github/workflows/stg-lm-preview.yml
 
 permissions:
   contents: read
