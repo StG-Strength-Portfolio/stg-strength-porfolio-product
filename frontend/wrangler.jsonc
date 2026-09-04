@@ -7,6 +7,13 @@
   "assets": {
     "directory": ".output/public"
   },
+  "ai": {
+    "binding": "AI"
+  },
+  "vars": {
+    "STG_LM_MODE": "deterministic",
+    "STG_BASE_MODEL": "@cf/google/gemma-7b-it-lora"
+  },
   "observability": {
     "enabled": true
   }
