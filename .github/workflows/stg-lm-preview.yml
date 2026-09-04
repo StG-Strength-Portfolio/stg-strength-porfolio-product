@@ -1,0 +1,33 @@
+name: STG-LM Cloudflare Preview
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.STG_PREVIEW_SUPABASE_URL }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.STG_PREVIEW_SUPABASE_PUBLISHABLE_KEY }}
+      SUPABASE_URL: ${{ secrets.STG_PREVIEW_SUPABASE_URL }}
+      SUPABASE_PUBLISHABLE_KEY: ${{ secrets.STG_PREVIEW_SUPABASE_PUBLISHABLE_KEY }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run eval:stg
+      - run: npm run build
+      - name: Deploy temporary Cloudflare preview
+        run: npx wrangler deploy --config wrangler.preview.jsonc --temporary
