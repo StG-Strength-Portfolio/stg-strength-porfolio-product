@@ -1,0 +1,6 @@
+{
+  "$schema": "../frontend/node_modules/wrangler/config-schema.json",
+  "name": "see-the-good-course-stg-lm-preview",
+  "main": "worker.js",
+  "compatibility_date": "2026-09-04"
+}
