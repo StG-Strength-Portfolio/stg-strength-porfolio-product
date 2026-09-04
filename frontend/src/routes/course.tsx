@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { requestStgClose, requestStgFollowup } from "@/lib/stg-lm.client";
+import { requestStgClose, requestStgFollowup } from "@/lib/stg-lm";
 
 export const Route = createFileRoute("/course")({
   component: TeacherCourse,
