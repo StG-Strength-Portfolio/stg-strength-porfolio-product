@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "see-the-good-course-stg-lm-preview",
+  "main": ".output/server/index.mjs",
+  "compatibility_date": "2026-09-03",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".output/public"
+  },
+  "vars": {
+    "STG_LM_MODE": "deterministic",
+    "STG_BASE_MODEL": "@cf/google/gemma-7b-it-lora"
+  }
+}
