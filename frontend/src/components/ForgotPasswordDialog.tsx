@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { sendPasswordResetEmail } from "@/lib/password-reset.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,10 +52,14 @@ export function ForgotPasswordDialog({
 }) {
   const { language } = useLanguage();
   const copy = FORGOT_PASSWORD_COPY[language];
+
+  const sendPasswordReset = useServerFn(sendPasswordResetEmail);
+
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
   const [cooldown, setCooldown] = useState(0);
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -65,36 +70,50 @@ export function ForgotPasswordDialog({
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
     }
+
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+
+    return () => {
+      window.removeEventListener("keydown", onKey);
+    };
   }, [onClose]);
 
   useEffect(() => {
     if (cooldown <= 0) return;
-    const id = setTimeout(() => setCooldown((c) => c - 1), 1000);
+
+    const id = setTimeout(() => {
+      setCooldown((c) => c - 1);
+    }, 1000);
+
     return () => clearTimeout(id);
   }, [cooldown]);
 
   async function sendResetEmail() {
     if (busy || cooldown > 0 || !email.trim()) return;
+
     setBusy(true);
+
     try {
-      const redirectTo = `${window.location.origin}/reset-password${
-        source === "superadmin" ? "?source=superadmin" : ""
-      }`;
-      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo });
-      // Intentionally never branch on `error` for the user-facing message:
-      // Supabase's resetPasswordForEmail already avoids confirming whether an
-      // address has an account, and mirroring that here (rather than e.g.
-      // showing "email not found") prevents leaking who has an account and
-      // keeps the UI predictable even if the free email tier is rate-limited.
-      if (error) {
-        // eslint-disable-next-line no-console
-        console.warn("[forgot-password]", error.message);
-      }
+      await sendPasswordReset({
+        data: {
+          email: email.trim(),
+          language,
+          source,
+        },
+      });
+    } catch (error) {
+      /*
+       * Do not reveal whether:
+       * - the email exists,
+       * - Supabase generated the link,
+       * - or the email provider encountered an error.
+       *
+       * The user always receives the same generic response.
+       */
+      console.warn("[forgot-password]", error);
+    } finally {
       setSent(true);
       setCooldown(RESEND_COOLDOWN_SECONDS);
-    } finally {
       setBusy(false);
     }
   }
@@ -118,6 +137,7 @@ export function ForgotPasswordDialog({
         {sent ? (
           <div className="mt-3 space-y-4">
             <p className="text-sm">{copy.sent}</p>
+
             <button
               type="button"
               onClick={() => void sendResetEmail()}
@@ -138,6 +158,7 @@ export function ForgotPasswordDialog({
           >
             <div className="space-y-1.5">
               <Label htmlFor="forgot-email">{copy.email}</Label>
+
               <Input
                 id="forgot-email"
                 ref={inputRef}
@@ -148,6 +169,7 @@ export function ForgotPasswordDialog({
                 autoComplete="email"
               />
             </div>
+
             <Button
               type="submit"
               disabled={busy}
@@ -157,7 +179,12 @@ export function ForgotPasswordDialog({
             </Button>
           </form>
         )}
-        <Button variant="ghost" className="mt-3 w-full rounded-full" onClick={onClose}>
+
+        <Button
+          variant="ghost"
+          className="mt-3 w-full rounded-full"
+          onClick={onClose}
+        >
           {copy.close}
         </Button>
       </div>
