@@ -1,6 +1,3 @@
-import { createServerFn } from "@tanstack/react-start";
-
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { domainBrandName, portfolioOriginForLanguage } from "@/lib/domain-language";
 import type { Language } from "@/lib/i18n";
 import {
@@ -11,8 +8,6 @@ import {
 import { getStrengthName } from "@/lib/strengths-i18n";
 
 export type MonthlyReportRole = "teacher" | "school_admin";
-
-export type MonthlyReportSendMode = "test" | "scheduled";
 
 export interface MonthlyReportSendResult {
   ok: boolean;
@@ -28,6 +23,10 @@ type MonthlyReportRecipient = {
   language: Language;
   schoolId: string;
 };
+
+export const MONTHLY_REPORT_INTERVAL_DAYS = 30;
+
+const MONTHLY_REPORT_INTERVAL_MS = MONTHLY_REPORT_INTERVAL_DAYS * 24 * 60 * 60 * 1000;
 
 const TEACHER_TEMPLATE_BY_LANGUAGE: Record<Language, string> = {
   fi: "monthly-report-teacher-finnish",
@@ -81,10 +80,8 @@ function subjectFor(role: MonthlyReportRole, language: Language): string {
     : SCHOOL_ADMIN_SUBJECT_BY_LANGUAGE[language];
 }
 
-function logKeyFor(role: MonthlyReportRole, mode: MonthlyReportSendMode): string {
-  const base = role === "teacher" ? "monthly_teacher_report" : "monthly_school_admin_report";
-
-  return mode === "test" ? `${base}_test` : base;
+export function monthlyReportTemplateKeyForRole(role: MonthlyReportRole): string {
+  return role === "teacher" ? "monthly_teacher_report" : "monthly_school_admin_report";
 }
 
 function reportUrlFor(role: MonthlyReportRole, language: Language): string {
@@ -129,7 +126,6 @@ function buildTemplateVariables(
 
   for (let index = 0; index < 5; index += 1) {
     const item = report.topStrengths[index];
-
     const position = index + 1;
 
     variables[`TOP_${position}_NAME`] = item ? getStrengthName(item.id, recipient.language) : "";
@@ -143,14 +139,10 @@ function buildTemplateVariables(
   return variables;
 }
 
-function currentMonthStartIso(): string {
-  const now = new Date();
-
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
-}
-
-async function alreadySentThisMonth(recipientId: string, templateKey: string): Promise<boolean> {
+async function sentWithinLast30Days(recipientId: string, templateKey: string): Promise<boolean> {
   const db = await admin();
+
+  const cutoff = new Date(Date.now() - MONTHLY_REPORT_INTERVAL_MS).toISOString();
 
   const { data, error } = await db
     .from("email_log")
@@ -158,7 +150,7 @@ async function alreadySentThisMonth(recipientId: string, templateKey: string): P
     .eq("template_key", templateKey)
     .eq("recipient_id", recipientId)
     .eq("status", "sent")
-    .gte("created_at", currentMonthStartIso())
+    .gte("created_at", cutoff)
     .limit(1)
     .maybeSingle();
 
@@ -181,7 +173,7 @@ async function writeEmailLog(input: {
   const db = await admin();
 
   try {
-    await db.from("email_log").insert({
+    const { error } = await db.from("email_log").insert({
       template_key: input.templateKey,
       recipient_email: input.recipient.email,
       recipient_id: input.recipient.id,
@@ -190,23 +182,40 @@ async function writeEmailLog(input: {
       status: input.status,
       error_message: input.errorMessage ?? null,
     });
+
+    if (error) {
+      console.warn("[monthly-report] email log failed", error.message);
+    }
   } catch (error) {
     console.warn("[monthly-report] email log failed", error);
   }
 }
 
 /**
- * Core monthly-report sender.
+ * Production monthly-report sender.
  *
- * This is intentionally a plain server-side function so it can
- * later be reused by the Cloudflare monthly scheduler.
+ * A recipient can receive the same scheduled report
+ * at most once every 30 days.
  */
 export async function sendMonthlyReportForUser(input: {
   userId: string;
   role: MonthlyReportRole;
-  mode: MonthlyReportSendMode;
 }): Promise<MonthlyReportSendResult> {
-  const { userId, role, mode } = input;
+  const { userId, role } = input;
+
+  const templateKey = monthlyReportTemplateKeyForRole(role);
+
+  /*
+   * Check first so scheduler runs can cheaply skip users
+   * who already received this report within the last 30 days.
+   */
+  if (await sentWithinLast30Days(userId, templateKey)) {
+    return {
+      ok: true,
+      sent: false,
+      skipped: "already_sent",
+    };
+  }
 
   const { loadTeacherMonthlyReportSource, loadSchoolAdminMonthlyReportSource } =
     await import("@/lib/monthly-report-source.server");
@@ -235,21 +244,6 @@ export async function sendMonthlyReportForUser(input: {
     report = buildSchoolAdminMonthlyReport(source.data);
 
     schoolName = report.schoolName ?? null;
-  }
-
-  const templateKey = logKeyFor(role, mode);
-
-  /*
-   * Test sends intentionally bypass the monthly duplicate guard.
-   * They also use a separate email_log key, so testing cannot
-   * accidentally prevent the real month-end email.
-   */
-  if (mode === "scheduled" && (await alreadySentThisMonth(recipient.id, templateKey))) {
-    return {
-      ok: true,
-      sent: false,
-      skipped: "already_sent",
-    };
   }
 
   const resendApiKey = getResendApiKey();
@@ -324,46 +318,3 @@ export async function sendMonthlyReportForUser(input: {
     sent: true,
   };
 }
-
-/**
- * Manual test sender for the currently signed-in Teacher
- * or School Admin.
- *
- * This is ONLY for testing before the monthly scheduler is enabled.
- */
-export const sendMyMonthlyReportTest = createServerFn({
-  method: "POST",
-})
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const db = await admin();
-
-    const { data: roleRows, error: roleError } = await db
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", context.userId);
-
-    if (roleError) {
-      throw new Error(roleError.message);
-    }
-
-    const roles = new Set((roleRows ?? []).map((row) => row.role as string));
-
-    let role: MonthlyReportRole | null = null;
-
-    if (roles.has("school_admin")) {
-      role = "school_admin";
-    } else if (roles.has("teacher")) {
-      role = "teacher";
-    }
-
-    if (!role) {
-      throw new Error("Monthly reports are only available for Teachers and School Admins");
-    }
-
-    return sendMonthlyReportForUser({
-      userId: context.userId,
-      role,
-      mode: "test",
-    });
-  });
