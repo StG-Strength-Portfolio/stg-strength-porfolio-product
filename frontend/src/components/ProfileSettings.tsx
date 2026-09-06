@@ -175,7 +175,9 @@ export function ProfileSettings({
     <>
       <StickyNote seed="settings-profile" className="space-y-4">
         <div>
-          <div className="text-[0.7rem] uppercase tracking-wider opacity-60">{tr("Koulun nimi")}</div>
+          <div className="text-[0.7rem] uppercase tracking-wider opacity-60">
+            {tr("Koulun nimi")}
+          </div>
           <div className="font-bold">{schoolName ?? "—"}</div>
         </div>
         <form onSubmit={save} className="grid gap-4 md:grid-cols-3">
