@@ -32,7 +32,19 @@ export default defineConfig(async ({ command }) => {
   // (matches the existing Cloudflare Pages/Workers deployment).
   if (command === "build") {
     const { nitro } = await import("nitro/vite");
-    plugins.push(nitro({ preset: "cloudflare-module" }));
+
+    plugins.push(
+      nitro({
+        preset: "cloudflare-module",
+        serverDir: "./server",
+        experimental: {
+          tasks: true,
+        },
+        scheduledTasks: {
+          "0 * * * *": ["monthly-report"],
+        },
+      }),
+    );
   }
 
   return {
