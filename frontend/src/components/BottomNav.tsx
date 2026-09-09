@@ -31,20 +31,19 @@ export function BottomNav({
   async function goNext(
     e: React.MouseEvent<HTMLButtonElement>,
   ) {
-   
     if (subpages.hasNext) {
       subpages.goNext();
       return;
     }
 
-  
     const btn = e.currentTarget;
 
     if (onBeforeNext) {
       try {
         await onBeforeNext();
       } catch {
-     
+        // Do not navigate if the caller could not persist the student's advance.
+        return;
       }
     }
 
@@ -59,12 +58,10 @@ export function BottomNav({
   }
 
   function goPrevious() {
-
     if (subpages.hasPrevious) {
       subpages.goPrevious();
       return;
     }
-
 
     navigate({
       to: "/seikkailu/$screen",
