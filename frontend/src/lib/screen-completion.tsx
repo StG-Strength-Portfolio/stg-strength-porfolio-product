@@ -91,7 +91,18 @@ export const REQUIREMENTS: Record<number, string[]> = {
   23: ["screen_20_onnistuminen", "screen_20_ydinvahvuudet", "screen_20_tuki", "screen_20_yhteinen"],
   24: ["screen_21_ylpea", "screen_21_sinnikas", "screen_21_kehut", "screen_21_rohkea", "screen_21_tavoite", "screen_21_tunne", "screen_21_vahvuudet", "screen_21_uudet"],
   25: ["screen_22_tulevaisuus", "screen_22_oppi"],
-  26: Array.from({ length: 10 }, (_, i) => `screen_23_pair_${i + 1}`),
+  26: [
+    "screen_23_innostus",
+    "screen_23_kevyelta",
+    "screen_23_palaute",
+    "screen_23_parasta_opinnoissa",
+    "screen_23_love_to_do",
+    "screen_23_flow",
+    "screen_23_lukioon",
+    "screen_23_arvostat",
+    "screen_23_lapsena",
+    "screen_23_vapaalla",
+  ],
   27: ["screen_24_palaute_1", "screen_24_palaute_2", "screen_24_palaute_3"],
   28: Array.from({ length: 11 }, (_, i) => `screen_25_tassa_${i + 1}`),
   29: Array.from({ length: 14 }, (_, i) => `screen_26_likert_${i + 1}`),
@@ -128,8 +139,6 @@ export const REQUIREMENTS: Record<number, string[]> = {
   71: ["screen_69_kertovat", "screen_69_kehittamisesta", "screen_69_tilanteissa", "screen_69_toimia"],
 };
 
-// Keep local Next-button gating in sync with the progression engine for
-// Strength Meter screens 78–103.
 METER_STRENGTHS.forEach((strength, index) => {
   REQUIREMENTS[METER_STRENGTH_FIRST + index] = [
     fieldKeyFor(strength.id, 0),
