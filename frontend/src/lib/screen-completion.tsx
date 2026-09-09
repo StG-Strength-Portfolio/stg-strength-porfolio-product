@@ -133,7 +133,7 @@ export const REQUIREMENTS: Record<number, string[]> = {
   62: ["screen_60_koulusta", "screen_60_perheelta", "screen_60_vapaa_ajalta", "screen_60_ystavilta"],
   63: ["screen_61_samaa", "screen_61_eroavat", "screen_61_huomataan", "screen_61_yllatti", "screen_61_muistaa"],
   64: Array.from({ length: 5 }, (_, i) => `screen_62_visioni_${i + 1}`),
-  65: Array.from({ length: 7 }, (_, i) => `screen_63_kerro_${i + 1}`),
+  65: [],
   66: ["screen_64_havainnot", "screen_64_muistaa", "screen_64_tarkeaa"],
   67: ["screen_65_notes"],
   68: ["screen_66_notes"],
