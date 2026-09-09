@@ -41,7 +41,7 @@ export function MeterPicker({
     })();
   }, [fieldKey]);
 
-  const state = useAutosave(fieldKey, picked, { enabled: loaded && picked !== null });
+  const state = useAutosave(fieldKey, picked, { enabled: loaded });
   useEffect(() => {
     onSaveStateChange?.(state);
   }, [state, onSaveStateChange]);
