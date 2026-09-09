@@ -67,6 +67,7 @@ function Screen10StrengthSelect({ index, fieldKey, language, selectedValues, onV
   const tr = useTr();
   const [value, setValue] = useState("");
   const [loaded, setLoaded] = useState(false);
+  const [pendingSave, setPendingSave] = useState(false);
   const report = useReportCompletion();
 
   useEffect(() => {
@@ -87,10 +88,17 @@ function Screen10StrengthSelect({ index, fieldKey, language, selectedValues, onV
 
   const state = useAutosave(fieldKey, value, { enabled: loaded });
 
-  useEffect(() => { onSaveStateChange?.(state); }, [state, onSaveStateChange]);
-  useEffect(() => { if (loaded) report(fieldKey, value.trim().length > 0); }, [fieldKey, loaded, report, value]);
+  useEffect(() => {
+    onSaveStateChange?.(state);
+    if (state === "saved") setPendingSave(false);
+  }, [state, onSaveStateChange]);
+
+  useEffect(() => {
+    if (loaded) report(fieldKey, value.trim().length > 0 && !pendingSave);
+  }, [fieldKey, loaded, pendingSave, report, value]);
 
   function handleChange(nextValue: string) {
+    setPendingSave(true);
     setValue(nextValue);
     onValueChange(index, nextValue);
   }
