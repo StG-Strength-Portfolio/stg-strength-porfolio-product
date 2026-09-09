@@ -141,7 +141,7 @@ function isFilled(value: unknown): boolean {
   if (value === null || value === undefined) return false;
   if (typeof value === "string") {
     const trimmed = value.trim();
-    if (!trimmed || trimmed === '\"\"' || trimmed === "null") return false;
+    if (!trimmed || trimmed === '""' || trimmed === "null") return false;
     // Saved JSON arrays appear as strings in some paths
     if (trimmed.startsWith("[")) {
       try {
