@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import "@/lib/i18n/translation-overrides";
 import { METER_STRENGTHS, METER_STRENGTH_FIRST, fieldKeyFor } from "@/lib/meter-data";
 
 export type CompletionReporter = (fieldKey: string, complete: boolean) => void;
