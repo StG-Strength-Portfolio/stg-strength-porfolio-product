@@ -36,16 +36,22 @@ export function useAutosave<T>(
   const debounceMs = opts?.debounceMs ?? 700;
   const enabled = scopeEnabled && (opts?.enabled ?? true);
   const [state, setState] = useState<SaveState>("idle");
-  const firstRun = useRef(true);
+  const initialValue = useRef(JSON.stringify(value));
+  const hasSeenEnabledRun = useRef(false);
   const latest = useRef(value);
   latest.current = value;
 
   useEffect(() => {
     if (!enabled) return;
-    if (firstRun.current) {
-      firstRun.current = false;
-      return;
+
+    const serialized = JSON.stringify(value);
+    if (!hasSeenEnabledRun.current) {
+      hasSeenEnabledRun.current = true;
+      // Skip only the untouched initial value. If autosave becomes enabled
+      // because of the user's first edit, save that edit instead of dropping it.
+      if (serialized === initialValue.current) return;
     }
+
     setState("saving");
     const t = setTimeout(async () => {
       try {
