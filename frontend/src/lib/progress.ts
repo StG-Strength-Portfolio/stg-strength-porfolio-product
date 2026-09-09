@@ -22,6 +22,22 @@ function compute(filled: Set<string>, current: number): ScreenProgress {
   return { filledKeys: filled, currentScreen: current, completedScreens, byWorld };
 }
 
+export const STUDENT_CURRENT_SCREEN_CHANGED_EVENT = "student-current-screen-changed";
+
+/**
+ * Keep progression state in sync immediately after the current student advances.
+ * The database remains the source of truth; this event only prevents the router
+ * from briefly evaluating the next screen against stale client-side progress.
+ */
+export function notifyStudentCurrentScreenChanged(currentScreen: number): void {
+  if (typeof window === "undefined" || !Number.isFinite(currentScreen)) return;
+  window.dispatchEvent(
+    new CustomEvent(STUDENT_CURRENT_SCREEN_CHANGED_EVENT, {
+      detail: { currentScreen: Math.max(1, Math.floor(currentScreen)) },
+    }),
+  );
+}
+
 export function useStudentProgress(userId: string | null): ScreenProgress | null {
   const [progress, setProgress] = useState<ScreenProgress | null>(null);
 
@@ -67,7 +83,21 @@ export function useStudentProgress(userId: string | null): ScreenProgress | null
       });
     };
 
+    const onLocalCurrentScreenChanged = (event: Event) => {
+      const detail = (event as CustomEvent<{ currentScreen?: number }>).detail;
+      const nextCurrent = detail?.currentScreen;
+      if (typeof nextCurrent !== "number" || !Number.isFinite(nextCurrent)) return;
+
+      setProgress((previous) => {
+        if (!previous) return previous;
+        const current = Math.max(previous.currentScreen, Math.max(1, Math.floor(nextCurrent)));
+        if (current === previous.currentScreen) return previous;
+        return compute(new Set(previous.filledKeys), current);
+      });
+    };
+
     window.addEventListener("student-response-saved", onLocalResponseSaved);
+    window.addEventListener(STUDENT_CURRENT_SCREEN_CHANGED_EVENT, onLocalCurrentScreenChanged);
 
     if (getSuperAdminPreview().mode === "student") {
       const off = onDemoStateChange(() => void loadAll());
@@ -75,6 +105,10 @@ export function useStudentProgress(userId: string | null): ScreenProgress | null
         cancelled = true;
         off();
         window.removeEventListener("student-response-saved", onLocalResponseSaved);
+        window.removeEventListener(
+          STUDENT_CURRENT_SCREEN_CHANGED_EVENT,
+          onLocalCurrentScreenChanged,
+        );
       };
     }
 
@@ -92,6 +126,10 @@ export function useStudentProgress(userId: string | null): ScreenProgress | null
     return () => {
       cancelled = true;
       window.removeEventListener("student-response-saved", onLocalResponseSaved);
+      window.removeEventListener(
+        STUDENT_CURRENT_SCREEN_CHANGED_EVENT,
+        onLocalCurrentScreenChanged,
+      );
       supabase.removeChannel(ch);
     };
   }, [userId]);
@@ -103,7 +141,7 @@ function isFilled(value: unknown): boolean {
   if (value === null || value === undefined) return false;
   if (typeof value === "string") {
     const trimmed = value.trim();
-    if (!trimmed || trimmed === '""' || trimmed === "null") return false;
+    if (!trimmed || trimmed === '\"\"' || trimmed === "null") return false;
     // Saved JSON arrays appear as strings in some paths
     if (trimmed.startsWith("[")) {
       try {
