@@ -104,7 +104,7 @@ export const REQUIREMENTS: Record<number, string[]> = {
     "screen_23_lapsena",
     "screen_23_vapaalla",
   ],
-  27: ["screen_24_palaute_1", "screen_24_palaute_2", "screen_24_palaute_3"],
+  27: [],
   28: Array.from({ length: 11 }, (_, i) => `screen_25_tassa_${i + 1}`),
   29: Array.from({ length: 14 }, (_, i) => `screen_26_likert_${i + 1}`),
   32: ["screen_29_karkki_1", "screen_29_teit", "screen_29_seuraavaksi", "screen_29_opit", "screen_29_hyodynnat"],
