@@ -67,8 +67,6 @@ function Screen10StrengthSelect({ index, fieldKey, language, selectedValues, onV
   const tr = useTr();
   const [value, setValue] = useState("");
   const [loaded, setLoaded] = useState(false);
-  const [dirty, setDirty] = useState(false);
-  const [initialValueWasValid, setInitialValueWasValid] = useState(false);
   const report = useReportCompletion();
 
   useEffect(() => {
@@ -80,7 +78,6 @@ function Screen10StrengthSelect({ index, fieldKey, language, selectedValues, onV
       const isValidSavedStrength = typeof saved === "string" && Number.isInteger(savedNumber) && savedNumber >= 1 && savedNumber <= 26;
       if (isValidSavedStrength) {
         setValue(saved);
-        setInitialValueWasValid(true);
         onValueChange(index, saved);
       }
       setLoaded(true);
@@ -88,13 +85,12 @@ function Screen10StrengthSelect({ index, fieldKey, language, selectedValues, onV
     return () => { cancelled = true; };
   }, [fieldKey, index, onValueChange]);
 
-  const state = useAutosave(fieldKey, value, { enabled: loaded && (dirty || initialValueWasValid) });
+  const state = useAutosave(fieldKey, value, { enabled: loaded });
 
   useEffect(() => { onSaveStateChange?.(state); }, [state, onSaveStateChange]);
   useEffect(() => { if (loaded) report(fieldKey, value.trim().length > 0); }, [fieldKey, loaded, report, value]);
 
   function handleChange(nextValue: string) {
-    setDirty(true);
     setValue(nextValue);
     onValueChange(index, nextValue);
   }
