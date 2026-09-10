@@ -3,6 +3,24 @@
     "en": "\"I feel that another's happiness comes at my expense, and I cannot rejoice in others' success\"",
     "sv": "\"Jag tycker att den andres lycka är något bort från mig och kan inte glädjas åt andras framgångar\""
   },
+  "Anna itselle\nja toisille\npalautetta!": {
+  "en": "Give feedback\nto yourself\nand others!",
+  "sv": "Ge respons\ntill dig själv\noch andra!"
+},
+  "Vahvuustyöskentelyn tavoitteena on tuoda sinut tietoiseksi vahvuuskielestä, joka ohjaa sinua tunnistamaan entistä monipuolisemmin vahvuuksia itsessäsi ja ihmisissä ympärilläsi.": {
+  "en": "The goal of strength-based work is to make you more aware of the language of strengths, which helps you recognize strengths in yourself and in the people around you in increasingly diverse ways.",
+  "sv": "Målet med styrkearbetet är att göra dig mer medveten om styrkespråket, som hjälper dig att identifiera styrkor hos dig själv och människorna omkring dig på ett allt mer mångsidigt sätt."
+},
+
+"Ohje: Vahvuusmittari löytyy liitteenä lopussa.": {
+  "en": "Note: The strengths assessment can be found in the appendix at the end.",
+  "sv": "Obs: Styrkemätaren finns som bilaga i slutet."
+},
+  "Yksi keino oppia tunnistamaan omia vahvuuksia on täyttää oheinen vahvuusmittari.": {
+  "en": "One way to learn to recognize your own strengths is to complete the strengths assessment provided.",
+  "sv": "Ett sätt att lära sig känna igen sina egna styrkor är att fylla i den bifogade styrkemätaren."
+},
+  
   "Mikä palautteissa ilahdutti?": {
   "en": "What made you happy in the feedback?",
   "sv": "Vad gjorde dig glad i responsen?"
