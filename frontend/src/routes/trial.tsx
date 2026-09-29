@@ -70,6 +70,10 @@ const copy = {
     sentTitle: "Confirm your work email",
     sentBody: "We sent a confirmation link to",
     sentHint: "Open the email and confirm your address to activate your school trial.",
+    spamHint: "Can’t find the email? Check your spam or other folders. It may take a few minutes to arrive.",
+    resend: "Resend verification email",
+    resending: "Sending…",
+    resent: "Verification email sent again.",
     workEmail: "Use a school or work email address. Personal email providers are not accepted.",
     used: "This email already has an account. Sign in instead of creating a free trial.",
     referral: "This referral code is not active.",
@@ -97,6 +101,10 @@ const copy = {
     sentTitle: "Vahvista työsähköpostisi",
     sentBody: "Lähetimme vahvistuslinkin osoitteeseen",
     sentHint: "Avaa sähköposti ja vahvista osoitteesi aktivoidaksesi koulun kokeilujakson.",
+    spamHint: "Etkö löydä viestiä? Tarkista myös roskaposti- tai muut kansiot. Viestin saapumisessa voi kestää muutama minuutti.",
+    resend: "Lähetä vahvistusviesti uudelleen",
+    resending: "Lähetetään…",
+    resent: "Vahvistusviesti lähetettiin uudelleen.",
     workEmail: "Käytä koulun tai työpaikan sähköpostiosoitetta. Henkilökohtaisia sähköposteja ei hyväksytä.",
     used: "Tällä sähköpostilla on jo tili. Kirjaudu sisään uuden kokeilun sijaan.",
     referral: "Tämä suosittelukoodi ei ole aktiivinen.",
@@ -124,6 +132,10 @@ const copy = {
     sentTitle: "Bekräfta din arbets-e-post",
     sentBody: "Vi skickade en bekräftelselänk till",
     sentHint: "Öppna e-postmeddelandet och bekräfta adressen för att aktivera skolans provperiod.",
+    spamHint: "Hittar du inte mejlet? Kontrollera även skräpposten och andra mappar. Det kan ta några minuter innan mejlet kommer fram.",
+    resend: "Skicka bekräftelsemejlet igen",
+    resending: "Skickar…",
+    resent: "Bekräftelsemejlet har skickats igen.",
     workEmail: "Använd skolans eller arbetsplatsens e-postadress. Personliga e-posttjänster godkänns inte.",
     used: "Den här e-postadressen har redan ett konto. Logga in i stället för att skapa en provperiod.",
     referral: "Den här rekommendationskoden är inte aktiv.",
@@ -136,6 +148,7 @@ function TrialPage() {
   const text = copy[language];
   const register = useServerFn(registerFreeTrial);
   const [busy, setBusy] = useState(false);
+  const [resending, setResending] = useState(false);
   const [sentTo, setSentTo] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
@@ -250,6 +263,26 @@ function TrialPage() {
     }
   }
 
+  async function resendConfirmation() {
+    if (!sentTo || resending) return;
+    setResending(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: sentTo,
+        options: {
+          emailRedirectTo: `${window.location.origin}/confirm-trial`,
+        },
+      });
+      if (error) throw error;
+      toast.success(text.resent);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Error");
+    } finally {
+      setResending(false);
+    }
+  }
+
   if (sentTo)
     return (
       <div className="relative flex min-h-screen items-center justify-center bg-background px-4 text-foreground">
@@ -264,6 +297,16 @@ function TrialPage() {
             {text.sentBody} <strong>{sentTo}</strong>.
           </p>
           <p className="text-sm opacity-70">{text.sentHint}</p>
+          <p className="text-sm font-medium">{text.spamHint}</p>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={resending}
+            onClick={resendConfirmation}
+            className="mx-auto rounded-full"
+          >
+            {resending ? text.resending : text.resend}
+          </Button>
         </StickyNote>
       </div>
     );
