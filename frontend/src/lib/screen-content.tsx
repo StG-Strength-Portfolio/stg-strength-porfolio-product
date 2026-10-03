@@ -886,10 +886,7 @@ function Screen6({ onSaveStateChange }: Props) {
               text-white/90
             "
           >
-            <span className="font-semibold">Sisu:</span>{" "}
-            {tr(
-              "Sisu tarkoittaa sinnikkyyttä, sisäistä voimaa ja kykyä jatkaa vaikeuksista huolimatta.",
-            )}
+            {tr("Sisu = sinnikkyys ja sisäinen voima.")}
           </p>
         </section>
       </div>
@@ -11185,6 +11182,7 @@ function Screen44StrengthCandyHome({ onSaveStateChange }: Props) {
                 h-full
                 w-full
                 object-fill
+                [clip-path:inset(8%_0_0_0)]
                 select-none
               "
             />
@@ -11199,23 +11197,23 @@ function Screen44StrengthCandyHome({ onSaveStateChange }: Props) {
             <div
               className="
                 absolute
-                left-[30%]
-                top-[1.4%]
+                left-[8%]
+                top-[0.4%]
                 z-30
                 flex
-                min-h-[46px]
-                w-[40%]
+                min-h-[58px]
+                w-[84%]
                 items-center
                 justify-center
-                rounded-[12px]
+                rounded-[14px]
                 border-[3px]
                 border-black
                 bg-[#FFE77A]
-                px-4
-                py-2
+                px-5
+                py-3
                 text-center
                 font-display
-                text-[15px]
+                text-[16px]
                 font-bold
                 leading-none
                 text-[#241b3f]
@@ -12491,6 +12489,7 @@ function Screen50({ onSaveStateChange }: Props) {
                 h-full
                 w-full
                 object-fill
+                [clip-path:inset(8%_0_0_0)]
                 select-none
               "
             />
@@ -12500,23 +12499,23 @@ function Screen50({ onSaveStateChange }: Props) {
             <div
               className="
                 absolute
-                left-[30%]
-                top-[1.4%]
+                left-[8%]
+                top-[0.4%]
                 z-30
                 flex
-                min-h-[46px]
-                w-[40%]
+                min-h-[58px]
+                w-[84%]
                 items-center
                 justify-center
-                rounded-[12px]
+                rounded-[14px]
                 border-[3px]
                 border-black
                 bg-[#FFE77A]
-                px-4
-                py-2
+                px-5
+                py-3
                 text-center
                 font-display
-                text-[15px]
+                text-[16px]
                 font-bold
                 leading-none
                 text-[#241b3f]
