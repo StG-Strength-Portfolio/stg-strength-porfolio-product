@@ -61,7 +61,14 @@ export function languageFromDisplayName(name?: string | null): Language | null {
 // ---------------- Content dictionary (Excel-derived) ----------------
 
 type Entry = { en?: string; sv?: string };
-const CONTENT_DICT: Record<string, Entry> = generated as Record<string, Entry>;
+
+const CONTENT_DICT: Record<string, Entry> =
+  Object.fromEntries(
+    Object.entries(generated).map(([key, value]) => [
+      normalize(key),
+      value,
+    ]),
+  ) as Record<string, Entry>;
 
 // Normalize a Finnish source string so that trivial whitespace / quote /
 // punctuation variants still match the Excel keys.
@@ -628,20 +635,62 @@ function formatTemplate(s: string, vars?: Record<string, string | number>): stri
 
 // ---- Finnish-source lookup (Prompt 1 dictionary) ----
 const trWarned = new Set<string>();
-function trFinnish(finnish: string, language: Language): string {
+function trFinnish(
+  finnish: string,
+  language: Language,
+): string {
   // Defensive: callers occasionally pass an undefined lookup result.
-  if (typeof finnish !== "string" || !finnish) return "";
-  if (language === "fi") return finnish.replace("Näy hyvää!", "Huomaa hyvä!");
-  const out = translateFinnish(finnish, language as AppLanguage);
-  if (out !== finnish && TRANSLATIONS[finnish]) return out;
-  // Fall back to the Excel-derived dictionary (normalized key match).
+  if (typeof finnish !== "string" || !finnish) {
+    return "";
+  }
+
+  // Keep Finnish source text unchanged.
+  if (language === "fi") {
+    return finnish.replace("Näy hyvää!", "Huomaa hyvä!");
+  }
+
+  /*
+   * Swedish reviewer corrections from translations-generated.json
+   * have priority over the older generated TypeScript dictionary.
+   */
+  if (language === "sv") {
+    const hit = CONTENT_DICT[normalize(finnish)];
+    const swedish = hit?.sv;
+
+    if (swedish && swedish.trim()) {
+      return swedish;
+    }
+  }
+
+  /*
+   * Keep the existing generated translation flow for English.
+   */
+  const out = translateFinnish(
+    finnish,
+    language as AppLanguage,
+  );
+
+  if (out !== finnish && TRANSLATIONS[finnish]) {
+    return out;
+  }
+
+  /*
+   * Fallback to the JSON dictionary when the generated map
+   * does not contain the source string.
+   */
   const hit = CONTENT_DICT[normalize(finnish)];
-  const alt = hit && hit[language];
-  if (alt && alt.trim()) return alt;
+  const fallback = hit?.[language];
+
+  if (fallback && fallback.trim()) {
+    return fallback;
+  }
+
   if (out === finnish && !TRANSLATIONS[finnish]) {
     const key = `${language}:${finnish}`;
+
     if (!trWarned.has(key)) {
       trWarned.add(key);
+
       // eslint-disable-next-line no-console
       console.warn(
         `[i18n] Missing ${language.toUpperCase()} chrome translation (rendering Finnish):`,
@@ -649,6 +698,7 @@ function trFinnish(finnish: string, language: Language): string {
       );
     }
   }
+
   return out;
 }
 
