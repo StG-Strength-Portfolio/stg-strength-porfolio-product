@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { CornerBlobs } from "@/components/CornerBlobs";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -49,6 +49,7 @@ const TAB_ICONS: Record<string, IconCmp> = {
  */
 export function iconForRoute(to: string): IconCmp {
   if (/\/(dashboard|seikkailu)$/.test(to)) return ArrowLeftIcon;
+  if (to.includes("classrooms/teachers")) return PeopleIcon;
   if (to.includes("teach/materials")) return BookIcon;
   if (to.includes("teach/portfolio")) return PresentIcon;
   if (to.includes("sprint")) return to.includes("student") ? GamepadIcon : MapIcon;
@@ -88,11 +89,17 @@ export function DashboardShell({
 }) {
   const tr = useTr();
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const isTeacherArea = pathname.startsWith("/teacher");
 
   async function signOut() {
     await supabase.auth.signOut();
     navigate({ to: "/auth/login", replace: true });
   }
+
+  const teacherManagementLink = isTeacherArea
+    ? { to: "/teacher/classrooms/teachers", label: tr("Opettajat") }
+    : null;
 
   return (
     <div className="relative min-h-screen bg-background text-foreground">
@@ -126,6 +133,20 @@ export function DashboardShell({
                 );
               })}
             </nav>
+
+            {teacherManagementLink && (
+              <nav className="mt-3 space-y-1.5 border-t border-white/20 pt-3">
+                <Link
+                  to={teacherManagementLink.to}
+                  className="flex w-full items-center gap-2 rounded-2xl px-4 py-2.5 text-left text-sm font-semibold text-white/90 transition-all hover:bg-white/15"
+                  activeProps={{ className: "bg-white text-[color:var(--purple)] shadow-md" }}
+                >
+                  <PeopleIcon size={18} className="shrink-0" />
+                  <span className="min-w-0 break-words">{teacherManagementLink.label}</span>
+                </Link>
+              </nav>
+            )}
+
             {/* @lovable-new */}
             {links && links.length > 0 && (
               <nav className="mt-3 space-y-1.5 border-t border-white/20 pt-3">
@@ -206,6 +227,16 @@ export function DashboardShell({
                 </button>
               );
             })}
+            {teacherManagementLink && (
+              <Link
+                to={teacherManagementLink.to}
+                className="flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 text-xs font-semibold text-foreground"
+                activeProps={{ className: "bg-[color:var(--purple)] text-white shadow" }}
+              >
+                <PeopleIcon size={14} />
+                {teacherManagementLink.label}
+              </Link>
+            )}
           </nav>
 
           {children}

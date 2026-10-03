@@ -1,0 +1,101 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { z } from "zod";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  appendTriedStrengthPortfolioOrigin,
+  crossDomainMissUrl,
+  isStrengthPortfolioOrigin,
+  nextStrengthPortfolioOrigin,
+  parseTriedStrengthPortfolioOrigins,
+  safeAuthReturnPath,
+} from "@/lib/cross-domain-auth";
+
+export const Route = createFileRoute("/auth/cross-domain")({
+  validateSearch: z.object({
+    target: z.string(),
+    returnTo: z.enum(["/auth", "/auth/login"]).optional(),
+    tried: z.string().optional(),
+  }).parse,
+  component: CrossDomainAuthBridge,
+});
+
+function CrossDomainAuthBridge() {
+  const { target, returnTo, tried } = Route.useSearch();
+  const [message, setMessage] = useState("Checking your session…");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function run() {
+      const targetOrigin = target;
+      const returnPath = safeAuthReturnPath(returnTo);
+      const triedOrigins = parseTriedStrengthPortfolioOrigins(tried);
+
+      if (!isStrengthPortfolioOrigin(targetOrigin) || targetOrigin === window.location.origin) {
+        window.location.replace("/auth");
+        return;
+      }
+
+      const { data: sessionData } = await supabase.auth.getSession();
+      const session = sessionData.session;
+
+      if (!session) {
+        const nextOrigin = nextStrengthPortfolioOrigin(targetOrigin, triedOrigins);
+
+        if (nextOrigin) {
+          const nextTriedOrigins = appendTriedStrengthPortfolioOrigin(triedOrigins, nextOrigin);
+          const nextBridge = new URL("/auth/cross-domain", nextOrigin);
+          nextBridge.searchParams.set("target", targetOrigin);
+          nextBridge.searchParams.set("returnTo", returnPath);
+          nextBridge.searchParams.set("tried", nextTriedOrigins.join(","));
+          window.location.replace(nextBridge.toString());
+          return;
+        }
+
+        window.location.replace(crossDomainMissUrl(targetOrigin, returnPath, triedOrigins));
+        return;
+      }
+
+      setMessage("Opening Strength Portfolio…");
+
+      const { data, error } = await supabase.functions.invoke("cross-domain-session", {
+        body: { targetOrigin },
+      });
+
+      if (cancelled) return;
+
+      const tokenHash = typeof data?.tokenHash === "string" ? data.tokenHash : "";
+      const verificationType =
+        data?.verificationType === "magiclink" || data?.verificationType === "email"
+          ? data.verificationType
+          : "email";
+
+      if (error || !tokenHash) {
+        console.error("[cross-domain-auth] Could not create handoff", error ?? data);
+        window.location.replace(crossDomainMissUrl(targetOrigin, returnPath, triedOrigins));
+        return;
+      }
+
+      const callback = new URL("/auth", targetOrigin);
+      callback.searchParams.set("token_hash", tokenHash);
+      callback.searchParams.set("type", verificationType);
+      callback.searchParams.set("returnTo", returnPath);
+      if (triedOrigins.length > 0) {
+        callback.searchParams.set("ssoTried", triedOrigins.join(","));
+      }
+      window.location.replace(callback.toString());
+    }
+
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [returnTo, target, tried]);
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 text-foreground">
+      <p className="text-center text-sm opacity-70">{message}</p>
+    </div>
+  );
+}

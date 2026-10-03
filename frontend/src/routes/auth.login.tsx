@@ -9,8 +9,13 @@ import { StickyNote } from "@/components/StickyNote";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
 import { ForgotPasswordDialog } from "@/components/ForgotPasswordDialog";
 import { toast } from "sonner";
-import { useT, useTr } from "@/lib/i18n";
+import { useLanguage, useT, useTr } from "@/lib/i18n";
 import { homeForRole, roleOfCurrentUser } from "@/lib/role-guard";
+import {
+  appendTriedStrengthPortfolioOrigin,
+  nextStrengthPortfolioOrigin,
+  parseTriedStrengthPortfolioOrigins,
+} from "@/lib/cross-domain-auth";
 import { z } from "zod";
 
 export const Route = createFileRoute("/auth/login")({
@@ -20,31 +25,58 @@ export const Route = createFileRoute("/auth/login")({
         .string()
         .refine((v) => v.startsWith("/") && !v.startsWith("//"))
         .optional(),
+      sso: z.enum(["miss"]).optional(),
+      ssoTried: z.string().optional(),
     })
     .default({}),
   component: LoginPage,
 });
 
+const unconfirmedEmailCopy = {
+  fi: "Sähköpostiosoitettasi ei ole vielä vahvistettu. Avaa sähköposti ja napsauta vahvistuslinkkiä. Linkki avaa palvelun automaattisesti.",
+  en: "Your email address has not been confirmed yet. Open your email and click the confirmation link. The link will open the platform automatically.",
+  sv: "Din e-postadress är inte bekräftad ännu. Öppna e-postmeddelandet och klicka på bekräftelselänken. Länken öppnar tjänsten automatiskt.",
+} as const;
+
 function LoginPage() {
   const navigate = useNavigate();
-  const next = Route.useSearch().next ?? "";
+  const search = Route.useSearch();
+  const next = search.next ?? "";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [forgotOpen, setForgotOpen] = useState(false);
   const t = useT();
   const tr = useTr();
+  const { language } = useLanguage();
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
-      if (!data.session) return;
-      if (next) {
-        window.location.href = next;
+      if (data.session) {
+        if (next) {
+          window.location.href = next;
+          return;
+        }
+        window.location.href = homeForRole(await roleOfCurrentUser());
         return;
       }
-      window.location.href = homeForRole(await roleOfCurrentUser());
+
+      // A completed SSO miss means the other portfolio domains have already
+      // been checked. Do not repeat the same cross-domain scan on this route.
+      if (search.sso === "miss") return;
+
+      const triedOrigins = parseTriedStrengthPortfolioOrigins(search.ssoTried);
+      const otherOrigin = nextStrengthPortfolioOrigin(window.location.origin, triedOrigins);
+      if (!otherOrigin) return;
+
+      const nextTriedOrigins = appendTriedStrengthPortfolioOrigin(triedOrigins, otherOrigin);
+      const bridge = new URL("/auth/cross-domain", otherOrigin);
+      bridge.searchParams.set("target", window.location.origin);
+      bridge.searchParams.set("returnTo", "/auth/login");
+      bridge.searchParams.set("tried", nextTriedOrigins.join(","));
+      window.location.replace(bridge.toString());
     });
-  }, [navigate, next]);
+  }, [navigate, next, search.sso, search.ssoTried]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -52,7 +84,12 @@ function LoginPage() {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        toast.error(t("auth.login.wrong"));
+        const errorText = `${error.code ?? ""} ${error.message}`.toLowerCase();
+        const isUnconfirmed =
+          errorText.includes("email_not_confirmed") ||
+          errorText.includes("email not confirmed") ||
+          errorText.includes("email not verified");
+        toast.error(isUnconfirmed ? unconfirmedEmailCopy[language] : t("auth.login.wrong"));
         return;
       }
       if (next) {

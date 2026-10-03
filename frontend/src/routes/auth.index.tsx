@@ -5,11 +5,28 @@ import { CornerBlobs } from "@/components/CornerBlobs";
 import { StickyNote } from "@/components/StickyNote";
 import { Button } from "@/components/ui/button";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
-import { useT, useTr } from "@/lib/i18n";
+import { useLanguage, useT } from "@/lib/i18n";
+import { homeForRole, roleOfCurrentUser } from "@/lib/role-guard";
+import {
+  appendTriedStrengthPortfolioOrigin,
+  crossDomainMissUrl,
+  nextStrengthPortfolioOrigin,
+  parseTriedStrengthPortfolioOrigins,
+  safeAuthReturnPath,
+} from "@/lib/cross-domain-auth";
 import { z } from "zod";
 
 export const Route = createFileRoute("/auth/")({
-  validateSearch: z.object({ idle: z.enum(["1"]).optional() }).parse,
+  validateSearch: z
+    .object({
+      idle: z.enum(["1"]).optional(),
+      sso: z.enum(["miss"]).optional(),
+      ssoTried: z.string().optional(),
+      token_hash: z.string().optional(),
+      type: z.enum(["email", "magiclink"]).optional(),
+      returnTo: z.enum(["/auth", "/auth/login"]).optional(),
+    })
+    .parse,
   component: AuthLanding,
 });
 
@@ -17,13 +34,69 @@ function AuthLanding() {
   const navigate = useNavigate();
   const search = Route.useSearch();
   const t = useT();
-  const tr = useTr();
+  const { language } = useLanguage();
+  const staffLabel =
+    language === "en"
+      ? "Create staff account"
+      : language === "sv"
+        ? "Skapa personalkonto"
+        : "Luo henkilökunnan tili";
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/seikkailu", replace: true });
-    });
-  }, [navigate]);
+    let cancelled = false;
+
+    async function resolveAuth() {
+      const triedOrigins = parseTriedStrengthPortfolioOrigins(search.ssoTried);
+
+      if (search.token_hash && search.type) {
+        const { error } = await supabase.auth.verifyOtp({
+          token_hash: search.token_hash,
+          type: search.type,
+        });
+
+        if (cancelled) return;
+
+        if (error) {
+          console.error("[cross-domain-auth] Handoff verification failed", error);
+          window.location.replace(
+            crossDomainMissUrl(
+              window.location.origin,
+              safeAuthReturnPath(search.returnTo),
+              triedOrigins,
+            ),
+          );
+          return;
+        }
+
+        window.history.replaceState({}, "", "/auth");
+        window.location.replace(homeForRole(await roleOfCurrentUser()));
+        return;
+      }
+
+      const { data } = await supabase.auth.getSession();
+      if (cancelled) return;
+
+      if (data.session) {
+        window.location.href = homeForRole(await roleOfCurrentUser());
+        return;
+      }
+
+      const otherOrigin = nextStrengthPortfolioOrigin(window.location.origin, triedOrigins);
+      if (!otherOrigin) return;
+
+      const nextTriedOrigins = appendTriedStrengthPortfolioOrigin(triedOrigins, otherOrigin);
+      const bridge = new URL("/auth/cross-domain", otherOrigin);
+      bridge.searchParams.set("target", window.location.origin);
+      bridge.searchParams.set("returnTo", "/auth");
+      bridge.searchParams.set("tried", nextTriedOrigins.join(","));
+      window.location.replace(bridge.toString());
+    }
+
+    void resolveAuth();
+    return () => {
+      cancelled = true;
+    };
+  }, [navigate, search.returnTo, search.sso, search.ssoTried, search.token_hash, search.type]);
 
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-hidden flex items-center justify-center px-4 py-10">
@@ -31,7 +104,9 @@ function AuthLanding() {
       <AuthLanguageSwitcher />
       <div className="relative z-10 w-full max-w-md space-y-6">
         <div className="text-center">
-          <h1 className="text-5xl font-bold">{t("app.title")}</h1>
+          <h1 className="text-5xl font-bold">
+            {language === "fi" ? "Vahvuusportfolio" : t("app.title")}
+          </h1>
           <p className="mt-2 opacity-90">{t("app.tagline")}</p>
         </div>
 
@@ -43,7 +118,15 @@ function AuthLanding() {
 
         <StickyNote seed="landing-card" className="space-y-4 text-center">
           <Button
-            onClick={() => navigate({ to: "/auth/login" })}
+            onClick={() =>
+              navigate({
+                to: "/auth/login",
+                search:
+                  search.sso === "miss"
+                    ? { sso: "miss", ssoTried: search.ssoTried }
+                    : {},
+              })
+            }
             className="w-full rounded-full bg-[color:var(--purple)] hover:bg-[color:var(--purple)]/90 text-white font-bold py-6 text-base h-auto"
           >
             {t("auth.landing.loginBtn")}
@@ -55,10 +138,10 @@ function AuthLanding() {
             {t("auth.landing.signupBtn")}
           </Button>
           <Button
-            onClick={() => navigate({ to: "/register-teacher" })}
+            onClick={() => navigate({ to: "/register-staff" })}
             className="w-full rounded-full bg-yellow hover:bg-yellow/90 text-ink font-bold py-6 text-base h-auto"
           >
-            {tr("Luo opettajatili")}
+            {staffLabel}
           </Button>
         </StickyNote>
       </div>

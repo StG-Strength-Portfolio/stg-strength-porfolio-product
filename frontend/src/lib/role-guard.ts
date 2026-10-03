@@ -2,6 +2,17 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import type { AppRole } from "@/lib/auth-helpers";
+import { getSuperAdminPreview } from "@/lib/superadmin-preview";
+import {
+  DEMO_PRINCIPAL_ID,
+  DEMO_SCHOOL_ID,
+  DEMO_SCHOOL_NAME,
+  DEMO_TEACHER_ID,
+} from "@/lib/demo-store";
+import { getDemoProfile } from "@/lib/demo-community";
+import { normalizeDemoStateForCurrentUi } from "@/lib/demo-normalize";
+import { DEFAULT_LANGUAGE, isLanguage } from "@/lib/i18n";
+import type { PrivacyRegion } from "@/lib/external-content-preferences";
 
 export interface RoleGuardState {
   ready: boolean;
@@ -9,11 +20,12 @@ export interface RoleGuardState {
   userId: string | null;
   schoolId: string | null;
   schoolName: string | null;
+  privacyRegion: PrivacyRegion | null;
   displayName: string | null;
   email: string | null;
+  preview: boolean;
 }
 
-/** Reads the current user's role (defaults to student). */
 export async function roleOfCurrentUser(): Promise<AppRole | null> {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) return null;
@@ -22,10 +34,12 @@ export async function roleOfCurrentUser(): Promise<AppRole | null> {
     .select("role")
     .eq("user_id", userData.user.id)
     .maybeSingle();
-  return ((data as { role?: AppRole } | null)?.role ?? "student") as AppRole;
+  const role = (data as { role?: AppRole } | null)?.role;
+  if (role) return role;
+  if (userData.user.user_metadata?.registration_type === "staff") return null;
+  return "student";
 }
 
-/** Where a signed-in user belongs, by role. */
 export function homeForRole(role: AppRole | null): string {
   switch (role) {
     case "super_admin":
@@ -36,15 +50,19 @@ export function homeForRole(role: AppRole | null): string {
       return "/teacher/dashboard";
     case "admin":
       return "/opettaja";
-    default:
+    case "student":
       return "/seikkailu";
+    default:
+      return "/confirm-staff";
   }
 }
 
-/**
- * Client-side gate for role-scoped dashboards. Signed-out users go to /auth,
- * users with a different role are sent to their own dashboard.
- */
+function demoLanguage() {
+  if (typeof window === "undefined") return DEFAULT_LANGUAGE;
+  const raw = window.localStorage.getItem("student_language");
+  return isLanguage(raw) ? raw : DEFAULT_LANGUAGE;
+}
+
 export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
   const navigate = useNavigate();
   const [state, setState] = useState<RoleGuardState>({
@@ -53,8 +71,10 @@ export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
     userId: null,
     schoolId: null,
     schoolName: null,
+    privacyRegion: null,
     displayName: null,
     email: null,
+    preview: false,
   });
 
   useEffect(() => {
@@ -71,7 +91,55 @@ export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
         .select("role")
         .eq("user_id", user.id)
         .maybeSingle();
-      const role = ((roleRow as { role?: AppRole } | null)?.role ?? "student") as AppRole;
+      const storedRole = (roleRow as { role?: AppRole } | null)?.role;
+      if (!storedRole && user.user_metadata?.registration_type === "staff") {
+        window.location.href = "/confirm-staff";
+        return;
+      }
+      const role = (storedRole ?? "student") as AppRole;
+
+      if (role === "super_admin") {
+        const preview = getSuperAdminPreview();
+        const wantsTeacher = preview.mode === "teacher" && allowed.includes("teacher");
+        const wantsPrincipal = preview.mode === "principal" && allowed.includes("school_admin");
+        const language = demoLanguage();
+
+        if (wantsPrincipal) {
+          const profile = getDemoProfile("principal", language);
+          if (cancelled) return;
+          setState({
+            ready: true,
+            role: "school_admin",
+            userId: DEMO_PRINCIPAL_ID,
+            schoolId: DEMO_SCHOOL_ID,
+            schoolName: DEMO_SCHOOL_NAME,
+            privacyRegion: null,
+            displayName: profile.name,
+            email: profile.email,
+            preview: true,
+          });
+          return;
+        }
+
+        if (wantsTeacher) {
+          normalizeDemoStateForCurrentUi();
+          const profile = getDemoProfile("teacher", language);
+          if (cancelled) return;
+          setState({
+            ready: true,
+            role: "teacher",
+            userId: DEMO_TEACHER_ID,
+            schoolId: DEMO_SCHOOL_ID,
+            schoolName: DEMO_SCHOOL_NAME,
+            privacyRegion: null,
+            displayName: profile.name,
+            email: profile.email,
+            preview: true,
+          });
+          return;
+        }
+      }
+
       if (!allowed.includes(role)) {
         window.location.href = homeForRole(role);
         return;
@@ -84,13 +152,16 @@ export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
       const p = profile as { display_name?: string | null; school_id?: string | null } | null;
 
       let schoolName: string | null = null;
+      let privacyRegion: PrivacyRegion | null = null;
       if (p?.school_id) {
         const { data: school } = await supabase
           .from("schools" as never)
-          .select("name")
+          .select("name, privacy_region")
           .eq("id", p.school_id)
           .maybeSingle();
-        schoolName = (school as { name?: string } | null)?.name ?? null;
+        const s = school as { name?: string; privacy_region?: string | null } | null;
+        schoolName = s?.name ?? null;
+        privacyRegion = s?.privacy_region === "us" ? "us" : "eu_eea";
       }
 
       if (cancelled) return;
@@ -100,8 +171,10 @@ export function useRoleGuard(allowed: AppRole[]): RoleGuardState {
         userId: user.id,
         schoolId: p?.school_id ?? null,
         schoolName,
+        privacyRegion,
         displayName: p?.display_name ?? null,
         email: user.email ?? null,
+        preview: false,
       });
     })();
     return () => {

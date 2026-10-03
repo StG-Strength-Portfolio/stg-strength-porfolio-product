@@ -1,7 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { matchStrengthId, strengthIdsFromResponses } from "@/lib/strength-jar-data";
+import { createStaffCode } from "@/lib/staff-registration.functions";
 import type { ReportEvent } from "@/lib/report-series";
+import {
+  DEMO_SCHOOL_ID,
+  getDemoSchoolAdminData,
+  getDemoState,
+} from "@/lib/demo-store";
 
 export interface SchoolAdminStudent {
   id: string;
@@ -34,6 +40,7 @@ export interface SchoolAdminCode {
   is_revoked: boolean;
   used_by: string | null;
   created_at: string;
+  expires_at: string | null;
 }
 
 export interface SchoolAdminClass {
@@ -61,13 +68,18 @@ async function admin() {
   return supabaseAdmin as any;
 }
 
-async function assertSchoolAdmin(supabase: any, userId: string): Promise<string> {
-  const { data: role } = await supabase
+async function currentRole(supabase: any, userId: string): Promise<string | null> {
+  const { data } = await supabase
     .from("user_roles")
     .select("role")
     .eq("user_id", userId)
     .maybeSingle();
-  if (role?.role !== "school_admin") throw new Error("Forbidden");
+  return data?.role ?? null;
+}
+
+async function assertSchoolAdmin(supabase: any, userId: string): Promise<string> {
+  const role = await currentRole(supabase, userId);
+  if (role !== "school_admin") throw new Error("Forbidden");
   const db = await admin();
   const { data: profile } = await db
     .from("profiles")
@@ -78,17 +90,22 @@ async function assertSchoolAdmin(supabase: any, userId: string): Promise<string>
   return profile.school_id as string;
 }
 
-function randomTeacherCode(): string {
-  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let s = "TEACH-";
-  for (let i = 0; i < 5; i++) s += alphabet[Math.floor(Math.random() * alphabet.length)];
-  return s;
+/** Read access for a real principal or a Superadmin fictional principal preview. */
+async function resolveReadSchool(supabase: any, userId: string): Promise<string> {
+  const role = await currentRole(supabase, userId);
+  if (role === "school_admin") return assertSchoolAdmin(supabase, userId);
+  if (role === "super_admin") return DEMO_SCHOOL_ID;
+  throw new Error("Forbidden");
 }
 
 export const getSchoolAdminData = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<SchoolAdminData> => {
-    const schoolId = await assertSchoolAdmin(context.supabase, context.userId);
+    const schoolId = await resolveReadSchool(context.supabase, context.userId);
+    if (schoolId === DEMO_SCHOOL_ID) {
+      return getDemoSchoolAdminData("en");
+    }
+
     const db = await admin();
 
     const [{ data: school }, { data: profiles }, { data: roles }, { data: codes }] =
@@ -101,8 +118,9 @@ export const getSchoolAdminData = createServerFn({ method: "GET" })
         db.from("user_roles").select("user_id, role"),
         db
           .from("school_codes")
-          .select("id, code, code_type, is_used, is_revoked, used_by_admin_id, created_at")
+          .select("id, code, code_type, is_used, is_revoked, used_by_admin_id, created_at, expires_at")
           .eq("school_id", schoolId)
+          .eq("code_type", "staff")
           .order("created_at", { ascending: false }),
       ]);
 
@@ -120,7 +138,6 @@ export const getSchoolAdminData = createServerFn({ method: "GET" })
     const { data: classes } = await db
       .from("classes")
       .select("id, name, teacher_id, join_code, language")
-
       .eq("is_deleted", false)
       .in("teacher_id", teacherIds.length ? teacherIds : ["00000000-0000-0000-0000-000000000000"]);
 
@@ -141,14 +158,12 @@ export const getSchoolAdminData = createServerFn({ method: "GET" })
       studentsPerClass.set(m.class_id, (studentsPerClass.get(m.class_id) ?? 0) + 1);
     }
 
-    // Students are found both by profile.school_id AND by membership in a class
-    // owned by one of the school's teachers (students who joined via a class code
-    // never get a school_id on their profile).
     const studentIdSet = new Set<string>(memberIds.filter((id) => roleOf.get(id) === "student"));
     for (const m of (members ?? []) as any[]) {
       if ((roleOf.get(m.student_id) ?? "student") === "student") studentIdSet.add(m.student_id);
     }
     const studentIds = Array.from(studentIdSet);
+    const communityIdSet = new Set<string>([...memberIds, ...studentIds]);
 
     const extraProfiles: any[] = [];
     const missingIds = studentIds.filter((id) => !nameOf.has(id));
@@ -200,19 +215,24 @@ export const getSchoolAdminData = createServerFn({ method: "GET" })
 
     const { data: assigned } = await db
       .from("teacher_assigned_strengths")
-      .select("strength_id, student_id, created_at");
+      .select("strength_id, student_id, teacher_id, from_user_id, to_user_id, created_at");
     const counts = new Map<string, number>();
     const giftsPer = new Map<string, number[]>();
     for (const a of (assigned ?? []) as any[]) {
-      if (!studentIds.includes(a.student_id)) continue;
+      const linkedToSchool = [a.from_user_id, a.to_user_id, a.teacher_id, a.student_id]
+        .filter(Boolean)
+        .some((id) => communityIdSet.has(id));
+      if (!linkedToSchool) continue;
+
       counts.set(a.strength_id, (counts.get(a.strength_id) ?? 0) + 1);
       const id = Number.isFinite(Number(a.strength_id))
         ? Number(a.strength_id)
         : matchStrengthId(String(a.strength_id));
-      if (id && id >= 1 && id <= 26) {
-        const list = giftsPer.get(a.student_id) ?? [];
+      const recipientId = a.to_user_id ?? a.student_id;
+      if (id && id >= 1 && id <= 26 && studentIdSet.has(recipientId)) {
+        const list = giftsPer.get(recipientId) ?? [];
         list.push(id);
-        giftsPer.set(a.student_id, list);
+        giftsPer.set(recipientId, list);
       }
     }
 
@@ -235,13 +255,14 @@ export const getSchoolAdminData = createServerFn({ method: "GET" })
       });
     }
     for (const a of (assigned ?? []) as any[]) {
-      if (!studentIdSet.has(a.student_id) || !a.created_at) continue;
+      const recipientId = a.to_user_id ?? a.student_id;
+      if (!studentIdSet.has(recipientId) || !a.created_at) continue;
       const giftId = Number.isFinite(Number(a.strength_id))
         ? Number(a.strength_id)
         : matchStrengthId(String(a.strength_id));
       events.push({
-        userId: a.student_id,
-        classId: classIdOfStudent.get(a.student_id) ?? null,
+        userId: recipientId,
+        classId: classIdOfStudent.get(recipientId) ?? null,
         at: a.created_at,
         strengths: 1,
         strengthIds: giftId ? [giftId] : [],
@@ -305,6 +326,7 @@ export const getSchoolAdminData = createServerFn({ method: "GET" })
         is_revoked: c.is_revoked,
         used_by: c.used_by_admin_id ? (nameOf.get(c.used_by_admin_id) ?? null) : null,
         created_at: c.created_at,
+        expires_at: c.expires_at ?? null,
       })),
       events,
       strengthCounts: Array.from(counts, ([strengthId, count]) => ({ strengthId, count })).sort(
@@ -313,36 +335,33 @@ export const getSchoolAdminData = createServerFn({ method: "GET" })
     };
   });
 
+/** Legacy export name kept for the existing dashboard; demo calls never write customer data. */
 export const createTeacherCode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const schoolId = await assertSchoolAdmin(context.supabase, context.userId);
-    const db = await admin();
-    for (let attempt = 0; attempt < 5; attempt++) {
-      const code = randomTeacherCode();
-      const { error } = await db.from("school_codes").insert({
-        school_id: schoolId,
-        code,
-        code_type: "teacher",
-        created_by: context.userId,
-      });
-      if (!error) return { code };
-      if ((error as any).code !== "23505") throw new Error(error.message);
+    const role = await currentRole(context.supabase, context.userId);
+    if (role === "super_admin") {
+      return { code: `TEACH-DEMO${Math.floor(100 + Math.random() * 900)}` };
     }
-    throw new Error("Could not generate a unique code");
+    const schoolId = await assertSchoolAdmin(context.supabase, context.userId);
+    return createStaffCode(await admin(), schoolId, context.userId);
   });
 
 export const revokeTeacherCode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { id: string }) => d)
   .handler(async ({ data, context }) => {
+    const role = await currentRole(context.supabase, context.userId);
+    if (role === "super_admin") return { ok: true };
+
     const schoolId = await assertSchoolAdmin(context.supabase, context.userId);
     const db = await admin();
     const { error } = await db
       .from("school_codes")
       .update({ is_revoked: true })
       .eq("id", data.id)
-      .eq("school_id", schoolId);
+      .eq("school_id", schoolId)
+      .eq("code_type", "staff");
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -351,6 +370,9 @@ export const promoteToSchoolAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { userId: string }) => d)
   .handler(async ({ data, context }) => {
+    const role = await currentRole(context.supabase, context.userId);
+    if (role === "super_admin") return { ok: true };
+
     const schoolId = await assertSchoolAdmin(context.supabase, context.userId);
     const db = await admin();
     const { data: target } = await db
@@ -377,13 +399,25 @@ export const getStudentPortfolio = createServerFn({ method: "GET" })
     }): Promise<{
       name: string | null;
       currentScreen: number | null;
-      responses: { field_key: string; value: string | null }[];
+      responses: { field_key: string; value: unknown }[];
     }> => {
-      const schoolId = await assertSchoolAdmin(context.supabase, context.userId);
-      const db = await admin();
+      const schoolId = await resolveReadSchool(context.supabase, context.userId);
+      if (schoolId === DEMO_SCHOOL_ID) {
+        const demo = getDemoState();
+        const student = demo.students.find((item) => item.id === data.userId);
+        if (!student) throw new Error("Demo student not found");
+        const responses =
+          data.userId === "demo-student-primary"
+            ? Object.entries(demo.studentResponses).map(([field_key, value]) => ({ field_key, value }))
+            : student.filledKeys.map((field_key) => ({ field_key, value: "Demo response" }));
+        return {
+          name: student.name,
+          currentScreen: student.currentScreen,
+          responses,
+        };
+      }
 
-      // The student must belong to this school, either directly or through a
-      // class owned by one of the school's teachers.
+      const db = await admin();
       const { data: profile } = await db
         .from("profiles")
         .select("id, display_name, current_screen, school_id")
@@ -421,7 +455,7 @@ export const getStudentPortfolio = createServerFn({ method: "GET" })
         currentScreen: profile.current_screen ?? null,
         responses: ((rows ?? []) as any[]).map((r) => ({
           field_key: r.field_key as string,
-          value: (r.value ?? null) as string | null,
+          value: r.value ?? null,
         })),
       };
     },

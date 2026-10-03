@@ -14,6 +14,9 @@ export interface TeachingCategory {
   strength_id: string;
   sort_order: number;
   is_published: boolean;
+  thumbnail_url_fi: string | null;
+  thumbnail_url_en: string | null;
+  thumbnail_url_sv: string | null;
 }
 
 export interface TeachingSubcategory {
@@ -74,7 +77,6 @@ export const createTeachingCategory = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
-    // Sub-categories are added manually by the super admin — no presets.
     return { id: row.id as string };
   });
 
@@ -99,6 +101,31 @@ export const setTeachingCategoryPublished = createServerFn({ method: "POST" })
     const { error } = await db
       .from("teaching_categories")
       .update({ is_published: data.isPublished })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const saveTeachingCategoryThumbnails = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (d: {
+      id: string;
+      thumbnailFi?: string;
+      thumbnailEn?: string;
+      thumbnailSv?: string;
+    }) => d,
+  )
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.supabase, context.userId);
+    const db = await admin();
+    const { error } = await db
+      .from("teaching_categories")
+      .update({
+        thumbnail_url_fi: data.thumbnailFi?.trim() || null,
+        thumbnail_url_en: data.thumbnailEn?.trim() || null,
+        thumbnail_url_sv: data.thumbnailSv?.trim() || null,
+      })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };

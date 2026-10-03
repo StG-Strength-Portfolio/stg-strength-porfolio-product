@@ -16,6 +16,7 @@ import { useReportCompletion } from "@/lib/screen-completion";
 import { cn } from "@/lib/utils";
 import { useTr, useLanguage } from "@/lib/i18n";
 import { getStrengthColor, getStrengthName } from "@/lib/strengths-i18n";
+import { Heart } from "lucide-react";
 
 // Screens 1–22: content sourced verbatim from the workbook PDF
 // "Vahvuusportfolio lukiolaiselle" (Huomaa hyvä!®).
@@ -75,14 +76,14 @@ function Screen1() {
 
   return (
     <div className="relative flex h-full min-h-[620px] w-full flex-col overflow-hidden px-[5%] text-center font-display text-white">
-      <div className="relative z-10 flex shrink-0 flex-col items-center pt-[7vh]">
+      <div className="relative z-10 flex shrink-0 flex-col items-center pt-[5vh]">
         <div className="text-[clamp(24px,2.4vw,42px)] font-bold leading-none tracking-[0] text-white">
           {tr("Huomaa hyvä!®")}
         </div>
 
         <h1
           className="
-            mt-[3vh]
+            mt-[2.5vh]
             max-w-[900px]
             text-[clamp(30px,3.4vw,48px)]
             font-medium
@@ -91,12 +92,23 @@ function Screen1() {
             text-white
           "
         >
-          {" "}
           {trLines(tr, "Vahvuusportfolio\nlukiolaiselle")}
         </h1>
       </div>
 
-      <div className="relative z-0 flex min-h-0 flex-1 items-end justify-center pb-[8vh] pt-[6vh]">
+      <div
+        className="
+          relative
+          z-0
+          flex
+          min-h-0
+          flex-1
+          items-center
+          justify-center
+          pb-[3vh]
+          pt-[2vh]
+        "
+      >
         <img
           src="/illustrations/naytto-1.png"
           alt=""
@@ -105,12 +117,12 @@ function Screen1() {
     pointer-events-none
     block
     h-auto
-    w-[900px]
-    max-w-none
+    w-[760px]
+    max-w-[90%]
     object-contain
     object-center
     select-none
-    translate-y-40
+    -translate-y-12
   "
         />
       </div>
@@ -1915,11 +1927,6 @@ function Screen14() {
   const tr = useTr();
   return (
     <div className="relative flex h-full min-h-[620px] w-full items-center justify-center overflow-hidden px-8 text-white">
-      <div className="absolute right-[4%] top-0 rounded-b-[12px] border-2 border-t-0 border-black bg-[#7654ad] px-5 py-3 text-white"></div>
-
-      <div className="pointer-events-none absolute left-[7%] top-[16%] h-28 w-28 rounded-full border-[14px] border-[#ffd95d]/45" />
-      <div className="pointer-events-none absolute bottom-[14%] right-[11%] h-40 w-40 rounded-full border-2 border-black bg-[#f36f56]/25" />
-
       <h1 className="relative z-10 text-center font-display text-[clamp(48px,5vw,78px)] font-semibold leading-[1.08]">
         {trLines(tr, "1. Omat\nydinvahvuudet")}
       </h1>
@@ -2350,13 +2357,7 @@ function Screen15({ onSaveStateChange }: Props) {
           ? "saved"
           : "idle";
     onSaveStateChange?.(merged);
-  }, [
-    picksSaveState,
-    examplesSaveState,
-    successSaveState,
-    effectSaveState,
-    onSaveStateChange,
-  ]);
+  }, [picksSaveState, examplesSaveState, successSaveState, effectSaveState, onSaveStateChange]);
 
   const full = picked.length === PICK;
   const chosen = picked.map((id) => DATA.find((d) => d.id === id));
@@ -4472,8 +4473,8 @@ export function Screen19({ onSaveStateChange }: Props) {
                       h-full
                       min-h-[225px]
                       w-full
-                      grid-cols-[minmax(0,1fr)_150px]
-                      gap-3
+                      grid-cols-[minmax(0,1fr)_124px]
+                      gap-2
                     "
                   >
                     <div
@@ -4483,7 +4484,8 @@ export function Screen19({ onSaveStateChange }: Props) {
                         border-2
                         border-black
                         rounded-[18px]
-                        bg-white
+                        bg-[#fffdf6]
+                        screen19-lined-textarea
 
                         [&_label]:hidden
                         [&>div]:h-full
@@ -4498,13 +4500,8 @@ export function Screen19({ onSaveStateChange }: Props) {
                         [&_textarea]:min-h-[225px]
                         [&_textarea]:w-full
                         [&_textarea]:resize-none
-                        [&_textarea]:rounded-[18px]
+                        [&_textarea]:rounded-[16px]
                         [&_textarea]:border-0
-                        [&_textarea]:bg-transparent
-                        [&_textarea]:px-4
-                        [&_textarea]:py-4
-                        [&_textarea]:text-[15px]
-                        [&_textarea]:leading-[1.55]
                         [&_textarea]:text-[#241b3f]
                         [&_textarea]:outline-none
                         [&_textarea]:shadow-none
@@ -4534,7 +4531,7 @@ export function Screen19({ onSaveStateChange }: Props) {
                         border-black
                         rounded-[18px]
                         bg-white
-                        px-4
+                        px-2.5
                         py-5
                       "
                     >
@@ -4548,17 +4545,18 @@ export function Screen19({ onSaveStateChange }: Props) {
                           text-[#4b3a66]
                         "
                       >
-                        {trLines(tr, "Merkitse\nvahvuutesi")}
+                        {trLines(tr, "Väritä\nsydämet")}
                       </p>
 
                       <div
                         className="
                           grid
                           grid-cols-2
-                          gap-4
+                          gap-x-3
+                          gap-y-2
                         "
                       >
-                        {[1, 2, 3, 4].map((score) => {
+                        {[1, 2, 3, 4, 5, 6].map((score) => {
                           const isSelected = selectedScores.includes(score);
 
                           return (
@@ -4569,24 +4567,24 @@ export function Screen19({ onSaveStateChange }: Props) {
                               aria-pressed={isSelected}
                               onClick={() => selectScore(group.fieldKey, score)}
                               className={`
+                                relative
                                 flex
-                                h-[48px]
-                                w-[48px]
+                                h-[43px]
+                                w-[43px]
                                 cursor-pointer
                                 items-center
                                 justify-center
-                                rounded-[8px]
-                                border-[3px]
-                                text-[31px]
+                                border-0
+                                bg-transparent
+                                text-[#241b3f]
                                 font-semibold
-                                leading-[1.12]
                                 transition-all
                                 duration-150
 
                                 ${
                                   isSelected
-                                    ? "border-black bg-[#eee8f8] text-[#241b3f] shadow-[0_3px_0_rgba(68,42,105,0.18)]"
-                                    : "border-black bg-white text-transparent hover:bg-[#f7f3fb]"
+                                    ? "drop-shadow-[0_2px_0_rgba(0,0,0,0.18)]"
+                                    : "hover:text-[#ef706e]"
                                 }
 
                                 focus-visible:outline-none
@@ -4594,28 +4592,16 @@ export function Screen19({ onSaveStateChange }: Props) {
                                 focus-visible:ring-[#d9ccec]
                               `}
                             >
-                              {isSelected ? "✓" : ""}
+                              <Heart
+                                aria-hidden="true"
+                                className="h-[36px] w-[36px]"
+                                strokeWidth={2.8}
+                                fill={isSelected ? "#ef706e" : "transparent"}
+                                color={isSelected ? "#ef706e" : "#241b3f"}
+                              />
                             </button>
                           );
                         })}
-                      </div>
-
-                      <div
-                        className="
-                          mt-2
-                          grid
-                          grid-cols-4
-                          gap-[25px]
-                          text-center
-                          text-[11px]
-                          font-semibold
-                          text-[#7654ad]
-                        "
-                      >
-                        <span>1</span>
-                        <span>2</span>
-                        <span>3</span>
-                        <span>4</span>
                       </div>
                     </div>
                   </div>
@@ -6757,10 +6743,10 @@ function Screen27() {
   const { language } = useLanguage();
   const illustrationSrc =
     language === "en"
-      ? "/illustrations/s24-feedback-bubbles-en.png"
+      ? "/illustrations/s27-feedback-bubbles-en.png"
       : language === "sv"
-        ? "/illustrations/s24-feedback-bubbles-sv.png"
-        : "/illustrations/s24-feedback-bubbles-fi.png";
+        ? "/illustrations/s27-feedback-bubbles-sv.png"
+        : "/illustrations/s27-feedback-bubbles-fi.png";
 
   return (
     <div
@@ -7680,13 +7666,15 @@ function VahvuuskarkkiSheet({
 }) {
   const tr = useTr();
   const { language } = useLanguage();
+  const [selectedStrengths, setSelectedStrengths] = useState<string[]>([]);
 
-  const sheetIllustration =
-    language === "fi"
-      ? "/illustrations/s29-lukiossa-sheet-fi.png"
-      : language === "sv"
-        ? "/illustrations/s29-lukiossa-sheet-sv.png"
-        : "/illustrations/s29-lukiossa-sheet-en.png";
+  const updateStrength = useCallback((index: number, value: string) => {
+    setSelectedStrengths((current) => {
+      const next = [...current];
+      next[index] = value;
+      return next;
+    });
+  }, []);
 
   return (
     <div
@@ -7708,28 +7696,23 @@ function VahvuuskarkkiSheet({
           grid
           min-h-[760px]
           w-full
-          max-w-[1500px]
+          max-w-[1220px]
           grid-cols-1
-          gap-12
-          px-[6%]
+          gap-10
+          px-6
           pb-24
-          pt-8
-          lg:grid-cols-[44%_56%]
+          pt-3
+          lg:grid-cols-[minmax(0,1fr)_360px]
         "
       >
-        {/* =========================
-            LEFT SIDE
-        ========================== */}
-
-        <div className="relative min-w-0 pt-6">
+        <div className="min-w-0">
           <h1
             className="
-              max-w-[520px]
               font-display
-              text-[clamp(36px,3.2vw,54px)]
+              text-[clamp(34px,3vw,50px)]
               font-semibold
               leading-[1.05]
-              text-[#FFE77A]
+              text-white
             "
           >
             {tr(title)}
@@ -7737,12 +7720,10 @@ function VahvuuskarkkiSheet({
 
           <p
             className="
-              mt-10
-              max-w-[430px]
+              mt-4
               font-display
-              text-[clamp(20px,1.55vw,27px)]
+              text-[clamp(17px,1.35vw,21px)]
               font-semibold
-              leading-[1.25]
               text-white
             "
           >
@@ -7751,219 +7732,96 @@ function VahvuuskarkkiSheet({
 
           <p
             className="
-              mt-2
+              mt-12
               font-display
-              text-[clamp(18px,1.4vw,24px)]
+              text-[clamp(18px,1.35vw,22px)]
               font-semibold
-              text-white
-            "
-          >
-            {tr("Kirjoita vahvuudet tähän")}
-          </p>
-
-          <div
-            className="
-              mt-7
-              max-w-[390px]
-
-              [&_label]:hidden
-
-              [&_input]:border-0
-              [&_input]:border-b-2
-              [&_input]:border-white
-              [&_input]:bg-transparent
-              [&_input]:text-[18px]
-              [&_input]:text-white
-              [&_input]:outline-none
-              [&_input]:placeholder:text-white/50
-            "
-          >
-            <ReflectionInput
-              fieldKey={`${fieldPrefix}_karkit`}
-              prefix=""
-              placeholder=""
-              onSaveStateChange={onSaveStateChange}
-            />
-          </div>
-
-          <p
-            className="
-              mt-24
-              max-w-[440px]
-              font-display
-              text-[clamp(19px,1.6vw,26px)]
-              font-semibold
-              leading-[1.35]
               text-white
             "
           >
             {tr("Pohdi, mitä teit, koit ja opit.")}
           </p>
 
-          <div
-            className="
-              mt-8
-              grid
-              max-w-[460px]
-              grid-cols-[10px_minmax(0,1fr)]
-              gap-x-4
-            "
-          >
-            <span
-              aria-hidden="true"
-              className="
-                mt-[10px]
-                h-[8px]
-                w-[8px]
-                rounded-full
-                bg-[#ffc936]
-              "
+          <div className="mt-7 grid gap-6">
+            <ReflectionTextarea
+              fieldKey={`${fieldPrefix}_teit`}
+              label={tr("1. Mitä teit?")}
+              rows={3}
+              onSaveStateChange={onSaveStateChange}
             />
-
-            <p
-              className="
-                text-[clamp(18px,1.45vw,24px)]
-                leading-[1.35]
-                text-white
-              "
-            >
-              {tr("Täydennä oheinen tehtävä.")}
-            </p>
+            <ReflectionTextarea
+              fieldKey={`${fieldPrefix}_seuraavaksi`}
+              label={tr("2. Mitä tapahtui seuraavaksi?")}
+              rows={3}
+              onSaveStateChange={onSaveStateChange}
+            />
+            <ReflectionTextarea
+              fieldKey={`${fieldPrefix}_opit`}
+              label={tr("3. Mitä opit?")}
+              rows={3}
+              onSaveStateChange={onSaveStateChange}
+            />
+            <ReflectionTextarea
+              fieldKey={`${fieldPrefix}_hyodynnat`}
+              label={tr("4. Miten hyödynnät oppimaasi?")}
+              rows={3}
+              onSaveStateChange={onSaveStateChange}
+            />
           </div>
-
-          <img
-            src="/illustrations/s29-candy-collage.png"
-            alt=""
-            aria-hidden="true"
-            className="
-              pointer-events-none
-              absolute
-              bottom-[-10px]
-              left-[-8%]
-              h-[250px]
-              w-auto
-              object-contain
-              select-none
-            "
-          />
         </div>
 
-        {/* =========================
-            RIGHT SIDE
-        ========================== */}
+        <StickyNote tone="coral" seed={`${fieldPrefix}-candies`} className="self-start">
+          <div
+            className="
+              mb-4
+              text-center
+              font-display
+              text-xl
+              font-bold
+              leading-tight
+              text-[color:var(--purple-dark)]
+            "
+          >
+            {tr("Valitse 1–2 vahvuuskarkkia")}
+          </div>
 
-        <div
+          <div className="grid gap-3">
+            <Screen42StrengthSelect
+              index={0}
+              fieldKey={`${fieldPrefix}_karkki_1`}
+              language={language}
+              selectedValues={selectedStrengths}
+              onValueChange={updateStrength}
+              onSaveStateChange={onSaveStateChange}
+            />
+            <Screen42StrengthSelect
+              index={1}
+              fieldKey={`${fieldPrefix}_karkki_2`}
+              language={language}
+              selectedValues={selectedStrengths}
+              onValueChange={updateStrength}
+              onSaveStateChange={onSaveStateChange}
+            />
+          </div>
+        </StickyNote>
+
+        <img
+          src="/illustrations/s16-bottom-right.png"
+          alt=""
+          aria-hidden="true"
           className="
-            relative
-            flex
-            min-h-[760px]
-            min-w-0
-            items-start
-            justify-center
+            pointer-events-none
+            absolute
+            bottom-4
+            right-4
+            z-20
+            h-auto
+            w-[500px]
+            max-w-[100%]
+            select-none
+            object-contain
           "
-        >
-          <div
-            className="
-              relative
-              h-[700px]
-              w-[560px]
-              max-w-full
-              shrink-0
-            "
-          >
-            {/* =========================
-                LANGUAGE-SPECIFIC ILLUSTRATION
-            ========================== */}
-
-            <img
-              src={sheetIllustration}
-              alt=""
-              aria-hidden="true"
-              className="
-                pointer-events-none
-                absolute
-                inset-0
-                z-0
-                h-full
-                w-full
-                object-fill
-                select-none
-              "
-            />
-
-            {/* TOP BOX */}
-
-            <div
-              className="
-                absolute
-                left-[25.39%]
-                top-[13.09%]
-                z-20
-                h-[18.95%]
-                w-[50%]
-              "
-            >
-              <VahvuuskarkkiOverlayInput
-                fieldKey={`${fieldPrefix}_opit`}
-                onSaveStateChange={onSaveStateChange}
-              />
-            </div>
-
-            {/* MIDDLE LEFT */}
-
-            <div
-              className="
-                absolute
-                left-[14.75%]
-                top-[39.65%]
-                z-20
-                h-[18.65%]
-                w-[33.59%]
-              "
-            >
-              <VahvuuskarkkiOverlayInput
-                fieldKey={`${fieldPrefix}_seuraavaksi`}
-                onSaveStateChange={onSaveStateChange}
-              />
-            </div>
-
-            {/* MIDDLE RIGHT */}
-
-            <div
-              className="
-                absolute
-                left-[51.86%]
-                top-[39.65%]
-                z-20
-                h-[18.65%]
-                w-[33.40%]
-              "
-            >
-              <VahvuuskarkkiOverlayInput
-                fieldKey={`${fieldPrefix}_hyodynnat`}
-                onSaveStateChange={onSaveStateChange}
-              />
-            </div>
-
-            {/* BOTTOM BOX */}
-
-            <div
-              className="
-                absolute
-                left-[24.71%]
-                top-[69.73%]
-                z-20
-                h-[16.02%]
-                w-[50.49%]
-              "
-            >
-              <VahvuuskarkkiOverlayInput
-                fieldKey={`${fieldPrefix}_teit`}
-                onSaveStateChange={onSaveStateChange}
-              />
-            </div>
-          </div>
-        </div>
+        />
       </div>
     </div>
   );
@@ -8720,7 +8578,7 @@ function Screen37({ onSaveStateChange }: Props) {
                 shadow-[0_6px_0_rgba(0,0,0,0.18)]
               "
             >
-              <h2 className="min-h-[70px] text-left font-display text-[clamp(23px,1.9vw,31px)] font-semibold leading-[1.12] text-[#ffd95d] [paint-order:stroke_fill] [-webkit-text-stroke:0.8px_#241b3f]">
+              <h2 className="min-h-[70px] text-left font-display text-[clamp(23px,1.9vw,31px)] font-semibold leading-[1.12] text-[black] [paint-order:stroke_fill] [-webkit-text-stroke:0.8px_#241b3f]">
                 {tr(x.q)}
               </h2>
 
@@ -8778,81 +8636,81 @@ function Screen37({ onSaveStateChange }: Props) {
 }
 
 // ----- Screen38 (PDF p41): Tavoitteeni opiskelijana 1/2 — informational -----
-function Screen38({ onSaveStateChange }: Props) {
+function Screen38(_props: Props) {
   const tr = useTr();
-  const steps = [
-    {
-      key: "screen_35_jaavuori_1",
-      text: "Kirjoita tavoitteesi jäävuoren pinnan päällä näkyvään osaan.",
-    },
-    {
-      key: "screen_35_jaavuori_2",
-      text: "Pohdi ja kirjaa jäävuoren pinnan alapuolelle kaikki vahvuudet, joiden käyttäminen ja kehittäminen tukee tavoitteen saavuttamista.",
-    },
-    {
-      key: "screen_35_jaavuori_3",
-      text: "Pohdi ja konkretisoi, miten voit hyödyntää kyseisiä vahvuuksia tavoitteen saavuttamisessa.",
-    },
-    {
-      key: "screen_35_jaavuori_4",
-      text: "Kirjoita myös, mitä muita taitoja tulet tarvitsemaan ja kehittämään tavoitteen saavuttamisessa.",
-    },
+
+  const questions = [
+    "Mikä on sinulle se iso tavoite, jonka haluat elämässäsi saavuttaa?",
+    "Kirjoita tavoitteesi jäävuoren pinnan päällä näkyvään osaan.",
+    "Pohdi ja kirjaa jäävuoren pinnan alapuolelle kaikki vahvuudet, joiden käyttäminen ja kehittäminen tukee tavoitteen saavuttamista.",
+    "Pohdi ja konkretisoi, miten voit hyödyntää kyseisiä vahvuuksia tavoitteen saavuttamisessa.",
+    "Kirjoita myös, mitä muita taitoja tulet tarvitsemaan ja kehittämään tavoitteen saavuttamisessa.",
   ];
+
   return (
-    <div className="h-full min-h-0 w-full overflow-x-hidden overflow-y-auto px-[8%] pb-12 pt-12 text-white">
+    <div
+      className="
+        h-full
+        min-h-0
+        w-full
+        overflow-x-hidden
+        overflow-y-auto
+        px-[8%]
+        pb-12
+        pt-12
+        text-white
+      "
+    >
       <div className="mx-auto max-w-[1180px]">
-        <h1 className="font-display text-[clamp(38px,4vw,64px)] font-semibold leading-[1.08] text-[#ffd33f]">
+        <h1
+          className="
+            font-display
+            text-[clamp(38px,4vw,64px)]
+            font-semibold
+            leading-[1.08]
+            text-[#ffd33f]
+          "
+        >
           {tr("Tavoitteeni opiskelijana 1/2")}
         </h1>
 
-        <p className="mt-8 max-w-[1080px] text-[clamp(20px,1.6vw,28px)] font-normal leading-[1.42] text-white">
-          {tr(
-            "Tässä tehtävässä pääset kirkastamaan tavoitteesi opiskelijana, ne joita haluaisit saavuttaa. Pääset lisäksi pohtimaan, mitä kaikkea tämä tulee vaatimaan. Pohdi ja täydennä, mitä vahvuuksia sinulla jo on, joita aiot hyödyntää tavoitteen saavuttamisessa.",
-          )}
-        </p>
+        <div className="mt-12 max-w-[1080px] space-y-9">
+          {questions.map((question, index) => (
+            <div
+              key={question}
+              className="
+                grid
+                grid-cols-[34px_minmax(0,1fr)]
+                items-start
+                gap-4
+              "
+            >
+              <span
+                className="
+                  font-display
+                  text-[clamp(22px,1.8vw,30px)]
+                  font-semibold
+                  leading-[1.35]
+                  text-[#ffd33f]
+                "
+              >
+                {index + 1}.
+              </span>
 
-        <p className="mt-8 max-w-[1080px] text-[clamp(23px,2vw,34px)] font-semibold leading-[1.25] text-white">
-          {tr("Mikä on sinulle se iso tavoite, jonka haluat elämässäsi saavuttaa?")}
-        </p>
-
-        <div className="mt-5 max-w-[1080px] overflow-hidden rounded-[28px] border-[5px] border-black bg-[#fffdf8] shadow-[inset_0_6px_0_0_#000,0_8px_0_rgba(0,0,0,0.16)]">
-          <FlatReflectionTextarea
-            fieldKey="screen_35_iso_tavoite"
-            rows={6}
-            minHeight={188}
-            textClass="text-[18px] bg-[repeating-linear-gradient(to_bottom,transparent_0,transparent_31px,#e7d8ff_32px,#e7d8ff_33px)]"
-            onSaveStateChange={onSaveStateChange}
-          />
-        </div>
-
-        <ul className="mt-8 space-y-8 text-[clamp(19px,1.55vw,27px)] font-normal leading-[1.26] text-white">
-          {steps.map((step, index) => (
-            <li key={step.key} className="grid grid-cols-[28px_minmax(0,1fr)] gap-4">
-              <span className="mt-[0.45em] h-3 w-3 rounded-full bg-[#ffd33f]" aria-hidden="true" />
-              <div className="min-w-0">
-                <p>
-                  {index + 1}. {tr(step.text)}
-                </p>
-                <div className="mt-4 overflow-hidden rounded-[24px] border-[5px] border-black bg-[#fffdf8] shadow-[inset_0_6px_0_0_#000,0_8px_0_rgba(0,0,0,0.16)]">
-                  <FlatReflectionTextarea
-                    fieldKey={step.key}
-                    rows={6}
-                    minHeight={172}
-                    textClass="text-[16px] bg-[repeating-linear-gradient(to_bottom,transparent_0,transparent_27px,#e7d8ff_28px,#e7d8ff_29px)]"
-                    onSaveStateChange={onSaveStateChange}
-                  />
-                </div>
-              </div>
-            </li>
+              <p
+                className="
+                  font-display
+                  text-[clamp(22px,1.8vw,30px)]
+                  font-medium
+                  leading-[1.4]
+                  text-white
+                "
+              >
+                {tr(question)}
+              </p>
+            </div>
           ))}
-        </ul>
-
-        <p className="mt-9 flex items-center gap-5 text-[clamp(22px,2vw,34px)] font-semibold text-[#ffd33f]">
-          <span className="text-[1.8em] leading-none" aria-hidden="true">
-            &gt;
-          </span>
-          <span>{tr("Jäävuori seuraavalla sivulla.")}</span>
-        </p>
+        </div>
       </div>
     </div>
   );
@@ -8861,89 +8719,286 @@ function Screen38({ onSaveStateChange }: Props) {
 // ----- Screen39 (PDF p42): Tavoitteeni opiskelijana 2/2 — iceberg quadrants -----
 function Screen39({ onSaveStateChange }: Props) {
   const tr = useTr();
-  const boxes: Array<{ k: string; label: string; className: string }> = [
+
+  const boxes = [
     {
       k: "screen_36_tavoite",
       label: "1. Tavoitteeni ja miksi se on minulle tärkeä",
-      className: "left-[2%] top-[25%] w-[31%]",
+      position: "left-[5%] top-[20%] w-[22%]",
+      height: 190,
     },
     {
       k: "screen_36_vahvuudet",
       label: "2. Vaaditut vahvuudet",
-      className: "left-[2%] top-[67%] w-[31%]",
+      position: "left-[5%] top-[57%] w-[22%]",
+      height: 180,
     },
     {
       k: "screen_36_hyodynnan",
       label: "3. Miten hyödynnän vahvuuksia",
-      className: "right-[2%] top-[25%] w-[31%]",
+      position: "right-[5%] top-[20%] w-[22%]",
+      height: 190,
     },
     {
       k: "screen_36_taidot",
       label: "4. Mitä muita taitoja tarvitsen",
-      className: "right-[2%] top-[67%] w-[31%]",
+      position: "right-[5%] top-[57%] w-[22%]",
+      height: 180,
     },
   ];
+
   return (
-    <div className="h-full min-h-0 w-full overflow-x-hidden overflow-y-auto px-[7%] pb-12 pt-10 text-white">
-      <div className="relative mx-auto min-h-[980px] w-full max-w-[1240px]">
-        <h1 className="font-display text-[clamp(38px,4vw,64px)] font-semibold leading-[1.08] text-[#ffd33f]">
+    <div
+      className="
+        relative
+        h-full
+        min-h-0
+        w-full
+        overflow-x-hidden
+        overflow-y-auto
+        text-white
+        [scrollbar-gutter:stable]
+      "
+    >
+      <div
+        className="
+          relative
+          mx-auto
+          min-h-[760px]
+          w-full
+          max-w-[1500px]
+          overflow-hidden
+          px-[5%]
+          pb-10
+          pt-6
+        "
+      >
+        {/* TITLE */}
+        <h1
+          className="
+            relative
+            z-30
+            font-display
+            text-[clamp(38px,3.6vw,56px)]
+            font-semibold
+            leading-[1.05]
+            tracking-[-0.02em]
+            text-[#ffd33f]
+          "
+        >
           {tr("Tavoitteeni opiskelijana 2/2")}
         </h1>
 
+        {/* WATER LINE */}
+        <div
+          aria-hidden="true"
+          className="
+            pointer-events-none
+            absolute
+            left-[5%]
+            right-[5%]
+            top-[54%]
+            z-[1]
+            border-t-[2px]
+            border-dashed
+            border-[#b7dfe0]
+          "
+        />
+
+        {/* ICEBERG */}
         <svg
-          className="pointer-events-none absolute left-1/2 top-[17%] h-[560px] w-[470px] -translate-x-1/2 select-none"
-          viewBox="0 0 470 560"
+          className="
+            pointer-events-none
+            absolute
+            left-1/2
+            top-[13%]
+            z-[2]
+            h-[590px]
+            w-[510px]
+            -translate-x-1/2
+            select-none
+          "
+          viewBox="0 0 510 590"
           aria-hidden="true"
         >
           <defs>
             <linearGradient id="screen39Ice" x1="0" x2="1" y1="0" y2="1">
-              <stop offset="0%" stopColor="#d8fbfb" />
-              <stop offset="100%" stopColor="#91d8d8" />
+              <stop offset="0%" stopColor="#c5e9e9" />
+              <stop offset="100%" stopColor="#9dd5d5" />
             </linearGradient>
           </defs>
+
+          {/* ICEBERG ABOVE WATER */}
           <path
-            d="M84 212 C94 174 138 126 162 91 C171 78 176 112 187 102 C204 54 232 25 248 11 C263 44 271 78 284 60 C296 43 306 37 317 79 C326 112 338 154 350 176 C360 193 374 162 383 184 C390 205 393 230 407 239 C421 248 420 270 419 278 C332 288 190 287 84 280 C78 267 78 236 84 212 Z"
+            d="
+              M70 290
+              C74 260 100 222 124 190
+              C148 158 173 118 194 81
+              C206 61 212 112 227 93
+              C244 70 252 22 273 12
+              C291 45 297 93 316 75
+              C332 59 340 26 354 74
+              C366 112 372 157 389 184
+              C401 202 414 167 427 194
+              C439 219 440 253 453 262
+              C464 269 469 282 468 294
+              C375 303 167 303 70 294
+              C68 292 68 291 70 290
+              Z
+            "
             fill="url(#screen39Ice)"
-            opacity="0.92"
           />
+
+          {/* ICEBERG BELOW WATER */}
           <path
-            d="M10 296 C126 300 315 300 460 296"
-            fill="none"
-            stroke="#bde7ea"
-            strokeDasharray="8 10"
-            strokeWidth="3"
-          />
-          <path
-            d="M78 315 C118 305 350 308 406 315 C421 342 417 367 455 389 C428 410 430 451 418 479 C387 469 382 519 355 538 C320 528 305 496 277 516 C259 531 248 553 224 544 C200 548 192 493 164 490 C143 519 137 550 112 516 C92 498 74 505 51 479 C35 459 48 423 23 393 C51 372 48 337 78 315 Z"
+            d="
+              M64 315
+              C105 306 389 307 451 315
+              C463 326 467 344 475 356
+              C487 373 501 375 507 388
+              C486 402 478 412 479 432
+              C481 447 487 462 476 470
+              C461 477 451 462 442 478
+              C427 505 431 543 409 551
+              C390 557 381 530 366 546
+              C348 566 337 579 320 572
+              C301 563 290 543 273 552
+              C253 563 244 586 224 577
+              C206 569 202 518 183 504
+              C169 494 158 546 141 527
+              C129 513 121 489 105 484
+              C88 479 74 474 61 458
+              C45 439 56 414 38 395
+              C22 378 32 350 49 338
+              C55 332 57 323 64 315
+              Z
+            "
             fill="url(#screen39Ice)"
-            opacity="0.92"
           />
+
+          {/* ARROW */}
           <path
-            d="M0 44 C98 -10 193 -20 232 16 C246 29 251 45 252 58"
+            d="
+              M8 68
+              C90 24 181 -6 240 2
+              C276 6 295 22 305 44
+            "
             fill="none"
             stroke="#b89ae8"
             strokeLinecap="round"
-            strokeWidth="3"
+            strokeWidth="2.5"
           />
-          <path d="M252 58 L239 48 L255 44 Z" fill="#b89ae8" />
+
+          <path d="M305 44 L295 34 L311 36 Z" fill="#b89ae8" />
         </svg>
 
-        {boxes.map((b) => (
-          <section key={b.k} className={cn("absolute", b.className)}>
-            <h2 className="min-h-[66px] font-display text-[clamp(19px,1.55vw,27px)] font-semibold leading-[1.12] text-white">
-              {tr(b.label)}
-            </h2>
-            <div className="mt-3 overflow-hidden rounded-[24px] border-[5px] border-black bg-[#fffdf8] shadow-[inset_0_6px_0_0_#000,0_8px_0_rgba(0,0,0,0.16)]">
-              <FlatReflectionTextarea
-                fieldKey={b.k}
-                rows={6}
-                minHeight={172}
-                textClass="text-[16px] bg-[repeating-linear-gradient(to_bottom,transparent_0,transparent_27px,#e7d8ff_28px,#e7d8ff_29px)]"
-                onSaveStateChange={onSaveStateChange}
-              />
-            </div>
-          </section>
-        ))}
+        {/* QUESTIONS + TEXTBOXES */}
+        {boxes.map((box) => {
+          const isRight = box.position.includes("right-");
+
+          return (
+            <section
+              key={box.k}
+              className={`
+                absolute
+                z-20
+                flex
+                flex-col
+                ${isRight ? "items-end" : "items-start"}
+                ${box.position}
+              `}
+            >
+              {/* QUESTION */}
+              <h2
+                className="
+                  w-full
+                  max-w-[290px]
+                  font-display
+                  text-[clamp(16px,1.2vw,21px)]
+                  font-semibold
+                  leading-[1.12]
+                  text-white
+                "
+              >
+                {tr(box.label)}
+              </h2>
+
+              {/* TEXTBOX */}
+              <div
+                className="
+                  relative
+                  mt-1
+                  w-full
+                  max-w-[290px]
+                  overflow-hidden
+                  rounded-[20px]
+                  border-[4px]
+                  border-solid
+                  border-black
+                  bg-transparent
+                "
+                style={{
+                  height: `${box.height}px`,
+                }}
+              >
+                <div
+                  className="
+                    h-full
+                    w-full
+
+                    [&_label]:hidden
+
+                    [&>div]:h-full
+                    [&>div]:w-full
+                    [&>div]:border-0
+                    [&>div]:bg-transparent
+                    [&>div]:p-0
+                    [&>div]:shadow-none
+                    [&>div]:outline-none
+                    [&>div]:ring-0
+
+                    [&_div]:border-0
+                    [&_div]:bg-transparent
+                    [&_div]:shadow-none
+
+                    [&_textarea]:block
+                    [&_textarea]:h-full
+                    [&_textarea]:min-h-0
+                    [&_textarea]:w-full
+                    [&_textarea]:resize-none
+                    [&_textarea]:rounded-[16px]
+                    [&_textarea]:border-0
+                    [&_textarea]:bg-transparent
+                    [&_textarea]:px-4
+                    [&_textarea]:py-3
+                    [&_textarea]:font-display
+                    [&_textarea]:text-[15px]
+                    [&_textarea]:font-normal
+                    [&_textarea]:leading-[27px]
+                    [&_textarea]:text-white
+                    [&_textarea]:outline-none
+                    [&_textarea]:shadow-none
+                    [&_textarea]:ring-0
+
+                    [&_textarea::placeholder]:text-white/50
+
+                    [&_textarea:focus]:border-0
+                    [&_textarea:focus]:outline-none
+                    [&_textarea:focus]:shadow-none
+                    [&_textarea:focus]:ring-0
+                  "
+                >
+                  <ReflectionTextarea
+                    fieldKey={box.k}
+                    label=""
+                    rows={6}
+                    onSaveStateChange={onSaveStateChange}
+                  />
+                </div>
+              </div>
+            </section>
+          );
+        })}
       </div>
     </div>
   );
@@ -9071,14 +9126,16 @@ function Screen41({ onSaveStateChange }: Props) {
 // ----- Screen42 (PDF p45): Minä olen (M2) -----
 function Screen42({ onSaveStateChange }: Props) {
   const tr = useTr();
+  const { language } = useLanguage();
+  const [selectedStrengths, setSelectedStrengths] = useState<Record<number, string>>({});
+  const selectedValues = Object.values(selectedStrengths).filter(Boolean);
 
-  const figures = [
-    "/illustrations/illustration-screen42-1.png",
-    "/illustrations/illustration-screen42-2.png",
-    "/illustrations/illustration-screen42-3.png",
-    "/illustrations/illustration-screen42-4.png",
-    "/illustrations/illustration-screen42-5.png",
-  ];
+  const updateStrength = useCallback((index: number, value: string) => {
+    setSelectedStrengths((current) => {
+      if (current[index] === value) return current;
+      return { ...current, [index]: value };
+    });
+  }, []);
 
   const cardPositions = ["", "", "", "", "", "", "md:col-start-2 xl:col-start-3"];
 
@@ -9180,8 +9237,8 @@ function Screen42({ onSaveStateChange }: Props) {
             className="
               grid
               min-w-0
-              auto-rows-[minmax(126px,auto)]
-              gap-3
+              auto-rows-[minmax(170px,auto)]
+              gap-4
               md:grid-cols-2
               xl:grid-cols-3
             "
@@ -9192,57 +9249,54 @@ function Screen42({ onSaveStateChange }: Props) {
                 className={cn(
                   `
                     flex
-                    min-h-[126px]
+                    min-h-[170px]
                     flex-col
-                    overflow-hidden
+                    overflow-visible
                     rounded-[18px_14px_24px_16px]
                     border-[3px]
                     border-black
                     bg-[#fffefa]
-                    px-4
-                    pb-3
-                    pt-3
+                    px-5
+                    pb-4
+                    pt-4
                     text-black
-                    shadow-[0_8px_0_#4b326c]
+                    shadow-[0_10px_0_#4b326c]
+                    transition-all
+                    duration-200
+                    hover:z-30
+                    hover:-translate-y-1
+                    hover:scale-[1.02]
+                    focus-within:z-40
+                    focus-within:ring-2
+                    focus-within:ring-[#d5c2ef]
                   `,
                   cardPositions[i],
                 )}
               >
                 <p
                   className="
-                    mb-2
+                    mb-5
                     shrink-0
                     text-center
                     font-display
-                    text-[14px]
+                    text-[15px]
                     font-medium
                     uppercase
                     leading-[1.2]
+                    tracking-[0.2px]
                     text-black
                   "
                 >
                   {tr("Minä olen ...")}
                 </p>
 
-                <div
-                  className="
-                    min-h-0
-                    flex-1
-                    overflow-hidden
-                    rounded-[12px]
-                    border-2
-                    border-black
-                    bg-[#fffefa]
-                  "
-                >
-                  <FlatReflectionTextarea
+                <div className="flex flex-1 items-center">
+                  <Screen42StrengthSelect
+                    index={i}
                     fieldKey={`screen_39_mina_olen_${i + 1}`}
-                    rows={3}
-                    minHeight={74}
-                    textClass="
-                      text-[16px]
-                      bg-[repeating-linear-gradient(to_bottom,transparent_0,transparent_28px,#b7a8cc_29px,#b7a8cc_30px)]
-                    "
+                    language={language}
+                    selectedValues={selectedValues}
+                    onValueChange={updateStrength}
                     onSaveStateChange={onSaveStateChange}
                   />
                 </div>
@@ -9252,79 +9306,134 @@ function Screen42({ onSaveStateChange }: Props) {
         </div>
 
         {/* =====================================================
-            5 ILLUSTRATIONS
+            ILLUSTRATION
         ====================================================== */}
 
-        <div
+        <img
+          src="/illustrations/illustration-screen42-3.png"
+          alt=""
+          aria-hidden="true"
           className="
             pointer-events-none
             absolute
-            bottom-[-90px]
-            left-0
+            top-[310px]
+            left-[-18px]
             z-40
-            w-[760px]
-            max-w-[56vw]
-            translate-y-[-70px]
+            h-[470px]
+            w-auto
+            max-w-none
+            object-contain
+            object-bottom
+            select-none
+            drop-shadow-[0_12px_18px_rgba(0,0,0,0.22)]
           "
-        >
-          {/* HÀNG TRÊN: 2 HÌNH */}
-
-          <div
-            className="
-              flex
-              items-end
-              justify-start
-              gap-8
-            "
-          >
-            {figures.slice(0, 2).map((src, index) => (
-              <img
-                key={`${src}-${index}`}
-                src={src}
-                alt=""
-                aria-hidden="true"
-                className="
-                  h-[clamp(200px,16vw,250px)]
-                  w-auto
-                  object-contain
-                  object-bottom
-                  select-none
-                  drop-shadow-[0_12px_18px_rgba(0,0,0,0.22)]
-                "
-              />
-            ))}
-          </div>
-
-          {/* HÀNG DƯỚI: 3 HÌNH */}
-
-          <div
-            className="
-              mt-[-16px]
-              flex
-              items-end
-              justify-start
-              gap-6
-            "
-          >
-            {figures.slice(2, 5).map((src, index) => (
-              <img
-                key={`${src}-${index + 2}`}
-                src={src}
-                alt=""
-                aria-hidden="true"
-                className="
-                  h-[clamp(200px,16vw,250px)]
-                  w-auto
-                  object-contain
-                  object-bottom
-                  select-none
-                  drop-shadow-[0_12px_18px_rgba(0,0,0,0.22)]
-                "
-              />
-            ))}
-          </div>
-        </div>
+        />
       </div>
+    </div>
+  );
+}
+
+function Screen42StrengthSelect({
+  index,
+  fieldKey,
+  language,
+  selectedValues,
+  onValueChange,
+  onSaveStateChange,
+}: {
+  index: number;
+  fieldKey: string;
+  language: "fi" | "sv" | "en";
+  selectedValues: string[];
+  onValueChange: (index: number, value: string) => void;
+  onSaveStateChange?: (s: SaveState) => void;
+}) {
+  const tr = useTr();
+  const [value, setValue] = useState("");
+  const [loaded, setLoaded] = useState(false);
+  const [dirty, setDirty] = useState(false);
+  const [initialValueWasValid, setInitialValueWasValid] = useState(false);
+  const report = useReportCompletion();
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const saved = await loadResponse<string>(fieldKey);
+      if (cancelled) return;
+      const savedNumber = Number(saved);
+      const isValidSavedStrength =
+        typeof saved === "string" &&
+        Number.isInteger(savedNumber) &&
+        savedNumber >= 1 &&
+        savedNumber <= 26;
+      if (isValidSavedStrength) {
+        setValue(saved);
+        setInitialValueWasValid(true);
+        onValueChange(index, saved);
+      }
+      setLoaded(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [fieldKey, index, onValueChange]);
+
+  const state = useAutosave(fieldKey, value, {
+    enabled: loaded && (dirty || initialValueWasValid),
+  });
+
+  useEffect(() => {
+    onSaveStateChange?.(state);
+  }, [state, onSaveStateChange]);
+
+  useEffect(() => {
+    if (loaded) report(fieldKey, value.trim().length > 0);
+  }, [fieldKey, loaded, report, value]);
+
+  function handleChange(nextValue: string) {
+    setDirty(true);
+    setValue(nextValue);
+    onValueChange(index, nextValue);
+  }
+
+  const selectedStrengthNumber = Number(value);
+  const hasSelectedStrength =
+    Number.isInteger(selectedStrengthNumber) &&
+    selectedStrengthNumber >= 1 &&
+    selectedStrengthNumber <= 26;
+
+  return (
+    <div className="relative w-full">
+      {hasSelectedStrength && (
+        <span
+          className="absolute left-4 top-1/2 z-10 h-4 w-4 -translate-y-1/2 rounded-full border border-black/20"
+          style={{ backgroundColor: getStrengthColor(selectedStrengthNumber) }}
+        />
+      )}
+      <select
+        value={value}
+        onChange={(event) => handleChange(event.target.value)}
+        aria-label={tr("Minä olen ...")}
+        className={cn(
+          "h-12 w-full appearance-none rounded-2xl border border-black/10 bg-white px-4 pr-10 font-display text-sm font-bold text-[color:var(--ink)] shadow-sm outline-none transition focus:border-[color:var(--purple-dark)] focus:ring-2 focus:ring-[#d5c2ef]",
+          hasSelectedStrength && "pl-10",
+        )}
+      >
+        <option value="">{tr("Valitse vahvuus")}</option>
+        {Array.from({ length: 26 }).map((_, strengthIndex) => {
+          const strengthNumber = strengthIndex + 1;
+          const optionValue = String(strengthNumber);
+          const alreadyUsed = selectedValues.includes(optionValue) && optionValue !== value;
+          return (
+            <option key={strengthNumber} value={optionValue} disabled={alreadyUsed}>
+              {getStrengthName(strengthNumber, language)}
+            </option>
+          );
+        })}
+      </select>
+      <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-[color:var(--purple-dark)]">
+        ▼
+      </span>
     </div>
   );
 }
@@ -9345,8 +9454,8 @@ function Screen43() {
     </div>
   );
 }
-// ----- S41 (PDF p47): Vahvuuskarkkini kotona -----
-function S41(p: Props) {
+// ----- Screen44: Vahvuuskarkkini kotona -----
+function Screen44(p: Props) {
   return (
     <VahvuuskarkkiSheet
       title="Vahvuuskarkkini"
@@ -9357,35 +9466,26 @@ function S41(p: Props) {
   );
 }
 
-// Note: S41 worksheet stores under screen_41_* but REQUIREMENTS is keyed off
-// screen_42_*. The actual mapping below uses S42 for kotona-karkkini to keep
-// REQUIREMENTS keys aligned with the screen number. The dual numbering above
-// happened because PDF "Vahvuudet perheessä" is on the next page (p48 → S42).
-// The registry below assigns S41 = M3 title, S42 = kotona-karkkini, etc.
-
-// ----- S42 (PDF p48): Vahvuudet perheessä -----
+// ----- Screen45: Vahvuudet perheessä -----
 function Screen45({ onSaveStateChange }: Props) {
   const tr = useTr();
   const notes = [
     {
       fieldKey: "screen_43_vahvuudet",
       label: "Minkälaisia vahvuuksia sinulla on perheenjäsenenä? Miten ne näkyvät?",
-      rotate: -1.2,
     },
     {
       fieldKey: "screen_43_parasta",
-      label: "Mikä on parasta perheessäsi? Miten erilaiset vahvuudet näkyvät perheen vuorovaikutuksessa?",
-      rotate: 0.8,
+      label:
+        "Mikä on parasta perheessäsi? Miten erilaiset vahvuudet näkyvät perheen vuorovaikutuksessa?",
     },
     {
       fieldKey: "screen_43_kiitollinen",
       label: "Mistä olet kiitollinen perheessäsi?",
-      rotate: 1.3,
     },
     {
       fieldKey: "screen_43_yhdessa",
       label: "Mitä tykkäätte tehdä yhdessä?",
-      rotate: -1.8,
     },
   ];
 
@@ -9455,7 +9555,7 @@ function Screen45({ onSaveStateChange }: Props) {
           </div>
 
           <img
-            src="/illustrations/s44-mouse.svg"
+            src="/illustrations/s45-mouse.png"
             alt=""
             aria-hidden="true"
             className="
@@ -9483,9 +9583,8 @@ function Screen45({ onSaveStateChange }: Props) {
           "
         >
           {notes.map((note) => (
-            <IrregularPaper
+            <div
               key={note.fieldKey}
-              rotate={note.rotate}
               className="
                 relative
                 z-20
@@ -9493,12 +9592,8 @@ function Screen45({ onSaveStateChange }: Props) {
                 h-[320px]
                 min-w-0
                 flex-col
-                border-0
-                px-6
-                pb-6
-                pt-5
-                text-black
-                shadow-[0_14px_0_rgba(54,30,76,0.55)]
+                px-2
+                text-white
                 lg:h-[330px]
               "
             >
@@ -9515,7 +9610,7 @@ function Screen45({ onSaveStateChange }: Props) {
                   text-[clamp(17px,1.25vw,22px)]
                   font-semibold
                   leading-[1.18]
-                  text-black
+                  text-white
                 "
               >
                 {tr(note.label)}
@@ -9525,11 +9620,15 @@ function Screen45({ onSaveStateChange }: Props) {
                 className="
                   relative
                   z-10
-                  mt-3
+                  mt-5
                   min-h-0
                   flex-1
                   overflow-hidden
-                  rounded-[18px]
+                  rounded-[28px]
+                  border-[5px]
+                  border-black
+                  bg-[#fffdf6]
+                  shadow-[14px_14px_0_rgba(44,27,78,0.55)]
 
                   [&_label]:hidden
 
@@ -9545,11 +9644,11 @@ function Screen45({ onSaveStateChange }: Props) {
                   [&_textarea]:min-h-0
                   [&_textarea]:w-full
                   [&_textarea]:resize-none
-                  [&_textarea]:rounded-[18px]
+                  [&_textarea]:rounded-[24px]
                   [&_textarea]:border-0
                   [&_textarea]:bg-transparent
-                  [&_textarea]:px-3
-                  [&_textarea]:py-2
+                  [&_textarea]:px-6
+                  [&_textarea]:py-8
                   [&_textarea]:font-display
                   [&_textarea]:text-[16px]
                   [&_textarea]:leading-[32px]
@@ -9568,10 +9667,10 @@ function Screen45({ onSaveStateChange }: Props) {
                   className="
                     pointer-events-none
                     absolute
-                    inset-x-3
-                    inset-y-2
-                    opacity-65
-                    [background-image:repeating-linear-gradient(to_bottom,transparent_0,transparent_31px,#ddd4ea_32px,#ddd4ea_33px)]
+                    inset-x-0
+                    inset-y-8
+                    opacity-80
+                    [background-image:repeating-linear-gradient(to_bottom,transparent_0,transparent_30px,#ddd0ff_31px,#ddd0ff_32px)]
                   "
                 />
 
@@ -9585,7 +9684,7 @@ function Screen45({ onSaveStateChange }: Props) {
                   />
                 </div>
               </div>
-            </IrregularPaper>
+            </div>
           ))}
         </div>
       </div>
@@ -9593,110 +9692,622 @@ function Screen45({ onSaveStateChange }: Props) {
   );
 }
 
-// ----- S43 (PDF p49): Minä perheenjäsenenä -----
+// ----- Screen46: Minä perheenjäsenenä -----
 function Screen46({ onSaveStateChange }: Props) {
   const tr = useTr();
-  return (
-    <div className="space-y-4">
-      <StickyNote tone="yellow" seed="s43-h">
-        <h1 className="font-display text-2xl">{tr("Minä perheenjäsenenä")}</h1>
-      </StickyNote>
-      <ReflectionTextarea
-        fieldKey="screen_44_perheenjasenena"
-        label={tr(
-          "Kirjoita itsellesi muistiin, millainen olet perheenjäsenenä ja millaisia vahvuuksia tuot perheeseesi.",
-        )}
-        rows={8}
-        onSaveStateChange={onSaveStateChange}
-      />
-      <p className="text-center text-xs opacity-60">
-        {tr(
-          "Alkuperäisen sivun kahta saraketta ei ollut mahdollista poimia PDF:stä; kenttä on tilapäisesti yhtenä laajana tekstialueena.",
-        )}
-      </p>
-    </div>
-  );
-}
 
-// ----- S44 (PDF p50): Muistele ja kysy vanhemmilta -----
-function Screen47({ onSaveStateChange }: Props) {
-  const tr = useTr();
-  const qs = [
-    "Millainen lapsi olin?",
-    "Mitkä olivat lempileikkejäni?",
-    "Mistä innostuin?",
-    "Missä olin lapsena hyvä?",
-    "Mistä sain kannustusta ja kehuja?",
-    "Mitä vahvuuksia minussa huomattiin jo lapsena?",
-    "Mitä toivoit minusta tulevan?",
-    "Mitä haluat vielä sanoa minulle vahvuuksistani?",
-  ];
   return (
-    <div className="space-y-4">
-      <StickyNote tone="mint" seed="s44-h">
-        <h1 className="font-display text-2xl mb-1">{tr("Muistele ja kysy vanhemmilta")}</h1>
-        <p className="text-sm opacity-90">
-          {tr("Pyydä vanhempaasi muistelemaan ja kerro lapsuusaikaisista vahvuuksistasi.")}
-        </p>
-      </StickyNote>
-      <div className="grid gap-3">
-        {qs.map((q, i) => (
-          <ReflectionTextarea
-            key={i}
-            fieldKey={`screen_45_vanhemmat_${i + 1}`}
-            label={tr(q)}
-            rows={2}
-            onSaveStateChange={onSaveStateChange}
-          />
-        ))}
-      </div>
-      <p className="text-center text-xs opacity-60">
-        {tr(
-          "Kysymykset ovat osittain rekonstruoitu PDF-sivun rakenteesta — alkuperäinen sivu on käsinkirjoitusta varten varattu, ja muutamat kysymyssanat eivät olleet poimittavissa OCR:llä.",
-        )}
-      </p>
-    </div>
-  );
-}
+    <div
+      className="
+        h-full
+        min-h-0
+        w-full
+        overflow-x-hidden
+        overflow-y-auto
+        [scrollbar-gutter:stable]
+      "
+    >
+      <div className="mx-auto w-full max-w-[1280px] px-6 py-5">
+        {/* Title */}
+        <h1 className="font-display text-[46px] font-bold leading-tight text-[#FFE77A]">
+          {tr("Minä perheenjäsenenä")}
+        </h1>
 
-// ----- S45 (PDF p51): Vahvuuskirje vanhemmalta — informational -----
-function Screen48() {
-  const tr = useTr();
-  return (
-    <div className="space-y-4">
-      <StickyNote tone="coral" seed="s45-h">
-        <h1 className="font-display text-2xl mb-1">{tr("Pyydä vanhempaasi täydentämään!")}</h1>
-        <p className="text-sm opacity-90">
+        {/* Instruction */}
+        <p className="mt-4 text-[26px] font-semibold leading-snug text-white">
           {tr(
-            "Tämä sivu on vahvuuskirjeen pohja, jonka vanhempi voi täydentää nuorelleen. Voitte tulostaa sen tai kirjoittaa puhtaaksi yhdessä.",
+            "Haastattele perheenjäseniä ja kerää tietoa omista vahvuuksistasi. Täydennä lauseet:",
           )}
         </p>
-      </StickyNote>
-      <StickyNote tone="white" seed="s45-letter">
-        <h2 className="font-display text-lg mb-2">{tr("Kirjoita vahvuuskirje nuorellesi")}</h2>
-        <p className="text-sm leading-relaxed whitespace-pre-line">
-          {tr(`Hän kun . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-Sinun vahvuuksiasi ovat . . . . . . . . , . . . . . . . . ja . . . . . . . .
+        {/* Two-column table */}
+        <div className="mt-10 grid grid-cols-2 border-x border-white/80">
+          {/* Left column */}
+          <div className="border-r border-white/80">
+            <div className="flex min-h-[82px] items-center justify-center border-b border-white/80 px-6">
+              <h2 className="text-center text-[25px] font-semibold leading-tight text-white">
+                {tr("Perheeni mielestä vahvuuksiani ovat")}
+              </h2>
+            </div>
 
-Olen huomannut, että käytät niitä, kun . . . . . . . . . . ja . . . . . . . . .
+            <div className="min-h-[430px] p-5">
+              <ReflectionTextarea
+                fieldKey="screen_46_perheeni_vahvuudet"
+                label=""
+                rows={15}
+                onSaveStateChange={onSaveStateChange}
+              />
+            </div>
+          </div>
 
-Arvostan sinussa erityisesti . . . . . . . . . . . . . . . . . ja . . . . . . . . . . .
+          {/* Right column */}
+          <div>
+            <div className="flex min-h-[82px] items-center justify-center border-b border-white/80 px-6">
+              <h2 className="max-w-[520px] text-center text-[25px] font-semibold leading-tight text-white">
+                {tr("Perheenjäsenten vahvuuksia ovat minun mielestäni")}
+              </h2>
+            </div>
 
-Kun käytät vahvuuksiasi kotona, se vaikuttaa . . . . . . . . . . . . . . . . . . . .
+            <div className="min-h-[430px] p-5">
+              <ReflectionTextarea
+                fieldKey="screen_46_perheenjasenten_vahvuudet"
+                label=""
+                rows={15}
+                onSaveStateChange={onSaveStateChange}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-Olet opettanut minulle erityisesti . . . . . . . . . . . . . . . . käytöstä.
+// ----- Screen47: Muistele ja kysy vanhemmilta -----
+function Screen47({ onSaveStateChange }: Props) {
+  const tr = useTr();
+  const { language } = useLanguage();
+  const [selectedStrengths, setSelectedStrengths] = useState<Record<number, string>>({});
+  const selectedValues = Object.values(selectedStrengths).filter(Boolean);
 
-Kun käytät vahvuuksiasi, näen sinut tulevaisuudessa . . . . . . . . . . . . . . . .
+  const updateStrength = useCallback((index: number, value: string) => {
+    setSelectedStrengths((current) => {
+      if (current[index] === value) return current;
+      return { ...current, [index]: value };
+    });
+  }, []);
 
-Anna vahvuuksiesi loistaa.
+  const notes = [
+    {
+      id: 1,
+      question: "Mieti, millainen toiminta oli minulle tyypillistä lapsena?",
+      position: "left-[0%] top-[3%] h-[205px] w-[29%] -rotate-[2deg]",
+    },
+    {
+      id: 2,
+      question: "Mikä oli minulle tärkeää?",
+      position: "left-[35.5%] top-[0%] h-[205px] w-[29%] rotate-[1deg]",
+    },
+    {
+      id: 3,
+      question: "Mistä ammatista haaveilin?",
+      position: "right-[0%] top-[3%] h-[205px] w-[29%] rotate-[2deg]",
+    },
+    {
+      id: 4,
+      question: "Mitä leikin mielelläni?",
+      position: "left-[2%] top-[34%] h-[195px] w-[29%] rotate-[1deg]",
+    },
+    {
+      id: 5,
+      question: "Mitä rakastin tehdä, mihin uppouduin?",
+      position: "left-[36%] top-[32%] h-[195px] w-[29%] -rotate-[1deg]",
+    },
+    {
+      id: 6,
+      question: "Millaisia vahvuuksia minulla oli lapsena?",
+      position: "right-[0%] top-[34%] h-[195px] w-[29%] -rotate-[2deg]",
+    },
+    {
+      id: 7,
+      question: "Mikä myönteinen muisto sinulle on jäänyt erityisen vahvasti mieleen minusta?",
+      position: "left-[18%] top-[64%] h-[190px] w-[29%] rotate-[1deg]",
+    },
+    {
+      id: 8,
+      question: "Mitä samoja vahvuuksia minulla on nykyään?",
+      position: "right-[18%] top-[64%] h-[190px] w-[29%] -rotate-[1deg]",
+    },
+  ];
 
-Rakkain terveisin, . . . . . . . . . .`)}
+  return (
+    <div
+      className="
+        relative
+        h-full
+        min-h-0
+        w-full
+        overflow-x-hidden
+        overflow-y-auto
+        px-[3%]
+        pb-16
+        pt-6
+        text-white
+      "
+    >
+      <div className="grid min-h-[760px] grid-cols-[0.25fr_0.75fr] gap-7">
+        {/* CỘT TRÁI */}
+        <div className="relative min-w-0">
+          <h1
+            className="
+              max-w-[300px]
+              font-display
+              text-[43px]
+              font-medium
+              leading-[1.12]
+              tracking-[-0.01em]
+            "
+          >
+            {tr("Muistele ja kysy vanhemmilta")}
+          </h1>
+          <img
+            src="/illustrations/illustration-screen42-4.png"
+            alt=""
+            aria-hidden="true"
+            className="
+              pointer-events-none
+              absolute
+              top-[260px]
+              left-[-62px]
+              h-[470px]
+              w-auto
+              max-w-none
+              select-none
+              object-contain
+              drop-shadow-[0_12px_18px_rgba(0,0,0,0.22)]
+            "
+          />
+        </div>
+
+        {/* CỘT PHẢI */}
+        <div className="relative min-h-[760px] min-w-0">
+          {notes.map((note) => (
+            <div
+              key={note.id}
+              className={`
+                absolute
+                flex
+                flex-col
+                overflow-visible
+                rounded-[18px_14px_24px_16px]
+                border-[3px]
+                border-black
+                bg-[#fffefa]
+                px-5
+                pb-4
+                pt-4
+                text-black
+                shadow-[0_10px_0_#4b326c]
+                transition-all
+                duration-200
+
+                hover:z-30
+                hover:-translate-y-1
+                hover:scale-[1.02]
+
+                focus-within:z-40
+                focus-within:ring-2
+                focus-within:ring-[#d5c2ef]
+
+                ${note.position}
+              `}
+            >
+              {/* CÂU HỎI */}
+              <p
+                className="
+                  mb-3
+                  min-h-[38px]
+                  shrink-0
+                  text-center
+                  font-display
+                  text-[15px]
+                  font-medium
+                  leading-[1.2]
+                  text-black
+                "
+              >
+                {tr(note.question)}
+              </p>
+
+              <div className="flex flex-1 items-center">
+                <Screen47StrengthSelect
+                  index={note.id - 1}
+                  fieldKey={`screen_45_vanhemmat_${note.id}`}
+                  language={language}
+                  selectedValues={selectedValues}
+                  onValueChange={updateStrength}
+                  onSaveStateChange={onSaveStateChange}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Screen47StrengthSelect({
+  index,
+  fieldKey,
+  language,
+  selectedValues,
+  onValueChange,
+  onSaveStateChange,
+}: {
+  index: number;
+  fieldKey: string;
+  language: "fi" | "sv" | "en";
+  selectedValues: string[];
+  onValueChange: (index: number, value: string) => void;
+  onSaveStateChange?: (s: SaveState) => void;
+}) {
+  const tr = useTr();
+  const [value, setValue] = useState("");
+  const [loaded, setLoaded] = useState(false);
+  const [dirty, setDirty] = useState(false);
+  const [initialValueWasValid, setInitialValueWasValid] = useState(false);
+  const report = useReportCompletion();
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const saved = await loadResponse<string>(fieldKey);
+      if (cancelled) return;
+      const savedNumber = Number(saved);
+      const isValidSavedStrength =
+        typeof saved === "string" &&
+        Number.isInteger(savedNumber) &&
+        savedNumber >= 1 &&
+        savedNumber <= 26;
+      if (isValidSavedStrength) {
+        setValue(saved);
+        setInitialValueWasValid(true);
+        onValueChange(index, saved);
+      }
+      setLoaded(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [fieldKey, index, onValueChange]);
+
+  const state = useAutosave(fieldKey, value, {
+    enabled: loaded && (dirty || initialValueWasValid),
+  });
+
+  useEffect(() => {
+    onSaveStateChange?.(state);
+  }, [state, onSaveStateChange]);
+
+  useEffect(() => {
+    if (loaded) report(fieldKey, value.trim().length > 0);
+  }, [fieldKey, loaded, report, value]);
+
+  function handleChange(nextValue: string) {
+    setDirty(true);
+    setValue(nextValue);
+    onValueChange(index, nextValue);
+  }
+
+  const selectedStrengthNumber = Number(value);
+  const hasSelectedStrength =
+    Number.isInteger(selectedStrengthNumber) &&
+    selectedStrengthNumber >= 1 &&
+    selectedStrengthNumber <= 26;
+
+  return (
+    <div className="relative w-full">
+      {hasSelectedStrength && (
+        <span
+          className="absolute left-4 top-1/2 z-10 h-4 w-4 -translate-y-1/2 rounded-full border border-black/20"
+          style={{ backgroundColor: getStrengthColor(selectedStrengthNumber) }}
+        />
+      )}
+      <select
+        value={value}
+        onChange={(event) => handleChange(event.target.value)}
+        aria-label={tr("Valitse vahvuus")}
+        className={cn(
+          "h-12 w-full appearance-none rounded-2xl border border-black/10 bg-white px-4 pr-10 font-display text-sm font-bold text-[color:var(--ink)] shadow-sm outline-none transition focus:border-[color:var(--purple-dark)] focus:ring-2 focus:ring-[#d5c2ef]",
+          hasSelectedStrength && "pl-10",
+        )}
+      >
+        <option value="">{tr("Valitse vahvuus")}</option>
+        {Array.from({ length: 26 }).map((_, strengthIndex) => {
+          const strengthNumber = strengthIndex + 1;
+          const optionValue = String(strengthNumber);
+          const alreadyUsed = selectedValues.includes(optionValue) && optionValue !== value;
+          return (
+            <option key={strengthNumber} value={optionValue} disabled={alreadyUsed}>
+              {getStrengthName(strengthNumber, language)}
+            </option>
+          );
+        })}
+      </select>
+      <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-[color:var(--purple-dark)]">
+        ▼
+      </span>
+    </div>
+  );
+}
+// ----- Screen48: Vahvuuskirje vanhemmalta — informational -----
+function Screen48({ onSaveStateChange }: Props) {
+  const tr = useTr();
+
+  const boxClass = `
+    min-h-[74px]
+    overflow-hidden
+    rounded-[26px]
+    border-[4px]
+    border-black
+    bg-[#fffdf6]
+    shadow-[8px_9px_0_rgba(48,31,88,0.42)]
+
+    [&_label]:hidden
+
+    [&>div]:h-full
+    [&>div]:min-h-0
+
+    [&>div]:border-0
+    [&>div]:bg-transparent
+    [&>div]:p-0
+    [&>div]:shadow-none
+
+    [&_textarea]:w-full
+    [&_textarea]:resize-none
+    [&_textarea]:rounded-[22px]
+    [&_textarea]:border-0
+    [&_textarea]:bg-transparent
+    [&_textarea]:px-5
+    [&_textarea]:py-4
+    [&_textarea]:text-[16px]
+    [&_textarea]:font-normal
+    [&_textarea]:leading-[28px]
+    [&_textarea]:tracking-[0]
+    [&_textarea]:text-[#241b3f]
+    [&_textarea]:outline-none
+    [&_textarea]:shadow-none
+    [&_textarea]:ring-0
+
+    [&_textarea:focus]:outline-none
+    [&_textarea:focus]:ring-0
+  `;
+  const labelClass =
+    "font-display text-[clamp(18px,1.35vw,23px)] font-semibold leading-[1.25] tracking-[0] text-white";
+
+  return (
+    <div
+      className="
+        relative
+        h-full
+        min-h-0
+        w-full
+        overflow-y-auto
+        px-[5%]
+        pb-20
+        pt-7
+        text-white
+        [scrollbar-gutter:stable]
+      "
+    >
+      <div className="mx-auto w-full max-w-[1220px]">
+        {/* PAGE HEADING */}
+        <p
+          className="
+            text-center
+            font-display
+            text-[25px]
+            font-medium
+            leading-[1.18]
+            tracking-[0]
+            text-white
+          "
+        >
+          {tr("Pyydä vanhempaasi täydentämään!")}
         </p>
-      </StickyNote>
-      <p className="text-center text-xs opacity-60">
-        {tr("Sivun visuaalinen ilme on tilapäisesti korvattu yksinkertaisella tekstipohjalla.")}
-      </p>
+
+        {/* MAIN TITLE */}
+        <h1
+          className="
+            mt-7
+            font-display
+            text-[clamp(34px,3vw,50px)]
+            font-semibold
+            leading-[1.08]
+            tracking-[0]
+            text-[#FFE77A]
+          "
+        >
+          {tr("Kirjoita vahvuuskirje nuorellesi:")}
+        </h1>
+
+        {/* FORM */}
+        <div className="mt-8 space-y-6">
+          {/* HEI */}
+          <div>
+            <p className={labelClass}>{tr("Hei")}</p>
+
+            <div className={`mt-2 ${boxClass}`}>
+              <ReflectionTextarea
+                fieldKey="screen_48_hei"
+                label=""
+                rows={2}
+                onSaveStateChange={onSaveStateChange}
+              />
+            </div>
+          </div>
+
+          {/* VAHVUUDET */}
+          <div>
+            <p className={labelClass}>{tr("Sinun vahvuuksiasi ovat")}</p>
+
+            <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3">
+              <div className={boxClass}>
+                <ReflectionTextarea
+                  fieldKey="screen_48_vahvuus_1"
+                  label=""
+                  rows={2}
+                  onSaveStateChange={onSaveStateChange}
+                />
+              </div>
+              <span className="font-display text-[20px] font-semibold leading-none text-white">
+                ,
+              </span>
+              <div className={boxClass}>
+                <ReflectionTextarea
+                  fieldKey="screen_48_vahvuus_2"
+                  label=""
+                  rows={2}
+                  onSaveStateChange={onSaveStateChange}
+                />
+              </div>
+              <span className="font-display text-[20px] font-semibold leading-none text-white">
+                {tr("ja")}
+              </span>
+              <div className={boxClass}>
+                <ReflectionTextarea
+                  fieldKey="screen_48_vahvuus_3"
+                  label=""
+                  rows={2}
+                  onSaveStateChange={onSaveStateChange}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* KÄYTÄT NIITÄ */}
+          <div>
+            <p className={labelClass}>{tr("Olen huomannut, että käytät niitä, kun")}</p>
+
+            <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3">
+              <div className={boxClass}>
+                <ReflectionTextarea
+                  fieldKey="screen_48_kaytat_1"
+                  label=""
+                  rows={2}
+                  onSaveStateChange={onSaveStateChange}
+                />
+              </div>
+              <span className="font-display text-[20px] font-semibold leading-none text-white">
+                {tr("ja")}
+              </span>
+              <div className={boxClass}>
+                <ReflectionTextarea
+                  fieldKey="screen_48_kaytat_2"
+                  label=""
+                  rows={2}
+                  onSaveStateChange={onSaveStateChange}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* ARVOSTAN */}
+          <div>
+            <p className={labelClass}>{tr("Arvostan sinussa erityisesti")}</p>
+
+            <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3">
+              <div className={boxClass}>
+                <ReflectionTextarea
+                  fieldKey="screen_48_arvostan_1"
+                  label=""
+                  rows={2}
+                  onSaveStateChange={onSaveStateChange}
+                />
+              </div>
+              <span className="font-display text-[20px] font-semibold leading-none text-white">
+                {tr("ja")}
+              </span>
+              <div className={boxClass}>
+                <ReflectionTextarea
+                  fieldKey="screen_48_arvostan_2"
+                  label=""
+                  rows={2}
+                  onSaveStateChange={onSaveStateChange}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* KOTONA */}
+          <div>
+            <p className={labelClass}>{tr("Kun käytät vahvuuksiasi kotona, se vaikuttaa")}</p>
+
+            <div className={`mt-2 ${boxClass}`}>
+              <ReflectionTextarea
+                fieldKey="screen_48_kotona"
+                label=""
+                rows={3}
+                onSaveStateChange={onSaveStateChange}
+              />
+            </div>
+          </div>
+
+          {/* OPETTANUT */}
+          <div>
+            <p className={labelClass}>{tr("Olet opettanut minulle erityisesti")}</p>
+
+            <div className={`mt-2 ${boxClass}`}>
+              <ReflectionTextarea
+                fieldKey="screen_48_opettanut"
+                label=""
+                rows={3}
+                onSaveStateChange={onSaveStateChange}
+              />
+            </div>
+
+            <p className="mt-2 text-right font-display text-[18px] font-semibold leading-[1.2] tracking-[0] text-white">
+              {tr("käytöstä.")}
+            </p>
+          </div>
+
+          {/* TULEVAISUUS */}
+          <div>
+            <p className={labelClass}>
+              {tr("Kun käytät vahvuuksiasi, näen sinut tulevaisuudessa")}
+            </p>
+
+            <div className={`mt-2 ${boxClass}`}>
+              <ReflectionTextarea
+                fieldKey="screen_48_tulevaisuus"
+                label=""
+                rows={4}
+                onSaveStateChange={onSaveStateChange}
+              />
+            </div>
+          </div>
+
+          {/* FINAL TEXT */}
+          <p className="pt-1 font-display text-[22px] font-semibold leading-[1.2] tracking-[0] text-white">
+            {tr("Anna vahvuuksiesi loistaa.")}
+          </p>
+
+          {/* SIGNATURE */}
+          <div>
+            <p className={labelClass}>{tr("Rakkain terveisin,")}</p>
+
+            <div className={`mt-2 ${boxClass}`}>
+              <ReflectionTextarea
+                fieldKey="screen_48_terveisin"
+                label=""
+                rows={2}
+                onSaveStateChange={onSaveStateChange}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -9705,14 +10316,13 @@ Rakkain terveisin, . . . . . . . . . .`)}
 function Screen49() {
   const tr = useTr();
   return (
-    <StickyNote tone="coral" seed="s46-h" className="text-center">
-      <div className="text-xs font-bold uppercase tracking-widest opacity-80 mb-2">
-        {tr("Taso 4")}
+    <div className="relative h-full min-h-[620px] w-full overflow-hidden text-white">
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-8 text-center">
+        <h1 className="font-display text-[clamp(48px,5vw,78px)] font-semibold leading-[1.08] tracking-[0]">
+          {trLines(tr, "4. Omat vahvuudet vapaa-ajalla ja harrastuksissa")}
+        </h1>
       </div>
-      <h1 className="font-display text-4xl leading-tight">
-        {tr("4. Omat vahvuudet vapaa-ajalla ja harrastuksissa")}
-      </h1>
-    </StickyNote>
+    </div>
   );
 }
 
@@ -9725,6 +10335,104 @@ function Screen50(p: Props) {
       fieldPrefix="screen_48"
       onSaveStateChange={p.onSaveStateChange}
     />
+  );
+}
+
+function AdventureWorkbookPage({
+  title,
+  kicker,
+  intro,
+  children,
+}: {
+  title: ReactNode;
+  kicker?: ReactNode;
+  intro?: ReactNode;
+  accent?: "yellow" | "coral" | "mint" | "purple";
+  children: ReactNode;
+}) {
+  return (
+    <div className="relative h-full min-h-0 w-full overflow-y-auto px-[4%] pb-20 pt-8 text-white [scrollbar-gutter:stable]">
+      <div className="relative mx-auto min-h-[760px] w-full max-w-[1320px]">
+        <header className="max-w-[980px]">
+          {kicker && (
+            <div className="mb-3 inline-flex rounded-full border-2 border-black bg-[#FFE77A] px-4 py-1 font-display text-[14px] font-semibold leading-none tracking-[0] text-[#2a194c] shadow-[0_4px_0_rgba(0,0,0,0.28)]">
+              {kicker}
+            </div>
+          )}
+          <h1 className="font-display text-[clamp(36px,4vw,66px)] font-semibold leading-[1.05] tracking-[0] text-[#FFE77A]">
+            {title}
+          </h1>
+          {intro && (
+            <p className="mt-5 max-w-[900px] text-[clamp(17px,1.25vw,22px)] font-semibold leading-[1.42] tracking-[0] text-white">
+              {intro}
+            </p>
+          )}
+        </header>
+
+        <div className="mt-8">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+function WorkbookTextBox({
+  fieldKey,
+  label,
+  rows = 4,
+  onSaveStateChange,
+}: {
+  fieldKey: string;
+  label: ReactNode;
+  rows?: number;
+  onSaveStateChange?: (s: SaveState) => void;
+}) {
+  return (
+    <div className="min-w-0">
+      <div className="mb-2 min-h-[44px] font-display text-[clamp(16px,1.1vw,20px)] font-semibold leading-[1.22] tracking-[0] text-white">
+        {label}
+      </div>
+      <div
+        className="
+          overflow-hidden
+          rounded-[24px]
+          border-[4px]
+          border-black
+          bg-[#fffdf6]
+          shadow-[7px_8px_0_rgba(48,31,88,0.45)]
+          [&_label]:hidden
+          [&>div]:border-0
+          [&>div]:bg-transparent
+          [&>div]:p-0
+          [&>div]:shadow-none
+          [&_textarea]:rounded-[20px]
+          [&_textarea]:border-0
+          [&_textarea]:bg-transparent
+          [&_textarea]:px-5
+          [&_textarea]:py-4
+          [&_textarea]:text-[16px]
+          [&_textarea]:leading-[28px]
+          [&_textarea]:tracking-[0]
+          [&_textarea]:text-[#241b3f]
+          [&_textarea]:outline-none
+          [&_textarea]:ring-0
+        "
+      >
+        <ReflectionTextarea
+          fieldKey={fieldKey}
+          label=""
+          rows={rows}
+          onSaveStateChange={onSaveStateChange}
+        />
+      </div>
+    </div>
+  );
+}
+
+function WorkbookInfoPanel({ children }: { children: ReactNode }) {
+  return (
+    <div className="text-[clamp(17px,1.25vw,22px)] font-semibold leading-[1.48] tracking-[0] text-white">
+      {children}
+    </div>
   );
 }
 
@@ -9741,18 +10449,16 @@ function Screen51({ onSaveStateChange }: Props) {
     { k: "screen_49_enemman", q: "Mitä vahvuuksiasi haluaisit hyödyntää enemmän vapaa-ajallasi?" },
   ];
   return (
-    <div className="space-y-4">
-      <StickyNote tone="yellow" seed="s48-h">
-        <h1 className="font-display text-2xl mb-1">{tr("Minä vapaa-ajalla")}</h1>
-        <p className="text-sm opacity-90">
-          {tr(
-            "Kirjoita itsellesi muistiin mitä teet vapaa-ajallasi ja millaisia vahvuuksia hyödynnät.",
-          )}
-        </p>
-      </StickyNote>
-      <div className="grid gap-3 sm:grid-cols-2">
+    <AdventureWorkbookPage
+      title={tr("Minä vapaa-ajalla")}
+      intro={tr(
+        "Kirjoita itsellesi muistiin mitä teet vapaa-ajallasi ja millaisia vahvuuksia hyödynnät.",
+      )}
+      accent="yellow"
+    >
+      <div className="grid gap-6 md:grid-cols-2">
         {cols.map((c) => (
-          <ReflectionTextarea
+          <WorkbookTextBox
             key={c.k}
             fieldKey={c.k}
             label={tr(c.q)}
@@ -9761,7 +10467,7 @@ function Screen51({ onSaveStateChange }: Props) {
           />
         ))}
       </div>
-    </div>
+    </AdventureWorkbookPage>
   );
 }
 
@@ -9770,29 +10476,26 @@ function Screen51({ onSaveStateChange }: Props) {
 function Screen52() {
   const tr = useTr();
   return (
-    <div className="space-y-4">
-      <StickyNote tone="mint" seed="s49-h">
-        <h1 className="font-display text-2xl">{tr("Love to-do -lista 1/3")}</h1>
-      </StickyNote>
-      <StickyNote tone="white" seed="s49-b">
-        <p className="text-sm leading-relaxed mb-2">
+    <AdventureWorkbookPage title={tr("Love to-do -lista 1/3")} accent="mint">
+      <WorkbookInfoPanel>
+        <p>
           {tr(
             "Mitkä asiat päätyvät sinun love-to-do listalle? Tee lista viidestä asiasta, joita rakastat tehdä vapaa-ajalla.",
           )}
         </p>
-        <p className="text-sm leading-relaxed">
+        <p className="mt-4">
           {tr("Mieti seuraavaksi, kuinka vahvuutesi liittyvät näihin tekemisiin.")}
         </p>
-        <p className="text-xs italic opacity-70 mt-2">
+        <p className="mt-5 text-[0.9em] italic opacity-80">
           {tr(
             "Ps. Todennäköisesti harrastukset ja tekemiset, joista pidät eniten, ovat myös tyydyttäviä, koska ne tarjoavat sinulle mahdollisuuden hyödyntää vahvuuksiasi.",
           )}
         </p>
-        <p className="text-xs italic opacity-70 mt-2">
+        <p className="mt-5 font-display text-[1.05em] text-[#FFE77A]">
           {tr("→ Love to-do -lista seuraavalla sivulla.")}
         </p>
-      </StickyNote>
-    </div>
+      </WorkbookInfoPanel>
+    </AdventureWorkbookPage>
   );
 }
 
@@ -9801,27 +10504,42 @@ function Screen52() {
 function Screen53({ onSaveStateChange }: Props) {
   const tr = useTr();
   return (
-    <div className="space-y-4">
-      <StickyNote tone="coral" seed="s50-h">
-        <h1 className="font-display text-2xl mb-1">{tr("Love to-do -lista")}</h1>
-        <p className="text-sm opacity-90">
-          {tr(
-            "Kirjoita viisi asiaa, joita rakastat tehdä vapaa-ajallasi. Merkkaa sydämiin miten paljon teet kyseistä asiaa.",
-          )}
-        </p>
-      </StickyNote>
-      <div className="grid gap-2">
+    <AdventureWorkbookPage
+      title={tr("Love to-do -lista 2/3")}
+      intro={tr(
+        "Kirjoita viisi asiaa, joita rakastat tehdä vapaa-ajallasi. Merkkaa sydämiin miten paljon teet kyseistä asiaa.",
+      )}
+      accent="coral"
+    >
+      <div className="grid max-w-[1050px] gap-4">
         {Array.from({ length: 5 }).map((_, i) => (
-          <ReflectionInput
+          <div
             key={i}
-            fieldKey={`screen_51_love_${i + 1}`}
-            prefix={`${i + 1}.`}
-            placeholder={tr("Asia, jota rakastan tehdä…")}
-            onSaveStateChange={onSaveStateChange}
-          />
+            className="grid grid-cols-[42px_minmax(0,1fr)_minmax(170px,auto)] items-center gap-4"
+          >
+            <div className="font-display text-[28px] font-semibold leading-none text-white">
+              {i + 1}.
+            </div>
+            <ReflectionInput
+              fieldKey={`screen_51_love_${i + 1}`}
+              prefix=""
+              placeholder={tr("Asia, jota rakastan tehdä…")}
+              onSaveStateChange={onSaveStateChange}
+            />
+            <div
+              className="flex items-center gap-2 font-display text-[28px] leading-none text-[#ff7c7a]"
+              aria-hidden="true"
+            >
+              <span>♡</span>
+              <span>♡</span>
+              <span>♡</span>
+              <span>♡</span>
+              <span>♡</span>
+            </div>
+          </div>
         ))}
       </div>
-    </div>
+    </AdventureWorkbookPage>
   );
 }
 
@@ -9830,27 +10548,26 @@ function Screen53({ onSaveStateChange }: Props) {
 function Screen54({ onSaveStateChange }: Props) {
   const tr = useTr();
   return (
-    <div className="space-y-4">
-      <StickyNote tone="mint" seed="s51-h">
-        <h1 className="font-display text-2xl">{tr("Love to-do -lista")}</h1>
-      </StickyNote>
-      <ReflectionTextarea
-        fieldKey="screen_52_konkreettisesti"
-        label={tr(
-          "Kuvittele, että voisit tehdä eniten rakastamaasi asiaa enemmän — miltä se konkreettisesti tuntuisi? Mihin haluaisit käyttää enemmän aikaa?",
-        )}
-        rows={5}
-        onSaveStateChange={onSaveStateChange}
-      />
-      <ReflectionTextarea
-        fieldKey="screen_52_vahvuudet"
-        label={tr(
-          "Kirjoita mitä vahvuuksiasi hyödynnät tehdessäsi rakastamiasi asioita vapaa-ajalla!",
-        )}
-        rows={4}
-        onSaveStateChange={onSaveStateChange}
-      />
-    </div>
+    <AdventureWorkbookPage title={tr("Love to-do -lista 3/3")} accent="mint">
+      <div className="grid gap-6">
+        <WorkbookTextBox
+          fieldKey="screen_52_konkreettisesti"
+          label={tr(
+            "Kuvittele, että voisit tehdä eniten rakastamaasi asiaa enemmän — miltä se konkreettisesti tuntuisi? Mihin haluaisit käyttää enemmän aikaa?",
+          )}
+          rows={5}
+          onSaveStateChange={onSaveStateChange}
+        />
+        <WorkbookTextBox
+          fieldKey="screen_52_vahvuudet"
+          label={tr(
+            "Kirjoita mitä vahvuuksiasi hyödynnät tehdessäsi rakastamiasi asioita vapaa-ajalla!",
+          )}
+          rows={4}
+          onSaveStateChange={onSaveStateChange}
+        />
+      </div>
+    </AdventureWorkbookPage>
   );
 }
 
@@ -9860,29 +10577,30 @@ function Screen55() {
   const tr = useTr();
   const bullets = [
     "Kerää kollaasi asioista / tavaroista, jotka ovat sinulle tärkeitä, joista olet kiinnostunut ja joissa voit hyödyntää vahvuuksiasi. Esimerkiksi koripallo, kirja, tietokone ja kissa.",
-    "Teenäistä kollaasi ja ota siitä kuva.",
-    "Esitelkää kuvat ryhmässä. Tutustukaa toistenne vahvuuksiin.",
+    "Tee näistä kollaasi ja ota siitä kuva.",
+    "Esitelkää kuvat ryhmässä. Tutustukaa toistenne vahvuuksiin vapaa-ajalla.",
     "Mitkä tavarat tai tekemiset valitsit kuvaasi? Miksi?",
     "Kirjoita, mitä vahvuuksiasi kiinnostuksen kohteesi ovat kehittäneet? Miten?",
     "Mitä uusia taitoja olet oppinut kiinnostuksen kohteiden parissa?",
-    "Käykää ystävän kanssa syvempi keskustelu vahvuuksien ja kiinnostuksen kohteiden välisestä yhteydestä vapaa-ajalla.",
+    "Käykää ystävän kanssa syvempi keskustelu vahvuuksien ja kiinnostuksen kohteiden välisestä yhteydestä.",
   ];
   return (
-    <div className="space-y-4">
-      <StickyNote tone="yellow" seed="s52-h">
-        <h1 className="font-display text-2xl mb-1">{tr("Kuvakollaasi 1/2")}</h1>
-        <p className="text-sm font-medium">
-          {tr("Mitkä asiat sinua kiinnostavat vapaa-ajalla? Miksi?")}
-        </p>
-      </StickyNote>
-      <StickyNote tone="white" seed="s52-b">
-        <ul className="list-disc pl-5 space-y-2 text-sm leading-relaxed">
+    <AdventureWorkbookPage
+      title={tr("Kuvakollaasi 1/2")}
+      intro={tr("Mitkä asiat sinua kiinnostavat vapaa-ajalla? Miksi?")}
+      accent="yellow"
+    >
+      <WorkbookInfoPanel>
+        <ul className="grid gap-3">
           {bullets.map((b) => (
-            <li key={b}>{tr(b)}</li>
+            <li key={b} className="grid grid-cols-[18px_minmax(0,1fr)] gap-3">
+              <span className="mt-[10px] h-2 w-2 rounded-full bg-[#FFE77A]" aria-hidden="true" />
+              <span>{tr(b)}</span>
+            </li>
           ))}
         </ul>
-      </StickyNote>
-    </div>
+      </WorkbookInfoPanel>
+    </AdventureWorkbookPage>
   );
 }
 
@@ -9891,32 +10609,32 @@ function Screen55() {
 function Screen56({ onSaveStateChange }: Props) {
   const tr = useTr();
   return (
-    <div className="space-y-4">
-      <StickyNote tone="coral" seed="s53-h">
-        <h1 className="font-display text-2xl mb-1">{tr("Kuvakollaasi 2/2")}</h1>
-        <p className="text-sm opacity-90">
-          {tr("Jutelkaa ystävien kanssa vahvuuksistanne ja kiinnostuksen kohteistanne!")}
-        </p>
-      </StickyNote>
-      <ReflectionTextarea
-        fieldKey="screen_54_valitsin"
-        label={tr("Mitä valitsin")}
-        rows={4}
-        onSaveStateChange={onSaveStateChange}
-      />
-      <ReflectionTextarea
-        fieldKey="screen_54_kehittaneet"
-        label={tr("Mitä vahvuuksia kiinnostuksen kohteeni ovat kehittäneet?")}
-        rows={4}
-        onSaveStateChange={onSaveStateChange}
-      />
-      <ReflectionTextarea
-        fieldKey="screen_54_uudet"
-        label={tr("Mitä uusia taitoja olet oppinut kiinnostuksen kohteiden parissa?")}
-        rows={4}
-        onSaveStateChange={onSaveStateChange}
-      />
-    </div>
+    <AdventureWorkbookPage
+      title={tr("Kuvakollaasi 2/2")}
+      intro={tr("Jutelkaa ystävien kanssa vahvuuksistanne ja kiinnostuksen kohteistanne!")}
+      accent="coral"
+    >
+      <div className="grid gap-6">
+        <WorkbookTextBox
+          fieldKey="screen_54_valitsin"
+          label={tr("Mitä valitsin kuvaani ja miksi?")}
+          rows={4}
+          onSaveStateChange={onSaveStateChange}
+        />
+        <WorkbookTextBox
+          fieldKey="screen_54_kehittaneet"
+          label={tr("Mitä vahvuuksia kiinnostuksen kohteeni ovat kehittäneet ja miten?")}
+          rows={4}
+          onSaveStateChange={onSaveStateChange}
+        />
+        <WorkbookTextBox
+          fieldKey="screen_54_uudet"
+          label={tr("Mitä uusia taitoja olet oppinut kiinnostuksen kohteiden parissa?")}
+          rows={4}
+          onSaveStateChange={onSaveStateChange}
+        />
+      </div>
+    </AdventureWorkbookPage>
   );
 }
 
@@ -9924,14 +10642,13 @@ function Screen56({ onSaveStateChange }: Props) {
 function Screen57() {
   const tr = useTr();
   return (
-    <StickyNote tone="coral" seed="s54-h" className="text-center">
-      <div className="text-xs font-bold uppercase tracking-widest opacity-80 mb-2">
-        {tr("Taso 5")}
+    <div className="relative h-full min-h-[620px] w-full overflow-hidden text-white">
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-8 text-center">
+        <h1 className="font-display text-[clamp(48px,5vw,78px)] font-semibold leading-[1.08] tracking-[0]">
+          {trLines(tr, "5. Omat vahvuudet ystävyyssuhteissa")}
+        </h1>
       </div>
-      <h1 className="font-display text-4xl leading-tight">
-        {tr("5. Omat vahvuudet ystävyyssuhteissa")}
-      </h1>
-    </StickyNote>
+    </div>
   );
 }
 
@@ -9952,28 +10669,28 @@ function Screen58(p: Props) {
 function Screen59({ onSaveStateChange }: Props) {
   const tr = useTr();
   return (
-    <div className="space-y-4">
-      <StickyNote tone="mint" seed="s56-h">
-        <h1 className="font-display text-2xl mb-1">{tr("Minä ystävänä")}</h1>
-        <p className="text-sm opacity-90">
-          {tr(
-            "Haastattele ystäviäsi. Pyydä heitä kertomaan tai lähettämään viesti. Täydennä lauseet:",
-          )}
-        </p>
-      </StickyNote>
-      <ReflectionTextarea
-        fieldKey="screen_57_ystavien"
-        label={tr("Ystävieni mielestä vahvuuksiani ovat")}
-        rows={4}
-        onSaveStateChange={onSaveStateChange}
-      />
-      <ReflectionTextarea
-        fieldKey="screen_57_parasta"
-        label={tr("Parasta ystävissäni on")}
-        rows={4}
-        onSaveStateChange={onSaveStateChange}
-      />
-    </div>
+    <AdventureWorkbookPage
+      title={tr("Minä ystävänä")}
+      intro={tr(
+        "Haastattele ystäviäsi. Pyydä heitä kertomaan tai lähettämään viesti. Täydennä lauseet:",
+      )}
+      accent="mint"
+    >
+      <div className="grid gap-6 md:grid-cols-2">
+        <WorkbookTextBox
+          fieldKey="screen_57_ystavien"
+          label={tr("Ystävieni mielestä vahvuuksiani ovat")}
+          rows={5}
+          onSaveStateChange={onSaveStateChange}
+        />
+        <WorkbookTextBox
+          fieldKey="screen_57_parasta"
+          label={tr("Parasta ystävissäni on")}
+          rows={5}
+          onSaveStateChange={onSaveStateChange}
+        />
+      </div>
+    </AdventureWorkbookPage>
   );
 }
 
@@ -9982,42 +10699,40 @@ function Screen59({ onSaveStateChange }: Props) {
 function Screen60({ onSaveStateChange }: Props) {
   const tr = useTr();
   return (
-    <div className="space-y-4">
-      <StickyNote tone="yellow" seed="s57-h">
-        <h1 className="font-display text-2xl mb-1">{tr("Vahvuuspalaute ystäviltä")}</h1>
-        <p className="text-sm opacity-90">
-          {tr(
-            "Kirjoita palautetta ja kehuja ystäviesi kesken. Kerätkää yhdessä 2–4 ystävältä palautetta vahvuuksistanne. Käytä sivua 11 pohjana. Nimetkää ne vahvuudet, joita toisissanne arvostatte. Kertokaa myös, missä toisen vahvuudet erityisesti näkyvät ja miten positiivisesti ne vaikuttavat ystävyyssuhteissa.",
-          )}
-        </p>
-      </StickyNote>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <ReflectionTextarea
+    <AdventureWorkbookPage
+      title={tr("Vahvuuspalaute ystäviltä")}
+      intro={tr(
+        "Kirjoita palautetta ja kehuja ystäviesi kesken. Kerätkää yhdessä 2–4 ystävältä palautetta vahvuuksistanne. Käytä sivua 11 pohjana. Nimetkää ne vahvuudet, joita toisissanne arvostatte. Kertokaa myös, missä toisen vahvuudet erityisesti näkyvät ja miten positiivisesti ne vaikuttavat ystävyyssuhteissa.",
+      )}
+      accent="yellow"
+    >
+      <div className="grid gap-6 md:grid-cols-2">
+        <WorkbookTextBox
           fieldKey="screen_58_uutta"
           label={tr("Mitä uutta opin palautteista?")}
           rows={3}
           onSaveStateChange={onSaveStateChange}
         />
-        <ReflectionTextarea
+        <WorkbookTextBox
           fieldKey="screen_58_tarkeaa"
           label={tr("Mikä palautteessa on minulle tärkeää?")}
           rows={3}
           onSaveStateChange={onSaveStateChange}
         />
-        <ReflectionTextarea
+        <WorkbookTextBox
           fieldKey="screen_58_muistavat"
           label={tr("Millaisista asioista ystäväni muistavat minut parhaiten?")}
           rows={3}
           onSaveStateChange={onSaveStateChange}
         />
-        <ReflectionTextarea
+        <WorkbookTextBox
           fieldKey="screen_58_parasta"
           label={tr("Mikä on parasta ystävissäni?")}
           rows={3}
           onSaveStateChange={onSaveStateChange}
         />
       </div>
-    </div>
+    </AdventureWorkbookPage>
   );
 }
 
@@ -10025,14 +10740,13 @@ function Screen60({ onSaveStateChange }: Props) {
 function Screen61() {
   const tr = useTr();
   return (
-    <StickyNote tone="yellow" seed="s58-h" className="text-center">
-      <div className="text-xs font-bold uppercase tracking-widest opacity-80 mb-2">
-        {tr("Taso 6")}
+    <div className="relative h-full min-h-[620px] w-full overflow-hidden text-white">
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-8 text-center">
+        <h1 className="font-display text-[clamp(48px,5vw,78px)] font-semibold leading-[1.08] tracking-[0]">
+          {trLines(tr, "6. Vahvuusportfolion kokoaminen")}
+        </h1>
       </div>
-      <h1 className="font-display text-4xl leading-tight">
-        {tr("6. Vahvuusportfolion kokoaminen")}
-      </h1>
-    </StickyNote>
+    </div>
   );
 }
 
@@ -10047,18 +10761,16 @@ function Screen62({ onSaveStateChange }: Props) {
     { k: "screen_60_ystavilta", label: "Ystäviltä" },
   ];
   return (
-    <div className="space-y-4">
-      <StickyNote tone="coral" seed="s59-h">
-        <h1 className="font-display text-2xl mb-1">{tr("Vahvuuksien yhteenveto")}</h1>
-        <p className="text-sm opacity-90">
-          {tr(
-            "Kokoa saamasi palautteet. Kirjoita ylös vahvuudet joita sinussa on huomattu eri ympäristöissä.",
-          )}
-        </p>
-      </StickyNote>
-      <div className="grid gap-3 sm:grid-cols-2">
+    <AdventureWorkbookPage
+      title={tr("Vahvuuksien yhteenveto")}
+      intro={tr(
+        "Kokoa saamasi palautteet. Kirjoita ylös vahvuudet joita sinussa on huomattu eri ympäristöissä.",
+      )}
+      accent="coral"
+    >
+      <div className="grid gap-6 md:grid-cols-2">
         {cols.map((c) => (
-          <ReflectionTextarea
+          <WorkbookTextBox
             key={c.k}
             fieldKey={c.k}
             label={tr(c.label)}
@@ -10067,7 +10779,7 @@ function Screen62({ onSaveStateChange }: Props) {
           />
         ))}
       </div>
-    </div>
+    </AdventureWorkbookPage>
   );
 }
 
@@ -10077,22 +10789,21 @@ function Screen63({ onSaveStateChange }: Props) {
   const tr = useTr();
   const qs = [
     { k: "screen_61_samaa", q: "Mitä samaa niissä on?" },
-    { k: "screen_61_eroavat", q: "Miten ne eroavat?" },
     { k: "screen_61_huomataan", q: "Mitä vahvuuksia sinussa huomataan?" },
+    { k: "screen_61_ilahdutti", q: "Mikä palautteissa ilahdutti?" },
     { k: "screen_61_yllatti", q: "Mikä palautteissa yllätti?" },
     { k: "screen_61_muistaa", q: "Mitä haluat muistaa palautteista?" },
+    { k: "screen_61_eroavat", q: "Miten ne eroavat?" },
   ];
   return (
-    <div className="space-y-4">
-      <StickyNote tone="mint" seed="s60-h">
-        <h1 className="font-display text-2xl mb-1">
-          {tr("Pohdi ja hyödynnä saamaasi palautetta")}
-        </h1>
-        <p className="text-sm opacity-90">{tr("Tutustu muilta saamiisi palautteisiin.")}</p>
-      </StickyNote>
-      <div className="grid gap-3">
+    <AdventureWorkbookPage
+      title={tr("Pohdi ja hyödynnä saamaasi palautetta")}
+      intro={tr("Tutustu muilta saamiisi palautteisiin.")}
+      accent="mint"
+    >
+      <div className="grid gap-6">
         {qs.map((x) => (
-          <ReflectionTextarea
+          <WorkbookTextBox
             key={x.k}
             fieldKey={x.k}
             label={tr(x.q)}
@@ -10101,7 +10812,7 @@ function Screen63({ onSaveStateChange }: Props) {
           />
         ))}
       </div>
-    </div>
+    </AdventureWorkbookPage>
   );
 }
 
@@ -10117,14 +10828,14 @@ function Screen64({ onSaveStateChange }: Props) {
     "Mitä toivoisit, että ystäväsi ja perheesi kertoisivat sinusta, kun et ole paikalla? Millaisena haluat tulla muistetuksi?",
   ];
   return (
-    <div className="space-y-4">
-      <StickyNote tone="yellow" seed="s61-h">
-        <h1 className="font-display text-2xl mb-1">{tr("Visioni ja tavoitteeni")}</h1>
-        <p className="text-sm opacity-90">{tr("Pohdi lopuksi:")}</p>
-      </StickyNote>
-      <div className="grid gap-3">
+    <AdventureWorkbookPage
+      title={tr("Visioni ja tavoitteeni")}
+      intro={tr("Pohdi lopuksi:")}
+      accent="yellow"
+    >
+      <div className="grid gap-6">
         {qs.map((q, i) => (
-          <ReflectionTextarea
+          <WorkbookTextBox
             key={i}
             fieldKey={`screen_62_visioni_${i + 1}`}
             label={tr(q)}
@@ -10133,7 +10844,7 @@ function Screen64({ onSaveStateChange }: Props) {
           />
         ))}
       </div>
-    </div>
+    </AdventureWorkbookPage>
   );
 }
 
@@ -10147,18 +10858,15 @@ function Screen65({ onSaveStateChange }: Props) {
     "Missä ympäristöissä vahvuutesi pääsevät esiin parhaiten?",
     "Mistä saat usein positiivista palautetta toisilta?",
     "Miten käytät vahvuuksiasi ryhmässä? Mihin se vaikuttaa?",
-    "Mitä haluat sanoa videolla tai esityksessä? Mitä haluat jättää katsojan mieleen?",
   ];
   return (
-    <div className="space-y-4">
-      <StickyNote tone="coral" seed="s62-h">
-        <h1 className="font-display text-2xl">
-          {tr("Kerro vahvuuksistasi videon tai esityksen avulla")}
-        </h1>
-      </StickyNote>
-      <div className="grid gap-3">
+    <AdventureWorkbookPage
+      title={tr("Kerro vahvuuksistasi videon tai esityksen avulla")}
+      accent="coral"
+    >
+      <div className="grid gap-6">
         {qs.map((q, i) => (
-          <ReflectionTextarea
+          <WorkbookTextBox
             key={i}
             fieldKey={`screen_63_kerro_${i + 1}`}
             label={tr(q)}
@@ -10167,7 +10875,7 @@ function Screen65({ onSaveStateChange }: Props) {
           />
         ))}
       </div>
-    </div>
+    </AdventureWorkbookPage>
   );
 }
 
@@ -10181,20 +10889,19 @@ function Screen66({ onSaveStateChange }: Props) {
     { k: "screen_64_tarkeaa", q: "Minulle on tärkeää…" },
   ];
   return (
-    <div className="space-y-4">
-      <StickyNote tone="mint" seed="s63-h">
-        <h1 className="font-display text-2xl">{tr("Muistiinpanoja")}</h1>
-      </StickyNote>
-      {stems.map((s) => (
-        <ReflectionTextarea
-          key={s.k}
-          fieldKey={s.k}
-          label={tr(s.q)}
-          rows={4}
-          onSaveStateChange={onSaveStateChange}
-        />
-      ))}
-    </div>
+    <AdventureWorkbookPage title={tr("Muistiinpanoja")} accent="mint">
+      <div className="grid gap-6">
+        {stems.map((s) => (
+          <WorkbookTextBox
+            key={s.k}
+            fieldKey={s.k}
+            label={tr(s.q)}
+            rows={4}
+            onSaveStateChange={onSaveStateChange}
+          />
+        ))}
+      </div>
+    </AdventureWorkbookPage>
   );
 }
 
@@ -10203,17 +10910,14 @@ function Screen66({ onSaveStateChange }: Props) {
 function Screen67({ onSaveStateChange }: Props) {
   const tr = useTr();
   return (
-    <div className="space-y-4">
-      <StickyNote tone="yellow" seed="s64-h">
-        <h1 className="font-display text-2xl">{tr("Muistiinpanoja")}</h1>
-      </StickyNote>
-      <ReflectionTextarea
+    <AdventureWorkbookPage title={tr("Muistiinpanoja")} accent="yellow">
+      <WorkbookTextBox
         fieldKey="screen_65_notes"
         label={tr("Vapaita muistiinpanoja")}
         rows={10}
         onSaveStateChange={onSaveStateChange}
       />
-    </div>
+    </AdventureWorkbookPage>
   );
 }
 
@@ -10222,17 +10926,14 @@ function Screen67({ onSaveStateChange }: Props) {
 function Screen68({ onSaveStateChange }: Props) {
   const tr = useTr();
   return (
-    <div className="space-y-4">
-      <StickyNote tone="coral" seed="s65-h">
-        <h1 className="font-display text-2xl">{tr("Muistiinpanoja")}</h1>
-      </StickyNote>
-      <ReflectionTextarea
+    <AdventureWorkbookPage title={tr("Muistiinpanoja")} accent="coral">
+      <WorkbookTextBox
         fieldKey="screen_66_notes"
         label={tr("Vapaita muistiinpanoja")}
         rows={10}
         onSaveStateChange={onSaveStateChange}
       />
-    </div>
+    </AdventureWorkbookPage>
   );
 }
 
@@ -10240,36 +10941,14 @@ function Screen68({ onSaveStateChange }: Props) {
 function Screen69() {
   const tr = useTr();
   return (
-    <div className="space-y-4">
-      <StickyNote tone="mint" seed="s66-h">
-        <h1 className="font-display text-2xl mb-1">
-          {tr("Anna itsellesi ja toisille palautetta!")}
-        </h1>
-      </StickyNote>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <StickyNote tone="white" seed="s66-a">
-          <div className="font-display text-sm mb-1">{tr("MITÄ VAHVUUKSIA SINUSSA NÄHTIIN")}</div>
-          <p className="text-xs opacity-80">
-            {tr(
-              "Tämä sivu kannustaa kokoamaan toisilta saadut vahvuushavainnot näkyväksi — esimerkiksi luokassa, perheessä tai ystäväpiirissä.",
-            )}
-          </p>
-        </StickyNote>
-        <StickyNote tone="white" seed="s66-b">
-          <div className="font-display text-sm mb-1">{tr("SINUN VAHVUUKSIASI")}</div>
-          <p className="text-xs opacity-80">
-            {tr(
-              "Anna itse itsellesi vahvuuspalautetta. Mitä vahvuuksia olet bongannut itsestäsi erityisesti?",
-            )}
-          </p>
-        </StickyNote>
-      </div>
-      <p className="text-center text-xs opacity-60">
-        {tr(
-          "Alkuperäisen sivun käsinkirjoitettua ulkoasua ei voitu poimia PDF:stä; sivu on tilapäisesti esitetty kahtena ohjeistuslappuna.",
-        )}
+    <AdventureWorkbookPage
+      title={trLines(tr, "Anna itselle\nja toisille\npalautetta!")}
+      accent="mint"
+    >
+      <p className="font-display text-[clamp(28px,3vw,52px)] font-semibold leading-none text-[#FFE77A]">
+        {tr("VINKKI!")}
       </p>
-    </div>
+    </AdventureWorkbookPage>
   );
 }
 
@@ -10285,21 +10964,20 @@ function Screen70() {
     "Uskalla näyttää innostuksesi. Se tarttuu!",
   ];
   return (
-    <div className="space-y-4">
-      <StickyNote tone="yellow" seed="s67-h">
-        <h1 className="font-display text-2xl">{tr("5 vinkkiä sinulle")}</h1>
-      </StickyNote>
-      <ol className="grid gap-2">
+    <AdventureWorkbookPage title={tr("5 vinkkiä sinulle")} accent="yellow">
+      <ol className="grid gap-4">
         {tips.map((t, i) => (
-          <StickyNote key={i} tone="white" seed={`s67-${i}`}>
-            <div className="flex items-start gap-3">
-              <span className="font-display text-2xl text-[color:var(--coral)]">{i + 1}.</span>
-              <span className="text-sm leading-relaxed pt-1">{tr(t)}</span>
-            </div>
-          </StickyNote>
+          <li key={i} className="grid grid-cols-[52px_minmax(0,1fr)] items-start gap-4">
+            <span className="font-display text-[clamp(26px,2.2vw,38px)] font-semibold leading-none text-[#FFE77A]">
+              {i + 1}.
+            </span>
+            <span className="pt-1 text-[clamp(18px,1.35vw,24px)] font-semibold leading-[1.35] text-white">
+              {tr(t)}
+            </span>
+          </li>
         ))}
       </ol>
-    </div>
+    </AdventureWorkbookPage>
   );
 }
 
@@ -10308,37 +10986,38 @@ function Screen70() {
 function Screen71({ onSaveStateChange }: Props) {
   const tr = useTr();
   return (
-    <div className="space-y-4">
-      <StickyNote tone="coral" seed="s68-h">
-        <h1 className="font-display text-2xl">{tr("Reflektoi tuloksia")}</h1>
-      </StickyNote>
-      <ReflectionTextarea
-        fieldKey="screen_69_kertovat"
-        label={tr("Mitä vahvuutesi kertovat sinusta?")}
-        rows={4}
-        onSaveStateChange={onSaveStateChange}
-      />
-      <ReflectionTextarea
-        fieldKey="screen_69_kehittamisesta"
-        label={tr("Minkä vahvuuksien kehittämisestä olisi sinulle eniten iloa?")}
-        rows={4}
-        onSaveStateChange={onSaveStateChange}
-      />
-      <ReflectionTextarea
-        fieldKey="screen_69_tilanteissa"
-        label={tr("Missä tilanteissa ja ympäristöissä pääset käyttämään vahvuuksiasi päivittäin?")}
-        rows={4}
-        onSaveStateChange={onSaveStateChange}
-      />
-      <ReflectionTextarea
-        fieldKey="screen_69_toimia"
-        label={tr(
-          "Miten sinun kannattaisi toimia, jos haluaisit hyödyntää vahvuuksiasi enemmän — opinnoissa, vapaa-ajalla ja ystävyyssuhteissa?",
-        )}
-        rows={5}
-        onSaveStateChange={onSaveStateChange}
-      />
-    </div>
+    <AdventureWorkbookPage title={tr("Reflektoi tuloksia")} accent="coral">
+      <div className="grid gap-6">
+        <WorkbookTextBox
+          fieldKey="screen_69_kertovat"
+          label={tr("Mitä vahvuutesi kertovat sinusta?")}
+          rows={4}
+          onSaveStateChange={onSaveStateChange}
+        />
+        <WorkbookTextBox
+          fieldKey="screen_69_kehittamisesta"
+          label={tr("Minkä vahvuuksien kehittämisestä olisi sinulle eniten iloa?")}
+          rows={4}
+          onSaveStateChange={onSaveStateChange}
+        />
+        <WorkbookTextBox
+          fieldKey="screen_69_tilanteissa"
+          label={tr(
+            "Missä tilanteissa ja ympäristöissä pääset käyttämään vahvuuksiasi päivittäin?",
+          )}
+          rows={4}
+          onSaveStateChange={onSaveStateChange}
+        />
+        <WorkbookTextBox
+          fieldKey="screen_69_toimia"
+          label={tr(
+            "Miten sinun kannattaisi toimia, jos haluaisit hyödyntää vahvuuksiasi enemmän — opinnoissa, vapaa-ajalla ja ystävyyssuhteissa?",
+          )}
+          rows={5}
+          onSaveStateChange={onSaveStateChange}
+        />
+      </div>
+    </AdventureWorkbookPage>
   );
 }
 
@@ -10346,32 +11025,25 @@ function Screen71({ onSaveStateChange }: Props) {
 function Screen72() {
   const tr = useTr();
   return (
-    <div className="space-y-4">
-      <StickyNote tone="yellow" seed="s69-h" className="text-center">
-        <div className="text-xs font-bold uppercase tracking-widest opacity-80 mb-2">
-          {tr("Vahvuusseikkailu päättyy")}
-        </div>
-        <h1 className="font-display text-3xl leading-tight mb-2">
-          {tr("Täydennä vahvuusmittari ja vertaa tuloksia itse valitsemiisi vahvuuskarkkeihin.")}
-        </h1>
-        <p className="text-sm">{tr("Mitä huomaat?")}</p>
-      </StickyNote>
-      <StickyNote tone="white" seed="s69-b">
-        <p className="text-sm leading-relaxed">
+    <AdventureWorkbookPage
+      title={tr("Täydennä vahvuusmittari ja vertaa tuloksia itse valitsemiisi vahvuuskarkkeihin.")}
+      intro={tr("Mitä huomaat?")}
+      accent="yellow"
+    >
+      <WorkbookInfoPanel>
+        <p>
           {tr(
             "Suurin osa meistä ihmisistä pystyy tunnistamaan helposti ainakin osan omista ydinvahvuuksistaan. Tämä on osa itsetuntemusta, joka on yhteydessä hyvinvointiin.",
           )}
         </p>
-      </StickyNote>
-      <StickyNote tone="coral" seed="s69-end" className="text-center">
-        <div className="font-display text-2xl mb-1">{tr("Onneksi olkoon! 🎉")}</div>
-        <p className="text-sm">
+        <p className="mt-4">
           {tr(
-            "Olet käynyt läpi koko Vahvuusportfolion. Voit aina palata aiempiin sivuihin ja täydentää vastauksiasi — tallennukset säilyvät.",
+            "Vahvuustyöskentelyn tavoitteena on tuoda sinut tietoiseksi vahvuuskielestä, joka ohjaa sinua tunnistamaan entistä monipuolisemmin vahvuuksia itsessäsi ja ihmisissä ympärilläsi.",
           )}
         </p>
-      </StickyNote>
-    </div>
+        <p className="mt-5">{tr("Ohje: Vahvuusmittari löytyy liitteenä lopussa.")}</p>
+      </WorkbookInfoPanel>
+    </AdventureWorkbookPage>
   );
 }
 
@@ -10379,24 +11051,210 @@ function Screen72() {
 function Screen73() {
   const tr = useTr();
   return (
-    <div className="space-y-4">
-      <StickyNote tone="mint" seed="s70-h" className="text-center">
-        <h1 className="font-display text-3xl mb-2">{tr("Kiitos seikkailusta! 🌟")}</h1>
-        <p className="text-sm leading-relaxed">
-          {tr(
-            "Vahvuusportfoliosi on nyt koossa. Käytä sitä esimerkiksi kesätyönhaussa, jatko-opintoihin hakeutuessa tai aina kun haluat muistuttaa itseäsi siitä, millainen olet parhaimmillasi.",
-          )}
-        </p>
-      </StickyNote>
-    </div>
+    <AdventureWorkbookPage title={tr("Vahvuusmittari")} accent="mint">
+      <div className="mx-auto max-w-[860px] text-center">
+        <WorkbookInfoPanel>
+          <p>
+            {tr("Yksi keino oppia tunnistamaan omia vahvuuksia on täyttää oheinen vahvuusmittari.")}
+          </p>
+        </WorkbookInfoPanel>
+      </div>
+    </AdventureWorkbookPage>
   );
 }
 
 // ============================================================
-// Screen 44
+// Screen44 implementation
 // ============================================================
-function Screen44({ onSaveStateChange }: Props) {
-  return <Screen45 onSaveStateChange={onSaveStateChange} />;
+function Screen44StrengthCandyHome({ onSaveStateChange }: Props) {
+  const tr = useTr();
+
+  return (
+    <div
+      className="
+        relative
+        h-full
+        min-h-0
+        w-full
+        overflow-x-hidden
+        overflow-y-auto
+        text-white
+        [scrollbar-gutter:stable]
+      "
+    >
+      <div
+        className="
+          relative
+          mx-auto
+          grid
+          min-h-[760px]
+          w-full
+          max-w-[1500px]
+          grid-cols-1
+          gap-8
+          overflow-hidden
+          px-[5%]
+          pb-24
+          pt-8
+          lg:grid-cols-[44%_56%]
+        "
+      >
+        <div className="relative z-10 min-w-0 pt-3">
+          <div className="ml-[10%] mt-24 flex max-w-[480px] flex-col">
+            <h1
+              className="
+                font-display
+                text-[clamp(36px,3.7vw,52px)]
+                font-semibold
+                leading-[1.12]
+                tracking-[0]
+                text-[#FFE77A]
+              "
+            >
+              {tr("Vahvuuskarkkini")}
+            </h1>
+
+            <p
+              className="
+                mt-10
+                max-w-[420px]
+                font-display
+                text-[clamp(21px,1.75vw,28px)]
+                font-semibold
+                leading-[1.28]
+                text-white
+              "
+            >
+              {tr("Valitse 1–2 vahvuuskarkkia ja")} {tr("hyödynnä")} {tr("kotona")}.{" "}
+              {tr("Kirjoita vahvuudet tähän")}
+            </p>
+
+            <div
+              className="
+                mt-24
+                font-display
+                text-[clamp(20px,1.55vw,26px)]
+                font-semibold
+                leading-[1.3]
+                text-white
+              "
+            >
+              {tr("Pohdi, mitä teit, koit ja opit.")}
+            </div>
+
+            <div className="mt-10 grid grid-cols-[10px_minmax(0,1fr)] gap-x-5">
+              <span aria-hidden="true" className="mt-[12px] h-2 w-2 rounded-full bg-[#ffd13b]" />
+              <p className="text-[clamp(18px,1.35vw,23px)] leading-[1.35] text-white">
+                {tr("Täydennä oheinen tehtävä.")}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="relative z-10 flex min-h-[680px] min-w-0 items-center justify-center">
+          <div
+            className="
+              relative
+              h-[670px]
+              w-[560px]
+              max-w-full
+              rounded-[32px]
+              bg-[#ffd643]
+              shadow-[0_8px_20px_rgba(36,27,63,0.28)]
+            "
+          >
+            <div
+              className="
+                absolute
+                left-1/2
+                top-[-40px]
+                z-0
+                h-[78px]
+                w-[244px]
+                -translate-x-1/2
+                rounded-t-[12px]
+                bg-[#ef6f6d]
+                pt-3
+                text-center
+                font-display
+                text-[17px]
+                font-semibold
+                uppercase
+                text-white
+              "
+            >
+              {tr("KOTONA")}
+            </div>
+
+            <div className="absolute left-[17%] top-[4.5%] z-10 h-[22.5%] w-[66%] rounded-[18px] bg-white">
+              <VahvuuskarkkiOverlayInput
+                fieldKey="screen_41_opit"
+                onSaveStateChange={onSaveStateChange}
+              />
+            </div>
+            <div className="absolute left-[39%] top-[28%] z-20 font-display text-[23px] font-semibold text-white">
+              {tr("3. Mitä opit?")}
+            </div>
+
+            <div className="absolute left-[4.5%] top-[35%] z-10 h-[22%] w-[44%] rounded-[18px] bg-white">
+              <VahvuuskarkkiOverlayInput
+                fieldKey="screen_41_seuraavaksi"
+                onSaveStateChange={onSaveStateChange}
+              />
+            </div>
+            <div className="absolute left-[9%] top-[59%] z-20 text-center font-display text-[22px] font-semibold leading-[1.05] text-white">
+              {tr("2. Mitä tapahtui seuraavaksi?")}
+            </div>
+
+            <div className="absolute right-[4.5%] top-[35%] z-10 h-[22%] w-[44%] rounded-[18px] bg-white">
+              <VahvuuskarkkiOverlayInput
+                fieldKey="screen_41_hyodynnat"
+                onSaveStateChange={onSaveStateChange}
+              />
+            </div>
+            <div className="absolute right-[8%] top-[59%] z-20 max-w-[210px] text-center font-display text-[22px] font-semibold leading-[1.05] text-white">
+              {tr("4. Miten hyödynnät oppimaasi?")}
+            </div>
+
+            <div className="absolute bottom-[8.5%] left-[17%] z-10 h-[22%] w-[66%] rounded-[18px] bg-white">
+              <VahvuuskarkkiOverlayInput
+                fieldKey="screen_41_teit"
+                onSaveStateChange={onSaveStateChange}
+              />
+            </div>
+            <div className="absolute bottom-[1.5%] left-[34%] z-20 font-display text-[28px] font-semibold text-white">
+              {tr("1. Mitä teit?")}
+            </div>
+
+            <div
+              aria-hidden="true"
+              className="absolute left-[4%] top-[21%] z-20 text-[78px] font-light leading-none text-white"
+            >
+              ↗
+            </div>
+            <div
+              aria-hidden="true"
+              className="absolute right-[5%] top-[21%] z-20 text-[78px] font-light leading-none text-white"
+            >
+              ↘
+            </div>
+            <div
+              aria-hidden="true"
+              className="absolute right-[6%] bottom-[25%] z-20 text-[78px] font-light leading-none text-white"
+            >
+              ↙
+            </div>
+            <div
+              aria-hidden="true"
+              className="absolute left-[5%] bottom-[25%] z-20 text-[78px] font-light leading-none text-white"
+            >
+              ↖
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 const REGISTRY: Record<number, (p: Props) => ReactNode> = {

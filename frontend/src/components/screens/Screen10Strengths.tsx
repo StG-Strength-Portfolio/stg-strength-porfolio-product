@@ -38,7 +38,7 @@ export function Screen10Strengths({ onSaveStateChange }: Props) {
           <h1 className="font-display text-[42px] font-medium leading-[1.12] tracking-[-0.01em]">{tr("Minä olen")}</h1>
           <p className="mt-8 max-w-[290px] font-display text-[22px] font-medium leading-[1.4]">{tr("Muuta muilta saamasi palaute lauseiksi minä muotoon:")}</p>
           <div className="mt-7 max-w-[290px] text-[21px] font-normal leading-[1.45]">{tr('"Olet sinnikäs" → "Minä olen sinnikäs."')}</div>
-          <img src="/illustrations/mina-olen-character.png" alt={tr("Minä olen –övning")} className="pointer-events-none absolute bottom-[-55px] left-[-95px] h-[520px] w-auto max-w-none select-none object-contain" />
+          <img src="/illustrations/mina-olen-character.png" alt={tr("Minä olen –harjoitus")} className="pointer-events-none absolute bottom-[-55px] left-[-95px] h-[520px] w-auto max-w-none select-none object-contain" />
         </div>
 
         <div className="relative min-h-[760px] min-w-0">
