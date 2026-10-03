@@ -3456,7 +3456,7 @@
   },
   "Valitse vahvuus": {
     "en": "Choose a strength",
-    "sv": "Choose a strength"
+    "sv": "Välj en styrka"
   },
   "Valitse ne vahvuudet, jotka tunnistat itsessäsi tai läheisissäsi. Voit palata muokkaamaan valintaasi myöhemmin.": {
     "en": "Select the strengths you recognize in yourself or people close to you. You can come back and edit your choices later.",
@@ -4325,5 +4325,9 @@
   },
   "\"En juurikaan koe kiitollisuutta elämän pienistä asioista.\"": {
     "sv": "\"Jag känner tacksamhet för livets små saker.\""
+  },
+  "Sisu = sinnikkyys ja sisäinen voima.": {
+    "en": "Sisu = perseverance and inner strength.",
+    "sv": "Sisu = ihärdighet och inre styrka."
   }
 }
