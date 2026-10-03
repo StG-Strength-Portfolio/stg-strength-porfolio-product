@@ -776,7 +776,14 @@ function Screen6({ onSaveStateChange }: Props) {
             {tr("Luonteenvahvuudet, joita voit tunnistaa itsessäsi")}
           </h1>
 
-          <p className="mb-4 font-display text-[18px] font-medium">{tr("Keksitkö lisää?")}</p>
+          <p className="mb-2 font-display text-[18px] font-medium">{tr("Keksitkö lisää?")}</p>
+
+          {language === "sv" && (
+            <p className="mb-4 max-w-[860px] font-display text-[13px] font-medium leading-[1.35] text-white/95">
+              <strong>Sisu:</strong> ett finskt begrepp för inre styrka, uthållighet och beslutsamhet
+              när något är svårt.
+            </p>
+          )}
 
           <div className="grid max-w-[1000px] grid-cols-5 gap-x-3 gap-y-3">
             {Array.from({ length: 26 }, (_, index) => index + 1).map((id) => {
@@ -6046,7 +6053,7 @@ function Screen24({ onSaveStateChange }: Props) {
             gap-x-12
             gap-y-16
             md:grid-cols-2
-            lg:grid-cols-[25%_1fr_1fr_1fr]
+            lg:grid-cols-[30%_1fr_1fr_1fr]
             lg:grid-rows-[270px_270px_270px]
             lg:gap-x-10
             lg:gap-y-20
@@ -6070,9 +6077,9 @@ function Screen24({ onSaveStateChange }: Props) {
           >
             <h1
               className="
-                max-w-[340px]
+                max-w-[280px]
                 font-display
-                text-[clamp(48px,4.8vw,72px)]
+                text-[clamp(42px,4vw,60px)]
                 font-extrabold
                 leading-[1.02]
                 tracking-[-0.025em]
@@ -11183,15 +11190,21 @@ function Screen44StrengthCandyHome({ onSaveStateChange }: Props) {
               className="
                 absolute
                 right-[3%]
-                top-[3%]
+                top-[2.5%]
                 z-30
-                -rotate-[4deg]
+                flex
+                min-h-[52px]
+                w-[46%]
+                -rotate-[3deg]
+                items-center
+                justify-center
                 rounded-[12px]
                 border-[3px]
                 border-black
                 bg-[#FFE77A]
-                px-4
+                px-5
                 py-2
+                text-center
                 font-display
                 text-[15px]
                 font-bold
@@ -12482,15 +12495,21 @@ function Screen50({ onSaveStateChange }: Props) {
               className="
                 absolute
                 right-[3%]
-                top-[3%]
+                top-[2.5%]
                 z-30
-                -rotate-[4deg]
+                flex
+                min-h-[52px]
+                w-[46%]
+                -rotate-[3deg]
+                items-center
+                justify-center
                 rounded-[12px]
                 border-[3px]
                 border-black
                 bg-[#FFE77A]
-                px-4
+                px-5
                 py-2
+                text-center
                 font-display
                 text-[15px]
                 font-bold
