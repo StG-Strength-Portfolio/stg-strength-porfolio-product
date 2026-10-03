@@ -758,7 +758,7 @@ function Screen6({ onSaveStateChange }: Props) {
             <span className="absolute -left-7 top-2 -rotate-[25deg] text-[34px]">↗</span>
 
             {tr(
-              "Valitse ne vahvuudet, jotka tunnistat itsessäsi. Voit palata muokkaamaan valintaasi myöhemmin.",
+              "Valitse ne vahvuudet, jotka tunnistat itsessäsi tai läheisissäsi. Voit palata muokkaamaan valintaasi myöhemmin.",
             )}
           </div>
 
@@ -773,17 +773,10 @@ function Screen6({ onSaveStateChange }: Props) {
           {/* Updated title */}
 
           <h1 className="mb-1 max-w-[850px] font-display text-[30px] font-bold leading-tight">
-            {tr("Luonteenvahvuudet, joita voit tunnistaa itsessäsi")}
+            {tr("Luonteenvahvuudet, joita voit tunnistaa itsessäsi ja toisissa ihmisissä")}
           </h1>
 
-          <p className="mb-2 font-display text-[18px] font-medium">{tr("Keksitkö lisää?")}</p>
-
-          {language === "sv" && (
-            <p className="mb-4 max-w-[860px] font-display text-[13px] font-medium leading-[1.35] text-white/95">
-              <strong>Sisu:</strong> ett finskt begrepp för inre styrka, uthållighet och beslutsamhet
-              när något är svårt.
-            </p>
-          )}
+          <p className="mb-4 font-display text-[18px] font-medium">{tr("Keksitkö lisää?")}</p>
 
           <div className="grid max-w-[1000px] grid-cols-5 gap-x-3 gap-y-3">
             {Array.from({ length: 26 }, (_, index) => index + 1).map((id) => {
@@ -881,6 +874,23 @@ function Screen6({ onSaveStateChange }: Props) {
               );
             })}
           </div>
+
+          <p
+            className="
+              mt-4
+              max-w-[900px]
+              font-display
+              text-[13px]
+              font-medium
+              leading-[1.35]
+              text-white/90
+            "
+          >
+            <span className="font-semibold">Sisu:</span>{" "}
+            {tr(
+              "Sisu tarkoittaa sinnikkyyttä, sisäistä voimaa ja kykyä jatkaa vaikeuksista huolimatta.",
+            )}
+          </p>
         </section>
       </div>
     </div>
@@ -6053,7 +6063,7 @@ function Screen24({ onSaveStateChange }: Props) {
             gap-x-12
             gap-y-16
             md:grid-cols-2
-            lg:grid-cols-[30%_1fr_1fr_1fr]
+            lg:grid-cols-[25%_1fr_1fr_1fr]
             lg:grid-rows-[270px_270px_270px]
             lg:gap-x-10
             lg:gap-y-20
@@ -6077,9 +6087,9 @@ function Screen24({ onSaveStateChange }: Props) {
           >
             <h1
               className="
-                max-w-[280px]
+                max-w-[340px]
                 font-display
-                text-[clamp(42px,4vw,60px)]
+                text-[clamp(48px,4.8vw,72px)]
                 font-extrabold
                 leading-[1.02]
                 tracking-[-0.025em]
@@ -11189,20 +11199,19 @@ function Screen44StrengthCandyHome({ onSaveStateChange }: Props) {
             <div
               className="
                 absolute
-                right-[3%]
-                top-[2.5%]
+                left-[30%]
+                top-[1.4%]
                 z-30
                 flex
-                min-h-[52px]
-                w-[46%]
-                -rotate-[3deg]
+                min-h-[46px]
+                w-[40%]
                 items-center
                 justify-center
                 rounded-[12px]
                 border-[3px]
                 border-black
                 bg-[#FFE77A]
-                px-5
+                px-4
                 py-2
                 text-center
                 font-display
@@ -12107,9 +12116,6 @@ function Screen48({ onSaveStateChange }: Props) {
               />
             </div>
 
-            <p className="mt-2 text-right font-display text-[18px] font-semibold leading-[1.2] tracking-[0] text-white">
-              {tr("käytöstä.")}
-            </p>
           </div>
 
           {/* TULEVAISUUS */}
@@ -12494,20 +12500,19 @@ function Screen50({ onSaveStateChange }: Props) {
             <div
               className="
                 absolute
-                right-[3%]
-                top-[2.5%]
+                left-[30%]
+                top-[1.4%]
                 z-30
                 flex
-                min-h-[52px]
-                w-[46%]
-                -rotate-[3deg]
+                min-h-[46px]
+                w-[40%]
                 items-center
                 justify-center
                 rounded-[12px]
                 border-[3px]
                 border-black
                 bg-[#FFE77A]
-                px-5
+                px-4
                 py-2
                 text-center
                 font-display
