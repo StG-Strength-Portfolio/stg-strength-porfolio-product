@@ -194,11 +194,11 @@ function Screen2() {
                 {index + 1}
               </div>
 
-              <h2 className="mb-4 break-words font-display text-[clamp(16px,1.35vw,22px)] font-semibold leading-[1.15] text-[#7654ad]">
+              <h2 className="mb-4 hyphens-none [overflow-wrap:normal] [word-break:normal] font-display text-[clamp(16px,1.35vw,22px)] font-semibold leading-[1.15] text-[#7654ad]">
                 {title}
               </h2>
 
-              <p className="break-words text-[clamp(15px,1vw,18px)] leading-[1.3] text-[#7654ad]">
+              <p className="hyphens-none [overflow-wrap:normal] [word-break:normal] text-[clamp(15px,1vw,18px)] leading-[1.3] text-[#7654ad]">
                 {description}
               </p>
             </div>
@@ -6121,14 +6121,14 @@ function Screen24({ onSaveStateChange }: Props) {
                   z-20
                   mx-auto
                   flex
-                  min-h-[52px]
+                  min-h-[76px]
                   max-w-[95%]
                   shrink-0
                   items-start
                   justify-center
                   text-center
                   font-display
-                  text-[17px]
+                  text-[16px]
                   font-semibold
                   leading-[1.22]
                   text-black
@@ -8655,11 +8655,11 @@ function Screen33({ onSaveStateChange }: Props) {
         <div
           className="
             absolute
-            left-[30%]
-            top-[6%]
+            left-[34%]
+            top-[9%]
             z-10
             aspect-[99/86]
-            w-[67%]
+            w-[62%]
             max-w-[1020px]
           "
         >
@@ -10957,6 +10957,7 @@ function Screen44StrengthCandyHome({ onSaveStateChange }: Props) {
   // Screen44 uses the same worksheet artwork structure,
   // but the context label must represent "At home".
   const homeLabel = language === "fi" ? "KOTONA" : language === "sv" ? "HEMMA" : "AT HOME";
+  const homeContext = language === "fi" ? "kotona" : language === "sv" ? "hemma" : "at home";
 
   return (
     <div
@@ -11036,7 +11037,7 @@ function Screen44StrengthCandyHome({ onSaveStateChange }: Props) {
               text-white
             "
           >
-            {tr("Valitse 1–2 vahvuuskarkkia ja")} {tr("hyödynnä")} {tr("kotona")}.
+            {tr("Valitse 1–2 vahvuuskarkkia ja")} {tr("hyödynnä")} {homeContext}.
           </p>
 
           <p
@@ -11174,10 +11175,33 @@ function Screen44StrengthCandyHome({ onSaveStateChange }: Props) {
             {/* =================================================
                 HOME LABEL OVERLAY
 
-                The existing illustration contains the original
-                school-context tab. This overlay changes only the
-                context label without recreating the worksheet.
+                The source illustration is shared with the school version.
+                Cover its school-context label with the correct home label.
             ================================================== */}
+
+            <div
+              className="
+                absolute
+                right-[3%]
+                top-[3%]
+                z-30
+                -rotate-[4deg]
+                rounded-[12px]
+                border-[3px]
+                border-black
+                bg-[#FFE77A]
+                px-4
+                py-2
+                font-display
+                text-[15px]
+                font-bold
+                leading-none
+                text-[#241b3f]
+                shadow-[0_4px_0_rgba(0,0,0,0.18)]
+              "
+            >
+              {homeLabel}
+            </div>
 
             {/* =================================================
                 TOP BOX — 3. WHAT DID YOU LEARN?
@@ -12203,6 +12227,11 @@ function Screen50({ onSaveStateChange }: Props) {
         ? "/illustrations/s29-lukiossa-sheet-sv.png"
         : "/illustrations/s29-lukiossa-sheet-en.png";
 
+  const freeTimeLabel =
+    language === "fi" ? "VAPAA-AJALLA" : language === "sv" ? "PÅ FRITIDEN" : "IN FREE TIME";
+  const freeTimeContext =
+    language === "fi" ? "vapaa-ajalla" : language === "sv" ? "på fritiden" : "in your free time";
+
   return (
     <div
       className="
@@ -12265,7 +12294,7 @@ function Screen50({ onSaveStateChange }: Props) {
               text-white
             "
           >
-            {tr("Valitse 1–2 vahvuuskarkkia ja")} {tr("hyödynnä")} {tr("vapaa-ajalla")}.
+            {tr("Valitse 1–2 vahvuuskarkkia ja")} {tr("hyödynnä")} {freeTimeContext}.
           </p>
 
           <p
@@ -12446,6 +12475,32 @@ function Screen50({ onSaveStateChange }: Props) {
                 select-none
               "
             />
+
+            {/* Free-time context label overlay */}
+
+            <div
+              className="
+                absolute
+                right-[3%]
+                top-[3%]
+                z-30
+                -rotate-[4deg]
+                rounded-[12px]
+                border-[3px]
+                border-black
+                bg-[#FFE77A]
+                px-4
+                py-2
+                font-display
+                text-[15px]
+                font-bold
+                leading-none
+                text-[#241b3f]
+                shadow-[0_4px_0_rgba(0,0,0,0.18)]
+              "
+            >
+              {freeTimeLabel}
+            </div>
 
             {/* Top box — What did you learn? */}
 
