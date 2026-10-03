@@ -1,29 +1,91 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { CornerBlobs } from "@/components/CornerBlobs";
 import { StickyNote } from "@/components/StickyNote";
 import { Button } from "@/components/ui/button";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
-import { useT, useTr } from "@/lib/i18n";
+import { useLanguage, useT } from "@/lib/i18n";
+import { homeForRole, roleOfCurrentUser } from "@/lib/role-guard";
+import { hasRecentAuthorityMiss, isSsoAuthorityOrigin } from "@/lib/cross-domain-auth";
+import {
+  seedAuthorityAndContinue,
+  startAuthorityCheck,
+  startLegacyAuthorityDiscovery,
+} from "@/lib/central-sso-client";
 import { z } from "zod";
 
 export const Route = createFileRoute("/auth/")({
-  validateSearch: z.object({ idle: z.enum(["1"]).optional() }).parse,
+  validateSearch: z
+    .object({
+      idle: z.enum(["1"]).optional(),
+    })
+    .parse,
   component: AuthLanding,
 });
+
+function cleanLegacyAuthUrl(idle?: "1") {
+  if (typeof window === "undefined" || !window.location.search) return;
+  const clean = idle === "1" ? "/auth?idle=1" : "/auth";
+  if (`${window.location.pathname}${window.location.search}` !== clean) {
+    window.history.replaceState({}, "", clean);
+  }
+}
 
 function AuthLanding() {
   const navigate = useNavigate();
   const search = Route.useSearch();
+  const [resolving, setResolving] = useState(true);
   const t = useT();
-  const tr = useTr();
+  const { language } = useLanguage();
+  const staffLabel =
+    language === "en"
+      ? "Create staff account"
+      : language === "sv"
+        ? "Skapa personalkonto"
+        : "Luo henkilökunnan tili";
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/seikkailu", replace: true });
-    });
-  }, [navigate]);
+    let cancelled = false;
+
+    async function resolveAuth() {
+      cleanLegacyAuthUrl(search.idle);
+
+      const { data } = await supabase.auth.getSession();
+      if (cancelled) return;
+
+      if (data.session) {
+        const home = homeForRole(await roleOfCurrentUser());
+        if (!isSsoAuthorityOrigin(window.location.origin)) {
+          const seeding = await seedAuthorityAndContinue(data.session, home);
+          if (seeding || cancelled) return;
+        }
+        window.location.replace(home);
+        return;
+      }
+
+      if (hasRecentAuthorityMiss()) {
+        setResolving(false);
+        return;
+      }
+
+      if (isSsoAuthorityOrigin(window.location.origin)) {
+        if (!startLegacyAuthorityDiscovery("auth")) setResolving(false);
+        return;
+      }
+
+      if (!startAuthorityCheck("auth")) setResolving(false);
+    }
+
+    void resolveAuth();
+    return () => {
+      cancelled = true;
+    };
+  }, [search.idle]);
+
+  if (resolving) {
+    return <div className="min-h-screen bg-background" aria-hidden="true" />;
+  }
 
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-hidden flex items-center justify-center px-4 py-10">
@@ -31,7 +93,9 @@ function AuthLanding() {
       <AuthLanguageSwitcher />
       <div className="relative z-10 w-full max-w-md space-y-6">
         <div className="text-center">
-          <h1 className="text-5xl font-bold">{t("app.title")}</h1>
+          <h1 className="text-5xl font-bold">
+            {language === "fi" ? "Vahvuusportfolio" : t("app.title")}
+          </h1>
           <p className="mt-2 opacity-90">{t("app.tagline")}</p>
         </div>
 
@@ -55,10 +119,10 @@ function AuthLanding() {
             {t("auth.landing.signupBtn")}
           </Button>
           <Button
-            onClick={() => navigate({ to: "/register-teacher" })}
+            onClick={() => navigate({ to: "/register-staff" })}
             className="w-full rounded-full bg-yellow hover:bg-yellow/90 text-ink font-bold py-6 text-base h-auto"
           >
-            {tr("Luo opettajatili")}
+            {staffLabel}
           </Button>
         </StickyNote>
       </div>

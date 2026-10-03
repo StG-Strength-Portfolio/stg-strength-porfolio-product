@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useT, useTr } from "@/lib/i18n";
 import { REQUIREMENTS, useNavGate } from "@/lib/screen-completion";
 import { TOTAL_SCREENS, worldForScreen } from "@/lib/screens";
+import { ScreenSubPageProvider } from "@/lib/screen-subpages";
 
 export const Route = createFileRoute("/_authenticated/seikkailu/$screen")({
   component: ScreenView,
@@ -95,7 +96,8 @@ function ScreenView() {
     );
   }
 
-  return (
+ return (
+  <ScreenSubPageProvider key={n}>
     <div className="journey-bg relative flex h-[calc(100dvh-3.5rem)] min-h-0 min-w-0 w-full flex-col overflow-hidden">
       <div className="relative z-30 shrink-0">
         <ScreenChrome n={n} saveState={saveState} />
@@ -140,5 +142,6 @@ function ScreenView() {
         <BottomNav n={n} saveState={saveState} showProgress={false} nextDisabled={nextBlocked} nextHint={nextBlocked ? hint : undefined} />
       </div>
     </div>
+      </ScreenSubPageProvider>
   );
 }

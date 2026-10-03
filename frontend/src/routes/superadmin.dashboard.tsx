@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Copy, ExternalLink } from "lucide-react";
+import { Copy, ExternalLink, RotateCcw, Search, Trash2 } from "lucide-react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,17 +15,25 @@ import { useLanguage, useTr } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { EmailTemplatesTab } from "@/components/superadmin/EmailTemplatesTab";
 import { EmailAnalyticsTab } from "@/components/superadmin/EmailAnalyticsTab";
-// @lovable-new
 import { TeachingMaterialsTab } from "@/components/superadmin/TeachingMaterialsTab";
 import { SuperAdminsTab } from "@/components/superadmin/SuperAdminsTab";
-// @lovable-new 2026-08-08 — super admin "view as student" (view mode only)
+import { SuperAdminSettingsTab } from "@/components/superadmin/SuperAdminSettingsTab";
 import { setStudentViewMode } from "@/lib/progression";
+import { setSuperAdminPreview } from "@/lib/superadmin-preview";
+import {
+  getCurrentSchoolAdminCodes,
+  generateSecureSchoolAdminCode,
+} from "@/lib/school-admin-invitations.functions";
+import {
+  purgeExpiredSchools,
+  restoreSchool,
+  trashSchool,
+} from "@/lib/school-trash.functions";
 import {
   listSchools,
   createSchool,
   renewSchool,
   updateSchool,
-  generateSchoolCode,
   type SchoolRow,
 } from "@/lib/superadmin.functions";
 
@@ -40,6 +48,7 @@ const TABS = [
   "settings",
 ] as const;
 type Tab = (typeof TABS)[number];
+type SchoolListRow = SchoolRow & { deleted_at?: string | null };
 
 export const Route = createFileRoute("/superadmin/dashboard")({
   validateSearch: z.object({ tab: z.enum(TABS).optional() }).parse,
@@ -74,31 +83,56 @@ function CopyCode({ code }: { code: string }) {
 function SuperAdminDashboard() {
   const tr = useTr();
   const { language } = useLanguage();
-  const studentViewLabel =
-    language === "en" ? "View as student" : language === "sv" ? "Visa elevvyn" : "Näytä oppilaan näkymä";
+  const staffCodeLabel =
+    language === "en" ? "Staff code" : language === "sv" ? "Personalkod" : "Henkilökunnan koodi";
+  const generateCodeLabel =
+    language === "en"
+      ? "Generate new staff code"
+      : language === "sv"
+        ? "Skapa ny personalkod"
+        : "Luo uusi henkilökunnan koodi";
+  const noActiveCodeLabel =
+    language === "en" ? "No active code" : language === "sv" ? "Ingen aktiv kod" : "Ei aktiivista koodia";
+  const searchLabel = language === "en" ? "Find school" : language === "sv" ? "Sök skola" : "Etsi koulu";
+  const trashLabel = language === "en" ? "Deleted schools" : language === "sv" ? "Raderade skolor" : "Poistetut koulut";
+  const deleteLabel = language === "en" ? "Delete" : language === "sv" ? "Radera" : "Poista";
+  const restoreLabel = language === "en" ? "Restore" : language === "sv" ? "Återställ" : "Palauta";
+  const deletedLabel = language === "en" ? "Deleted" : language === "sv" ? "Raderad" : "Poistettu";
+  const daysLabel = language === "en" ? "days to restore" : language === "sv" ? "dagar att återställa" : "päivää palautusaikaa";
+  const noMatchesLabel = language === "en" ? "No matching schools." : language === "sv" ? "Inga matchande skolor." : "Ei hakua vastaavia kouluja.";
   const navigate = useNavigate();
   const ready = useSuperAdminGuard();
   const tab: Tab = Route.useSearch().tab ?? "schools";
 
   const fetchSchools = useServerFn(listSchools);
+  const fetchStaffCodes = useServerFn(getCurrentSchoolAdminCodes);
   const addSchool = useServerFn(createSchool);
   const renew = useServerFn(renewSchool);
   const edit = useServerFn(updateSchool);
-  const genCode = useServerFn(generateSchoolCode);
+  const genCode = useServerFn(generateSecureSchoolAdminCode);
+  const moveToTrash = useServerFn(trashSchool);
+  const restoreFromTrash = useServerFn(restoreSchool);
+  const purgeTrash = useServerFn(purgeExpiredSchools);
 
-  const [schools, setSchools] = useState<SchoolRow[]>([]);
+  const [schools, setSchools] = useState<SchoolListRow[]>([]);
+  const [staffCodes, setStaffCodes] = useState<Record<string, string>>({});
   const [name, setName] = useState("");
   const [start, setStart] = useState(today());
   const [expiry, setExpiry] = useState("");
   const [busy, setBusy] = useState(false);
+  const [search, setSearch] = useState("");
+  const [showDeleted, setShowDeleted] = useState(false);
 
   const load = useCallback(async () => {
     try {
-      setSchools(await fetchSchools());
+      await purgeTrash();
+      const [schoolRows, currentCodes] = await Promise.all([fetchSchools(), fetchStaffCodes()]);
+      setSchools(schoolRows as SchoolListRow[]);
+      setStaffCodes(currentCodes);
     } catch (e) {
       toast.error((e as Error).message);
     }
-  }, [fetchSchools]);
+  }, [fetchStaffCodes, fetchSchools, purgeTrash]);
 
   useEffect(() => {
     if (ready) void load();
@@ -152,9 +186,61 @@ function SuperAdminDashboard() {
     await load();
   }
 
-  const totalTeachers = schools.reduce((a, s) => a + s.teacherCount, 0);
-  const totalStudents = schools.reduce((a, s) => a + s.studentCount, 0);
-  const expired = schools.filter((s) => !s.is_active);
+  async function onDelete(s: SchoolListRow) {
+    const instruction =
+      language === "en"
+        ? `Delete ${s.name}? Type the school name exactly to confirm. The school can be restored for 90 days.`
+        : language === "sv"
+          ? `Radera ${s.name}? Skriv skolans namn exakt för att bekräfta. Skolan kan återställas i 90 dagar.`
+          : `Poistetaanko ${s.name}? Kirjoita koulun nimi täsmälleen vahvistaaksesi. Koulu voidaan palauttaa 90 päivän ajan.`;
+    const typed = window.prompt(instruction);
+    if (typed == null) return;
+    if (typed.trim() !== s.name) {
+      toast.error(language === "en" ? "School name does not match." : language === "sv" ? "Skolans namn stämmer inte." : "Koulun nimi ei täsmää.");
+      return;
+    }
+    setBusy(true);
+    try {
+      await moveToTrash({ data: { schoolId: s.id, confirmName: typed } });
+      toast.success(language === "en" ? "School deleted. It can be restored for 90 days." : language === "sv" ? "Skolan har raderats. Den kan återställas i 90 dagar." : "Koulu poistettu. Sen voi palauttaa 90 päivän ajan.");
+      await load();
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onRestore(s: SchoolListRow) {
+    setBusy(true);
+    try {
+      await restoreFromTrash({ data: { schoolId: s.id } });
+      toast.success(language === "en" ? "School restored." : language === "sv" ? "Skolan har återställts." : "Koulu palautettu.");
+      await load();
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function restoreDaysLeft(s: SchoolListRow) {
+    if (!s.deleted_at) return 0;
+    const deadline = new Date(s.deleted_at).getTime() + 90 * 86400000;
+    return Math.max(0, Math.ceil((deadline - Date.now()) / 86400000));
+  }
+
+  const query = search.trim().toLowerCase();
+  const filteredSchools = schools.filter((s) => {
+    const isDeleted = !!s.deleted_at;
+    if (isDeleted !== showDeleted) return false;
+    if (!query) return true;
+    return [s.name, staffCodes[s.id] ?? "", ...s.adminNames].join(" ").toLowerCase().includes(query);
+  });
+  const activeSchools = schools.filter((s) => !s.deleted_at);
+  const totalTeachers = activeSchools.reduce((a, s) => a + s.teacherCount, 0);
+  const totalStudents = activeSchools.reduce((a, s) => a + s.studentCount, 0);
+  const expired = activeSchools.filter((s) => !s.is_active);
 
   return (
     <div className="relative min-h-screen bg-background text-foreground">
@@ -194,18 +280,19 @@ function SuperAdminDashboard() {
               </Link>
             ))}
           </nav>
-          {/* @lovable-new 2026-08-08 — QA: open the student-facing portfolio
-              with full bypass. View mode only — the DB role stays super_admin. */}
-          <button
-            type="button"
-            className="mt-4 block w-full rounded-full bg-[color:var(--yellow)] px-4 py-2 text-sm font-bold text-[color:var(--purple)]"
-            onClick={() => {
-              setStudentViewMode(true);
-              window.location.href = "/seikkailu";
-            }}
-          >
-            {studentViewLabel}
-          </button>
+          <div className="mt-4">
+            <button
+              type="button"
+              className="block w-full rounded-full bg-[color:var(--yellow)] px-4 py-2 text-sm font-bold text-[color:var(--purple)]"
+              onClick={() => {
+                setSuperAdminPreview("student");
+                setStudentViewMode(true);
+                window.location.href = "/seikkailu";
+              }}
+            >
+              DEMO
+            </button>
+          </div>
 
           <button
             type="button"
@@ -265,15 +352,37 @@ function SuperAdminDashboard() {
                 </form>
               </StickyNote>
 
-              <StickyNote seed="sa-school-list" className="overflow-x-auto">
-                {schools.length === 0 ? (
-                  <p className="opacity-70">{tr("Ei kouluja vielä.")}</p>
+              <StickyNote seed="sa-school-list" className="space-y-4 overflow-x-auto">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="relative min-w-[260px] flex-1 md:max-w-md">
+                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 opacity-50" />
+                    <Input
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder={searchLabel}
+                      aria-label={searchLabel}
+                      className="pl-9"
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant={showDeleted ? "default" : "outline"}
+                    className="rounded-full"
+                    onClick={() => setShowDeleted((v) => !v)}
+                  >
+                    <Trash2 className="mr-1 h-4 w-4" />
+                    {trashLabel} ({schools.filter((s) => !!s.deleted_at).length})
+                  </Button>
+                </div>
+
+                {filteredSchools.length === 0 ? (
+                  <p className="py-4 opacity-70">{search ? noMatchesLabel : tr("Ei kouluja vielä.")}</p>
                 ) : (
                   <table className="w-full text-left text-sm">
                     <thead>
                       <tr className="border-b border-black/10">
                         <th className="py-2 pr-3">{tr("Koulun nimi")}</th>
-                        <th className="py-2 pr-3">{tr("Koulukoodi")}</th>
+                        <th className="py-2 pr-3">{staffCodeLabel}</th>
                         <th className="py-2 pr-3">{tr("Tila")}</th>
                         <th className="py-2 pr-3">{tr("Laskutus aloitus")}</th>
                         <th className="py-2 pr-3">{tr("Vanhentuminen")}</th>
@@ -284,76 +393,117 @@ function SuperAdminDashboard() {
                       </tr>
                     </thead>
                     <tbody>
-                      {schools.map((s) => (
-                        <tr key={s.id} className="border-b border-black/5 align-top">
-                          <td className="py-2 pr-3 font-medium">{s.name}</td>
-                          <td className="py-2 pr-3">
-                            <CopyCode code={s.code} />
-                          </td>
-                          <td className="py-2 pr-3">
-                            <span
-                              className={
-                                s.is_active
-                                  ? "rounded-full bg-green-600/15 px-2 py-0.5 text-xs font-semibold text-green-800"
-                                  : "rounded-full bg-red-600/15 px-2 py-0.5 text-xs font-semibold text-red-800"
-                              }
-                            >
-                              {s.is_active ? tr("Aktiivinen") : tr("Vanhentuneet")}
-                            </span>
-                          </td>
-                          <td className="py-2 pr-3 opacity-70">
-                            {s.billing_start_date
-                              ? new Date(s.billing_start_date).toLocaleDateString()
-                              : "—"}
-                          </td>
-                          <td className="py-2 pr-3 opacity-70">
-                            {s.billing_expiry_date
-                              ? new Date(s.billing_expiry_date).toLocaleDateString()
-                              : "—"}
-                          </td>
-                          <td className="py-2 pr-3">{s.teacherCount}</td>
-                          <td className="py-2 pr-3">{s.studentCount}</td>
-                          <td className="py-2 pr-3">{s.adminNames.join(", ") || "—"}</td>
-                          <td className="py-2">
-                            <div className="flex flex-wrap gap-1.5">
-                              {!s.is_active && (
+                      {filteredSchools.map((s) => {
+                        const isDeleted = !!s.deleted_at;
+                        return (
+                          <tr key={s.id} className="border-b border-black/5 align-top">
+                            <td className="py-2 pr-3 font-medium">{s.name}</td>
+                            <td className="py-2 pr-3">
+                              {!isDeleted && staffCodes[s.id] ? (
+                                <CopyCode code={staffCodes[s.id]} />
+                              ) : (
+                                <span className="text-xs opacity-60">{noActiveCodeLabel}</span>
+                              )}
+                            </td>
+                            <td className="py-2 pr-3">
+                              {isDeleted ? (
+                                <div className="space-y-1">
+                                  <span className="rounded-full bg-red-600/15 px-2 py-0.5 text-xs font-semibold text-red-800">
+                                    {deletedLabel}
+                                  </span>
+                                  <div className="text-[0.7rem] opacity-60">
+                                    {restoreDaysLeft(s)} {daysLabel}
+                                  </div>
+                                </div>
+                              ) : (
+                                <span
+                                  className={
+                                    s.is_active
+                                      ? "rounded-full bg-green-600/15 px-2 py-0.5 text-xs font-semibold text-green-800"
+                                      : "rounded-full bg-red-600/15 px-2 py-0.5 text-xs font-semibold text-red-800"
+                                  }
+                                >
+                                  {s.is_active ? tr("Aktiivinen") : tr("Vanhentuneet")}
+                                </span>
+                              )}
+                            </td>
+                            <td className="py-2 pr-3 opacity-70">
+                              {s.billing_start_date
+                                ? new Date(s.billing_start_date).toLocaleDateString()
+                                : "—"}
+                            </td>
+                            <td className="py-2 pr-3 opacity-70">
+                              {s.billing_expiry_date
+                                ? new Date(s.billing_expiry_date).toLocaleDateString()
+                                : "—"}
+                            </td>
+                            <td className="py-2 pr-3">{s.teacherCount}</td>
+                            <td className="py-2 pr-3">{s.studentCount}</td>
+                            <td className="py-2 pr-3">{s.adminNames.join(", ") || "—"}</td>
+                            <td className="py-2">
+                              {isDeleted ? (
                                 <Button
                                   size="sm"
                                   variant="outline"
                                   className="rounded-full"
-                                  onClick={() => void onRenew(s)}
+                                  disabled={busy || restoreDaysLeft(s) <= 0}
+                                  onClick={() => void onRestore(s)}
                                 >
-                                  {tr("Uusi")}
+                                  <RotateCcw className="mr-1 h-3 w-3" />
+                                  {restoreLabel}
                                 </Button>
+                              ) : (
+                                <div className="flex flex-wrap gap-1.5">
+                                  {!s.is_active && (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="rounded-full"
+                                      onClick={() => void onRenew(s)}
+                                    >
+                                      {tr("Uusi")}
+                                    </Button>
+                                  )}
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="rounded-full"
+                                    onClick={() => void onEdit(s)}
+                                  >
+                                    {tr("Muokkaa")}
+                                  </Button>
+                                  <Button size="sm" variant="outline" className="rounded-full" asChild>
+                                    <Link
+                                      to="/superadmin/schools/$schoolId"
+                                      params={{ schoolId: s.id }}
+                                    >
+                                      {tr("Näytä")} <ExternalLink className="ml-1 h-3 w-3" />
+                                    </Link>
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="rounded-full"
+                                    onClick={() => void onGenerate(s)}
+                                  >
+                                    {generateCodeLabel}
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="rounded-full border-red-500/40 text-red-700 hover:bg-red-50"
+                                    disabled={busy}
+                                    onClick={() => void onDelete(s)}
+                                  >
+                                    <Trash2 className="mr-1 h-3 w-3" />
+                                    {deleteLabel}
+                                  </Button>
+                                </div>
                               )}
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="rounded-full"
-                                onClick={() => void onEdit(s)}
-                              >
-                                {tr("Muokkaa")}
-                              </Button>
-                              <Button size="sm" variant="outline" className="rounded-full" asChild>
-                                <Link
-                                  to="/superadmin/schools/$schoolId"
-                                  params={{ schoolId: s.id }}
-                                >
-                                  {tr("Näytä")} <ExternalLink className="ml-1 h-3 w-3" />
-                                </Link>
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="rounded-full"
-                                onClick={() => void onGenerate(s)}
-                              >
-                                {tr("Luo koodi")}
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 )}
@@ -364,7 +514,7 @@ function SuperAdminDashboard() {
           {tab === "billing" && (
             <StickyNote seed="sa-billing" className="space-y-3">
               <h2 className="text-2xl font-bold">{tr("Laskutus")}</h2>
-              {schools.map((s) => (
+              {activeSchools.map((s) => (
                 <div
                   key={s.id}
                   className="flex flex-wrap items-center justify-between gap-3 border-b border-black/5 py-2 text-sm"
@@ -407,7 +557,7 @@ function SuperAdminDashboard() {
                 {tr("Avaa koulu nähdäksesi ja muokataksesi sen käyttäjiä.")}
               </p>
               <ul className="space-y-1 text-sm">
-                {schools.map((s) => (
+                {activeSchools.map((s) => (
                   <li key={s.id}>
                     <Link
                       to="/superadmin/schools/$schoolId"
@@ -431,14 +581,13 @@ function SuperAdminDashboard() {
             </>
           )}
 
-          {/* @lovable-new */}
           {tab === "materials" && <TeachingMaterialsTab />}
 
           {tab === "reports" && (
             <StickyNote seed="sa-reports" className="space-y-2">
               <h2 className="text-2xl font-bold">{tr("Raportit")}</h2>
               <p className="opacity-80">
-                {tr("Koulut")}: {schools.length} · {tr("Opettajat")}: {totalTeachers} ·{" "}
+                {tr("Koulut")}: {activeSchools.length} · {tr("Opettajat")}: {totalTeachers} ·{" "}
                 {tr("Opiskelijat")}: {totalStudents}
               </p>
               <p className="text-sm opacity-70">
@@ -447,14 +596,7 @@ function SuperAdminDashboard() {
             </StickyNote>
           )}
 
-          {tab === "settings" && (
-            <StickyNote seed="sa-settings">
-              <h2 className="text-2xl font-bold">{tr("Asetukset")}</h2>
-              <p className="mt-2 text-sm opacity-70">
-                {tr("Ylläpitäjätilit luodaan vain ylläpidon kautta.")}
-              </p>
-            </StickyNote>
-          )}
+          {tab === "settings" && <SuperAdminSettingsTab />}
         </main>
       </div>
     </div>

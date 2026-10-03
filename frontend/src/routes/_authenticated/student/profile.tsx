@@ -7,7 +7,10 @@ import { Label } from "@/components/ui/label";
 import { StickyNote } from "@/components/StickyNote";
 import { UserIcon } from "@/components/icons/AppIcons";
 import { supabase } from "@/integrations/supabase/client";
-import { useTr } from "@/lib/i18n";
+import { useLanguage, useTr } from "@/lib/i18n";
+import { getSuperAdminPreview } from "@/lib/superadmin-preview";
+import { getDemoProfile, updateDemoProfile } from "@/lib/demo-community";
+import { isStrongPassword, passwordPolicyMessage } from "@/lib/password-policy";
 
 export const Route = createFileRoute("/_authenticated/student/profile")({
   component: StudentProfilePage,
@@ -38,6 +41,8 @@ function initialsOf(name: string, email: string): string {
 
 function StudentProfilePage() {
   const tr = useTr();
+  const { language } = useLanguage();
+  const isDemo = getSuperAdminPreview().mode === "student";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [originalEmail, setOriginalEmail] = useState("");
@@ -47,6 +52,15 @@ function StudentProfilePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (isDemo) {
+      const profile = getDemoProfile("student", language);
+      setName(profile.name);
+      setEmail(profile.email);
+      setOriginalEmail(profile.email);
+      setLoading(false);
+      return;
+    }
+
     (async () => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return;
@@ -60,7 +74,7 @@ function StudentProfilePage() {
       setName((prof as { display_name?: string | null } | null)?.display_name ?? "");
       setLoading(false);
     })();
-  }, []);
+  }, [isDemo, language]);
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
@@ -69,8 +83,8 @@ function StudentProfilePage() {
       return;
     }
     if (password) {
-      if (password.length < 8) {
-        toast.error(tr("Salasanan pitää olla vähintään 8 merkkiä"));
+      if (!isStrongPassword(password)) {
+        toast.error(passwordPolicyMessage(language));
         return;
       }
       if (password !== confirm) {
@@ -80,6 +94,15 @@ function StudentProfilePage() {
     }
     setBusy(true);
     try {
+      if (isDemo) {
+        updateDemoProfile("student", { name, email });
+        setOriginalEmail(email.trim());
+        setPassword("");
+        setConfirm("");
+        toast.success(tr("Tallennettu!"));
+        return;
+      }
+
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return;
       const { error: pErr } = await supabase
@@ -148,16 +171,19 @@ function StudentProfilePage() {
             <Input
               id="sp-pass"
               type="password"
+              minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="new-password"
             />
+            <p className="text-xs opacity-65">{passwordPolicyMessage(language)}</p>
           </div>
           <div className="space-y-1">
             <Label htmlFor="sp-pass2">{tr("Vahvista salasana")}</Label>
             <Input
               id="sp-pass2"
               type="password"
+              minLength={8}
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               autoComplete="new-password"

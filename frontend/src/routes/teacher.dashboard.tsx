@@ -9,6 +9,8 @@ import { StickyNote } from "@/components/StickyNote";
 import { StrengthPickerGrid } from "@/components/strengths/StrengthPickerGrid";
 import { DashboardShell } from "@/components/DashboardShell";
 import { ProfileSettings } from "@/components/ProfileSettings";
+import { ClassTeacherManager } from "@/components/classes/ClassTeacherManager";
+import { TeacherStrengthSummary } from "@/components/strengths/TeacherStrengthSummary";
 import { supabase } from "@/integrations/supabase/client";
 import { useRoleGuard } from "@/lib/role-guard";
 import { useLanguage, useTr, LANGUAGES, LANGUAGE_LABEL, type Language } from "@/lib/i18n";
@@ -26,12 +28,18 @@ import {
   type TeacherStudent,
   type TeacherClass,
 } from "@/lib/teacher-dashboard-data";
-import { ALL_STRENGTHS } from "@/lib/strength-jar-data";
 import { getStrengthName } from "@/lib/strengths-i18n";
 import { cn } from "@/lib/utils";
 import { WorldIcon } from "@/components/icons/AppIcons";
 import { TopStrengthCards } from "@/components/strengths/TopStrengthCards";
 import { StudentDetailReport } from "@/components/students/StudentDetailReport";
+import { getSuperAdminPreview } from "@/lib/superadmin-preview";
+import {
+  createDemoClass,
+  deleteDemoClass,
+  giveDemoStudentStrength,
+  restoreDemoClass,
+} from "@/lib/demo-store";
 
 import { ReportTrends, RangeSelector } from "@/components/reports/ReportTrends";
 import type { RangeDays, ReportEvent } from "@/lib/report-series";
@@ -57,6 +65,18 @@ export const Route = createFileRoute("/teacher/dashboard")({
   component: TeacherDashboardPage,
 });
 
+const SUMMARY_LABEL = {
+  fi: "Yhteenveto",
+  en: "Summary",
+  sv: "Sammanfattning",
+} as const;
+
+const STUDENT_SEARCH_PLACEHOLDER = {
+  fi: "Etsi opiskelijoita…",
+  en: "Search students…",
+  sv: "Sök elever…",
+} as const;
+
 const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function randomCode(): string {
   let s = "LK-";
@@ -70,15 +90,20 @@ function pctOf(s: TeacherStudent): number {
 
 function TeacherDashboardPage() {
   const tr = useTr();
+  const { language } = useLanguage();
   const guard = useRoleGuard(["teacher"]);
-  const [tab, setTab] = useState("classes");
+  const [tab, setTab] = useState("overview");
   const [openClass, setOpenClass] = useState<string | null>(null);
   const [openStudent, setOpenStudent] = useState<string | null>(null);
+  const [studentSearch, setStudentSearch] = useState("");
+  const [classDetailTab, setClassDetailTab] = useState<"teachers" | "students">("students");
+  const [classTeacherCount, setClassTeacherCount] = useState(1);
   const { classes, deletedClasses, students, assigned, events, refresh } = useTeacherData();
 
   if (!guard.ready) return null;
 
   const tabs = [
+    { id: "overview", label: SUMMARY_LABEL[language] },
     { id: "classes", label: tr("Luokat") },
     { id: "students", label: tr("Opiskelijat") },
     { id: "strengths", label: tr("Vahvuuksien antaminen") },
@@ -91,6 +116,19 @@ function TeacherDashboardPage() {
   }
 
   const selectedStudent = students.find((s) => s.studentId === openStudent) ?? null;
+  const selectedClass = classes.find((c) => c.id === openClass) ?? null;
+  const selectedClassStudents = selectedClass
+    ? students.filter((student) => student.classId === selectedClass.id)
+    : [];
+  const searchTerm = studentSearch.trim().toLocaleLowerCase();
+  const filteredStudents = searchTerm
+    ? students.filter((student) =>
+        [student.displayName, student.className, student.email]
+          .filter(Boolean)
+          .some((value) => String(value).toLocaleLowerCase().includes(searchTerm)),
+      )
+    : students;
+  const ownedDeletedClasses = deletedClasses.filter((c) => c.teacher_id === guard.userId);
 
   return (
     <DashboardShell
@@ -100,9 +138,10 @@ function TeacherDashboardPage() {
       onSelect={(id) => {
         setTab(id);
         setOpenStudent(null);
+        if (id !== "students") setStudentSearch("");
+        if (id !== "classes") setOpenClass(null);
       }}
       schoolName={guard.schoolName}
-      /* @lovable-new */
       links={[
         { to: "/teacher/sprint", label: tr("Vahvuussprintti") },
         { to: "/teacher/profile", label: tr("Profiili") },
@@ -117,30 +156,28 @@ function TeacherDashboardPage() {
         },
       ]}
     >
-      {tab === "classes" && !openClass && (
-        <TopStrengths students={students} classes={classes} assigned={assigned} />
-      )}
+      {tab === "overview" && <TeacherStrengthSummary />}
 
-      {/* FIX: form "Luo luokka" (CreateClass) trước đây chỉ được render khi
-          tab === "settings" — nhưng KHÔNG có nút nào trong sidebar trỏ tới
-          tab đó (Profile trỏ sang route /teacher/profile riêng), nên form
-          này hoàn toàn không thể truy cập được qua UI. Chuyển nó lên đầu
-          tab "Classes" để giáo viên thấy và tạo lớp được ngay. */}
       {tab === "classes" && !openClass && <CreateClass onCreated={refresh} />}
 
       {tab === "classes" && !openClass && (
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2">
           {classes.length === 0 && <p className="opacity-70">{tr("Ei luokkia.")}</p>}
           {classes.map((c) => {
             const inClass = students.filter((s) => s.classId === c.id);
             const avg = inClass.length
               ? Math.round(inClass.reduce((a, s) => a + pctOf(s), 0) / inClass.length)
               : 0;
+            const isOwner = c.teacher_id === guard.userId;
             return (
               <StickyNote key={c.id} seed={`cls-${c.id}`} className="space-y-2">
                 <button
                   type="button"
-                  onClick={() => setOpenClass(c.id)}
+                  onClick={() => {
+                    setOpenClass(c.id);
+                    setClassDetailTab("students");
+                    setClassTeacherCount(1);
+                  }}
                   className="text-left text-xl font-bold underline-offset-2 hover:underline"
                 >
                   {c.name}
@@ -153,43 +190,102 @@ function TeacherDashboardPage() {
                   {tr("Opiskelijoita")}: {inClass.length} · {tr("Valmistuminen %")}: {avg} % ·{" "}
                   {tr("Luotu")}: {new Date(c.created_at).toLocaleDateString()}
                 </div>
-                <div className="pt-1">
-                  <DeleteClassButton
-                    klass={c}
-                    studentCount={inClass.length}
-                    teacherId={guard.userId}
-                    onDone={refresh}
-                  />
-                </div>
+                {isOwner && (
+                  <div className="pt-1">
+                    <DeleteClassButton
+                      klass={c}
+                      studentCount={inClass.length}
+                      teacherId={guard.userId}
+                      onDone={refresh}
+                    />
+                  </div>
+                )}
               </StickyNote>
             );
           })}
-          {deletedClasses.length > 0 && (
+          {ownedDeletedClasses.length > 0 && (
             <div className="md:col-span-2">
-              <DeletedClasses classes={deletedClasses} onDone={refresh} />
+              <DeletedClasses classes={ownedDeletedClasses} onDone={refresh} />
             </div>
           )}
         </div>
       )}
 
-      {tab === "classes" && openClass && (
-        <StickyNote seed={`cls-detail-${openClass}`} className="space-y-3 overflow-x-auto">
-          <Button variant="outline" className="rounded-full" onClick={() => setOpenClass(null)}>
+      {tab === "classes" && openClass && selectedClass && (
+        <StickyNote seed={`cls-detail-${openClass}`} className="space-y-4 overflow-x-auto">
+          <Button
+            variant="outline"
+            className="rounded-full border-transparent bg-[color:var(--purple)] text-white hover:bg-[color:var(--purple)]/90 hover:text-white"
+            onClick={() => setOpenClass(null)}
+          >
             {tr("Takaisin luokkiin")}
           </Button>
-          <h2 className="text-2xl font-bold">
-            {classes.find((c) => c.id === openClass)?.name ?? ""}
-          </h2>
-          <StudentTable
-            students={students.filter((s) => s.classId === openClass)}
-            onOpen={openStudentView}
-          />
+          <h2 className="text-2xl font-bold">{selectedClass.name}</h2>
+
+          {selectedClass.teacher_id === guard.userId ? (
+            <div className="space-y-4">
+              <div className="flex flex-wrap gap-2 border-b border-black/10 pb-3">
+                <button
+                  type="button"
+                  onClick={() => setClassDetailTab("teachers")}
+                  className={cn(
+                    "rounded-full border border-[color:var(--purple)] px-4 py-2 text-sm font-bold transition-colors",
+                    classDetailTab === "teachers"
+                      ? "bg-[color:var(--purple)] text-white"
+                      : "bg-white text-[color:var(--purple)] hover:bg-[color:var(--purple)]/10",
+                  )}
+                >
+                  {tr("Opettajat")} ({classTeacherCount})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setClassDetailTab("students")}
+                  className={cn(
+                    "rounded-full border border-[color:var(--purple)] px-4 py-2 text-sm font-bold transition-colors",
+                    classDetailTab === "students"
+                      ? "bg-[color:var(--purple)] text-white"
+                      : "bg-white text-[color:var(--purple)] hover:bg-[color:var(--purple)]/10",
+                  )}
+                >
+                  {tr("Opiskelijat")} ({selectedClassStudents.length})
+                </button>
+              </div>
+
+              <div className={classDetailTab === "teachers" ? "" : "hidden"}>
+                <ClassTeacherManager
+                  classId={openClass}
+                  showTitle={false}
+                  onTeacherCountChange={setClassTeacherCount}
+                />
+              </div>
+
+              {classDetailTab === "students" && (
+                <StudentTable students={selectedClassStudents} onOpen={openStudentView} />
+              )}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <h3 className="text-lg font-bold">
+                {tr("Opiskelijat")} ({selectedClassStudents.length})
+              </h3>
+              <StudentTable students={selectedClassStudents} onOpen={openStudentView} />
+            </div>
+          )}
         </StickyNote>
       )}
 
       {tab === "students" && !selectedStudent && (
         <StickyNote seed="teacher-students" className="overflow-x-auto">
-          <StudentTable students={students} onOpen={openStudentView} showClass />
+          <div className="mb-4 max-w-md">
+            <Input
+              value={studentSearch}
+              onChange={(event) => setStudentSearch(event.target.value)}
+              placeholder={STUDENT_SEARCH_PLACEHOLDER[language]}
+              aria-label={STUDENT_SEARCH_PLACEHOLDER[language]}
+              className="bg-white text-[color:var(--ink)] placeholder:text-[color:var(--ink)]/45"
+            />
+          </div>
+          <StudentTable students={filteredStudents} onOpen={openStudentView} showClass />
         </StickyNote>
       )}
 
@@ -327,7 +423,7 @@ function StudentDetail({
         <Link
           to="/opettaja/oppilas/$userId"
           params={{ userId: student.studentId }}
-          className="inline-flex items-center gap-1 rounded-full bg-[color:var(--purple)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--purple)]/90"
+          className="inline-flex items-center gap-1 rounded-full bg-[color:var(--yellow)] px-4 py-2 text-sm font-bold text-[color:var(--ink)] shadow hover:brightness-95"
         >
           {tr("Avaa portfolio")} <ExternalLink className="h-3 w-3" />
         </Link>
@@ -395,15 +491,19 @@ function AssignStrengths({
     if (!ok) return;
     setBusy(true);
     try {
-      const { error } = await supabase.from("teacher_assigned_strengths" as never).insert(
-        strengthIds.map((id) => ({
-          teacher_id: teacherId,
-          student_id: studentId,
-          strength_id: String(id),
-          message: message.trim() || null,
-        })) as never,
-      );
-      if (error) throw error;
+      if (getSuperAdminPreview().mode === "teacher") {
+        giveDemoStudentStrength(studentId, strengthIds, message);
+      } else {
+        const { error } = await supabase.from("teacher_assigned_strengths" as never).insert(
+          strengthIds.map((id) => ({
+            teacher_id: teacherId,
+            student_id: studentId,
+            strength_id: String(id),
+            message: message.trim() || null,
+          })) as never,
+        );
+        if (error) throw error;
+      }
       toast.success(`${strengthIds.length} ${tr("vahvuutta lähetetty!")}`);
       setMessage("");
       setStrengthIds([]);
@@ -523,7 +623,6 @@ function AssignStrengths({
   );
 }
 
-/** Counts every collected strength id for a set of students (+ teacher gifts). */
 function countStrengths(
   students: TeacherStudent[],
   assigned: { student_id: string; strength_id: string }[],
@@ -548,82 +647,6 @@ function countStrengths(
   return [...counts.entries()]
     .map(([id, e]) => ({ id, total: e.total, students: e.students.size }))
     .sort((a, b) => b.total - a.total || a.id - b.id);
-}
-
-function TopStrengths({
-  students,
-  classes,
-  assigned,
-}: {
-  students: TeacherStudent[];
-  classes: TeacherClass[];
-  assigned: { student_id: string; strength_id: string }[];
-}) {
-  const tr = useTr();
-  const { language } = useLanguage();
-  const lang = language === "sv" ? "sv" : language === "en" ? "en" : "fi";
-  const top = useMemo(() => countStrengths(students, assigned).slice(0, 5), [students, assigned]);
-
-  const colorOf = (id: number) => ALL_STRENGTHS.find((s) => s.id === id)?.color ?? "var(--purple)";
-
-  return (
-    <StickyNote seed="t-top-strengths" className="space-y-4 md:col-span-2">
-      <h2 className="text-2xl font-bold">{tr("Ryhmän suosituimmat vahvuudet")}</h2>
-      {top.length === 0 ? (
-        <p className="opacity-70">{tr("Opiskelijasi eivät ole vielä keränneet vahvuuksia.")}</p>
-      ) : (
-        <TopStrengthCards
-          items={top.map((x) => ({
-            id: x.id,
-            count: x.total,
-            caption: `${x.students} ${tr("opiskelijaa")}`,
-          }))}
-          lang={lang}
-        />
-      )}
-
-      {classes.length > 0 && (
-        <div className="grid gap-3 md:grid-cols-2">
-          {classes.map((c) => {
-            const inClass = students.filter((s) => s.classId === c.id);
-            const list = countStrengths(inClass, assigned);
-            return (
-              <div key={c.id} className="rounded-2xl bg-white/70 p-3 text-slate-900">
-                <div className="font-bold">{c.name}</div>
-                {list.length === 0 ? (
-                  <p className="text-sm opacity-70">
-                    {tr("Opiskelijasi eivät ole vielä keränneet vahvuuksia.")}
-                  </p>
-                ) : (
-                  <>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {list.slice(0, 3).map((s, i) => (
-                        <span
-                          key={s.id}
-                          className="flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-medium shadow-sm"
-                        >
-                          <span className="opacity-60">#{i + 1}</span>
-                          <span
-                            className="h-3 w-3 rounded-full"
-                            style={{ background: colorOf(s.id) }}
-                            aria-hidden
-                          />
-                          {getStrengthName(s.id, lang)} ×{s.total}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="mt-2 text-xs opacity-70">
-                      {list.length}/26 · {tr("uusia vahvuuksia kerätty")}
-                    </div>
-                  </>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </StickyNote>
-  );
 }
 
 function TeacherReports({
@@ -767,15 +790,19 @@ function CreateClass({
     if (!name.trim()) return;
     setBusy(true);
     try {
-      const { data: u } = await supabase.auth.getUser();
-      if (!u.user) return;
-      const { error } = await supabase.from("classes" as never).insert({
-        name: name.trim(),
-        teacher_id: u.user.id,
-        join_code: randomCode(),
-        language,
-      } as never);
-      if (error) throw error;
+      if (getSuperAdminPreview().mode === "teacher") {
+        createDemoClass(name.trim(), language);
+      } else {
+        const { data: u } = await supabase.auth.getUser();
+        if (!u.user) return;
+        const { error } = await supabase.from("classes" as never).insert({
+          name: name.trim(),
+          teacher_id: u.user.id,
+          join_code: randomCode(),
+          language,
+        } as never);
+        if (error) throw error;
+      }
       setName("");
       toast.success(tr("Tallennettu!"));
       await onCreated();
@@ -848,15 +875,19 @@ function DeleteClassButton({
     if (!ok) return;
     setBusy(true);
     try {
-      const { error } = await supabase
-        .from("classes" as never)
-        .update({
-          is_deleted: true,
-          deleted_at: new Date().toISOString(),
-          deleted_by: teacherId,
-        } as never)
-        .eq("id", klass.id);
-      if (error) throw error;
+      if (getSuperAdminPreview().mode === "teacher") {
+        deleteDemoClass(klass.id);
+      } else {
+        const { error } = await supabase
+          .from("classes" as never)
+          .update({
+            is_deleted: true,
+            deleted_at: new Date().toISOString(),
+            deleted_by: teacherId,
+          } as never)
+          .eq("id", klass.id);
+        if (error) throw error;
+      }
       toast.success(tr("Luokka poistettu."));
       await onDone();
     } catch (e) {
@@ -898,11 +929,15 @@ function DeletedClasses({
   async function restore(id: string) {
     setBusy(id);
     try {
-      const { error } = await supabase
-        .from("classes" as never)
-        .update({ is_deleted: false, deleted_at: null, deleted_by: null } as never)
-        .eq("id", id);
-      if (error) throw error;
+      if (getSuperAdminPreview().mode === "teacher") {
+        restoreDemoClass(id);
+      } else {
+        const { error } = await supabase
+          .from("classes" as never)
+          .update({ is_deleted: false, deleted_at: null, deleted_by: null } as never)
+          .eq("id", id);
+        if (error) throw error;
+      }
       toast.success(tr("Luokka palautettu."));
       await onDone();
     } catch (e) {

@@ -3,7 +3,7 @@ import { WORLDS, TOTAL_SCREENS, worldForScreen } from "@/lib/screens";
 import { WorldBadge } from "@/components/WorldBadge";
 import { StickyNote } from "@/components/StickyNote";
 import { Button } from "@/components/ui/button";
-import { useT, useTr } from "@/lib/i18n";
+import { useLanguage, useT, useTr } from "@/lib/i18n";
 // @lovable-new 2026-08-08 — level locking comes from the shared progression rules
 import { useProgression } from "@/lib/progression";
 
@@ -15,6 +15,7 @@ function WorldMap() {
   const navigate = useNavigate();
   const t = useT();
   const tr = useTr();
+  const { language } = useLanguage();
   const progression = useProgression();
 
   const current = progression.nextAvailable;
@@ -24,7 +25,9 @@ function WorldMap() {
     <div className="mx-auto max-w-5xl px-4 py-8">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-4xl">{t("worldmap.title")}</h1>
+          <h1 className="text-4xl">
+            {language === "fi" ? "Lukiolaisen vahvuusportfolio" : t("worldmap.title")}
+          </h1>
           <p className="opacity-85 mt-1">{t("worldmap.subtitle")}</p>
         </div>
         <StickyNote tone="yellow" className="!p-3 !px-4 max-w-xs">
@@ -68,7 +71,7 @@ function WorldMap() {
       </div>
 
       <p className="mt-8 text-center text-xs opacity-70">
-        {TOTAL_SCREENS} {t("app.screensSuffix")} • {t("app.title")}
+        {TOTAL_SCREENS} {t("app.screensSuffix")} • {language === "fi" ? "Vahvuusportfolio" : t("app.title")}
       </p>
     </div>
   );

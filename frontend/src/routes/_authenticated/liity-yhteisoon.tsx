@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CornerBlobs } from "@/components/CornerBlobs";
 import { StickyNote } from "@/components/StickyNote";
+import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
 import { toast } from "sonner";
 import { getStudentClassMembership } from "@/lib/auth-helpers";
 import { useLanguage, useT, isLanguage } from "@/lib/i18n";
@@ -14,13 +15,19 @@ export const Route = createFileRoute("/_authenticated/liity-yhteisoon")({
   component: JoinCommunityPage,
 });
 
+const PORTFOLIO_COPY = {
+  fi: "Avaa oma portfolio",
+  en: "Open My Portfolio",
+  sv: "Öppna min portfolio",
+} as const;
+
 function JoinCommunityPage() {
   const navigate = useNavigate();
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [checking, setChecking] = useState(true);
   const t = useT();
-  const { setLanguage } = useLanguage();
+  const { language, setLanguage } = useLanguage();
 
   useEffect(() => {
     getStudentClassMembership().then((m) => {
@@ -48,10 +55,20 @@ function JoinCommunityPage() {
         language?: string;
       };
       if (!result?.ok) {
-        toast.error(t("join.err.notFound"));
+        // A student already assigned to another active class must be moved by
+        // authorized school staff; the database does not permit self-transfer.
+        toast.error(
+          result?.error === "already_in_class"
+            ? language === "fi"
+              ? "Olet jo aktiivisessa luokassa. Pyydä opettajaa tai koulun adminia siirtämään sinut."
+              : language === "sv"
+                ? "Du tillhör redan en aktiv klass. Be en lärare eller skoladministratör att flytta dig."
+                : "You already belong to an active class. Ask a teacher or school administrator to move you."
+            : t("join.err.notFound"),
+        );
         return;
       }
-      // Adopt the class language immediately.
+      // The student's class language becomes authoritative after joining.
       if (isLanguage(result.language)) setLanguage(result.language);
       toast.success(t("join.success", { name: result.class_name ?? "" }));
       navigate({ to: "/seikkailu", replace: true });
@@ -78,9 +95,10 @@ function JoinCommunityPage() {
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-hidden flex items-center justify-center px-4 py-10">
       <CornerBlobs />
+      <AuthLanguageSwitcher />
       <button
         onClick={signOut}
-        className="absolute top-4 right-4 z-20 text-sm opacity-80 hover:opacity-100 underline"
+        className="absolute top-4 right-4 z-20 mt-9 text-sm opacity-80 hover:opacity-100 underline"
       >
         {t("common.logout")}
       </button>
@@ -112,6 +130,14 @@ function JoinCommunityPage() {
             </Button>
           </form>
           <p className="mt-5 text-xs text-muted-foreground">{t("join.hint")}</p>
+          <div className="mt-4 border-t border-black/10 pt-4 text-center">
+            <Link
+              to="/student/portfolio"
+              className="font-semibold text-[color:var(--purple)] underline underline-offset-2"
+            >
+              {PORTFOLIO_COPY[language]}
+            </Link>
+          </div>
         </StickyNote>
       </div>
     </div>

@@ -77,7 +77,7 @@ function normalize(s: string): string {
 // Lookup with graceful fallback + one-time console warning per missing key.
 const warned = new Set<string>();
 export function lookupContent(fi: string, lang: Language): string {
-  if (lang === "fi") return fi;
+  if (lang === "fi") return fi.replace("Näy hyvää!", "Huomaa hyvä!");
   const key = normalize(fi);
   const hit = CONTENT_DICT[key];
   const out = hit && hit[lang];
@@ -125,19 +125,19 @@ export const UI: UIDict = {
     "common.print": "Tulosta",
     "common.locked": "Lukittu",
 
-    "app.title": "Vahvuusseikkailu",
-    "app.tagline": "Huomaa hyvä! — vahvuusportfolio lukiolaiselle",
-    "app.screenOfTotal": "Näyttö {n} / {total}",
-    "app.screensSuffix": "näyttöä",
+    "app.title": "Vahvuusportfolio",
+"app.tagline": "Huomaa hyvä! — vahvuusportfolio lukiolaiselle",
+"app.screenOfTotal": "Näyttö {n} / {total}",
+"app.screensSuffix": "näyttöä",
 
-    "sidebar.general": "Yleiset",
-    "sidebar.modules": "Tasot",
-    "sidebar.worldmap": "Maailmankartta",
+"sidebar.general": "Yleiset",
+"sidebar.modules": "Tasot",
+"sidebar.worldmap": "Lukiolaisen vahvuusportfolio",
 
-    "worldmap.title": "Maailmankartta",
-    "worldmap.subtitle": "Valitse maailma tai jatka siitä, mihin jäit.",
-    "worldmap.resumeHeader": "Jatka seikkailua",
-    "worldmap.resumeAt": "{world} — näyttö {n}",
+"worldmap.title": "Lukiolaisen vahvuusportfolio",
+"worldmap.subtitle": "Valitse moduuli tai jatka siitä, mihin jäit.",
+"worldmap.resumeHeader": "Jatka seikkailua",
+"worldmap.resumeAt": "{world} — näyttö {n}",
 
     "auth.landing.loginBtn": "Kirjaudu sisään",
     "auth.landing.signupBtn": "Luo opiskelija-tunnus",
@@ -631,7 +631,7 @@ const trWarned = new Set<string>();
 function trFinnish(finnish: string, language: Language): string {
   // Defensive: callers occasionally pass an undefined lookup result.
   if (typeof finnish !== "string" || !finnish) return "";
-  if (language === "fi") return finnish;
+  if (language === "fi") return finnish.replace("Näy hyvää!", "Huomaa hyvä!");
   const out = translateFinnish(finnish, language as AppLanguage);
   if (out !== finnish && TRANSLATIONS[finnish]) return out;
   // Fall back to the Excel-derived dictionary (normalized key match).
