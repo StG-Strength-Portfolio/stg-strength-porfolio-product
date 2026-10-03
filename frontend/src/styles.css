@@ -68,8 +68,8 @@
   --color-green: var(--green);
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
-  --font-display: "Fredoka", system-ui, sans-serif;
-  --font-sans: "Fredoka", system-ui, sans-serif;
+  --font-display: "Ageo", system-ui, sans-serif;
+  --font-sans: "Ageo", system-ui, sans-serif;
 }
 
 :root {

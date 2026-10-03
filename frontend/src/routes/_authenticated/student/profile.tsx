@@ -7,7 +7,9 @@ import { Label } from "@/components/ui/label";
 import { StickyNote } from "@/components/StickyNote";
 import { UserIcon } from "@/components/icons/AppIcons";
 import { supabase } from "@/integrations/supabase/client";
-import { useTr } from "@/lib/i18n";
+import { useLanguage, useTr } from "@/lib/i18n";
+import { getSuperAdminPreview } from "@/lib/superadmin-preview";
+import { getDemoProfile, updateDemoProfile } from "@/lib/demo-community";
 
 export const Route = createFileRoute("/_authenticated/student/profile")({
   component: StudentProfilePage,
@@ -38,6 +40,8 @@ function initialsOf(name: string, email: string): string {
 
 function StudentProfilePage() {
   const tr = useTr();
+  const { language } = useLanguage();
+  const isDemo = getSuperAdminPreview().mode === "student";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [originalEmail, setOriginalEmail] = useState("");
@@ -47,6 +51,15 @@ function StudentProfilePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (isDemo) {
+      const profile = getDemoProfile("student", language);
+      setName(profile.name);
+      setEmail(profile.email);
+      setOriginalEmail(profile.email);
+      setLoading(false);
+      return;
+    }
+
     (async () => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return;
@@ -60,7 +73,7 @@ function StudentProfilePage() {
       setName((prof as { display_name?: string | null } | null)?.display_name ?? "");
       setLoading(false);
     })();
-  }, []);
+  }, [isDemo, language]);
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
@@ -80,6 +93,15 @@ function StudentProfilePage() {
     }
     setBusy(true);
     try {
+      if (isDemo) {
+        updateDemoProfile("student", { name, email });
+        setOriginalEmail(email.trim());
+        setPassword("");
+        setConfirm("");
+        toast.success(tr("Tallennettu!"));
+        return;
+      }
+
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return;
       const { error: pErr } = await supabase

@@ -1,0 +1,26 @@
+/* School admin summary metric cards: solid white, black text, centered content. */
+body:has(a[href="/school-admin/give-strength"])
+  main
+  > div.space-y-6
+  > div.grid.sm\:grid-cols-2.lg\:grid-cols-4
+  > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  background: #fff;
+  color: #000;
+  text-align: center;
+}
+
+body:has(a[href="/school-admin/give-strength"])
+  main
+  > div.space-y-6
+  > div.grid.sm\:grid-cols-2.lg\:grid-cols-4
+  > div
+  > div {
+  color: #000 !important;
+  opacity: 1 !important;
+  text-align: center;
+}

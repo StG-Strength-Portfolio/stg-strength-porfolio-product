@@ -1,4 +1,5 @@
 import { LANGUAGES, useLanguage, type Language } from "@/lib/i18n";
+import { rememberDomainLanguagePreference } from "@/lib/domain-language";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -6,7 +7,7 @@ const ORDER: Language[] = ["fi", "sv", "en"];
 
 /**
  * FI | SV | EN switcher for staff surfaces (Super Admin, School Admin, Teacher).
- * Always persists to localStorage; optionally also to the user's profile row.
+ * Always persists locally for this domain; optionally also to the user's profile row.
  */
 export function LanguageSwitcher({
   className,
@@ -17,8 +18,11 @@ export function LanguageSwitcher({
 }) {
   const { language, setLanguage } = useLanguage();
   const items = ORDER.filter((l) => LANGUAGES.includes(l));
+  const useDarkFreeTrialText =
+    typeof window !== "undefined" && window.location.pathname === "/superadmin/free-trials";
 
   async function pick(l: Language) {
+    rememberDomainLanguagePreference(l);
     setLanguage(l);
     if (!persistToProfile) return;
     const { data } = await supabase.auth.getUser();
@@ -39,14 +43,22 @@ export function LanguageSwitcher({
             aria-pressed={language === l}
             className={cn(
               "rounded-full px-2 py-0.5 transition-colors",
-              language === l
-                ? "bg-foreground/15 text-foreground"
-                : "text-foreground/60 hover:text-foreground",
+              useDarkFreeTrialText
+                ? language === l
+                  ? "bg-[#EEE9FA] !text-[#1F2937]"
+                  : "!text-[#1F2937] hover:bg-[#F5F2FB] hover:!text-[#1F2937]"
+                : language === l
+                  ? "bg-foreground/15 text-foreground"
+                  : "text-foreground/60 hover:text-foreground",
             )}
           >
             {l.toUpperCase()}
           </button>
-          {i < items.length - 1 && <span className="text-foreground/30">|</span>}
+          {i < items.length - 1 && (
+            <span className={useDarkFreeTrialText ? "!text-[#1F2937]" : "text-foreground/30"}>
+              |
+            </span>
+          )}
         </span>
       ))}
     </div>

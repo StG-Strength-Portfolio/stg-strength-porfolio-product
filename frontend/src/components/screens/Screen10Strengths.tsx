@@ -38,7 +38,7 @@ export function Screen10Strengths({ onSaveStateChange }: Props) {
           <h1 className="font-display text-[42px] font-medium leading-[1.12] tracking-[-0.01em]">{tr("Minä olen")}</h1>
           <p className="mt-8 max-w-[290px] font-display text-[22px] font-medium leading-[1.4]">{tr("Muuta muilta saamasi palaute lauseiksi minä muotoon:")}</p>
           <div className="mt-7 max-w-[290px] text-[21px] font-normal leading-[1.45]">{tr('"Olet sinnikäs" → "Minä olen sinnikäs."')}</div>
-          <img src="/illustrations/mina-olen-character.png" alt={tr("Minä olen –övning")} className="pointer-events-none absolute bottom-[-55px] left-[-95px] h-[520px] w-auto max-w-none select-none object-contain" />
+          <img src="/illustrations/mina-olen-character.png" alt={tr("Minä olen –harjoitus")} className="pointer-events-none absolute bottom-[-55px] left-[-95px] h-[520px] w-auto max-w-none select-none object-contain" />
         </div>
 
         <div className="relative min-h-[760px] min-w-0">
@@ -67,8 +67,7 @@ function Screen10StrengthSelect({ index, fieldKey, language, selectedValues, onV
   const tr = useTr();
   const [value, setValue] = useState("");
   const [loaded, setLoaded] = useState(false);
-  const [dirty, setDirty] = useState(false);
-  const [initialValueWasValid, setInitialValueWasValid] = useState(false);
+  const [pendingSave, setPendingSave] = useState(false);
   const report = useReportCompletion();
 
   useEffect(() => {
@@ -80,7 +79,6 @@ function Screen10StrengthSelect({ index, fieldKey, language, selectedValues, onV
       const isValidSavedStrength = typeof saved === "string" && Number.isInteger(savedNumber) && savedNumber >= 1 && savedNumber <= 26;
       if (isValidSavedStrength) {
         setValue(saved);
-        setInitialValueWasValid(true);
         onValueChange(index, saved);
       }
       setLoaded(true);
@@ -88,13 +86,19 @@ function Screen10StrengthSelect({ index, fieldKey, language, selectedValues, onV
     return () => { cancelled = true; };
   }, [fieldKey, index, onValueChange]);
 
-  const state = useAutosave(fieldKey, value, { enabled: loaded && (dirty || initialValueWasValid) });
+  const state = useAutosave(fieldKey, value, { enabled: loaded });
 
-  useEffect(() => { onSaveStateChange?.(state); }, [state, onSaveStateChange]);
-  useEffect(() => { if (loaded) report(fieldKey, value.trim().length > 0); }, [fieldKey, loaded, report, value]);
+  useEffect(() => {
+    onSaveStateChange?.(state);
+    if (state === "saved") setPendingSave(false);
+  }, [state, onSaveStateChange]);
+
+  useEffect(() => {
+    if (loaded) report(fieldKey, value.trim().length > 0 && !pendingSave);
+  }, [fieldKey, loaded, pendingSave, report, value]);
 
   function handleChange(nextValue: string) {
-    setDirty(true);
+    setPendingSave(true);
     setValue(nextValue);
     onValueChange(index, nextValue);
   }

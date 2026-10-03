@@ -11,10 +11,10 @@ import { Label } from "@/components/ui/label";
 import { CornerBlobs } from "@/components/CornerBlobs";
 import { StickyNote } from "@/components/StickyNote";
 import { useSuperAdminGuard } from "@/lib/superadmin-guard";
-import { useTr } from "@/lib/i18n";
+import { useLanguage, useTr } from "@/lib/i18n";
+import { generateSecureSchoolAdminCode } from "@/lib/school-admin-invitations.functions";
 import {
   getSchoolDetail,
-  generateSchoolCode,
   revokeSchoolCode,
   renewSchool,
   updateUserCredentials,
@@ -29,12 +29,50 @@ export const Route = createFileRoute("/superadmin/schools/$schoolId")({
 
 type Detail = Awaited<ReturnType<typeof getSchoolDetail>>;
 
+const staffCopy = {
+  fi: {
+    generate: "Luo uusi henkilökunnan koodi",
+    linkTitle: "Henkilökunnan rekisteröinti",
+    linkHint: "Jaa sama rekisteröitymislinkki ja koulun koodi koko henkilökunnalle. Koodi toimii usealle henkilölle 4 viikon ajan.",
+    copyLink: "Kopioi linkki",
+    codeCreated: "Uusi henkilökunnan koodi luotu: ",
+    active: "Voimassa",
+    expired: "Vanhentunut",
+    replaced: "Korvattu",
+    validUntil: "Voimassa asti",
+  },
+  en: {
+    generate: "Generate new staff code",
+    linkTitle: "Staff registration",
+    linkHint: "Share the same registration link and school code with the whole staff. The code can be used by many people for 4 weeks.",
+    copyLink: "Copy link",
+    codeCreated: "New staff code created: ",
+    active: "Active",
+    expired: "Expired",
+    replaced: "Replaced",
+    validUntil: "Valid until",
+  },
+  sv: {
+    generate: "Skapa ny personalkod",
+    linkTitle: "Personalregistrering",
+    linkHint: "Dela samma registreringslänk och skolkod med hela personalen. Koden kan användas av flera personer i 4 veckor.",
+    copyLink: "Kopiera länk",
+    codeCreated: "Ny personalkod skapad: ",
+    active: "Giltig",
+    expired: "Utgången",
+    replaced: "Ersatt",
+    validUntil: "Giltig till",
+  },
+} as const;
+
 function SchoolDetailPage() {
   const tr = useTr();
+  const { language } = useLanguage();
+  const staffText = staffCopy[language];
   const ready = useSuperAdminGuard();
   const { schoolId } = Route.useParams();
   const fetchDetail = useServerFn(getSchoolDetail);
-  const genCode = useServerFn(generateSchoolCode);
+  const genCode = useServerFn(generateSecureSchoolAdminCode);
   const revoke = useServerFn(revokeSchoolCode);
   const renew = useServerFn(renewSchool);
   const updateCreds = useServerFn(updateUserCredentials);
@@ -122,7 +160,6 @@ function SchoolDetailPage() {
                   {Math.min(100, Math.round(((u.currentScreen ?? 1) / TOTAL_REQUIRED) * 100))}%
                 </td>
               )}
-
               <td className="py-2">
                 <div className="flex flex-wrap gap-1.5">
                   <Button
@@ -219,15 +256,9 @@ function SchoolDetailPage() {
                 tab === t ? "bg-[color:var(--purple)] text-white" : "bg-black/5"
               }`}
             >
-              {tr(
-                t === "overview"
-                  ? "Yhteenveto"
-                  : t === "users"
-                    ? "Käyttäjät"
-                    : t === "billing"
-                      ? "Laskutus"
-                      : "Koodit",
-              )}
+              {t === "codes"
+                ? staffText.linkTitle
+                : tr(t === "overview" ? "Yhteenveto" : t === "users" ? "Käyttäjät" : "Laskutus")}
             </button>
           ))}
         </nav>
@@ -288,67 +319,106 @@ function SchoolDetailPage() {
         )}
 
         {tab === "codes" && (
-          <StickyNote seed="sa-detail-codes" className="space-y-3 overflow-x-auto">
+          <StickyNote seed="sa-detail-codes" className="space-y-4 overflow-x-auto">
+            <div className="rounded-xl bg-black/5 p-4">
+              <p className="font-semibold">{staffText.linkTitle}</p>
+              <p className="mt-1 text-sm opacity-75">{staffText.linkHint}</p>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <code className="rounded bg-white/70 px-3 py-2 text-sm">/register-staff</code>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="rounded-full"
+                  onClick={() => {
+                    const url = `${window.location.origin}/register-staff`;
+                    void navigator.clipboard.writeText(url);
+                    toast.success(tr("Kopioitu!"));
+                  }}
+                >
+                  <Copy className="mr-1 h-4 w-4" /> {staffText.copyLink}
+                </Button>
+                <a
+                  href="/register-staff"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-sm font-semibold text-[color:var(--purple)] underline"
+                >
+                  {staffText.linkTitle}
+                </a>
+              </div>
+            </div>
+
             <Button
               className="rounded-full bg-[color:var(--purple)] text-white font-bold"
               onClick={async () => {
                 const res = await genCode({ data: { schoolId } });
-                toast.success(`${tr("Uusi koodi luotu: ")}${res.code}`);
+                toast.success(`${staffText.codeCreated}${res.code}`);
                 await load();
               }}
             >
-              {tr("Luo koodi")}
+              {staffText.generate}
             </Button>
+
             <table className="w-full text-left text-sm">
               <thead>
                 <tr className="border-b border-black/10">
-                  <th className="py-2 pr-3">{tr("Koulukoodi")}</th>
+                  <th className="py-2 pr-3">{tr("Koodi")}</th>
                   <th className="py-2 pr-3">{tr("Tila")}</th>
-                  <th className="py-2 pr-3">{tr("Käyttäjä")}</th>
                   <th className="py-2 pr-3">{tr("Luotu")}</th>
+                  <th className="py-2 pr-3">{staffText.validUntil}</th>
                   <th className="py-2">{tr("Toiminnot")}</th>
                 </tr>
               </thead>
               <tbody>
-                {(detail.codes as SchoolCodeRow[]).map((c) => (
-                  <tr key={c.id} className="border-b border-black/5">
-                    <td className="py-2 pr-3">
-                      <span className="inline-flex items-center gap-2">
-                        <code className="font-mono">{c.code}</code>
-                        <button
-                          type="button"
-                          aria-label={tr("Kopioi")}
-                          className="opacity-60 hover:opacity-100"
-                          onClick={() => {
-                            void navigator.clipboard.writeText(c.code);
-                            toast.success(tr("Kopioitu!"));
-                          }}
-                        >
-                          <Copy className="h-4 w-4" />
-                        </button>
-                      </span>
-                    </td>
-                    <td className="py-2 pr-3">{c.is_used ? tr("Käytetty") : tr("Käyttämätön")}</td>
-                    <td className="py-2 pr-3">{c.used_by ?? "—"}</td>
-                    <td className="py-2 pr-3 opacity-70">
-                      {new Date(c.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="py-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="rounded-full"
-                        onClick={async () => {
-                          await revoke({ data: { id: c.id } });
-                          toast.success(tr("Päivitetty!"));
-                          await load();
-                        }}
-                      >
-                        {tr("Peruuta")}
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
+                {(detail.codes as SchoolCodeRow[]).map((c) => {
+                  const expired = !c.expires_at || new Date(c.expires_at).getTime() <= Date.now();
+                  const active = !c.is_revoked && !expired;
+                  return (
+                    <tr key={c.id} className="border-b border-black/5">
+                      <td className="py-2 pr-3">
+                        <span className="inline-flex items-center gap-2">
+                          <code className="font-mono">{c.code}</code>
+                          <button
+                            type="button"
+                            aria-label={tr("Kopioi")}
+                            className="opacity-60 hover:opacity-100"
+                            onClick={() => {
+                              void navigator.clipboard.writeText(c.code);
+                              toast.success(tr("Kopioitu!"));
+                            }}
+                          >
+                            <Copy className="h-4 w-4" />
+                          </button>
+                        </span>
+                      </td>
+                      <td className="py-2 pr-3">
+                        {active ? staffText.active : c.is_revoked ? staffText.replaced : staffText.expired}
+                      </td>
+                      <td className="py-2 pr-3 opacity-70">
+                        {new Date(c.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="py-2 pr-3 opacity-70">
+                        {c.expires_at ? new Date(c.expires_at).toLocaleDateString() : "—"}
+                      </td>
+                      <td className="py-2">
+                        {active && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="rounded-full"
+                            onClick={async () => {
+                              await revoke({ data: { id: c.id } });
+                              toast.success(tr("Päivitetty!"));
+                              await load();
+                            }}
+                          >
+                            {tr("Peruuta")}
+                          </Button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </StickyNote>

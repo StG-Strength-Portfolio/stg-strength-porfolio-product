@@ -1,0 +1,13 @@
+/* Keep active staff sidebar links readable when TanStack Link combines
+   inactive white text with the active white pill classes. */
+aside nav a.bg-white[href^="/teacher/"],
+aside nav a.bg-white[href^="/school-admin/"] {
+  background-color: white !important;
+  color: var(--purple) !important;
+}
+
+aside nav a.bg-white[href^="/teacher/"]:hover,
+aside nav a.bg-white[href^="/school-admin/"]:hover {
+  background-color: white !important;
+  color: var(--purple) !important;
+}

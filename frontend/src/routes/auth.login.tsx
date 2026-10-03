@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -9,8 +9,10 @@ import { StickyNote } from "@/components/StickyNote";
 import { AuthLanguageSwitcher } from "@/components/AuthLanguageSwitcher";
 import { ForgotPasswordDialog } from "@/components/ForgotPasswordDialog";
 import { toast } from "sonner";
-import { useT, useTr } from "@/lib/i18n";
+import { useLanguage, useT, useTr } from "@/lib/i18n";
 import { homeForRole, roleOfCurrentUser } from "@/lib/role-guard";
+import { isSsoAuthorityOrigin } from "@/lib/cross-domain-auth";
+import { checkAuthoritySilently, seedAuthoritySilently } from "@/lib/central-sso-client";
 import { z } from "zod";
 
 export const Route = createFileRoute("/auth/login")({
@@ -25,44 +27,93 @@ export const Route = createFileRoute("/auth/login")({
   component: LoginPage,
 });
 
+const unconfirmedEmailCopy = {
+  fi: "Sähköpostiosoitettasi ei ole vielä vahvistettu. Avaa sähköposti ja napsauta vahvistuslinkkiä. Linkki avaa palvelun automaattisesti.",
+  en: "Your email address has not been confirmed yet. Open your email and click the confirmation link. The link will open the platform automatically.",
+  sv: "Din e-postadress är inte bekräftad ännu. Öppna e-postmeddelandet och klicka på bekräftelselänken. Länken öppnar tjänsten automatiskt.",
+} as const;
+
+function cleanLegacyLoginUrl(next: string) {
+  if (typeof window === "undefined" || !window.location.search) return;
+  const clean = next ? `/auth/login?next=${encodeURIComponent(next)}` : "/auth/login";
+  if (`${window.location.pathname}${window.location.search}` !== clean) {
+    window.history.replaceState({}, "", clean);
+  }
+}
+
 function LoginPage() {
-  const navigate = useNavigate();
-  const next = Route.useSearch().next ?? "";
+  const search = Route.useSearch();
+  const next = search.next ?? "";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [forgotOpen, setForgotOpen] = useState(false);
+  const [resolving, setResolving] = useState(true);
   const t = useT();
   const tr = useTr();
+  const { language } = useLanguage();
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data }) => {
-      if (!data.session) return;
-      if (next) {
-        window.location.href = next;
+    let cancelled = false;
+
+    async function resolveAuth() {
+      cleanLegacyLoginUrl(next);
+      const { data } = await supabase.auth.getSession();
+      if (cancelled) return;
+
+      if (data.session) {
+        const returnPath = next || homeForRole(await roleOfCurrentUser());
+        window.location.replace(returnPath);
         return;
       }
-      window.location.href = homeForRole(await roleOfCurrentUser());
-    });
-  }, [navigate, next]);
+
+      if (!isSsoAuthorityOrigin(window.location.origin)) {
+        const transferred = await checkAuthoritySilently();
+        if (cancelled) return;
+        if (transferred) {
+          const returnPath = next || homeForRole(await roleOfCurrentUser());
+          window.location.replace(returnPath);
+          return;
+        }
+      }
+
+      setResolving(false);
+    }
+
+    void resolveAuth();
+    return () => {
+      cancelled = true;
+    };
+  }, [next]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        toast.error(t("auth.login.wrong"));
+        const errorText = `${error.code ?? ""} ${error.message}`.toLowerCase();
+        const isUnconfirmed =
+          errorText.includes("email_not_confirmed") ||
+          errorText.includes("email not confirmed") ||
+          errorText.includes("email not verified");
+        toast.error(isUnconfirmed ? unconfirmedEmailCopy[language] : t("auth.login.wrong"));
         return;
       }
-      if (next) {
-        window.location.href = next;
-        return;
+
+      if (data.session && !isSsoAuthorityOrigin(window.location.origin)) {
+        await seedAuthoritySilently(data.session, true);
       }
-      window.location.href = homeForRole(await roleOfCurrentUser());
+
+      const returnPath = next || homeForRole(await roleOfCurrentUser());
+      window.location.replace(returnPath);
     } finally {
       setBusy(false);
     }
+  }
+
+  if (resolving) {
+    return <div className="min-h-screen bg-background" aria-hidden="true" />;
   }
 
   return (

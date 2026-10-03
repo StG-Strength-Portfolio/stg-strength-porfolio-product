@@ -32,7 +32,6 @@ function StrengthPair({ onSaveStateChange }: Props) {
   const report = useReportCompletion();
   const [values, setValues] = useState<[string, string]>(["", ""]);
   const [loaded, setLoaded] = useState(false);
-  const [dirty, setDirty] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -49,7 +48,7 @@ function StrengthPair({ onSaveStateChange }: Props) {
 
   const serialized = values.filter(Boolean).join(",");
   const saveState = useAutosave(STRENGTH_FIELD, serialized, {
-    enabled: loaded && dirty,
+    enabled: loaded,
   });
 
   useEffect(() => {
@@ -61,7 +60,6 @@ function StrengthPair({ onSaveStateChange }: Props) {
   }, [loaded, report, values]);
 
   function change(slot: 0 | 1, next: string) {
-    setDirty(true);
     setValues((current) => {
       const other = slot === 0 ? 1 : 0;
       if (next && current[other] === next) return current;

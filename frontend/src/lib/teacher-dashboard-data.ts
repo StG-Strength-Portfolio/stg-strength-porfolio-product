@@ -9,6 +9,8 @@ import {
 import type { Language } from "@/lib/i18n";
 import { matchStrengthId, strengthIdsFromResponses } from "@/lib/strength-jar-data";
 import type { ReportEvent } from "@/lib/report-series";
+import { getSuperAdminPreview } from "@/lib/superadmin-preview";
+import { getDemoTeacherData, onDemoStateChange } from "@/lib/demo-store";
 
 export interface TeacherClass {
   id: string;
@@ -16,6 +18,8 @@ export interface TeacherClass {
   join_code: string;
   language: Language;
   created_at: string;
+  /** The classroom owner. Optional only for legacy/demo data. */
+  teacher_id?: string;
   is_deleted?: boolean;
   deleted_at?: string | null;
 }
@@ -54,12 +58,26 @@ export function useTeacherData() {
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
+      const preview = getSuperAdminPreview();
+      if (preview.mode === "teacher") {
+        const demo = getDemoTeacherData();
+        setClasses(demo.classes);
+        setDeletedClasses(demo.deletedClasses);
+        setStudents(demo.students);
+        setAssigned(demo.assigned);
+        setEvents(demo.events);
+        return;
+      }
+
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return;
+      const teacherId = u.user.id;
 
+      // RLS now returns both classrooms this teacher owns and classrooms where
+      // they are an assigned co-teacher. Do not filter by teacher_id here.
       const { data: cls } = await supabase
         .from("classes" as never)
-        .select("id,name,join_code,created_at,language,is_deleted,deleted_at")
+        .select("id,name,join_code,created_at,language,is_deleted,deleted_at,teacher_id")
         .order("created_at", { ascending: false });
       const allRows = (cls ?? []) as unknown as TeacherClass[];
       const classRows = allRows.filter((c) => !c.is_deleted);
@@ -170,7 +188,7 @@ export function useTeacherData() {
       const { data: gifts } = await supabase
         .from("teacher_assigned_strengths" as never)
         .select("id, student_id, strength_id, message, created_at")
-        .eq("teacher_id", u.user.id as never)
+        .eq("teacher_id", teacherId as never)
         .order("created_at", { ascending: false });
       const giftRows = (gifts ?? []) as unknown as AssignedStrength[];
       setAssigned(giftRows);
@@ -208,6 +226,10 @@ export function useTeacherData() {
 
   useEffect(() => {
     void refresh();
+
+    if (getSuperAdminPreview().mode === "teacher") {
+      return onDemoStateChange(() => void refresh());
+    }
 
     const channel = supabase
       .channel("teacher-strength-reports")

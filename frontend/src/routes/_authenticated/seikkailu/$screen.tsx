@@ -14,7 +14,9 @@ import type { SaveState } from "@/hooks/use-autosave";
 import { supabase } from "@/integrations/supabase/client";
 import { useT, useTr } from "@/lib/i18n";
 import { REQUIREMENTS, useNavGate } from "@/lib/screen-completion";
+import { notifyStudentCurrentScreenChanged } from "@/lib/progress";
 import { TOTAL_SCREENS, worldForScreen } from "@/lib/screens";
+import { ScreenSubPageProvider } from "@/lib/screen-subpages";
 
 export const Route = createFileRoute("/_authenticated/seikkailu/$screen")({
   component: ScreenView,
@@ -65,10 +67,11 @@ function ScreenView() {
       const currentScreen = profile?.current_screen ?? 1;
       if (n <= currentScreen) return;
 
-      await supabase
+      const { error: updateError } = await supabase
         .from("profiles" as never)
         .update({ current_screen: n } as never)
         .eq("id", currentUserId);
+      if (!updateError) notifyStudentCurrentScreenChanged(n);
     }
 
     void loadCurrentUserAndSync();
@@ -84,6 +87,45 @@ function ScreenView() {
     };
   }, [n, setScreen]);
 
+  async function persistAdvanceBeforeNext() {
+    if (progression.bypass || n >= TOTAL_SCREENS) return;
+
+    const targetScreen = n + 1;
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (userError || !userData.user) {
+      toast.error(tr("Tallennus epäonnistui"));
+      throw userError ?? new Error("No authenticated user");
+    }
+
+    const currentUserId = userData.user.id;
+    const { data: profileData, error: profileError } = await supabase
+      .from("profiles" as never)
+      .select("current_screen")
+      .eq("id", currentUserId)
+      .maybeSingle();
+    if (profileError) {
+      toast.error(tr("Tallennus epäonnistui"));
+      throw profileError;
+    }
+
+    const currentScreen = (profileData as { current_screen?: number } | null)?.current_screen ?? 1;
+    if (currentScreen >= targetScreen) {
+      notifyStudentCurrentScreenChanged(currentScreen);
+      return;
+    }
+
+    const { error: updateError } = await supabase
+      .from("profiles" as never)
+      .update({ current_screen: targetScreen } as never)
+      .eq("id", currentUserId);
+    if (updateError) {
+      toast.error(tr("Tallennus epäonnistui"));
+      throw updateError;
+    }
+
+    notifyStudentCurrentScreenChanged(targetScreen);
+  }
+
   const built = hasPortfolioScreen(n);
   const nextBlocked = !progression.bypass && !isComplete;
 
@@ -95,7 +137,8 @@ function ScreenView() {
     );
   }
 
-  return (
+ return (
+  <ScreenSubPageProvider key={n}>
     <div className="journey-bg relative flex h-[calc(100dvh-3.5rem)] min-h-0 min-w-0 w-full flex-col overflow-hidden">
       <div className="relative z-30 shrink-0">
         <ScreenChrome n={n} saveState={saveState} />
@@ -137,8 +180,16 @@ function ScreenView() {
       </main>
 
       <div className="fixed bottom-0 right-0 left-[289px] z-[100] m-0 w-auto translate-y-4 p-0">
-        <BottomNav n={n} saveState={saveState} showProgress={false} nextDisabled={nextBlocked} nextHint={nextBlocked ? hint : undefined} />
+        <BottomNav
+          n={n}
+          saveState={saveState}
+          showProgress={false}
+          nextDisabled={nextBlocked}
+          nextHint={nextBlocked ? hint : undefined}
+          onBeforeNext={persistAdvanceBeforeNext}
+        />
       </div>
     </div>
+      </ScreenSubPageProvider>
   );
 }

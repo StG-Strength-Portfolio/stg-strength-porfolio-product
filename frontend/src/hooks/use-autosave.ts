@@ -1,5 +1,7 @@
 import { createContext, createElement, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getSuperAdminPreview } from "@/lib/superadmin-preview";
+import { getDemoStudentResponse, setDemoStudentResponse } from "@/lib/demo-store";
 
 export type SaveState = "idle" | "saving" | "saved" | "error";
 
@@ -22,7 +24,8 @@ export function AutosaveScope({
 
 /**
  * Autosaves a single field_key to public.responses for the current user.
- * Debounced; serializes value as JSON text. RLS ensures user_id = auth.uid().
+ * In Superadmin student demo mode the exact same UI writes only to session
+ * storage, never to Supabase.
  */
 export function useAutosave<T>(
   fieldKey: string,
@@ -33,19 +36,31 @@ export function useAutosave<T>(
   const debounceMs = opts?.debounceMs ?? 700;
   const enabled = scopeEnabled && (opts?.enabled ?? true);
   const [state, setState] = useState<SaveState>("idle");
-  const firstRun = useRef(true);
+  const initialValue = useRef(JSON.stringify(value));
+  const hasSeenEnabledRun = useRef(false);
   const latest = useRef(value);
   latest.current = value;
 
   useEffect(() => {
     if (!enabled) return;
-    if (firstRun.current) {
-      firstRun.current = false;
-      return;
+
+    const serialized = JSON.stringify(value);
+    if (!hasSeenEnabledRun.current) {
+      hasSeenEnabledRun.current = true;
+      // Skip only the untouched initial value. If autosave becomes enabled
+      // because of the user's first edit, save that edit instead of dropping it.
+      if (serialized === initialValue.current) return;
     }
+
     setState("saving");
     const t = setTimeout(async () => {
       try {
+        if (getSuperAdminPreview().mode === "student") {
+          setDemoStudentResponse(fieldKey, latest.current);
+          setState("saved");
+          return;
+        }
+
         const { data: u } = await supabase.auth.getUser();
         if (!u.user) {
           setState("error");
@@ -109,6 +124,10 @@ function isFilledValue(value: unknown): boolean {
 }
 
 export async function loadResponse<T = unknown>(fieldKey: string): Promise<T | null> {
+  if (getSuperAdminPreview().mode === "student") {
+    return getDemoStudentResponse<T>(fieldKey);
+  }
+
   const { data: u } = await supabase.auth.getUser();
   if (!u.user) return null;
   const { data } = await supabase

@@ -10,23 +10,87 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
+import { StaffProfileLanguageSync } from "@/components/StaffProfileLanguageSync";
+import { TrialExperience } from "@/components/trial/TrialExperience";
+import { TrialAccessPolicy } from "@/components/trial/TrialAccessPolicy";
 import { LanguageProvider, useLanguage } from "@/lib/i18n";
+import {
+  domainBrandName,
+  domainDefaultLanguage,
+  readDomainLanguagePreference,
+} from "@/lib/domain-language";
+import { ensureAgeoFont } from "@/lib/ageo-font";
 
 import appCss from "../styles.css?url";
+import schoolAdminMetricsCss from "../styles/school-admin-metrics.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 const DOCUMENT_TITLE = {
-  fi: "Vahvuusseikkailu",
+  fi: "Vahvuus Portfolio",
   en: "Strength Portfolio",
-  sv: "Styrkeportfolio",
+  sv: "Styrke Portfolj",
 } as const;
+
+const LANGUAGE_STORAGE_KEY = "student_language";
+const DOMAIN_LOCKED_STAFF_PATHS = new Set([
+  "/register-staff",
+  "/confirm-staff",
+  "/trial",
+  "/confirm-trial",
+]);
+
+function isDomainLockedStaffPath(pathname: string): boolean {
+  return DOMAIN_LOCKED_STAFF_PATHS.has(pathname);
+}
+
+function applyHostnameLanguageDefault() {
+  if (typeof window === "undefined") return;
+
+  const defaultLanguage = domainDefaultLanguage(window.location.hostname);
+  if (defaultLanguage && isDomainLockedStaffPath(window.location.pathname)) {
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, defaultLanguage);
+    return;
+  }
+
+  const manualPreference = readDomainLanguagePreference();
+  if (manualPreference) {
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, manualPreference);
+    return;
+  }
+
+  if (window.localStorage.getItem(LANGUAGE_STORAGE_KEY)) return;
+
+  if (defaultLanguage) {
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, defaultLanguage);
+  }
+}
+
+function DomainLanguagePreferenceSync() {
+  const { language, setLanguage } = useLanguage();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+
+  useEffect(() => {
+    const defaultLanguage = domainDefaultLanguage(window.location.hostname);
+    if (defaultLanguage && isDomainLockedStaffPath(pathname)) {
+      if (defaultLanguage !== language) setLanguage(defaultLanguage);
+      return;
+    }
+
+    const manualPreference = readDomainLanguagePreference();
+    if (manualPreference && manualPreference !== language) {
+      setLanguage(manualPreference);
+    }
+  }, [language, pathname, setLanguage]);
+
+  return null;
+}
 
 function LocalizedDocumentTitle() {
   const { language } = useLanguage();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
 
   useEffect(() => {
-    document.title = DOCUMENT_TITLE[language];
+    document.title = domainBrandName(window.location.hostname) ?? DOCUMENT_TITLE[language];
     document.documentElement.lang = language;
   }, [language, pathname]);
 
@@ -100,12 +164,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Strength Portfolio" },
       { name: "description", content: "Digitaalinen vahvuusportfolio lukiolaiselle." },
-      { property: "og:title", content: "Vahvuusseikkailu" },
+      { property: "og:title", content: "Vahvuusportfolio" },
       { property: "og:description", content: "Digitaalinen vahvuusportfolio lukiolaiselle." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Vahvuusseikkailu" },
+      { name: "twitter:title", content: "Vahvuusportfolio" },
       { name: "twitter:description", content: "Digitaalinen vahvuusportfolio lukiolaiselle." },
       {
         property: "og:image",
@@ -119,16 +183,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
     ],
     links: [
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap",
-      },
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "stylesheet", href: appCss },
+      { rel: "stylesheet", href: schoolAdminMetricsCss },
     ],
   }),
   shellComponent: RootShell,
@@ -140,25 +196,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
+      <head><HeadContent /></head>
+      <body>{children}<Scripts /></body>
     </html>
   );
 }
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  applyHostnameLanguageDefault();
+  useEffect(() => { void ensureAgeoFont(); }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
+        <DomainLanguagePreferenceSync />
+        <StaffProfileLanguageSync />
         <LocalizedDocumentTitle />
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <TrialExperience />
+        <TrialAccessPolicy />
         <Outlet />
         <Toaster position="top-center" />
       </LanguageProvider>
