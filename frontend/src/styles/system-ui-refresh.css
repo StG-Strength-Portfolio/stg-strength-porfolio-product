@@ -1,0 +1,276 @@
+/*
+ * 2026 full-system visual refresh based on the product design review.
+ * Loaded after the legacy stylesheet so the existing feature/layout code can
+ * keep its behaviour while the shared visual language becomes cleaner.
+ */
+
+:root {
+  --radius: 0.5rem;
+
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.278 0.033 256.848); /* #1f2937 */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.278 0.033 256.848);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.278 0.033 256.848);
+
+  --primary: var(--purple);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.985 0.002 247.839); /* #f9fafb */
+  --secondary-foreground: oklch(0.278 0.033 256.848);
+  --muted: oklch(0.985 0.002 247.839);
+  --muted-foreground: oklch(0.551 0.027 264.364); /* #6b7280 */
+  --accent: oklch(0.967 0.014 293); /* very light purple */
+  --accent-foreground: oklch(0.49 0.18 293);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.928 0.006 264.531); /* #e5e7eb */
+  --input: oklch(0.872 0.01 258); /* #d1d5db */
+  --ring: var(--purple);
+
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.373 0.034 259.733); /* #374151 */
+  --sidebar-primary: var(--purple);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.967 0.014 293);
+  --sidebar-accent-foreground: oklch(0.49 0.18 293);
+  --sidebar-border: oklch(0.928 0.006 264.531);
+  --sidebar-ring: var(--purple);
+
+  /* Keep the brand palette, but use neutral ink for the application chrome. */
+  --ink: oklch(0.278 0.033 256.848);
+  --ink-soft: oklch(0.551 0.027 264.364);
+}
+
+body {
+  background: #ffffff;
+  color: #1f2937;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: inherit;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+/* Shared surfaces ------------------------------------------------------- */
+.sticky-note {
+  background: #ffffff;
+  color: #1f2937;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 1.25rem;
+}
+
+.pencil-badge {
+  border: 1px solid #e5e7eb;
+  border-radius: 9999px;
+  background: #f9fafb;
+  color: #374151;
+  box-shadow: none;
+}
+
+/* Workbook/activity inputs keep their educational character, without the
+   heavy black comic-book outline. */
+.workbook-paper {
+  background-color: #ffffff;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(1.65rem - 1px),
+    #eef0f3 calc(1.65rem - 1px),
+    #eef0f3 1.65rem
+  );
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.workbook-paper:focus-within {
+  border-color: #7755c9;
+  box-shadow: 0 0 0 3px rgba(119, 85, 201, 0.14);
+}
+
+.workbook-line,
+.workbook-pill {
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  box-shadow: none;
+  color: #1f2937;
+}
+
+.workbook-line:focus-within,
+.workbook-pill:focus-within {
+  border-color: #7755c9;
+  box-shadow: 0 0 0 3px rgba(119, 85, 201, 0.14);
+}
+
+.candy-chip {
+  border-color: #e5e7eb !important;
+  box-shadow: none;
+}
+
+.candy-chip:hover:not(:disabled),
+.candy-chip.is-active {
+  transform: none;
+  border-color: #c4b5fd !important;
+  box-shadow: 0 0 0 3px rgba(119, 85, 201, 0.1);
+}
+
+.candy-chip.is-active::after {
+  box-shadow: none;
+}
+
+.game-btn,
+.game-btn:hover:not(:disabled),
+.game-btn:active:not(:disabled) {
+  transform: none;
+  box-shadow: none;
+}
+
+.celebrate-check {
+  box-shadow: 0 8px 24px rgba(31, 41, 55, 0.12);
+}
+
+/* Student portfolio canvas --------------------------------------------- */
+.journey-bg {
+  background: #f9fafb;
+}
+
+.journey-bg::before,
+.journey-bg::after {
+  display: none;
+}
+
+.journey-bg label,
+main > label {
+  color: #374151;
+}
+
+.journey-bg [role="progressbar"] {
+  background: #e5e7eb !important;
+}
+
+.journey-bg [role="progressbar"] > div {
+  background: #7755c9 !important;
+}
+
+.journey-bg [role="progressbar"] + span {
+  color: #6b7280 !important;
+}
+
+.cover-page {
+  border-radius: 12px;
+}
+
+.cover-title,
+.cover-description {
+  color: #1f2937 !important;
+}
+
+/* Normalize oversized fixed-radius panels without changing round badges,
+   avatars or deliberate CTA pills. */
+.rounded-2xl,
+.rounded-3xl {
+  border-radius: 12px;
+}
+
+/* Student sidebar: white canvas, neutral text, light-purple active state. */
+[data-sidebar="sidebar"] {
+  border-color: #e5e7eb;
+  background: #ffffff;
+  color: #374151;
+}
+
+[data-sidebar="menu-button"][data-active="true"] {
+  background: #f3eeff;
+  color: #6d28d9;
+}
+
+[data-sidebar="menu-button"]:hover {
+  background: #f9fafb;
+  color: #374151;
+}
+
+/* Teacher / school-admin DashboardShell currently has a purple card sidebar
+   hard-coded in the component. Restyle that structure without touching its
+   routing or role logic. */
+aside > div.sticky[class*="bg-[color:var(--purple)]"] {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  color: #374151 !important;
+  box-shadow: none !important;
+}
+
+aside > div.sticky[class*="bg-[color:var(--purple)]"] nav {
+  border-color: #e5e7eb !important;
+}
+
+aside > div.sticky[class*="bg-[color:var(--purple)]"] nav p {
+  color: #9ca3af !important;
+}
+
+aside > div.sticky[class*="bg-[color:var(--purple)]"] button,
+aside > div.sticky[class*="bg-[color:var(--purple)]"] a {
+  border-radius: 8px !important;
+  color: #374151 !important;
+  box-shadow: none !important;
+}
+
+aside > div.sticky[class*="bg-[color:var(--purple)]"] button:hover,
+aside > div.sticky[class*="bg-[color:var(--purple)]"] a:hover {
+  background: #f9fafb !important;
+  color: #374151 !important;
+}
+
+aside > div.sticky[class*="bg-[color:var(--purple)]"] button.bg-white,
+aside > div.sticky[class*="bg-[color:var(--purple)]"] a.bg-white {
+  background: #f3eeff !important;
+  color: #6d28d9 !important;
+}
+
+aside > div.sticky[class*="bg-[color:var(--purple)]"] > button,
+aside > div.sticky[class*="bg-[color:var(--purple)]"] > div:last-child {
+  color: #6b7280 !important;
+}
+
+/* Remove the legacy dashboard rule that paints nearly every staff action
+   yellow; primary actions now follow the shared purple token. */
+div[class*="button.inline-flex"][class*="var(--yellow)"] button.inline-flex:not(.bg-red-600):not(.bg-red-700) {
+  background: #7755c9 !important;
+  color: #ffffff !important;
+}
+
+/* Tables/forms read as SaaS management UI rather than activity cards. */
+table {
+  color: #374151;
+}
+
+thead {
+  color: #6b7280;
+}
+
+input,
+textarea,
+select {
+  color: #1f2937;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+}
+
+/* Preserve strength-specific colors/illustrations as content accents. */
+img {
+  color: initial;
+}

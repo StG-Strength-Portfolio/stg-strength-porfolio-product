@@ -77,7 +77,7 @@ function normalize(s: string): string {
 // Lookup with graceful fallback + one-time console warning per missing key.
 const warned = new Set<string>();
 export function lookupContent(fi: string, lang: Language): string {
-  if (lang === "fi") return fi;
+  if (lang === "fi") return fi.replace("Näy hyvää!", "Huomaa hyvä!");
   const key = normalize(fi);
   const hit = CONTENT_DICT[key];
   const out = hit && hit[lang];
@@ -631,7 +631,7 @@ const trWarned = new Set<string>();
 function trFinnish(finnish: string, language: Language): string {
   // Defensive: callers occasionally pass an undefined lookup result.
   if (typeof finnish !== "string" || !finnish) return "";
-  if (language === "fi") return finnish;
+  if (language === "fi") return finnish.replace("Näy hyvää!", "Huomaa hyvä!");
   const out = translateFinnish(finnish, language as AppLanguage);
   if (out !== finnish && TRANSLATIONS[finnish]) return out;
   // Fall back to the Excel-derived dictionary (normalized key match).

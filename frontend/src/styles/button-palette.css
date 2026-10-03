@@ -1,0 +1,258 @@
+/*
+ * Designer button palette - final UI control normalization.
+ * Loaded last so legacy color utility classes cannot override the product UI.
+ *
+ * Product controls:
+ *   Primary/action  #7C3AED + white
+ *   Hover           #6D28D9 + white
+ *   Destructive     red + white
+ *   Secondary       white/#F9FAFB + #374151
+ *   Link/ghost      transparent + #6D28D9/#374151
+ *
+ * Strength/world/activity cards are content, not generic UI controls, and are
+ * intentionally excluded where they are implemented as large card buttons.
+ */
+
+:root {
+  --designer-primary: #7c3aed;
+  --designer-primary-hover: #6d28d9;
+  --designer-primary-text: #ffffff;
+  --designer-danger: #dc2626;
+  --designer-danger-hover: #b91c1c;
+  --designer-neutral: #ffffff;
+  --designer-neutral-soft: #f9fafb;
+  --designer-neutral-hover: #f3f4f6;
+  --designer-text: #374151;
+  --designer-text-strong: #1f2937;
+  --designer-border: #d1d5db;
+  --designer-border-soft: #e5e7eb;
+  --designer-link: #6d28d9;
+}
+
+/* All actual UI buttons use the designer radius and never carry legacy
+   comic-book/drop shadows. Large content-card buttons are excluded below. */
+:is(button, input[type="button"], input[type="submit"], input[type="reset"], a[role="button"]):not([class*="shadow-[6px_8px_0_0_var(--purple-dark)]"]):not(.world-card) {
+  border-radius: 8px !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   PRIMARY / ACTION BUTTONS
+   Any old brand/activity color used on a real UI control is normalized to the
+   designer's single purple action color.
+   -------------------------------------------------------------------------- */
+:is(button, a[role="button"], input[type="button"], input[type="submit"]):is(
+  .bg-primary,
+  [class*="bg-primary"],
+  [class*="bg-[color:var(--purple)]"],
+  [class*="bg-[color:var(--purple-dark)]"],
+  [class*="bg-[var(--purple)]"],
+  [class*="bg-[#7C3AED]"],
+  [class*="bg-[#7c3aed]"],
+  [class*="bg-[#7755c9]"],
+  [class*="bg-[#7654ad]"],
+  [class*="bg-[#6D28D9]"],
+  [class*="bg-[#6d28d9]"],
+  [class*="bg-purple-"],
+  [class*="bg-violet-"],
+  [class*="bg-indigo-"],
+  [class*="bg-[color:var(--yellow)]"],
+  [class*="bg-[var(--yellow)]"],
+  [class*="bg-yellow-"],
+  [class*="bg-amber-"],
+  [class*="bg-orange-"],
+  [class*="bg-[color:var(--coral)]"],
+  [class*="bg-[var(--coral)]"],
+  [class*="bg-coral"],
+  [class*="bg-green-"],
+  [class*="bg-emerald-"],
+  [class*="bg-teal-"],
+  [class*="bg-cyan-"],
+  [class*="bg-blue-"],
+  [class*="bg-sky-"],
+  [class*="bg-pink-"],
+  [class*="bg-fuchsia-"],
+  [class*="bg-rose-"],
+  [class*="bg-black"],
+  [class*="bg-slate-7"],
+  [class*="bg-slate-8"],
+  [class*="bg-slate-9"],
+  [class*="bg-gray-7"],
+  [class*="bg-gray-8"],
+  [class*="bg-gray-9"]
+):not(.bg-destructive):not([class*="bg-destructive"]):not([class*="bg-red-"]):not([class*="shadow-[6px_8px_0_0_var(--purple-dark)]"]):not(.world-card) {
+  background: var(--designer-primary) !important;
+  border-color: var(--designer-primary) !important;
+  color: var(--designer-primary-text) !important;
+}
+
+:is(button, a[role="button"], input[type="button"], input[type="submit"]):is(
+  .bg-primary,
+  [class*="bg-primary"],
+  [class*="bg-[color:var(--purple)]"],
+  [class*="bg-[color:var(--purple-dark)]"],
+  [class*="bg-[var(--purple)]"],
+  [class*="bg-[#7C3AED]"],
+  [class*="bg-[#7c3aed]"],
+  [class*="bg-[#7755c9]"],
+  [class*="bg-[#7654ad]"],
+  [class*="bg-[#6D28D9]"],
+  [class*="bg-[#6d28d9]"],
+  [class*="bg-purple-"],
+  [class*="bg-violet-"],
+  [class*="bg-indigo-"],
+  [class*="bg-[color:var(--yellow)]"],
+  [class*="bg-[var(--yellow)]"],
+  [class*="bg-yellow-"],
+  [class*="bg-amber-"],
+  [class*="bg-orange-"],
+  [class*="bg-[color:var(--coral)]"],
+  [class*="bg-[var(--coral)]"],
+  [class*="bg-coral"],
+  [class*="bg-green-"],
+  [class*="bg-emerald-"],
+  [class*="bg-teal-"],
+  [class*="bg-cyan-"],
+  [class*="bg-blue-"],
+  [class*="bg-sky-"],
+  [class*="bg-pink-"],
+  [class*="bg-fuchsia-"],
+  [class*="bg-rose-"],
+  [class*="bg-black"]
+):not(.bg-destructive):not([class*="bg-destructive"]):not([class*="bg-red-"]):not([class*="shadow-[6px_8px_0_0_var(--purple-dark)]"]):not(.world-card):hover {
+  background: var(--designer-primary-hover) !important;
+  border-color: var(--designer-primary-hover) !important;
+  color: var(--designer-primary-text) !important;
+}
+
+/* Legacy custom action classes that do not expose a Tailwind background. */
+:is(button, a[role="button"]).game-btn,
+:is(button, a[role="button"]).tm-primary-action {
+  background: var(--designer-primary) !important;
+  border-color: var(--designer-primary) !important;
+  color: var(--designer-primary-text) !important;
+}
+
+:is(button, a[role="button"]).game-btn:hover,
+:is(button, a[role="button"]).tm-primary-action:hover {
+  background: var(--designer-primary-hover) !important;
+  border-color: var(--designer-primary-hover) !important;
+  color: var(--designer-primary-text) !important;
+}
+
+/* Anchor-based CTAs frequently use the same utility classes without role. */
+a[class*="inline-flex"]:is(
+  [class*="bg-primary"],
+  [class*="bg-[color:var(--purple)]"],
+  [class*="bg-[color:var(--purple-dark)]"],
+  [class*="bg-yellow-"],
+  [class*="bg-amber-"],
+  [class*="bg-[color:var(--yellow)]"],
+  [class*="bg-[color:var(--coral)]"],
+  [class*="bg-green-"],
+  [class*="bg-emerald-"],
+  [class*="bg-teal-"],
+  [class*="bg-blue-"],
+  [class*="bg-black"]
+):not([class*="bg-red-"]):not([class*="shadow-[6px_8px_0_0_var(--purple-dark)]"]) {
+  background: var(--designer-primary) !important;
+  border-color: var(--designer-primary) !important;
+  color: var(--designer-primary-text) !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   DESTRUCTIVE BUTTONS
+   -------------------------------------------------------------------------- */
+:is(button, a[role="button"], input[type="button"], input[type="submit"]):is(
+  .bg-destructive,
+  [class*="bg-destructive"],
+  [class*="bg-red-"],
+  [class*="bg-[#DC2626]"],
+  [class*="bg-[#dc2626]"],
+  [class*="bg-[#B91C1C]"],
+  [class*="bg-[#b91c1c]"]
+) {
+  background: var(--designer-danger) !important;
+  border-color: var(--designer-danger) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+:is(button, a[role="button"], input[type="button"], input[type="submit"]):is(
+  .bg-destructive,
+  [class*="bg-destructive"],
+  [class*="bg-red-"],
+  [class*="bg-[#DC2626]"],
+  [class*="bg-[#dc2626]"]
+):hover {
+  background: var(--designer-danger-hover) !important;
+  border-color: var(--designer-danger-hover) !important;
+  color: #ffffff !important;
+}
+
+/* --------------------------------------------------------------------------
+   SECONDARY / OUTLINE / GHOST BUTTONS
+   -------------------------------------------------------------------------- */
+:is(button, a[role="button"], input[type="button"]):is(
+  [class*="bg-white"],
+  [class*="bg-background"],
+  [class*="bg-secondary"],
+  [class*="bg-muted"],
+  [class*="bg-transparent"]
+):not([class*="bg-primary"]):not([class*="bg-red-"]):not([class*="bg-destructive"]):not([class*="shadow-[6px_8px_0_0_var(--purple-dark)]"]) {
+  background: var(--designer-neutral) !important;
+  border-color: var(--designer-border) !important;
+  color: var(--designer-text) !important;
+  box-shadow: none !important;
+}
+
+:is(button, a[role="button"]):is(
+  [class*="bg-white"],
+  [class*="bg-background"],
+  [class*="bg-secondary"],
+  [class*="bg-muted"],
+  [class*="bg-transparent"]
+):not([class*="bg-primary"]):not([class*="bg-red-"]):not([class*="bg-destructive"]):hover {
+  background: var(--designer-neutral-soft) !important;
+  border-color: #c4b5fd !important;
+  color: var(--designer-link) !important;
+}
+
+/* Unfilled bordered buttons are neutral secondary controls. */
+:is(button, a[role="button"])[class*="border"]:not([class*="bg-"]):not([class*="text-white"]):not([class*="shadow-[6px_8px_0_0_var(--purple-dark)]"]) {
+  background: var(--designer-neutral) !important;
+  border-color: var(--designer-border) !important;
+  color: var(--designer-text) !important;
+  box-shadow: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   BUTTON CONTENT
+   The label/icon inside a button must always follow the button foreground.
+   This is intentionally last and !important so old text-black/text-purple
+   utility classes cannot leak through a purple/red button.
+   -------------------------------------------------------------------------- */
+:is(button, a[role="button"], input[type="button"], input[type="submit"], input[type="reset"]):not([class*="shadow-[6px_8px_0_0_var(--purple-dark)]"]):not(.world-card) :is(span, strong, em, small, p, label, div, svg) {
+  color: inherit !important;
+  text-shadow: none !important;
+}
+
+/* Direct icon strokes/fills that use currentColor follow the label color. */
+:is(button, a[role="button"]):not([class*="shadow-[6px_8px_0_0_var(--purple-dark)]"]):not(.world-card) svg {
+  color: inherit !important;
+}
+
+/* Focus ring is always the designer purple. */
+:is(button, a[role="button"], input[type="button"], input[type="submit"], input[type="reset"]):focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.22) !important;
+}
+
+/* Disabled controls retain their palette but clearly read as disabled. */
+:is(button, a[role="button"], input[type="button"], input[type="submit"], input[type="reset"]):disabled,
+:is(button, a[role="button"])[aria-disabled="true"] {
+  opacity: 0.5 !important;
+}

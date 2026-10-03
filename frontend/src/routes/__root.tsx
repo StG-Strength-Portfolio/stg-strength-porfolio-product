@@ -10,16 +10,60 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
+import { LegacyTranslationGuard } from "@/components/LegacyTranslationGuard";
 import { LanguageProvider, useLanguage } from "@/lib/i18n";
+import {
+  domainDefaultLanguage,
+  readDomainLanguagePreference,
+} from "@/lib/domain-language";
+import { ensureAgeoFont } from "@/lib/ageo-font";
 
 import appCss from "../styles.css?url";
+import schoolAdminMetricsCss from "../styles/school-admin-metrics.css?url";
+import systemUiRefreshCss from "../styles/system-ui-refresh.css?url";
+import typographyScaleCss from "../styles/typography-scale.css?url";
+import contrastGuardrailsCss from "../styles/contrast-guardrails.css?url";
+import designerPolishCss from "../styles/designer-polish.css?url";
+import buttonPaletteCss from "../styles/button-palette.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 const DOCUMENT_TITLE = {
-  fi: "Vahvuusseikkailu",
+  fi: "Vahvuusportfolio",
   en: "Strength Portfolio",
   sv: "Styrkeportfolio",
 } as const;
+
+const LANGUAGE_STORAGE_KEY = "student_language";
+
+function applyHostnameLanguageDefault() {
+  if (typeof window === "undefined") return;
+
+  const manualPreference = readDomainLanguagePreference();
+  if (manualPreference) {
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, manualPreference);
+    return;
+  }
+
+  if (window.localStorage.getItem(LANGUAGE_STORAGE_KEY)) return;
+
+  // Product default is English. The three public domains can override this
+  // initial value, but preview/temporary hosts should not flash Finnish.
+  const defaultLanguage = domainDefaultLanguage(window.location.hostname) ?? "en";
+  window.localStorage.setItem(LANGUAGE_STORAGE_KEY, defaultLanguage);
+}
+
+function DomainLanguagePreferenceSync() {
+  const { language, setLanguage } = useLanguage();
+
+  useEffect(() => {
+    const manualPreference = readDomainLanguagePreference();
+    if (manualPreference && manualPreference !== language) {
+      setLanguage(manualPreference);
+    }
+  }, [language, setLanguage]);
+
+  return null;
+}
 
 function LocalizedDocumentTitle() {
   const { language } = useLanguage();
@@ -100,12 +144,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Strength Portfolio" },
       { name: "description", content: "Digitaalinen vahvuusportfolio lukiolaiselle." },
-      { property: "og:title", content: "Vahvuusseikkailu" },
+      { property: "og:title", content: "Vahvuusportfolio" },
       { property: "og:description", content: "Digitaalinen vahvuusportfolio lukiolaiselle." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Vahvuusseikkailu" },
+      { name: "twitter:title", content: "Vahvuusportfolio" },
       { name: "twitter:description", content: "Digitaalinen vahvuusportfolio lukiolaiselle." },
       {
         property: "og:image",
@@ -119,15 +163,33 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
     ],
     links: [
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap",
-      },
       {
         rel: "stylesheet",
         href: appCss,
+      },
+      {
+        rel: "stylesheet",
+        href: schoolAdminMetricsCss,
+      },
+      {
+        rel: "stylesheet",
+        href: systemUiRefreshCss,
+      },
+      {
+        rel: "stylesheet",
+        href: typographyScaleCss,
+      },
+      {
+        rel: "stylesheet",
+        href: contrastGuardrailsCss,
+      },
+      {
+        rel: "stylesheet",
+        href: designerPolishCss,
+      },
+      {
+        rel: "stylesheet",
+        href: buttonPaletteCss,
       },
     ],
   }),
@@ -153,11 +215,18 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  applyHostnameLanguageDefault();
+
+  useEffect(() => {
+    void ensureAgeoFont();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
+        <DomainLanguagePreferenceSync />
         <LocalizedDocumentTitle />
+        <LegacyTranslationGuard />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <Toaster position="top-center" />

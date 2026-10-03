@@ -1,0 +1,216 @@
+body.admin-materials-theme {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.278 0.033 256.848);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.278 0.033 256.848);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.278 0.033 256.848);
+  --primary: var(--purple);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.985 0.002 247.839);
+  --secondary-foreground: oklch(0.278 0.033 256.848);
+  --muted: oklch(0.985 0.002 247.839);
+  --muted-foreground: oklch(0.551 0.027 264.364);
+  --border: oklch(0.928 0.006 264.531);
+  --input: oklch(0.928 0.006 264.531);
+  --ring: var(--purple);
+  --radius: 0.5rem;
+  background: #ffffff;
+  color: #1f2937;
+}
+
+body.admin-materials-theme .pointer-events-none.no-print.absolute.inset-0.overflow-hidden {
+  display: none;
+}
+
+body.admin-materials-theme aside {
+  border-right: 1px solid #e5e7eb;
+  background: #ffffff;
+  padding-right: 1.25rem;
+}
+
+body.admin-materials-theme aside nav a {
+  border-radius: 8px !important;
+}
+
+body.admin-materials-theme main {
+  border-radius: 12px;
+  background: #f9fafb;
+  padding: 1.5rem;
+}
+
+body.admin-materials-theme main > header {
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 1rem;
+}
+
+body.admin-materials-theme main > header h1 {
+  color: #111827;
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 600;
+}
+
+body.admin-materials-theme .sticky-note {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+}
+
+body.admin-materials-theme input:not([type="checkbox"]),
+body.admin-materials-theme textarea,
+body.admin-materials-theme select {
+  border-radius: 8px;
+}
+
+body.admin-materials-theme input[type="checkbox"] {
+  accent-color: #7755c9;
+}
+
+.teaching-materials-admin {
+  color: #1f2937;
+}
+
+.teaching-materials-admin .tm-panel {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.teaching-materials-admin .tm-add-category {
+  padding: 1rem 1.25rem;
+}
+
+.teaching-materials-admin .tm-add-category h3,
+.teaching-materials-admin .tm-panel h3 {
+  color: #111827;
+  font-weight: 600;
+}
+
+.teaching-materials-admin .tm-select {
+  min-width: 20rem;
+  height: 2.5rem;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #111827;
+  outline: none;
+}
+
+.teaching-materials-admin .tm-select:focus {
+  border-color: #7755c9;
+  box-shadow: 0 0 0 3px rgba(119, 85, 201, 0.14);
+}
+
+.teaching-materials-admin .tm-category-card {
+  overflow: hidden;
+  padding: 0;
+}
+
+.teaching-materials-admin .tm-category-card > * + * {
+  margin-top: 0;
+}
+
+.teaching-materials-admin .tm-category-header {
+  padding: 0.875rem 1rem;
+}
+
+.teaching-materials-admin .tm-category-thumbnail {
+  width: 7rem;
+  border-radius: 10px;
+}
+
+.teaching-materials-admin .tm-category-title {
+  color: #1f2937;
+  font-size: 1.05rem;
+  line-height: 1.5rem;
+  font-weight: 600;
+}
+
+.teaching-materials-admin .tm-secondary-action {
+  border-radius: 8px;
+  color: #4b5563;
+}
+
+.teaching-materials-admin .tm-article-section {
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+  padding: 0.5rem 1rem 0.875rem;
+}
+
+.teaching-materials-admin .tm-article-list {
+  margin: 0;
+}
+
+.teaching-materials-admin .tm-article-row {
+  min-height: 2.75rem;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.6rem 0.5rem;
+  transition: background-color 150ms ease, opacity 150ms ease;
+}
+
+.teaching-materials-admin .tm-article-row:last-child {
+  border-bottom: 0;
+}
+
+.teaching-materials-admin .tm-article-row:hover {
+  background: #ffffff;
+}
+
+.teaching-materials-admin .tm-drag-handle {
+  display: inline-flex;
+  min-width: 2rem;
+  height: 1.75rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #9ca3af;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.teaching-materials-admin .tm-drag-handle:hover {
+  color: #6d28d9;
+  border-color: #c4b5fd;
+}
+
+.teaching-materials-admin .tm-article-actions button {
+  color: #6b7280;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.teaching-materials-admin .tm-article-actions button:hover {
+  color: #6d28d9;
+}
+
+.teaching-materials-admin .tm-article-actions button:last-child:hover {
+  color: #b91c1c;
+}
+
+.teaching-materials-admin .tm-primary-action {
+  border-radius: 8px;
+  background: #7755c9;
+  color: #ffffff;
+}
+
+.teaching-materials-admin .tm-primary-action:hover {
+  background: #6846b7;
+}
+
+.teaching-materials-admin .tm-thumbnail-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f9fafb;
+}
+
+@media (max-width: 900px) {
+  body.admin-materials-theme main {
+    padding: 1rem;
+  }
+
+  .teaching-materials-admin .tm-select {
+    min-width: min(20rem, 100%);
+  }
+}

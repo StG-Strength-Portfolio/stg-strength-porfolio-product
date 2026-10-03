@@ -1,0 +1,34 @@
+/* Super-admin shell overrides for the 2026 visual refresh. */
+
+.superadmin-ui {
+  background: #ffffff;
+  color: #1f2937;
+}
+
+.superadmin-ui aside {
+  border-right: 1px solid #e5e7eb;
+  padding-right: 1rem;
+}
+
+.superadmin-ui aside nav a {
+  border-radius: 8px !important;
+}
+
+.superadmin-ui aside nav a:not([class*="bg-[color:var(--purple)]"]) {
+  color: #374151 !important;
+}
+
+.superadmin-ui button.bg-background,
+.superadmin-ui a.bg-background {
+  color: #374151 !important;
+}
+
+.superadmin-ui button[class*="bg-[color:var(--purple)]"],
+.superadmin-ui a[class*="bg-[color:var(--purple)]"] {
+  color: white !important;
+}
+
+.superadmin-ui main > header h1 {
+  color: #111827;
+  font-weight: 600;
+}

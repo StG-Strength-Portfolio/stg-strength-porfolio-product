@@ -1,0 +1,199 @@
+/* Contrast rules for the 2026 light-surface UI refresh. */
+:root {
+  --ui-text-primary: #1f2937;
+  --ui-text-secondary: #6b7280;
+  --ui-text-on-dark: #ffffff;
+}
+
+/* Designer requirement: text must not have a shadow anywhere. */
+body,
+body * {
+  text-shadow: none !important;
+}
+
+/* ---------------------------------------------------------------------
+   LIGHT SURFACES
+   --------------------------------------------------------------------- */
+.journey-bg [class*="text-white"],
+.sticky-note [class*="text-white"],
+.workbook-paper [class*="text-white"],
+.workbook-line [class*="text-white"],
+.workbook-pill [class*="text-white"] {
+  color: var(--ui-text-primary) !important;
+}
+
+.journey-bg [class*="text-[#f1f1ef]"],
+.sticky-note [class*="text-[#f1f1ef]"],
+.workbook-paper [class*="text-[#f1f1ef]"],
+.workbook-line [class*="text-[#f1f1ef]"],
+.workbook-pill [class*="text-[#f1f1ef]"] {
+  color: var(--ui-text-secondary) !important;
+}
+
+.journey-bg h1[class*="text-[#f1f1ef]"],
+.journey-bg h2[class*="text-[#f1f1ef]"],
+.journey-bg h3[class*="text-[#f1f1ef]"],
+.sticky-note h1[class*="text-[#f1f1ef]"],
+.sticky-note h2[class*="text-[#f1f1ef]"],
+.sticky-note h3[class*="text-[#f1f1ef]"] {
+  color: var(--ui-text-primary) !important;
+}
+
+.journey-bg [class*="text-white"][class*="opacity-"],
+.sticky-note [class*="text-white"][class*="opacity-"] {
+  color: var(--ui-text-secondary) !important;
+}
+
+[class*="bg-background"] > [class*="text-white"],
+[class*="bg-card"] > [class*="text-white"],
+[class*="bg-white"] > [class*="text-white"],
+[class*="bg-slate-50"] > [class*="text-white"],
+[class*="bg-gray-50"] > [class*="text-white"],
+[class*="bg-background"] > [class*="text-[#f1f1ef]"],
+[class*="bg-card"] > [class*="text-[#f1f1ef]"],
+[class*="bg-white"] > [class*="text-[#f1f1ef]"],
+[class*="bg-slate-50"] > [class*="text-[#f1f1ef]"],
+[class*="bg-gray-50"] > [class*="text-[#f1f1ef]"] {
+  color: var(--ui-text-primary) !important;
+}
+
+.journey-bg input,
+.journey-bg textarea,
+.journey-bg select,
+.sticky-note input,
+.sticky-note textarea,
+.sticky-note select,
+.workbook-paper input,
+.workbook-paper textarea,
+.workbook-line input,
+.workbook-line textarea,
+.workbook-pill input,
+.workbook-pill textarea {
+  color: var(--ui-text-primary) !important;
+}
+
+.journey-bg input::placeholder,
+.journey-bg textarea::placeholder,
+.sticky-note input::placeholder,
+.sticky-note textarea::placeholder,
+.workbook-paper input::placeholder,
+.workbook-paper textarea::placeholder,
+.workbook-line input::placeholder,
+.workbook-line textarea::placeholder,
+.workbook-pill input::placeholder,
+.workbook-pill textarea::placeholder {
+  color: var(--ui-text-secondary) !important;
+  opacity: 1;
+}
+
+/* ---------------------------------------------------------------------
+   DARK BUTTONS / CONTROLS / SHAPES
+   Purple and other dark surfaces always use white text.
+   --------------------------------------------------------------------- */
+:is(button, a, [role="button"], input, textarea, select).bg-primary,
+:is(button, a, [role="button"], input, textarea, select)[class*="bg-primary"],
+:is(button, a, [role="button"], input, textarea, select)[class*="bg-[color:var(--purple)]"],
+:is(button, a, [role="button"], input, textarea, select)[class*="bg-[color:var(--purple-dark)]"],
+:is(button, a, [role="button"], input, textarea, select)[class*="bg-[#7755c9]"],
+:is(button, a, [role="button"], input, textarea, select)[class*="bg-[#7654ad]"],
+:is(button, a, [role="button"], input, textarea, select)[class*="bg-[#6d28d9]"],
+:is(button, a, [role="button"], input, textarea, select)[class*="bg-[#7c3aed]"],
+:is(button, a, [role="button"], input, textarea, select)[class*="bg-purple-"],
+:is(button, a, [role="button"], input, textarea, select)[class*="bg-violet-"],
+:is(button, a, [role="button"], input, textarea, select)[class*="bg-indigo-"],
+:is(button, a, [role="button"], input, textarea, select)[class*="bg-black"],
+:is(button, a, [role="button"], input, textarea, select)[class*="bg-slate-7"],
+:is(button, a, [role="button"], input, textarea, select)[class*="bg-slate-8"],
+:is(button, a, [role="button"], input, textarea, select)[class*="bg-slate-9"],
+:is(button, a, [role="button"], input, textarea, select)[class*="bg-gray-7"],
+:is(button, a, [role="button"], input, textarea, select)[class*="bg-gray-8"],
+:is(button, a, [role="button"], input, textarea, select)[class*="bg-gray-9"],
+:is(button, a, [role="button"], input, textarea, select)[class*="bg-red-6"],
+:is(button, a, [role="button"], input, textarea, select)[class*="bg-red-7"],
+:is(button, a, [role="button"], input, textarea, select)[class*="bg-red-8"],
+:is(button, a, [role="button"], input, textarea, select)[class*="bg-red-9"] {
+  color: var(--ui-text-on-dark) !important;
+  --foreground: var(--ui-text-on-dark);
+}
+
+/* Custom buttons often put their label/icon in a nested span. Override any
+   legacy text-black/text-foreground class inside a dark action. */
+:is(
+  button.bg-primary,
+  a.bg-primary,
+  [role="button"].bg-primary,
+  button[class*="bg-primary"],
+  a[class*="bg-primary"],
+  [role="button"][class*="bg-primary"],
+  button[class*="bg-[color:var(--purple)]"],
+  a[class*="bg-[color:var(--purple)]"],
+  [role="button"][class*="bg-[color:var(--purple)]"],
+  button[class*="bg-[color:var(--purple-dark)]"],
+  a[class*="bg-[color:var(--purple-dark)]"],
+  [role="button"][class*="bg-[color:var(--purple-dark)]"],
+  button[class*="bg-[#7755c9]"],
+  a[class*="bg-[#7755c9]"],
+  button[class*="bg-[#7654ad]"],
+  a[class*="bg-[#7654ad]"],
+  button[class*="bg-[#6d28d9]"],
+  a[class*="bg-[#6d28d9]"],
+  button[class*="bg-[#7c3aed]"],
+  a[class*="bg-[#7c3aed]"],
+  button[class*="bg-purple-"],
+  a[class*="bg-purple-"],
+  button[class*="bg-violet-"],
+  a[class*="bg-violet-"],
+  button[class*="bg-indigo-"],
+  a[class*="bg-indigo-"],
+  button[class*="bg-black"],
+  a[class*="bg-black"]
+) * {
+  color: var(--ui-text-on-dark) !important;
+}
+
+/* Dark non-button badges/shapes use white direct text while nested light
+   inputs/cards can still define their own foreground. */
+:is(
+  [class*="bg-[color:var(--purple)]"],
+  [class*="bg-[color:var(--purple-dark)]"],
+  [class*="bg-[#7755c9]"],
+  [class*="bg-[#7654ad]"],
+  [class*="bg-[#6d28d9]"],
+  [class*="bg-[#7c3aed]"],
+  [class*="bg-purple-"],
+  [class*="bg-violet-"],
+  [class*="bg-indigo-"],
+  [class*="bg-black"]
+) {
+  color: var(--ui-text-on-dark);
+}
+
+:is(
+  [class*="bg-[color:var(--purple)]"],
+  [class*="bg-[color:var(--purple-dark)]"],
+  [class*="bg-[#7755c9]"],
+  [class*="bg-[#7654ad]"],
+  [class*="bg-[#6d28d9]"],
+  [class*="bg-[#7c3aed]"],
+  [class*="bg-purple-"],
+  [class*="bg-violet-"],
+  [class*="bg-indigo-"],
+  [class*="bg-black"]
+) > :is(span, p, label, strong, em, h1, h2, h3, h4, h5, h6, svg) {
+  color: var(--ui-text-on-dark) !important;
+}
+
+/* Semantic text tokens on light application surfaces. */
+body > [class*="bg-background"] .text-foreground,
+.journey-bg .text-foreground,
+.sticky-note .text-foreground,
+.workbook-paper .text-foreground {
+  color: var(--ui-text-primary) !important;
+}
+
+body > [class*="bg-background"] .text-muted-foreground,
+.journey-bg .text-muted-foreground,
+.sticky-note .text-muted-foreground,
+.workbook-paper .text-muted-foreground {
+  color: var(--ui-text-secondary) !important;
+}

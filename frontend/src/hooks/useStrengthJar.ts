@@ -1,17 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { KARKKIKAUPPA_KEY, strengthIdsFromResponses } from "@/lib/strength-jar-data";
+import { getSuperAdminPreview } from "@/lib/superadmin-preview";
+import { getDemoStudentJar, onDemoStateChange } from "@/lib/demo-store";
 
 const SCREEN6_CHOSEN_STRENGTHS_KEY = "screen_6_known_strengths";
 
 /**
  * Reads the student's current strength collection from autosaved responses.
- *
- * selected  = strengths explicitly chosen by the student on Screen 6 and in the final candy shop
- * collected = current strength selections from all other supported selectors
- *
- * Repeated strengths are intentionally preserved so the collection can show
- * occurrence counts such as Courage ×3 across three different activities.
+ * Demo mode uses the fictional student's session-only jar.
  */
 export function useStrengthJar() {
   const [selected, setSelected] = useState<number[]>([]);
@@ -20,6 +17,14 @@ export function useStrengthJar() {
 
   const refresh = useCallback(async () => {
     try {
+      if (getSuperAdminPreview().mode === "student") {
+        const demo = getDemoStudentJar();
+        setSelected(demo.selected);
+        setCollected(demo.collected);
+        setLoading(false);
+        return;
+      }
+
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) {
         setSelected([]);
@@ -63,6 +68,8 @@ export function useStrengthJar() {
       await refresh();
       if (cancelled) return;
 
+      if (getSuperAdminPreview().mode === "student") return;
+
       const { data: u } = await supabase.auth.getUser();
       const uid = u.user?.id;
       if (!uid || cancelled) return;
@@ -98,11 +105,13 @@ export function useStrengthJar() {
 
     const onFocus = () => void refresh();
     const onManualRefresh = () => void refresh();
+    const offDemo = onDemoStateChange(() => void refresh());
     window.addEventListener("focus", onFocus);
     window.addEventListener("strength-jar:refresh", onManualRefresh);
 
     return () => {
       cancelled = true;
+      offDemo();
       window.removeEventListener("focus", onFocus);
       window.removeEventListener("strength-jar:refresh", onManualRefresh);
       if (channel) void supabase.removeChannel(channel);

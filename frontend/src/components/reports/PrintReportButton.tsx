@@ -13,7 +13,7 @@ export function PrintReportButton({ className }: { className?: string }) {
       type="button"
       onClick={() => window.print()}
       className={cn(
-        "no-print rounded-full bg-[color:var(--purple)] px-4 py-1.5 text-xs font-bold text-white shadow hover:brightness-110",
+        "no-print rounded-full bg-[color:var(--yellow)] px-4 py-1.5 text-xs font-bold text-[color:var(--ink)] shadow hover:brightness-95",
         className,
       )}
     >

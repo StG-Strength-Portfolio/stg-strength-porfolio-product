@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import "@/styles/superadmin.css";
 
 /** Client-side gate: only users with the `super_admin` role may stay. */
 export function useSuperAdminGuard() {
@@ -9,6 +10,8 @@ export function useSuperAdminGuard() {
 
   useEffect(() => {
     let cancelled = false;
+    document.body.classList.add("superadmin-ui");
+
     (async () => {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) {
@@ -27,8 +30,10 @@ export function useSuperAdminGuard() {
       }
       if (!cancelled) setReady(true);
     })();
+
     return () => {
       cancelled = true;
+      document.body.classList.remove("superadmin-ui");
     };
   }, [navigate]);
 
