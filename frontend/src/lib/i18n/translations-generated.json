@@ -2315,6 +2315,10 @@
     "en": "Sisu",
     "sv": "Sisu (ihärdighet och inre styrka)"
   },
+  "Sisu tarkoittaa sinnikkyyttä, sisäistä voimaa ja kykyä jatkaa vaikeuksista huolimatta.": {
+    "en": "Sisu means perseverance, inner strength, and the ability to keep going despite difficulties.",
+    "sv": "Sisu betyder ihärdighet, inre styrka och förmågan att fortsätta trots svårigheter."
+  },
   "Sivut, joilla on täytettäviä elementtejä tunnistat tästä kynäsymbolista.": {
     "en": "Pages with fillable fields are marked with a pencil icon.",
     "sv": "Sidor med ifyllnadsbara fält känner du igen på pennikonen."
@@ -3452,11 +3456,11 @@
   },
   "Valitse vahvuus": {
     "en": "Choose a strength",
-    "sv": "Välj en styrka"
+    "sv": "Choose a strength"
   },
   "Valitse ne vahvuudet, jotka tunnistat itsessäsi tai läheisissäsi. Voit palata muokkaamaan valintaasi myöhemmin.": {
     "en": "Select the strengths you recognize in yourself or people close to you. You can come back and edit your choices later.",
-    "sv": "Select the strengths you recognize in yourself or people close to you. You can come back and edit your choices later."
+    "sv": "Välj de styrkor som du känner igen hos dig själv eller personer som står dig nära. Du kan gå tillbaka och ändra dina val senare."
   },
   "Luonteenvahvuudet, joita voit tunnistaa itsessäsi ja toisissa": {
     "en": "Character strengths you can recognize in yourself and others",
@@ -3520,19 +3524,19 @@
   },
   "Ajattele itseäsi tekemässä tavanomaisia ja arkisia asioita tai tehtäviä. Miten olet näissä tekemisissä käyttänyt ydinvahvuuksiasi? Kirjoita muutama esimerkki tilanteista.": {
     "en": "Think of yourself doing ordinary everyday things or tasks. How have you used your core strengths in these situations? Write a few examples.",
-    "sv": "Tänk på dig själv när du gör vanliga vardagliga saker eller uppgifter. Hur har du använt dina kärnstyrkor i de här situationerna? Skriv några exempel."
+    "sv": "Think of yourself doing ordinary everyday things or tasks. How have you used your core strengths in these situations? Write a few examples."
   },
   "Missä onnistuit omia vahvuuksia hyödyntämällä?": {
     "en": "Where did you succeed by using your own strengths?",
-    "sv": "Var lyckades du genom att använda dina egna styrkor?"
+    "sv": "Where did you succeed by using your own strengths?"
   },
   "Miten omien ydinvahvuuksien hyödyntäminen vaikutti itseesi tai toisiin?": {
     "en": "How did using your core strengths affect you or others?",
-    "sv": "Hur påverkade användningen av dina kärnstyrkor dig själv eller andra?"
+    "sv": "How did using your core strengths affect you or others?"
   },
   "Merkkaa tähän 5 vahvuuskarkkiasi!": {
     "en": "Mark your 5 strength candies here!",
-    "sv": "Markera dina 5 styrkegodisar här!"
+    "sv": "Mark your 5 strength candies here!"
   },
   "Pohdi ja täydennä omien voimavarojesi sydämet": {
     "en": "Reflect and complete the hearts for your own resources",
@@ -3540,11 +3544,11 @@
   },
   "Vahvuuksien käyttökielto": {
     "en": "A ban on using strengths",
-    "sv": "Förbud mot att använda styrkor"
+    "sv": "A ban on using strengths"
   },
   "Jokainen opiskelija tekee itsestään ja ydinvahvuuksistaan julisteen, jossa on oma kuva ja viisi ydinvahvuutta.": {
     "en": "Each student creates a poster about themselves and their core strengths, including a photo and five core strengths.",
-    "sv": "Varje studerande gör en affisch om sig själv och sina kärnstyrkor, med ett eget foto och fem kärnstyrkor."
+    "sv": "Each student creates a poster about themselves and their core strengths, including a photo and five core strengths."
   },
   "Millä tavoin voisit tehdä ydinvahvuutesi näkyväksi muille hauskalla ja luovalla tavalla?": {
     "en": "How could you make your core strengths visible to others in a fun and creative way?",
@@ -3556,7 +3560,7 @@
   },
   "Mieti onnistumista, jossa pystyit tukemaan ja auttamaan toisia omia vahvuuksiasi hyödyntämällä? Mitä teit ja kenen kanssa olit? Kerro esimerkki.": {
     "en": "Think of a success where you were able to support and help others by using your strengths. What did you do and who were you with? Give an example.",
-    "sv": "Tänk på en framgång där du kunde stödja och hjälpa andra genom att använda dina styrkor. Vad gjorde du och vem var du med? Ge ett exempel."
+    "sv": "Think of a success where you were able to support and help others by using your strengths. What did you do and who were you with? Give an example."
   },
   "Mitä yhteistä hyvää vahvuutesi edistivät, miten?": {
     "en": "What common good did your strengths promote, and how?",
@@ -3568,7 +3572,7 @@
   },
   "Asteikolla 1 täysin eri mieltä, 2.. 3.. 4.. ja 5 täysin samaa mieltä, vastaa seuraavaan mittariin vahvuuksien käytöstä.": {
     "en": "On a scale from 1 strongly disagree to 5 strongly agree, answer the following meter about using strengths.",
-    "sv": "På en skala från 1 (instämmer inte alls) till 5 (instämmer helt), svara på följande frågor om hur du använder dina styrkor."
+    "sv": "On a scale from 1 strongly disagree to 5 strongly agree, answer the following meter about using strengths."
   },
   "Tässä kokonaisuudessa pääset tutustumaan ja työstämään omia vahvuuksiasi lukiolaisena.": {
     "en": "In this section, you will explore and work with your own strengths as a high school student.",
@@ -3612,7 +3616,7 @@
   },
   "käytöstä.": {
     "en": "use.",
-    "sv": "genom ditt sätt att vara."
+    "sv": "use."
   },
   "Kun käytät vahvuuksiasi, näen sinut tulevaisuudessa": {
     "en": "When you use your strengths, I see you in the future",
@@ -3728,7 +3732,7 @@
   },
   "5 vinkkiä sinulle": {
     "en": "5 tips for you",
-    "sv": "5 tips till dig"
+    "sv": "5 tips for you"
   },
   "Minkä vahvuuksien kehittämisestä olisi sinulle eniten iloa?": {
     "en": "Which strengths would bring you the most joy to develop?",
@@ -4080,31 +4084,31 @@
   },
   "Mistä innostut?": {
     "en": "What excites you?",
-    "sv": "Vad engagerar dig?"
+    "sv": "What excites you?"
   },
   "Minkä tekeminen tuntuu kevyeltä?": {
     "en": "What feels easy or light to do?",
-    "sv": "Vad känns lätt och naturligt för dig att göra?"
+    "sv": "What feels easy or light to do?"
   },
   "Mistä luonteenvahvuuksista saat kiitosta ja palautetta toisilta?": {
     "en": "Which character strengths do others thank you for or give you feedback on?",
-    "sv": "Vilka karaktärsstyrkor får du tack och feedback för av andra?"
+    "sv": "Which character strengths do others thank you for or give you feedback on?"
   },
   "Mitä rakastat tehdä vapaa-ajalla?": {
     "en": "What do you love doing in your free time?",
-    "sv": "Vad älskar du att göra på fritiden?"
+    "sv": "What do you love doing in your free time?"
   },
   "Minkä alkamista odotat eniten päivässäsi?": {
     "en": "What do you look forward to most in your day?",
-    "sv": "Vad ser du mest fram emot under dagen?"
+    "sv": "What do you look forward to most in your day?"
   },
   "Mitä tehdessä aika ja paikka unohtuvat ja pääset flow-tilaan?": {
     "en": "When do you lose track of time and place and get into a flow state?",
-    "sv": "När glömmer du tid och rum och kommer in i ett flow?"
+    "sv": "When do you lose track of time and place and get into a flow state?"
   },
   "Mitkä vahvuudet vahvistavat sinua vapaa-ajalla?": {
     "en": "Which strengths support you in your free time?",
-    "sv": "Vilka styrkor stödjer dig på fritiden?"
+    "sv": "Which strengths support you in your free time?"
   },
   "Mitkä vahvuudet tulevat lukioon, kun sinä tulet paikalle?": {
     "en": "Which strengths come to school when you arrive?",
@@ -4112,19 +4116,19 @@
   },
   "Mitä vahvuuksia arvostat eniten itsessäsi?": {
     "en": "Which strengths do you value most in yourself?",
-    "sv": "Vilka styrkor uppskattar du mest hos dig själv?"
+    "sv": "Which strengths do you value most in yourself?"
   },
   "Minusta tuntuu tällä hetkellä tältä, kun muistelen kokemaani": {
     "en": "This is how I feel right now when I remember what I experienced",
-    "sv": "Så här känner jag mig just nu när jag tänker tillbaka på det jag upplevde"
+    "sv": "This is how I feel right now when I remember what I experienced"
   },
   "Löysin itsestäni tilanteessa uusia tai yllättäviä puolia": {
     "en": "In the situation, I discovered new or surprising sides of myself",
-    "sv": "I situationen upptäckte jag nya eller överraskande sidor hos mig själv"
+    "sv": "In the situation, I discovered new or surprising sides of myself"
   },
   "Mikä on parasta opinnoissa?": {
     "en": "What is the best thing about studying?",
-    "sv": "Vad är det bästa med studierna?"
+    "sv": "What is the best thing about studying?"
   },
   "Mitkä asiat päätyvät love-to-do -listalle?": {
     "en": "What things end up on your love-to-do list?",
@@ -4132,11 +4136,11 @@
   },
   "Mitä samoja vahvuuksia sinussa oli jo lapsena?": {
     "en": "Which of the same strengths did you already have as a child?",
-    "sv": "Vilka av dina styrkor hade du redan som barn?"
+    "sv": "Which of the same strengths did you already have as a child?"
   },
   "Mitä luonteenvahvuuksia hyödynnät eniten vapaalla?": {
     "en": "Which character strengths do you use most in your free time?",
-    "sv": "Vilka karaktärsstyrkor använder du mest på fritiden?"
+    "sv": "Which character strengths do you use most in your free time?"
   },
   "Läheisissäni parasta on": {
     "en": "The best thing about the people close to me is",
@@ -4152,19 +4156,19 @@
   },
   "Minkälaisia asioita opit nopeasti ja helposti?": {
     "en": "What kinds of things do you learn quickly and easily?",
-    "sv": "Vilka slags saker lär du dig snabbt och lätt?"
+    "sv": "What kinds of things do you learn quickly and easily?"
   },
   "Mistä sait rohkaisevaa palautetta peruskoulussa opettajilta entä luokkakavereilta?": {
     "en": "What encouraging feedback did you receive in comprehensive school from teachers and classmates?",
-    "sv": "Vilken uppmuntrande feedback fick du i grundskolan av lärare och klasskamrater?"
+    "sv": "What encouraging feedback did you receive in comprehensive school from teachers and classmates?"
   },
   "Mistä tykkäsit koulussa ala-asteella, entä yläasteella?": {
     "en": "What did you enjoy at school in primary grades and lower secondary school?",
-    "sv": "Vad tyckte du om i skolan på lågstadiet, mellanstadiet och högstadiet?"
+    "sv": "What did you enjoy at school in primary grades and lower secondary school?"
   },
   "Mikä onnistuminen sinulle on jäänyt mieleen peruskoulusta?": {
     "en": "What success from comprehensive school has stayed in your mind?",
-    "sv": "Vilken framgång från grundskolan minns du särskilt väl?"
+    "sv": "What success from comprehensive school has stayed in your mind?"
   },
   "1. Tavoitteeni ja miksi se on minulle tärkeä": {
     "en": "1. My goal and why it matters to me",
@@ -4321,17 +4325,5 @@
   },
   "\"En juurikaan koe kiitollisuutta elämän pienistä asioista.\"": {
     "sv": "\"Jag känner tacksamhet för livets små saker.\""
-  },
-  "Luonteenvahvuudet, joita voit tunnistaa itsessäsi": {
-    "sv": "Karaktärsstyrkor du kan känna igen hos dig själv"
-  },
-  "Valitse ne vahvuudet, jotka tunnistat itsessäsi. Voit palata muokkaamaan valintaasi myöhemmin.": {
-    "sv": "Välj de styrkor som du känner igen hos dig själv. Du kan gå tillbaka och ändra dina val senare."
-  },
-  "Sain kehuja ja kannustusta seuraavista asioista": {
-    "sv": "Jag fick beröm och uppmuntran för följande saker"
-  },
-  "Vahvuuksien käyttäminen on minulle tuttua": {
-    "sv": "Jag är van vid att använda mina styrkor."
   }
 }
